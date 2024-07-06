@@ -11,9 +11,35 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: houzez
 Template: houzez
 */
-
-
-@import url("../houzez/style.css");
-
+/*@import url("../houzez/style.css");*/
 /* Your CSS code goes here
 -------------------------------------- */
+
+
+
+/*-----------------------------------Header Search-------------------------------*/
+.advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
+    background-color: #2c356d;
+}
+
+
+
+
+/*Admin Area*/
+a[href="https://imoveisunai.com.br/favorite-properties/"],
+a[href="https://imoveisunai.com.br/invoices/"],
+a[href="https://imoveisunai.com.br/insights/"],
+a[href="https://imoveisunai.com.br/saved-search/"],
+a[href="https://imoveisunai.com.br/my-properties/?prop_status=disapproved"],
+a[href="https://imoveisunai.com.br/my-properties/?prop_status=on_hold"],
+a[href="https://imoveisunai.com.br/my-properties/?prop_status=approved#"],
+a[href="https://imoveisunai.com.br/board/"],
+.put-on-hold
+{
+  display:none !important;
+}
+
+/*Add Featured*/
+.page-id-16053 #settings{
+	display:none;
+}
