@@ -1,0 +1,13 @@
+_create/
+wp-content/updraft/
+wp-content/uploads/wp-import-export-lite/
+wp-content/uploads/elementor/
+wp-config.php
+.htaccess
+wp-content/uploads
+wp-content/ewww/
+wp-config.php
+wp-content/cache
+wp-content/wflogs
+wp-content/wflogs/config-livewaf.php
+wp-content/wflogs/config-livewaf.php

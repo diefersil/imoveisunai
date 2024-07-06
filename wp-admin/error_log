@@ -1,0 +1,2 @@
+[29-Nov-2023 03:00:47 UTC] [Loco.warning] "Falling back to source extraction because houzez-login-register.pot is missing" in src/ajax/SyncController.php:55
+[29-Nov-2023 03:00:47 UTC] [Loco.warning] "1 file has been skipped because it's 102.2 KB. (Max is 100 KB). Check all strings are present before saving." in src/ajax/SyncController.php:101
