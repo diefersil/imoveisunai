@@ -1,5 +1,5 @@
 _create/
-.github/
+#.github/
 wp-content/updraft/
 wp-content/uploads/wp-import-export-lite/
 wp-content/uploads/elementor/
