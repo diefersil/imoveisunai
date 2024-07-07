@@ -9,8 +9,9 @@
 	<thead>
 		<tr>
 			<th scope="col" class="manage-column column-title column-primary desc field-column-1"><span><?php esc_html_e('Field Name', 'houzez-theme-functionality');?></span></span></a></th>
-			<th scope="col" class="manage-column column-title column-primary desc field-column-2"><span><?php esc_html_e('Edit', 'houzez-theme-functionality');?></span></span></a></th>
-			<th scope="col" class="manage-column column-title column-primary desc field-column-3"><span><?php esc_html_e('Delete', 'houzez-theme-functionality');?></span></span></a></th>
+			<th scope="col" class="manage-column column-title column-primary desc field-column-2"><span><?php esc_html_e('Field ID', 'houzez-theme-functionality');?></span></span></a></th>
+			<th scope="col" class="manage-column column-title column-primary desc field-column-3"><span><?php esc_html_e('Edit', 'houzez-theme-functionality');?></span></span></a></th>
+			<th scope="col" class="manage-column column-title column-primary desc field-column-4"><span><?php esc_html_e('Delete', 'houzez-theme-functionality');?></span></span></a></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -29,6 +30,9 @@
 				<tr>
 					<td>
 						<?php echo esc_attr($field_title); ?>
+					</td>
+					<td>
+						<input type="text" onfocus="this.select();" readonly="readonly" value="<?php echo 'fave_'.esc_attr($data->field_id); ?>" class="code">
 					</td>
 					<td>
 						<a href="<?php echo esc_url($edit_link); ?>" class=""

@@ -16,7 +16,7 @@ if ( ! class_exists( 'Houzez_CRM_Notes' ) ) {
 			$note_type = sanitize_text_field( $_POST['note_type'] );
 			$belong_to = sanitize_text_field( $_POST['belong_to'] );
 			
-			$nonce = $_REQUEST['security'];
+			$nonce = $_POST['security'];
 	        if ( ! wp_verify_nonce( $nonce, 'note_add_nonce' ) ) {
 	            $ajax_response = array( 'success' => false , 'msg' => esc_html__( 'Security check failed!', 'houzez-crm' ) );
 	            echo json_encode( $ajax_response );
@@ -67,11 +67,8 @@ if ( ! class_exists( 'Houzez_CRM_Notes' ) ) {
 			global $wpdb;
             $table_name = $wpdb->prefix . 'houzez_crm_notes';
 
-            $sql = "SELECT * FROM $table_name WHERE note_id = {$note_id}";
-
-			$result = $wpdb->get_row( $sql, OBJECT );
-
-			
+			$sql = $wpdb->prepare("SELECT * FROM $table_name WHERE note_id = %d", $note_id);
+			$result = $wpdb->get_row($sql, OBJECT);
 
             if( is_object( $result ) && ! empty( $result ) ) {
 
@@ -101,37 +98,52 @@ if ( ! class_exists( 'Houzez_CRM_Notes' ) ) {
 		}
 
 		public static function get_notes($belong_to, $type) {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_notes';
-            $user_id = get_current_user_id();
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_notes';
+		    $user_id = get_current_user_id();
 
-            $sql = "SELECT * FROM $table_name WHERE type = '{$type}' AND belong_to = {$belong_to} AND user_id = {$user_id} ORDER BY note_id DESC";
+		    // Use prepare() to secure the SQL query
+		    $sql = $wpdb->prepare(
+		        "SELECT * FROM $table_name WHERE type = %s AND belong_to = %d AND user_id = %d ORDER BY note_id DESC",
+		        $type,
+		        $belong_to,
+		        $user_id
+		    );
 
-			$results = $wpdb->get_results( $sql , OBJECT );
+		    $results = $wpdb->get_results($sql, OBJECT);
 
-			return $results;
+		    return $results;
 		}
+
 
 		public function delete_note() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_notes';
-			
-	        $note_id = $_REQUEST['note_id'];
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_notes';
 
-	        $where = array(
-            	'note_id' => $note_id
-            );
+		    $user_id = get_current_user_id();
 
-            $where_format = array(
-            	'%d'
-            );
+		    // Check if 'note_id' is set and is a number
+		    if (!isset($_POST['note_id']) || !is_numeric($_POST['note_id'])) {
+		        // Return an error response if 'note_id' is not valid
+		        echo json_encode(array(
+		            'success' => false,
+		            'reason' => esc_html__("Invalid note_id provided", 'houzez-crm')
+		        ));
+		        die;
+		    }
+		    $note_id = intval($_POST['note_id']); // Convert to integer for extra safety
 
-	        $wpdb->query( $wpdb->prepare( "DELETE FROM {$table_name} WHERE note_id = %d", $note_id ));
-	        
-	        $ajax_response = array( 'success' => true , 'reason' => '' );
-            echo json_encode( $ajax_response );
-            die;
+		    $deleted = $wpdb->query($wpdb->prepare("DELETE FROM {$table_name} WHERE note_id = %d AND user_id = %d", $note_id, $user_id));
+
+		    if($deleted) {
+		        $ajax_response = array('success' => true, 'reason' => '');
+		    } else {
+		        $ajax_response = array('success' => false, 'reason' => esc_html__("You don't have rights to perform this action", 'houzez-crm'));
+		    }
+		    echo json_encode($ajax_response);
+		    die;
 		}
+
 
 
 	} // end Houzez_CRM_Notes

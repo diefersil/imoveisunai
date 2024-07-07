@@ -186,15 +186,6 @@ if( !function_exists('houzez_agency_rest_api_field')) {
     }
 }
 
-
-if( !function_exists('houzez_wpml_translate_single_string') ) {
-    function houzez_wpml_translate_single_string($string_name) {
-        $translated_string = apply_filters('wpml_translate_single_string', $string_name, 'houzez_cfield', $string_name );
-
-        return $translated_string;
-    }
-}
-
 /*-----------------------------------------------------------------------------------*/
 // Get terms array
 /*-----------------------------------------------------------------------------------*/
@@ -233,15 +224,30 @@ if ( ! function_exists( 'houzez_pagination_type' ) ) :
     }
 endif;
 
+if ( ! function_exists( 'houzez_ele_property_status' ) ) :
+    function houzez_ele_property_status() {
+        $pagi = array(
+            'all' => esc_html__('Active & Sold', 'houzez-theme-functionality'),
+            'publish' => esc_html__('Active', 'houzez-theme-functionality'), 
+            'houzez_sold' => esc_html__('Sold', 'houzez-theme-functionality')
+        );  
+
+        return $pagi; 
+    }
+endif;
+
 if ( ! function_exists( 'houzez_sorting_array' ) ) :
     function houzez_sorting_array() {
         $sorting = array(
             '' => esc_html__('Default', 'houzez-theme-functionality'), 
+            'a_title' => esc_html__('Title - ASC', 'houzez-theme-functionality'), 
+            'd_title' => esc_html__('Title - DESC', 'houzez-theme-functionality'), 
             'a_price' => esc_html__('Price (Low to High)', 'houzez-theme-functionality'), 
             'd_price' => esc_html__('Price (High to Low)', 'houzez-theme-functionality'),
             'a_date' => esc_html__('Date Old to New', 'houzez-theme-functionality'),
             'd_date' => esc_html__('Date New to Old', 'houzez-theme-functionality'),
             'featured_top' => esc_html__('Featured on Top', 'houzez-theme-functionality'),
+            'featured_first_random' => esc_html__('Featured on Top - Randomly', 'houzez-theme-functionality'),
             'random' => esc_html__('Random', 'houzez-theme-functionality')
         );  
 
@@ -675,3 +681,354 @@ if ( !function_exists( 'houzez_update_property_label_colors20' ) ):
 
     }
 endif;
+
+if( ! function_exists( 'houzez_listing_statuses' ) ) {
+    function houzez_listing_statuses() {
+
+        $statuses = array(
+
+            'draft' => array(
+                'name'  => _x( 'Draft', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Draft', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'publish' => array(
+                'name'  => _x( 'Active', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Active', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'pending' => array(
+                'name'  => _x( 'Pending', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Pending approval', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'expired' => array(
+                'name'  => _x( 'Expired', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Expired', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'disapproved' => array(
+                'name'  => _x( 'Disapproved', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Disapproved', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'on_hold' => array(
+                'name'  => _x( 'On Hold', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'On Hold', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'houzez_sold' => array(
+                'name'  => _x( 'Sold', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Sold', 'listing post status', 'houzez-theme-functionality' )
+            ),
+            'preview' => array(
+                'name'                      => _x( 'Preview', 'listing post status', 'houzez-theme-functionality' ),
+                'label'                     => _x( 'Preview', 'listing post status', 'houzez-theme-functionality' ),
+                'public'                    => false,
+                'exclude_from_search'       => true,
+                'show_in_admin_all_list'    => false,
+                'show_in_admin_status_list' => false,
+                'label_count'               => _n_noop( 'Preview <span class="count">(%s)</span>', 'Preview <span class="count">(%s)</span>', 'houzez-theme-functionality' )
+            ),
+            'pending_payment' => array(
+                'name'                      => _x( 'Pending', 'listing post status', 'houzez-theme-functionality' ),
+                'label'                     => _x( 'Pending payment', 'listing post status', 'houzez-theme-functionality' ),
+                'public'                    => true,
+                'exclude_from_search'       => true,
+                'show_in_admin_all_list'    => true,
+                'show_in_admin_status_list' => true,
+                'label_count'               => _n_noop( 'Pending Payment <span class="count">(%s)</span>', 'Pending Payment <span class="count">(%s)</span>', 'houzez-theme-functionality' )
+            ),
+            'trash' => array(
+                'name'  => _x( 'Trash', 'listing post status', 'houzez-theme-functionality' ),
+                'label' => _x( 'Trash', 'listing post status', 'houzez-theme-functionality' )
+            )
+
+        );
+        return apply_filters( 'houzez_listing_statuses', $statuses );
+    }
+}
+
+if( ! function_exists('houzez_get_listing_status') ) {
+    /**
+     * houzez_get_listing_status()
+     *
+     * Get specific listing status
+     *
+     * @param string  $status Key of the corresponding status
+     * @param string  $field  Field of the status (default: label)
+     * @uses self::statuses()
+     * @return array
+     *
+     * @since 1.0.0
+     */
+    function houzez_get_listing_status( $status, $field = 'label' ) {
+
+        // Get all available statuses
+        $statuses = houzez_listing_statuses();
+
+        if ( isset( $statuses[ $status ][ $field ] ) )
+            return $statuses[ $status ][ $field ];
+
+        return false;
+
+    }
+}
+
+if(!function_exists('htf_traverse_comma_string')) {
+    function htf_traverse_comma_string($string) {
+        if(!empty($string)) {
+            $string_array = explode(',', $string);
+            
+            if(!empty($string_array[0])) {
+                return $string_array;
+            }
+        }
+        return '';
+    }
+}
+
+if( !function_exists('houzez_plugin_20')) {
+    function houzez_plugin_20($string) {
+       $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+
+       return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    }
+}
+
+if( !function_exists('houzez_tfp_get_image_placeholder')){
+    function houzez_tfp_get_image_placeholder( $featured_image_size ){
+
+        $placeholder_url = houzez_option( 'houzez_placeholder', false, 'url' );
+
+        if ( ! empty( $placeholder_url ) ) {
+            $placeholder_image_id = attachment_url_to_postid( $placeholder_url );
+            if ( ! empty( $placeholder_image_id ) ) {
+                return wp_get_attachment_image( $placeholder_image_id, $featured_image_size, false, array( "class" => "img-fluid" ) );
+            }
+
+        } else {
+            $dummy_image_url = houzez_tfp_get_dummy_placeholder_link( $featured_image_size );
+            if ( ! empty( $dummy_image_url ) ) {
+                return sprintf( '<img class="img-fluid" src="%s" alt="%s">', esc_url( $dummy_image_url ), the_title_attribute( 'echo=0' ) );
+            }
+        }
+
+        return '';
+    }
+}
+
+if( !function_exists('houzez_tfp_get_image_placeholder_url')){
+    function houzez_tfp_get_image_placeholder_url( $image_size ){
+
+        $placeholder_url = houzez_option( 'houzez_placeholder', false, 'url' );
+        if ( ! empty( $placeholder_url ) ) {
+            $placeholder_image_id = attachment_url_to_postid( $placeholder_url );
+            if ( ! empty( $placeholder_image_id ) ) {
+                return wp_get_attachment_image_url( $placeholder_image_id, $image_size, false );
+            }
+        }
+
+        return houzez_tfp_get_dummy_placeholder_link( $image_size );
+    }
+}
+
+if( !function_exists('houzez_tfp_get_dummy_placeholder_link')){
+    function houzez_tfp_get_dummy_placeholder_link( $image_size ){
+
+        global $_wp_additional_image_sizes;
+        $img_width = 0;
+        $img_height = 0;
+        $img_text = get_bloginfo('name');
+
+        $protocol = 'http';
+        $protocol = ( is_ssl() ) ? 'https' : $protocol;
+
+        if ( in_array( $image_size , array( 'thumbnail', 'medium', 'large' ) ) ) {
+
+            $img_width = get_option( $image_size . '_size_w' );
+            $img_height = get_option( $image_size . '_size_h' );
+
+        } elseif ( isset( $_wp_additional_image_sizes[ $image_size ] ) ) {
+
+            $img_width = $_wp_additional_image_sizes[ $image_size ]['width'];
+            $img_height = $_wp_additional_image_sizes[ $image_size ]['height'];
+
+        }
+
+        if( intval( $img_width ) > 0 && intval( $img_height ) > 0 ) {
+            return $protocol.'://placehold.it/' . $img_width . 'x' . $img_height . '&text=' . urlencode( $img_text ) . '';
+        }
+
+        return '';
+    }
+}
+
+if( !function_exists( 'houzez_tfp_image_placeholder' ) ) {
+    function houzez_tfp_image_placeholder( $image_size ) {
+        echo houzez_tfp_get_image_placeholder( $image_size );
+    }
+}
+
+if (!function_exists('houzez_tfp_user_role_by_post_id')) {
+    /**
+     * Get the user role associated with a given post ID.
+     *
+     * @param int $post_id The post ID.
+     * @return string The user role.
+     */
+    function houzez_tfp_user_role_by_post_id($post_id) {
+        if (!is_int($post_id) || $post_id <= 0) {
+            return 'houzez_guest';
+        }
+
+        $user_id = get_post_field('post_author', $post_id);
+        $user_id = intval($user_id);
+        return houzez_tfp_user_role_by_user_id($user_id);
+    }
+}
+
+if (!function_exists('houzez_tfp_user_role_by_user_id')) {
+    /**
+     * Get the user role associated with a given user ID.
+     *
+     * @param int $user_id The user ID.
+     * @return string The user role.
+     */
+    function houzez_tfp_user_role_by_user_id($user_id) {
+        if (!is_int($user_id) || $user_id <= 0) {
+            return 'houzez_guest';
+        }
+
+        $user = new WP_User($user_id);
+        return $user->roles ? $user->roles[0] : 'houzez_guest';
+    }
+}
+
+if ( ! function_exists( 'houzez_get_posts' ) ) {
+    
+    function houzez_get_posts() {
+        $keyword   = isset( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : ''; // phpcs:ignore
+        $post_type  = isset( $_POST['post_type'] ) ? $_POST['post_type'] : 'post'; // phpcs:ignore
+        $data       = array();
+
+        $args = array(
+            's'              => $keyword,
+            'post_type'      => $post_type,
+            'posts_per_page' => - 1,
+        );
+
+        $qry = new WP_Query($args);
+
+        if ( ! isset( $qry->posts ) ) {
+            return;
+        }
+
+        foreach ( $qry->posts as $post ) {
+            $data[] = array(
+                'id'   => $post->ID,
+                'text'      => $post->post_title,
+            );
+        }
+
+        wp_send_json( $data );
+    }
+
+    add_action( 'wp_ajax_houzez_get_posts', 'houzez_get_posts' );
+    add_action( 'wp_ajax_nopriv_houzez_get_posts', 'houzez_get_posts' );
+}
+
+if ( ! function_exists( 'houzez_render_posts_title' ) ) {
+    
+    function houzez_render_posts_title() {
+        $posts_ids  = isset( $_POST['post_id'] ) ? $_POST['post_id'] : array(); // phpcs:ignore
+        $post_type  = isset( $_POST['post_type'] ) ? $_POST['post_type'] : 'post'; // phpcs:ignore
+        $data       = array();
+
+        $args = array(
+            'post_type'      => $post_type,
+            'post__in'       => $posts_ids,
+            'posts_per_page' => - 1,
+            'orderby'        => 'post__in',
+        );
+
+        $query = new WP_Query( $args );
+
+        if ( ! isset( $query->posts ) ) {
+            return;
+        }
+
+        foreach ( $query->posts as $post ) {
+            $data[ $post->ID ] = $post->post_title;
+        }
+
+        wp_send_json( $data );
+    }
+
+    add_action( 'wp_ajax_houzez_render_posts_title', 'houzez_render_posts_title' );
+    add_action( 'wp_ajax_nopriv_houzez_render_posts_title', 'houzez_render_posts_title' );
+}
+
+if ( ! function_exists( 'houzez_render_taxonomies' ) ) {
+    
+    function houzez_render_taxonomies() {
+        $slugs     = isset( $_POST['post_slug'] ) ? $_POST['post_slug'] : array(); // phpcs:ignore
+        $taxonomy      = isset( $_POST['taxonomy'] ) ? $_POST['taxonomy'] : ''; // phpcs:ignore
+
+        $results = array();
+
+        // Check if slugs are empty
+        if ( empty( $slugs ) || empty( $taxonomy ) ) {
+            wp_send_json( $results );
+            return;
+        }
+
+        $args = array(
+            'slug' => $slugs,
+            'taxonomy'   => $taxonomy,
+            'hide_empty' => false,
+        );
+
+        $terms = get_terms( $args );
+
+        if ( is_array( $terms ) && $terms ) {
+            foreach ( $terms as $term ) {
+                if ( is_object( $term ) ) {
+                    $results[ $term->slug ] = $term->name;
+                }
+            }
+        }
+
+        wp_send_json( $results );
+    }
+
+    add_action( 'wp_ajax_houzez_render_taxonomies', 'houzez_render_taxonomies' );
+    add_action( 'wp_ajax_nopriv_houzez_render_taxonomies', 'houzez_render_taxonomies' );
+}
+
+if ( ! function_exists( 'houzez_get_taxonomies' ) ) {
+    
+    function houzez_get_taxonomies() {
+        $search_string = isset( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : ''; // phpcs:ignore
+        $taxonomy      = isset( $_POST['taxonomy'] ) ? $_POST['taxonomy'] : ''; // phpcs:ignore
+        $results       = array();
+
+        $args = array(
+            'taxonomy'   => $taxonomy,
+            'hide_empty' => false,
+            'search'     => $search_string,
+        );
+
+        $terms = get_terms( $args );
+
+        if ( is_array( $terms ) && $terms ) {
+            foreach ( $terms as $term ) {
+                if ( is_object( $term ) ) {
+                    $results[] = array(
+                        'id'   => $term->slug,
+                        'text' => $term->name,
+                    );
+                }
+            }
+        }
+
+        wp_send_json( $results );
+    }
+
+    add_action( 'wp_ajax_houzez_get_taxonomies', 'houzez_get_taxonomies' );
+    add_action( 'wp_ajax_nopriv_houzez_get_taxonomies', 'houzez_get_taxonomies' );
+}

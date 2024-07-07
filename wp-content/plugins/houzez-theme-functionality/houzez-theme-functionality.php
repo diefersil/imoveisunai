@@ -3,7 +3,7 @@
 Plugin Name: Houzez Theme - Functionality
 Plugin URI:  http://themeforest.net/user/favethemes
 Description: Adds functionality to Favethemes Themes
-Version:     2.5.2
+Version:     3.2.3
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 License:     GPL2
@@ -19,8 +19,9 @@ define( 'HOUZEZ_PLUGIN_IMAGES_URL',        HOUZEZ_PLUGIN_URL  . 'assets/images/'
 define( 'HOUZEZ_TEMPLATES',                HOUZEZ_PLUGIN_PATH . '/templates/');
 define( 'HOUZEZ_DS',                       DIRECTORY_SEPARATOR);
 define( 'HOUZEZ_PLUGIN_BASENAME',          plugin_basename(__FILE__));
-define( 'HOUZEZ_VERSION', '2.5.2' );
-define( 'HOUZEZ_PLUGIN_CORE_VERSION', '2.5.2' );
+define( 'HOUZEZ_VERSION', '3.2.4' );
+define( 'HOUZEZ_DB_VERSION', '3.0' );
+define( 'HOUZEZ_PLUGIN_CORE_VERSION', '3.2.3' );
 
 //Main plugin file
 require_once 'classes/class-houzez-init.php';

@@ -9,6 +9,19 @@
 /* -----------------------------------------------------------------------------------------------------------
  *  Login With Facebook
  -------------------------------------------------------------------------------------------------------------*/
+if( ! function_exists('houzez_linkedin_oauth_url') ) {
+    function houzez_linkedin_oauth_url() {
+        $client_id = '77zgiwur2h5748';
+        $redirect_uri = 'https://houzez.test/testing/';
+        $linkedin_url = "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id={$client_id}&redirect_uri={$redirect_uri}&scope=r_liteprofile%20r_emailaddress";
+
+        return $linkedin_url;
+    }
+}
+
+ /* -----------------------------------------------------------------------------------------------------------
+ *  Login With Facebook
+ -------------------------------------------------------------------------------------------------------------*/
 add_action( 'wp_ajax_nopriv_houzez_facebook_login_oauth', 'houzez_facebook_login_oauth' );
 add_action( 'wp_ajax_houzez_facebook_login_oauth', 'houzez_facebook_login_oauth' );
 
@@ -39,7 +52,7 @@ if( !function_exists('houzez_facebook_login_oauth') ) {
 
         $helper = $fb->getRedirectLoginHelper();
 
-        $permissions = ['email']; // Optional permissions
+        $permissions = array( 'public_profile', 'email' ); // App permissions.
         $loginUrl = $helper->getLoginUrl( $dashboard_profile_link, $permissions );
 
         echo json_encode( array(
@@ -51,9 +64,9 @@ if( !function_exists('houzez_facebook_login_oauth') ) {
     }
 }
 
-if( !function_exists('houzez_facebook_login') ):
+if( !function_exists('houzez_facebook_login_old') ):
 
-    function houzez_facebook_login($get_vars){
+    function houzez_facebook_login_old($get_vars){
         if(session_id() == '') {
             session_start(); 
         }
@@ -99,6 +112,7 @@ if( !function_exists('houzez_facebook_login') ):
             } catch ( Exception $e ) {
                 // error occured
                 echo 'Exception 1: ' . $e->getMessage() . '';
+                exit;
             }
 
             // get stored access token
@@ -165,6 +179,159 @@ if( !function_exists('houzez_facebook_login') ):
                 } else {
                     ///ueu
                     wp_redirect( $dashboard_profile_link );  // redirect to any page
+                    exit;
+                }
+            }
+
+        }
+        exit;
+
+    }
+
+endif;
+
+if( !function_exists('houzez_facebook_login') ):
+
+    function houzez_facebook_login($get_vars){
+        if(session_id() == '') {
+            session_start(); 
+        }
+
+        $dir = plugin_dir_path( __DIR__ ) . 'social/Facebook/';
+        require $dir.'autoload.php';
+
+        $dashboard_profile_link = houzez_get_dashboard_profile_link();
+
+        $facebook_api    =  houzez_option('facebook_api_key');
+        $facebook_secret =  houzez_option('facebook_secret');
+
+        $fb = new Facebook\Facebook([
+            'app_id' => $facebook_api,
+            'app_secret' => $facebook_secret,
+            'default_graph_version' => 'v3.2',
+            'http_client_handler' => 'curl', // can be changed to stream or guzzle
+            'persistent_data_handler' => 'session' // make sure session has started
+        ]);
+
+        if( isset( $get_vars['code'] ) )
+        {
+            $helper = $fb->getRedirectLoginHelper();
+            // Trick below will avoid "Cross-site request forgery validation failed. Required param "state" missing." from Facebook
+            $_SESSION['FBRLH_state'] = $_REQUEST['state'];
+        }
+        else
+        {
+            // login helper with redirect_uri
+            $helper = $fb->getRedirectLoginHelper( $dashboard_profile_link );
+        }
+
+
+        // see if we have a code in the URL
+        if( isset( $get_vars['code'] ) ) {
+            // get new access token if we've been redirected from login page
+            try {
+                // get access token
+                $access_token = $helper->getAccessToken();
+
+                // save access token to persistent data store
+                $helper->getPersistentDataHandler()->set( 'access_token', $access_token );
+            } catch ( Exception $e ) {
+                // error occured
+                echo 'Exception 1: ' . $e->getMessage() . '';
+                exit;
+            }
+
+            // get stored access token
+            $access_token = $helper->getPersistentDataHandler()->get( 'access_token' );
+        }
+
+        // check if we have an access_token, and that it's valid
+        if ( $access_token && !$access_token->isExpired() )
+        {
+            // set default access_token so we can use it in any requests
+            $fb->setDefaultAccessToken( $access_token );
+            try {
+                // Returns a `Facebook\FacebookResponse` object
+                $response = $fb->get('/me?fields=first_name,last_name,email', $access_token);
+            } catch(Facebook\Exceptions\FacebookResponseException $e) {
+                echo 'Graph returned an error: ' . $e->getMessage();
+                exit;
+            } catch(Facebook\Exceptions\FacebookSDKException $e) {
+                echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                exit;
+            }
+
+            $user = $response->getGraphObject()->asArray();
+
+            $profile_image_url = 'https://graph.facebook.com/'.$user['id'].'/picture?width=300&height=300';
+
+            $fb_email       = isset($user['email']) ? $user['email'] : null;
+            $fb_firstname   = $user['first_name'];
+            $fb_lastname    = $user['last_name'];
+            $password       = $user['id'];
+            $fid            = $password;
+
+            $linked_email = get_option( 'houzez_user_facebook_id_'.$password );
+
+            if (is_null($fb_email) && empty($linked_email)) {
+
+                $fb_info = array(
+                    'id' => $user['id'],
+                    'picture_url' => $profile_image_url,
+                    'first_name'  => $fb_firstname,
+                    'last_name'  => $fb_lastname,
+                );
+
+                update_option('houzez_user_facebook_info_'.$password, $fb_info);
+                // Email not available, redirect to the page to choose linking or creating an account
+                $login_link = houzez_get_template_link('template/template-login.php');
+                $login_link = add_query_arg( 'fid', $password, $login_link );
+                wp_redirect($login_link); // Replace with your actual URL
+
+                //wp_redirect(wp_login_url() . '?facebook_redirect=1&fid='.$fid);
+                exit;
+            } else {
+                $fb_email = $linked_email;
+            }
+
+            $username = explode( '@', $fb_email );
+            $username=  $username[0];
+            $display_name = $fb_firstname.' '.$fb_lastname;
+
+            $user = get_user_by( 'email', $fb_email );
+
+            if(isset($user->ID)) {
+
+                $redirect_url = esc_url(houzez_after_login_redirect());
+                $homeURL  = add_query_arg(
+                    array(
+                        'you_are_logged_in' => 1
+                    ),
+                    $redirect_url );
+
+                if(isset($user->user_login)){
+            
+                    add_filter( 'authenticate', 'houzez_nop_auto_login', 3, 10 );
+                    houzez_nop_auto_login($user, $user->user_login, null, $homeURL );
+                }
+
+            } else {
+
+                houzez_register_user_social( $fb_email, $username, $display_name, $password, $profile_image_url );
+
+                $info                   = array();
+                $info['user_login']     = $username;
+                $info['user_password']  = $password;
+                $info['remember']       = true;
+                $user_signon            = wp_signon( $info, false );
+
+                if ( is_wp_error($user_signon) ){
+                    wp_redirect( home_url() );
+                    exit;
+                } else {
+                    ///ueu
+                    $redirect = esc_url(houzez_after_login_redirect());
+                    wp_redirect( $redirect );  // redirect to any page
                     exit;
                 }
             }
@@ -269,11 +436,13 @@ if( !function_exists('houzez_google_oauth_login') ):
             $user = get_user_by( 'email', $email );
 
             if(isset($user->ID)) {
+
+                $redirect = esc_url(houzez_after_login_redirect());
                 $homeURL  = add_query_arg(
                     array(
                         'you_are_logged_in' => 1
                     ),
-                    $dashboard_url );
+                    $redirect );
 
                 if(isset($user->user_login)){
             

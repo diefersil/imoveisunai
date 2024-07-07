@@ -192,6 +192,8 @@ class Houzez_Post_Type_Agency {
         $email = wp_kses($_POST['fave_agency_email'], $allowed_html);
         $fave_agency_mobile = wp_kses($_POST['fave_agency_mobile'], $allowed_html);
         $fave_agency_whatsapp = wp_kses($_POST['fave_agency_whatsapp'], $allowed_html);
+        $fave_agency_telegram = wp_kses($_POST['fave_agency_telegram'], $allowed_html);
+        $fave_agency_line_id = wp_kses($_POST['fave_agency_line_id'], $allowed_html);
         $fave_agency_phone = wp_kses($_POST['fave_agency_phone'], $allowed_html);
         $fave_agency_fax = wp_kses($_POST['fave_agency_fax'], $allowed_html);
         $fave_agency_language = wp_kses($_POST['fave_agency_language'], $allowed_html);
@@ -207,10 +209,13 @@ class Houzez_Post_Type_Agency {
         $fave_agency_pinterest = wp_kses($_POST['fave_agency_pinterest'], $allowed_html);
         $fave_agency_vimeo = wp_kses($_POST['fave_agency_vimeo'], $allowed_html);
         $fave_agency_address = wp_kses($_POST['fave_agency_address'], $allowed_html);
-        $fave_agency_map_address = wp_kses($_POST['fave_agency_map_address'], $allowed_html);
-        $fave_agency_location = wp_kses($_POST['fave_agency_location'], $allowed_html);
+        $fave_agency_map_address = isset($_POST['fave_agency_map_address']) ? wp_kses($_POST['fave_agency_map_address'], $allowed_html) : null;
+        $fave_agency_location = isset( $_POST['fave_agency_location'] ) ? wp_kses($_POST['fave_agency_location'], $allowed_html) : null;
 
         $lat_lng = explode(',', $fave_agency_location);
+
+        $latitude = isset($lat_lng[0]) ? $lat_lng[0] : null;
+        $longitude = isset($lat_lng[1]) ? $lat_lng[1] : null;
 
         $image_id = get_post_thumbnail_id($post_id);
         $full_img = wp_get_attachment_image_src($image_id, 'houzez-image350_350');
@@ -224,8 +229,11 @@ class Houzez_Post_Type_Agency {
         update_user_meta( $user_id, 'fave_author_fax' , $fave_agency_fax);
         update_user_meta( $user_id, 'fave_author_mobile' , $fave_agency_mobile);
         update_user_meta( $user_id, 'fave_author_whatsapp' , $fave_agency_whatsapp) ;
+        update_user_meta( $user_id, 'fave_author_telegram' , $fave_agency_telegram) ;
+        update_user_meta( $user_id, 'fave_author_line_id' , $fave_agency_line_id) ;
         update_user_meta( $user_id, 'description' , $post->post_content);
         update_user_meta( $user_id, 'fave_author_custom_picture', $full_img[0]);
+        update_user_meta( $user_id, 'fave_author_picture_id', $image_id);
         update_user_meta( $user_id, 'fave_author_facebook', $fave_agency_facebook);
         update_user_meta( $user_id, 'fave_author_twitter', $fave_agency_twitter);
         update_user_meta( $user_id, 'fave_author_linkedin', $fave_agency_linkedin);
@@ -236,8 +244,8 @@ class Houzez_Post_Type_Agency {
         update_user_meta( $user_id, 'fave_author_instagram', $fave_agency_instagram);
         update_user_meta( $user_id, 'fave_author_address', $fave_agency_address);
         update_user_meta( $user_id, 'fave_author_google_location', $fave_agency_map_address);
-        update_user_meta( $user_id, 'fave_author_google_latitude', $lat_lng[0]);
-        update_user_meta( $user_id, 'fave_author_google_longitude', $lat_lng[1]);
+        update_user_meta( $user_id, 'fave_author_google_latitude', $latitude);
+        update_user_meta( $user_id, 'fave_author_google_longitude', $longitude);
         update_user_meta( $user_id, 'url', $fave_agency_website);
 
         $new_user_id = email_exists($email);

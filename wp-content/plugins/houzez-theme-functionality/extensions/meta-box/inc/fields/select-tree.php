@@ -1,14 +1,10 @@
 <?php
-/**
- * The select tree field.
- *
- * @package Meta Box
- */
+defined( 'ABSPATH' ) || die;
 
 /**
- * Select tree field class.
+ * The select tree field.
  */
-class RWMB_Select_Tree_Field extends RWMB_Select_Field {
+class RWMB_Select_Tree_Field extends RWMB_Select_Advanced_Field {
 	/**
 	 * Get field HTML.
 	 *
@@ -22,13 +18,11 @@ class RWMB_Select_Tree_Field extends RWMB_Select_Field {
 		return $options ? $walker->walk( $options ) : '';
 	}
 
-	/**
-	 * Enqueue scripts and styles.
-	 */
 	public static function admin_enqueue_scripts() {
 		parent::admin_enqueue_scripts();
-		wp_enqueue_style( 'rwmb-select-tree', RWMB_CSS_URL . 'select-tree.css', array( 'rwmb-select' ), RWMB_VER );
-		wp_enqueue_script( 'rwmb-select-tree', RWMB_JS_URL . 'select-tree.js', array( 'rwmb-select' ), RWMB_VER, true );
+		wp_enqueue_style( 'rwmb-select-tree', RWMB_CSS_URL . 'select-tree.css', [ 'rwmb-select' ], RWMB_VER );
+		wp_style_add_data( 'rwmb-select-tree', 'path', RWMB_CSS_DIR . 'select-tree.css' );
+		wp_enqueue_script( 'rwmb-select-tree', RWMB_JS_URL . 'select-tree.js', [ 'rwmb-select' ], RWMB_VER, true );
 	}
 
 	/**

@@ -30,6 +30,8 @@ class Houzez_Post_Type_Property {
 
         if( houzez_check_taxonomy('property_city') ) {
             add_action( 'init', array( __CLASS__, 'property_city' ) );
+            add_action('restrict_manage_posts', array( __CLASS__, 'houzez_admin_property_city_filter' ));
+            add_filter('parse_query', array( __CLASS__, 'houzez_convert_property_city_to_term_in_query' ));
         }
         
         if( houzez_check_taxonomy('property_area') ) {
@@ -39,9 +41,17 @@ class Houzez_Post_Type_Property {
         add_action( 'created_term', array( __CLASS__, 'save_taxonomies_fields' ), 10, 3 );
         add_action( 'edit_term', array( __CLASS__, 'save_taxonomies_fields' ), 10, 3 );
 
-        add_action('admin_init', array( __CLASS__, 'houzez_approve_listing' ));
-        add_action('admin_init', array( __CLASS__, 'houzez_expire_listing' ));
-        add_action('admin_init', array( __CLASS__, 'houzez_disapprove_listing' ));
+        add_action('admin_init', array( __CLASS__, 'disable_redux_library' ));
+        
+        add_action( 'admin_action_houzez_approve_listing', array( __CLASS__, 'houzez_approve_listing' ) );
+        add_action( 'admin_action_houzez_disapprove_listing', array( __CLASS__, 'houzez_disapprove_listing' ) );
+        add_action( 'admin_action_houzez_expire_listing', array( __CLASS__, 'houzez_expire_listing' ) );
+        add_action( 'admin_action_houzez_mark_as_sold', array( __CLASS__, 'houzez_sold_listing' ) );
+        add_action( 'admin_action_houzez_mark_featured', array( __CLASS__, 'houzez_mark_featured' ) );
+        add_action( 'admin_action_houzez_remove_featured', array( __CLASS__, 'houzez_remove_featured' ) );
+        add_action( 'admin_action_houzez_duplicate_property_as_draft', array( __CLASS__, 'duplicate_property_post_as_draft' ) );
+        add_action( 'admin_action_houzez_put_on_hold', array( __CLASS__, 'houzez_put_on_hold' ) );
+        add_action( 'admin_action_houzez_go_live', array( __CLASS__, 'houzez_go_live' ) );
 
         add_action('restrict_manage_posts', array( __CLASS__, 'houzez_admin_property_type_filter' ));
         add_filter('parse_query', array( __CLASS__, 'houzez_convert_property_type_to_term_in_query' ));
@@ -49,10 +59,6 @@ class Houzez_Post_Type_Property {
         add_action('restrict_manage_posts', array( __CLASS__, 'houzez_admin_property_status_filter' ));
         add_filter('parse_query', array( __CLASS__, 'houzez_convert_property_status_to_term_in_query' ));
 
-        add_action('restrict_manage_posts', array( __CLASS__, 'houzez_admin_property_city_filter' ));
-        add_filter('parse_query', array( __CLASS__, 'houzez_convert_property_city_to_term_in_query' ));
-
-        //add_action( 'save_post_property', array( __CLASS__, 'save_property_post_type' ), 10, 3 );
         add_action( 'added_post_meta', array( __CLASS__, 'save_property_post_type' ), 10, 4 );
         add_action( 'updated_post_meta', array( __CLASS__, 'save_property_post_type' ), 10, 4 );
 
@@ -232,6 +238,7 @@ class Houzez_Post_Type_Property {
             'can_export' => true,
             'show_in_rest'       => true,
             'rest_base'          => apply_filters( 'houzez_property_rest_base', __( 'properties', 'houzez-theme-functionality' ) ),
+            'rest_controller_class' => 'WP_REST_Posts_Controller',
             'supports' => array('title','editor','thumbnail','revisions','author','page-attributes','excerpt'),
 
              // The rewrite handles the URL structure.
@@ -495,21 +502,25 @@ class Houzez_Post_Type_Property {
      */
     public static function custom_columns() {
 
-        $columns = array(
-            "cb" => "<input type=\"checkbox\" />",
-            "title" => __( 'Title','houzez-theme-functionality' ),
-            "thumbnail" => __( 'Thumbnail','houzez-theme-functionality' ),
-            'city' => __( 'City','houzez-theme-functionality' ),
-            "type" => __('Type','houzez-theme-functionality'),
-            "status" => __('Status','houzez-theme-functionality'),
-            "price" => __('Price','houzez-theme-functionality'),
-            "id" => __( 'Property ID','houzez-theme-functionality' ),
-            "featured" => __( 'Featured','houzez-theme-functionality' ),
-            "listing_posted" => __( 'Posted','houzez-theme-functionality' ),
-            "listing_expiry" => __( 'Expires','houzez-theme-functionality' ),
-            "houzez_actions" => __( 'Actions','houzez-theme-functionality' ),
-            //"prop_id" => __( 'ID','houzez-theme-functionality' ),
-        );
+        $columns = array();
+
+        $columns['cb'] = "<input type=\"checkbox\" />";
+        $columns['title'] = __( 'Title','houzez-theme-functionality' );
+
+        if( class_exists('SitePress') ) {
+            $columns["icl_translations"] = $columns['icl_translations'];
+        }
+        $columns["thumbnail"] = __( 'Info','houzez-theme-functionality' );
+        $columns['info'] = '';
+        // $columns['city'] = __( 'City','houzez-theme-functionality' );
+        // $columns["type"] = __('Type','houzez-theme-functionality');
+        $columns["price"] = __('Price','houzez-theme-functionality');
+        // $columns["id"] = __( 'Listing ID','houzez-theme-functionality' );
+        $columns["featured"] = __( 'Featured','houzez-theme-functionality' );
+        $columns["listing_posted"] = __( 'Posted','houzez-theme-functionality' );
+        //$columns["listing_expiry"] = __( 'Expires','houzez-theme-functionality' );
+        $columns["status"] = __('Status','houzez-theme-functionality');
+        $columns["houzez_actions"] = __( 'Actions','houzez-theme-functionality' );
 
         $columns = apply_filters( 'houzez_custom_post_property_columns', $columns );
 
@@ -535,11 +546,11 @@ class Houzez_Post_Type_Property {
         {
             case 'thumbnail':
                 if ( has_post_thumbnail() ) {
-                    the_post_thumbnail( array(75, 75), array(
+                    the_post_thumbnail( array(100, 100), array(
                         'class' => 'attachment-thumbnail attachment-thumbnail-small',
                     ) );
                 } else {
-                    echo '-';
+                    houzez_tfp_image_placeholder('thumbnail');
                 }
                 break;
             case 'id':
@@ -550,6 +561,59 @@ class Houzez_Post_Type_Property {
                 else{
                     _e('NA','houzez-theme-functionality');
                 }
+                break;
+
+            case 'info':
+
+                if( houzez_check_taxonomy('property_city') ) {
+                    $city = Houzez::admin_taxonomy_terms ( $post->ID, 'property_city', 'property' );
+                    
+                    if( $city ) {
+                        echo __( 'City','houzez-theme-functionality' ).': '.$city;
+                        echo '<br>';
+                    }
+                }
+
+                if( houzez_check_taxonomy('property_type') ) {
+                    $type = Houzez::admin_taxonomy_terms ( $post->ID, 'property_type', 'property' );
+                    
+                    if( $type ) {
+                        echo __('Type','houzez-theme-functionality').': '.$type;
+                        echo '<br>';
+                    }
+                }
+
+                if( houzez_check_taxonomy('property_status') ) {
+                    $status = Houzez::admin_taxonomy_terms ( $post->ID, 'property_status', 'property' );
+
+                    if( $status ) {
+                        echo __('Status','houzez-theme-functionality').': '.$status;
+                        echo '<br>';
+                    }
+                }
+
+                $Prop_id = get_post_meta($post->ID, $houzez_prefix.'property_id',true);
+                if(!empty($Prop_id)){
+                    echo __( 'Listing ID','houzez-theme-functionality' ).': '.esc_attr( $Prop_id );
+                }
+                else{
+                    echo __( 'Listing ID','houzez-theme-functionality' ).': '.__('NA','houzez-theme-functionality');
+                }
+
+                echo '<br>';
+
+                if( function_exists('houzez_user_role_by_post_id')) {
+                    if( houzez_tfp_user_role_by_post_id($post->ID) != 'administrator' && get_post_status ( $post->ID ) == 'publish' ) {
+                        
+                        if( function_exists('houzez_listing_expire')) {
+                            echo __( 'Expires','houzez-theme-functionality' ).': ';
+                            echo '<span class="hz-expiry">';
+                            houzez_listing_expire();
+                            echo '</span>';
+                        }
+                    } 
+                }
+
                 break;
 
             case 'prop_id':
@@ -579,6 +643,13 @@ class Houzez_Post_Type_Property {
                 echo Houzez::admin_taxonomy_terms ( $post->ID, 'property_type', 'property' );
                 break;
             case 'status':
+                
+                // Display listing status (e.g. pending, active) with colored dot
+                echo '<span class="listing-status status-' . sanitize_html_class( $post->post_status ) . '"><span></span> ' . houzez_get_listing_status( $post->post_status ) . '</span>';
+
+                break;
+
+            case 'status_old':
                 echo Houzez::admin_taxonomy_terms ( $post->ID, 'property_status', 'property' );
                 break;
             case 'price':
@@ -616,32 +687,164 @@ class Houzez_Post_Type_Property {
             case 'features':
                 echo get_the_term_list($post->ID,'property-feature', '', ', ','');
                 break;
+
+            case "listing_posted" :
+                echo '<p>';
+                echo date_i18n( get_option('date_format'), strtotime( $post->post_date ) );
+                echo '<br>';
+                echo date_i18n( get_option('time_format'), strtotime( $post->post_date ) );
+                echo '</p>';
+                
+                // Translate the string and store it in a variable.
+                $translated_text = __('by %s', 'houzez-theme-functionality');
+
+                // Check if the translated text contains the '%s' specifier.
+                if (strpos($translated_text, '%s') === false) {
+                    // Fallback to English if '%s' is missing.
+                    $translated_text = 'by %s';
+                }
+
+                // Prepare the author link HTML.
+                $author_link = empty($post->post_author) ? __('a guest', 'houzez-theme-functionality') : 
+                    '<a href="' . esc_url(add_query_arg('author', $post->post_author)) . '">' . get_the_author() . '</a>';
+
+                // Output the final string.
+                echo '<p>' . sprintf($translated_text, $author_link) . '</p>';
+
+
+                break;
+            case "listing_expiry" :
+
+            if( function_exists('houzez_user_role_by_post_id')) {
+                if( houzez_tfp_user_role_by_post_id($post->ID) != 'administrator' && get_post_status ( $post->ID ) == 'publish' ) {
+                    if( function_exists('houzez_listing_expire')) {
+                        houzez_listing_expire();
+                    }
+
+                } else {
+
+                    if( get_post_status($post->ID) == 'expired' ) {
+                        echo '<span style="color:red;">'.get_post_status($post->ID).'</span>';
+                    }
+                }
+            }
+            break;
+
             case 'houzez_actions':
                 echo '<div class="actions">';
 
                 $admin_actions = apply_filters( 'post_row_actions', array(), $post );
 
+                $fave_featured = get_post_meta( $post->ID, 'fave_featured', true );
+
                 $user = wp_get_current_user();
 
-                if ( in_array( $post->post_status, array( 'pending', 'disapproved' ) ) && in_array( 'administrator', (array) $user->roles ) ) {
+                if ( in_array( $post->post_status, array( 'pending', 'disapproved' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
                     $admin_actions['approve']   = array(
-                        'action'  => 'approve',
+                        'class'  => 'approve',
                         'name'    => __( 'Approve', 'houzez-theme-functionality' ),
-                        'url'     =>  wp_nonce_url( add_query_arg( 'approve_listing', $post->ID ), 'approve_listing' )
+                        'icon'    => 'approve.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_approve_listing',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
                     );
                 }
-                if ( in_array( $post->post_status, array( 'publish' ) ) && in_array( 'administrator', (array) $user->roles ) ) {
-                    $admin_actions['expire']   = array(
-                        'action'  => 'expire',
-                        'name'    => __( 'Expire', 'houzez-theme-functionality' ),
-                        'url'     =>  wp_nonce_url( add_query_arg( 'expire_listing', $post->ID ), 'expire_listing' )
-                    );
-                }
-                if ( in_array( $post->post_status, array( 'pending', 'publish' ) ) && in_array( 'administrator', (array) $user->roles ) ) {
+                
+                if ( in_array( $post->post_status, array( 'pending', 'publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
                     $admin_actions['disapprove']   = array(
-                        'action'  => 'disapprove',
+                        'class'  => 'disapprove',
                         'name'    => __( 'Disapprove', 'houzez-theme-functionality' ),
-                        'url'     =>  wp_nonce_url( add_query_arg( 'disapprove_listing', $post->ID ), 'disapprove_listing' )
+                        'icon'    => 'disapprove.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_disapprove_listing',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( $post->post_status, array('publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) && ! $fave_featured ) {
+                    $admin_actions['make_featured']   = array(
+                        'class'  => 'make-featured',
+                        'name'    => __( 'Mark as Featured', 'houzez-theme-functionality' ),
+                        'icon'    => 'icon-featured.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_mark_featured',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( $post->post_status, array('publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) && $fave_featured ) {
+                    $admin_actions['remove_featured']   = array(
+                        'class'  => 'remove-featured',
+                        'name'    => __( 'Remove from Featured', 'houzez-theme-functionality' ),
+                        'icon'    => 'icon-not-featured.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_remove_featured',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( $post->post_status, array( 'publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['expire']   = array(
+                        'class'  => 'expire',
+                        'name'    => __( 'Expire', 'houzez-theme-functionality' ),
+                        'icon'    => 'mark-as-expired.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_expire_listing',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+                
+
+                if ( in_array( $post->post_status, array( 'publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['mark_sold']   = array(
+                        'class'  => 'mark_sold',
+                        'name'    => __( 'Mark as Sold', 'houzez-theme-functionality' ),
+                        'icon'    => 'mark-as-sold.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_mark_as_sold',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( $post->post_status, array( 'publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['on_hold']   = array(
+                        'class'  => 'on_hold',
+                        'name'    => __( 'Put on Hold', 'houzez-theme-functionality' ),
+                        'icon'    => 'put-on-hold.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_put_on_hold',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( $post->post_status, array( 'on_hold' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['go_live']   = array(
+                        'class'  => 'go_live',
+                        'name'    => __( 'Go Live', 'houzez-theme-functionality' ),
+                        'icon'    => 'reactivate-from-hold.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_go_live',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                if ( in_array( 'administrator', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) ) {
+                    $admin_actions['duplicate']   = array(
+                        'class'  => 'duplicate',
+                        'name'    => __( 'Duplicate', 'houzez-theme-functionality' ),
+                        'icon'    => 'duplicate.svg',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_duplicate_property_as_draft',
+                            'listing_id' => $post->ID,
+                        ), 'admin.php' )
                     );
                 }
                 
@@ -649,7 +852,7 @@ class Houzez_Post_Type_Property {
 
                 foreach ( $admin_actions as $action ) {
                     if ( is_array( $action ) ) {
-                        printf( '<a class="button button-icon tips icon-%1$s" href="%2$s" data-tip="%3$s">%4$s</a>', $action['action'], esc_url( $action['url'] ), esc_attr( $action['name'] ), esc_html( $action['name'] ) );
+                        printf( '<a class="button houzez-button-icon tips icon-%1$s" href="%2$s" data-tip="%3$s"><img src="'.HOUZEZ_PLUGIN_IMAGES_URL.'%4$s"/></a>', $action['class'], esc_url( $action['url'] ), esc_attr( $action['name'] ), esc_html( $action['icon'] ) );
                     } else {
                         
                     }
@@ -657,26 +860,6 @@ class Houzez_Post_Type_Property {
 
                 echo '</div>';
 
-                break;
-                case "listing_posted" :
-                    echo '<p>' . date_i18n( get_option('date_format').' '.get_option('time_format'), strtotime( $post->post_date ) ) . '</p>';
-                    echo '<p>'.( empty( $post->post_author ) ? __( 'by a guest', 'houzez-theme-functionality' ) : sprintf( __( 'by %s', 'houzez-theme-functionality' ), '<a href="' . esc_url( add_query_arg( 'author', $post->post_author ) ) . '">' . get_the_author() . '</a>' ) ) . '</p>';
-                    break;
-            case "listing_expiry" :
-
-                if( function_exists('houzez_user_role_by_post_id')) {
-                    if( houzez_user_role_by_post_id($post->ID) != 'administrator' && get_post_status ( $post->ID ) == 'publish' ) {
-                        if( function_exists('houzez_listing_expire')) {
-                            houzez_listing_expire();
-                        }
-
-                    } else {
-
-                        if( get_post_status($post->ID) == 'expired' ) {
-                            echo '<span style="color:red;">'.get_post_status($post->ID).'</span>';
-                        }
-                    }
-                }
                 break;
         }
     }
@@ -814,6 +997,21 @@ class Houzez_Post_Type_Property {
             return;
         }
 
+        // Define the relevant meta keys
+        $relevant_keys = ['fave_featured', 'fave_property_id', 'fave_property_location', 'fave_currency', 'houzez_geolocation_lat', 'houzez_geolocation_long'];
+
+        // Only proceed if the meta_key is one of the relevant ones
+        if (!in_array($meta_key, $relevant_keys)) {
+            return;
+        }
+
+        if ($meta_key === "fave_featured" && $meta_value == 1) {
+            update_post_meta( $property_id, 'houzez_featured_listing_date', current_time( 'mysql' ) );
+        }
+        if ($meta_key === "fave_featured" && $meta_value == 0) {
+            update_post_meta( $property_id, 'houzez_featured_listing_date', "" );
+        }
+
         if ( 'fave_property_id' === $meta_key ) {
             if( houzez_option('auto_property_id', 0) != 0 ) {
                 $existing_id     = get_post_meta( $property_id, 'fave_property_id', true );
@@ -853,80 +1051,328 @@ class Houzez_Post_Type_Property {
 
     }
 
-    public static function houzez_approve_listing()
-    {
-        if (!empty($_GET['approve_listing']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'approve_listing') && current_user_can('publish_post', $_GET['approve_listing'])) {
-            $post_id = absint($_GET['approve_listing']);
-            $listing_data = array(
-                'ID' => $post_id,
-                'post_status' => 'publish'
-            );
-            wp_update_post($listing_data);
 
-            $author_id = get_post_field ('post_author', $post_id);
-            $user           =   get_user_by('id', $author_id );
-            $user_email     =   $user->user_email;
+    public static function houzez_approve_listing() {
 
-            $args = array(
-                'listing_title' => get_the_title($post_id),
-                'listing_url' => get_permalink($post_id)
-            );
-            houzez_email_type( $user_email,'listing_approved', $args );
-
-            wp_redirect(remove_query_arg('approve_listing', add_query_arg('approve_listing', $post_id, admin_url('edit.php?post_type=property'))));
-            exit;
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_approve_listing' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
         }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+
+        $listing_status = get_post_status($listing_id); // get listing status before publish.
+
+        $post_id = absint($listing_id);
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'publish'
+        );
+        wp_update_post($listing_data);
+
+        $author_id  = get_post_field ('post_author', $post_id);
+        $user       =   get_user_by('id', $author_id );
+        $user_email =   $user->user_email;
+
+        $args = array(
+            'listing_title' => get_the_title($post_id),
+            'listing_url' => get_permalink($post_id)
+        );
+        houzez_email_type( $user_email,'listing_approved', $args );
+
+        if( $listing_status == 'disapproved' && houzez_get_remaining_listings($author_id) > 0 ) {
+            houzez_update_package_listings($author_id);
+        }
+
+        wp_redirect( admin_url( 'edit.php?post_type=property') );
+        exit;
     }
 
-    public static function houzez_disapprove_listing()
-    {
-        if (!empty($_GET['disapprove_listing']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'disapprove_listing') && current_user_can('publish_post', $_GET['disapprove_listing'])) {
-            $post_id = absint($_GET['disapprove_listing']);
-            $listing_data = array(
-                'ID' => $post_id,
-                'post_status' => 'disapproved'
-            );
-            wp_update_post($listing_data);
-
-            $author_id = get_post_field ('post_author', $post_id);
-            $user           =   get_user_by('id', $author_id );
-            $user_email     =   $user->user_email;
-
-            $args = array(
-                'listing_title' => get_the_title($post_id),
-                'listing_url' => get_permalink($post_id)
-            );
-            houzez_email_type( $user_email,'listing_disapproved', $args );
-
-            wp_redirect(remove_query_arg('disapprove_listing', add_query_arg('disapprove_listing', $post_id, admin_url('edit.php?post_type=property'))));
-            exit;
+    public static function houzez_disapprove_listing() {
+        
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_disapprove_listing' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
         }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+
+        $post_id = absint($listing_id);
+
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'disapproved'
+        );
+        wp_update_post($listing_data);
+
+        $author_id = get_post_field ('post_author', $post_id);
+        $user           =   get_user_by('id', $author_id );
+        $user_email     =   $user->user_email;
+
+        $args = array(
+            'listing_title' => get_the_title($post_id),
+            'listing_url' => get_permalink($post_id)
+        );
+        houzez_email_type( $user_email,'listing_disapproved', $args );
+
+        $package_id = get_the_author_meta('package_id', $author_id );
+        $user_package_listings = get_the_author_meta('package_listings', $author_id );
+        $packagelistings = get_post_meta($package_id, 'fave_package_listings', true);
+
+        if( $user_package_listings < $packagelistings ) {
+            update_user_meta( $author_id, 'package_listings', $user_package_listings+1 );
+        }
+
+        wp_redirect( admin_url( 'edit.php?post_type=property') );
+        exit;
+        
+    }
+
+    public static function houzez_sold_listing() {
+
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_mark_as_sold' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
+
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'houzez_sold'
+        );
+        wp_update_post($listing_data);
+
+        $mark_sold_status = houzez_option('mark_sold_status');
+
+        if( $mark_sold_status != '' ) {
+            $mark_sold_status = intval($mark_sold_status);
+            wp_set_object_terms( $post_id, $mark_sold_status, 'property_status' );
+        }
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
+        
+    }
+
+    public static function houzez_mark_featured() {
+
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_mark_featured' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
+
+        update_post_meta( $post_id, 'fave_featured', 1 );
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
+    }
+
+    public static function houzez_remove_featured() {
+
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_remove_featured' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
+
+        update_post_meta( $post_id, 'fave_featured', 0 );
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
     }
 
     public static function houzez_expire_listing() {
 
-        if (!empty($_GET['expire_listing']) && wp_verify_nonce($_REQUEST['_wpnonce'], 'expire_listing') && current_user_can('publish_post', $_GET['expire_listing'])) {
-            $post_id = absint($_GET['expire_listing']);
-            $listing_data = array(
-                'ID' => $post_id,
-                'post_status' => 'expired'
-            );
-            wp_update_post($listing_data);
 
-            update_post_meta($post_id, 'fave_featured', '0');
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_expire_listing' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
 
-            $author_id = get_post_field ('post_author', $post_id);
-            $user           =   get_user_by('id', $author_id );
-            $user_email     =   $user->user_email;
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'expired'
+        );
+        wp_update_post($listing_data);
 
+        update_post_meta($post_id, 'fave_featured', '0');
+
+        $author_id   = get_post_field ('post_author', $post_id);
+        $user        = get_user_by('id', $author_id );
+        $user_email  = $user->user_email;
+
+        $args = array(
+            'listing_title' => get_the_title($post_id),
+            'listing_url' => get_permalink($post_id)
+        );
+        houzez_email_type( $user_email,'listing_expired', $args );
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
+    }
+
+    public static function houzez_put_on_hold() {
+
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_put_on_hold' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
+
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'on_hold'
+        );
+        wp_update_post($listing_data);
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
+
+    }
+
+    public static function houzez_go_live() {
+        
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'houzez_go_live' == $_REQUEST['action'] ) ) ) {
+            wp_die('No property exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $listing_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        $post_id = absint($listing_id);
+
+        $listing_data = array(
+            'ID' => $post_id,
+            'post_status' => 'publish'
+        );
+        wp_update_post($listing_data);
+
+        wp_redirect( admin_url('edit.php?post_type=property') );
+        exit;
+
+    }
+
+    public static function duplicate_property_post_as_draft() {
+        global $wpdb;
+        if (! ( isset( $_GET['listing_id']) || isset( $_POST['listing_id'])  || ( isset($_REQUEST['action']) && 'duplicate_property_post_as_draft' == $_REQUEST['action'] ) ) ) {
+            wp_die('No post to duplicate has been supplied!');
+        }
+     
+        /*
+         * get the original post id
+         */
+        $post_id = (isset($_GET['listing_id']) ? $_GET['listing_id'] : $_POST['listing_id']);
+        /*
+         * and all the original post data then
+         */
+        $post = get_post( $post_id );
+     
+        /*
+         * if you don't want current user to be the new post author,
+         * then change next couple of lines to this: $new_post_author = $post->post_author;
+         */
+        $current_user = wp_get_current_user();
+        $new_post_author = $current_user->ID;
+     
+        /*
+         * if post data exists, create the post duplicate
+         */
+        if (isset( $post ) && $post != null) {
+     
+            /*
+             * new post data array
+             */
             $args = array(
-                'listing_title' => get_the_title($post_id),
-                'listing_url' => get_permalink($post_id)
+                'comment_status' => $post->comment_status,
+                'ping_status'    => $post->ping_status,
+                'post_author'    => $new_post_author,
+                'post_content'   => $post->post_content,
+                'post_excerpt'   => $post->post_excerpt,
+                'post_name'      => $post->post_name,
+                'post_parent'    => $post->post_parent,
+                'post_password'  => $post->post_password,
+                'post_status'    => 'draft',
+                'post_title'     => $post->post_title,
+                'post_type'      => $post->post_type,
+                'to_ping'        => $post->to_ping,
+                'menu_order'     => $post->menu_order
             );
-            houzez_email_type( $user_email,'listing_expired', $args );
+     
+            /*
+             * insert the post by wp_insert_post() function
+             */
+            $new_post_id = wp_insert_post( $args );
+            /*
+             * get all current post terms ad set them to the new post draft
+             */
+            $taxonomies = get_object_taxonomies($post->post_type); // returns array of taxonomy names for post type, ex array("category", "post_tag");
+            foreach ($taxonomies as $taxonomy) {
+                $post_terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
+                wp_set_object_terms($new_post_id, $post_terms, $taxonomy, false);
+            }
 
-            wp_redirect(remove_query_arg('expire_listing', add_query_arg('expire_listing', $post_id, admin_url('edit.php?post_type=property'))));
+            /*
+             * duplicate all post meta
+             */
+            $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id");
+            if (count($post_meta_infos)!=0) {
+                $sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
+                foreach ($post_meta_infos as $meta_info) {
+                    $meta_key = $meta_info->meta_key;
+                    if( $meta_key == '_wp_old_slug' ) continue;
+                    $meta_value = addslashes($meta_info->meta_value);
+                    $sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
+                }
+                $sql_query.= implode(" UNION ALL ", $sql_query_sel);
+                $wpdb->query($sql_query);
+            }
+
+            update_post_meta( $new_post_id, 'fave_featured', 0 );
+            update_post_meta( $new_post_id, 'houzez_featured_listing_date', '' );
+            update_post_meta( $new_post_id, 'fave_payment_status', 'not_paid' );
+
+            if( houzez_option('auto_property_id', 0) != 0 ) {
+                $pattern = houzez_option( 'property_id_pattern' );
+                $new_id   = preg_replace( '/{ID}/', $new_post_id, $pattern );
+                update_post_meta($new_post_id, 'fave_property_id', $new_id);
+            }
+
+
+            /*
+             * finally, redirect to the edit post screen for the new draft
+             */
+            //wp_redirect( admin_url( 'post.php?action=edit&post=' . $new_post_id ) );
+            wp_redirect( admin_url('edit.php?post_type=property') );
             exit;
+        } else {
+            wp_die('Post creation failed, could not find original post: ' . $post_id);
         }
     }
 
@@ -1076,8 +1522,15 @@ class Houzez_Post_Type_Property {
             if ( isset( $_GET['property_id'] ) && ! empty( $_GET['property_id'] ) ) {
                 $property_id = esc_attr( $_GET['property_id'] );
             }
+
+            $featured = isset( $_GET['houzez_featured_listings'] ) ? esc_attr($_GET['houzez_featured_listings']) : 'all';
             ?>
-            <input style="width: 110px;" id="property_id" type="text" name="property_id" placeholder="<?php esc_html_e( 'Property ID', 'houzez-theme-functionality' ); ?>" value="<?php echo esc_attr($property_id); ?>">
+            <input style="width: 95px;" id="property_id" type="text" name="property_id" placeholder="<?php esc_html_e( 'Property ID', 'houzez-theme-functionality' ); ?>" value="<?php echo esc_attr($property_id); ?>">
+
+            <select class="postform" id="houzez_featured_listings" name="houzez_featured_listings">
+                <option value="all"><?php esc_html_e( 'Featured', 'houzez-theme-functionality' ); ?></option>
+                <option <?php selected($featured, 'only_featured', true); ?> value="only_featured"><?php esc_html_e( 'Yes', 'houzez-theme-functionality' ); ?></option>
+            </select>
             <?php
 
         }
@@ -1110,6 +1563,18 @@ class Houzez_Post_Type_Property {
                 );
 
             }
+
+            if ( isset( $_GET['houzez_featured_listings'] ) && $_GET['houzez_featured_listings'] == 'only_featured' ) {
+
+                $meta_query[] = array(
+                    'key'     => 'fave_featured',
+                    'value'   => '1',
+                    'compare' => '=',
+                );
+
+            }
+
+
             if ( ! empty( $meta_query ) ) {
                 $query->query_vars['meta_query'] = $meta_query;
 
@@ -1132,5 +1597,10 @@ class Houzez_Post_Type_Property {
             }
 
         } // $pagenow
+    }
+
+    public static function disable_redux_library() {
+        update_option('use_extendify_templates', 0);
+        update_option('use_redux_templates', 0);
     }
 }

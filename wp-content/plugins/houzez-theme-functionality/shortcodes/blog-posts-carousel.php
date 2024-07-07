@@ -13,7 +13,16 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
             'category_id' => '',
             'posts_limit' => '',
             'offset' => '',
+            'navigation' => '',
+            'slides_to_show' => '',
+            'slide_auto' => '',
+            'auto_speed' => '',
+            'slide_dots' => '',
+            'slide_infinite' => '',
         ), $atts));
+
+        global $houzez_local;
+        $houzez_local = houzez_get_localization();
 
         ob_start();
 
@@ -51,20 +60,29 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
         <script>
             jQuery(document).ready(function ($) {
 
+                var slides_to_show = <?php echo $slides_to_show; ?>,
+                    navigation = <?php echo $navigation; ?>,
+                    auto_play = <?php echo $slide_auto; ?>,
+                    auto_play_speed = parseInt(<?php echo $auto_speed; ?>),
+                    dots = <?php echo $slide_dots; ?>,
+                    slide_infinite =  <?php echo $slide_infinite; ?>;
+
                 var owl_post_card = $('#carousel-post-card-<?php echo esc_attr( $token ); ?>');
 
                 owl_post_card.slick({
                     rtl: <?php echo esc_attr($houzez_rtl); ?>,
                     lazyLoad: 'ondemand',
-                    infinite: true,
+                    infinite: slide_infinite,
+                    autoplay: auto_play,
+                    autoplaySpeed: auto_play_speed,
                     speed: 300,
-                    slidesToShow: 4,
-                    arrows: true,
+                    slidesToShow: slides_to_show,
+                    arrows: navigation,
                     adaptiveHeight: true,
-                    dots: true,
+                    dots: dots,
                     appendArrows: '.blog-posts-slider',
-                    prevArrow: $('.blog-prev-js'),
-                    nextArrow: $('.blog-next-js'),
+                    prevArrow: $('.blog-prev-js-<?php echo esc_attr($token);?>'),
+                    nextArrow: $('.blog-next-js-<?php echo esc_attr($token);?>'),
                     responsive: [{
                             breakpoint: 992,
                             settings: {
@@ -86,10 +104,12 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
 
         <div class="blog-posts-module blog-posts-slider <?php echo esc_attr($module_class); ?>">
 
+            <?php if( $navigation == 'true' ) { ?>
             <div class="property-carousel-buttons-wrap">
-                <button type="button" class="blog-prev-js slick-prev btn-primary-outlined"><?php esc_html_e('Prev', 'houzez'); ?></button>
-                <button type="button" class="blog-next-js slick-next btn-primary-outlined"><?php esc_html_e('Next', 'houzez'); ?></button>
+                <button type="button" class="blog-prev-js-<?php echo esc_attr($token);?> slick-prev btn-primary-outlined"><?php esc_html_e('Prev', 'houzez'); ?></button>
+                <button type="button" class="blog-next-js-<?php echo esc_attr($token);?> slick-next btn-primary-outlined"><?php esc_html_e('Next', 'houzez'); ?></button>
             </div><!-- property-carousel-buttons-wrap -->
+            <?php } ?>
 
             <div class="blog-posts-slider-wrap">
                 <div id="carousel-post-card-<?php echo esc_attr($token); ?>" class="blog-posts-slide-wrap blog-posts-slide-wrap-js houzez-all-slider-wrap">

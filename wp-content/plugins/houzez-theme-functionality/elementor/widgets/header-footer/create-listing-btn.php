@@ -24,7 +24,7 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 	}
 
 	public function get_categories() {
-		return [ 'houzez-elements', 'favethemes_studio_header', 'favethemes_studio_footer' ];
+		return [ 'houzez-elements', 'houzez-header-footer' ];
 	}
 
 	public function get_keywords() {
@@ -106,6 +106,12 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 			]
 		);
 
+		$this->start_controls_tabs( 'create_listing_btn_options' );
+
+		$this->start_controls_tab( 'create_listing_btn_normal_options', [
+			'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
+		] );
+
 		$this->add_control(
 			'create_btn_color',
 			[
@@ -115,19 +121,6 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 					'{{WRAPPER}} .btn-create-listing' => 'color: {{VALUE}}',
 				],
 				'default' => '#ffffff'
-			]
-		);
-
-		$this->add_control(
-			'create_btn_color_hover',
-			[
-				'label' => __( 'Button Color Hover', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} .btn-create-listing:hover, .btn-create-listing:active' => 'color: {{VALUE}}',
-				],
-				'default' => '#fffffffc',
-				'alpha' => true,
 			]
 		);
 
@@ -144,18 +137,6 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 		);
 
 		$this->add_control(
-			'create_btn_bg_color_hover',
-			[
-				'label' => __( 'Button Background Color Hover', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} .btn-create-listing:hover, .btn-create-listing:active' => 'background-color: {{VALUE}}',
-				],
-				'default' => '#00aeffa6'
-			]
-		);
-
-		$this->add_control(
 			'create_btn_border_color',
 			[
 				'label' => __( 'Button Border Color', 'houzez-theme-functionality' ),
@@ -167,10 +148,41 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 			]
 		);
 
+		$this->end_controls_tab();
+
+		$this->start_controls_tab( 'create_listing_btn_hover_options', [
+			'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
+		] );
+
+		$this->add_control(
+			'create_btn_color_hover',
+			[
+				'label' => __( 'Button Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .btn-create-listing:hover, .btn-create-listing:active' => 'color: {{VALUE}}',
+				],
+				'default' => '#fffffffc',
+				'alpha' => true,
+			]
+		);
+
+		$this->add_control(
+			'create_btn_bg_color_hover',
+			[
+				'label' => __( 'Button Background Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .btn-create-listing:hover, .btn-create-listing:active' => 'background-color: {{VALUE}}',
+				],
+				'default' => '#00aeffa6'
+			]
+		);
+
 		$this->add_control(
 			'create_btn_border_color_hover',
 			[
-				'label' => __( 'Button Border Color Hover', 'houzez-theme-functionality' ),
+				'label' => __( 'Button Border Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .btn-create-listing:hover, .btn-create-listing:active' => 'border-color: {{VALUE}}',
@@ -178,6 +190,10 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 				'default' => '#00aeffa6'
 			]
 		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
 
        
 		$this->end_controls_section();

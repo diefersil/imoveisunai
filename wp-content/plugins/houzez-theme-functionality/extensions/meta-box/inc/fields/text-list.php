@@ -1,19 +1,13 @@
 <?php
-/**
- * The text list field which allows users to enter multiple texts.
- *
- * @package Meta Box
- */
+defined( 'ABSPATH' ) || die;
 
 /**
- * Text list field class.
+ * The text list field which allows users to enter multiple texts.
  */
 class RWMB_Text_List_Field extends RWMB_Multiple_Values_Field {
-	/**
-	 * Enqueue scripts and styles.
-	 */
 	public static function admin_enqueue_scripts() {
-		wp_enqueue_style( 'rwmb-text-list', RWMB_CSS_URL . 'text-list.css', '', RWMB_VER );
+		wp_enqueue_style( 'rwmb-text-list', RWMB_CSS_URL . 'text-list.css', [], RWMB_VER );
+		wp_style_add_data( 'rwmb-text-list', 'path', RWMB_CSS_DIR . 'text-list.css' );
 	}
 
 	/**
@@ -28,15 +22,15 @@ class RWMB_Text_List_Field extends RWMB_Multiple_Values_Field {
 		if ( empty( $field['options'] ) ) {
 			return '';
 		}
-		$html  = array();
+		$html  = [];
 		$input = '<label><span class="rwmb-text-list-label">%s</span> <input %s></label>';
 
-		$attributes = self::get_attributes( $field, $meta );
+		$attributes         = self::get_attributes( $field, $meta );
 		$attributes['type'] = 'text';
 
 		$count = 0;
 		foreach ( $field['options'] as $placeholder => $label ) {
-			$attributes['value'] = isset( $meta[ $count ] ) ? esc_attr( $meta[ $count ] ) : '';
+			$attributes['value']       = $meta[ $count ] ?? '';
 			$attributes['placeholder'] = $placeholder;
 
 			$html[] = sprintf(
@@ -78,7 +72,7 @@ class RWMB_Text_List_Field extends RWMB_Multiple_Values_Field {
 	 */
 	public static function value( $new, $old, $post_id, $field ) {
 		$filtered = array_filter( $new );
-		return count( $filtered ) ? $new : array();
+		return count( $filtered ) ? $new : [];
 	}
 
 	/**

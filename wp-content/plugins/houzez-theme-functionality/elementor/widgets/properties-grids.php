@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.5.6
  */
 class Houzez_Elementor_Properties_Grids extends Widget_Base {
+    use Houzez_Property_Card_Common_Filters;
+    use Houzez_Property_Filters_2;
 
     /**
      * Get widget name.
@@ -98,24 +100,7 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
             ]
         );
 
-        $this->add_control(
-            'posts_limit',
-            [
-                'label'     => esc_html__('Number of properties', 'houzez-theme-functionality'),
-                'type'      => Controls_Manager::TEXT,
-                'description' => '',
-                'default' => '9',
-            ]
-        );
-
-        $this->add_control(
-            'offset',
-            [
-                'label'     => 'Offset',
-                'type'      => Controls_Manager::TEXT,
-                'description' => '',
-            ]
-        );
+        $this->register_common_filter_controls_2();
 
         
         $this->end_controls_section();
@@ -129,86 +114,7 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
             ]
         );
 
-        // Property taxonomies controls
-        $prop_taxonomies = get_object_taxonomies( 'property', 'objects' );
-        unset( $prop_taxonomies['property_feature'] );
-
-        $page_filters = houzez_option('houzez_page_filters');
-
-        if( isset($page_filters) && !empty($page_filters) ) {
-            foreach ($page_filters as $filter) {
-                unset( $prop_taxonomies[$filter] );
-            }
-        }
-
-        if ( ! empty( $prop_taxonomies ) && ! is_wp_error( $prop_taxonomies ) ) {
-            foreach ( $prop_taxonomies as $single_tax ) {
-
-                $options_array = array();
-                $terms   = get_terms( $single_tax->name );
-
-                if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-                    foreach ( $terms as $term ) {
-                        $options_array[ $term->slug ] = $term->name;
-                    }
-                }
-
-                $this->add_control(
-                    $single_tax->name,
-                    [
-                        'label'    => $single_tax->label,
-                        'type'     => Controls_Manager::SELECT2,
-                        'multiple' => true,
-                        'label_block' => true,
-                        'options'  => $options_array,
-                    ]
-                );
-            }
-        }
-
-        $this->add_control(
-            'properties_by_agents',
-            [
-                'label'    => esc_html__('Properties by Agents', 'houzez'),
-                'type'     => Controls_Manager::SELECT2,
-                'multiple' => true,
-                'label_block' => true,
-                'options'  => array_slice( houzez_get_agents_array(), 1, null, true ),
-            ]
-        );
-
-        $this->add_control(
-            'min_price',
-            [
-                'label'    => esc_html__('Minimum Price', 'houzez'),
-                'type'     => Controls_Manager::NUMBER,
-                'label_block' => false,
-            ]
-        );
-        $this->add_control(
-            'max_price',
-            [
-                'label'    => esc_html__('Maximum Price', 'houzez'),
-                'type'     => Controls_Manager::NUMBER,
-                'label_block' => false,
-            ]
-        );
-
-
-        $this->add_control(
-            'featured_prop',
-            [
-                'label'     => esc_html__( 'Featured Properties', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => [
-                    ''  => esc_html__( '- Any -', 'houzez-theme-functionality'),
-                    'no'    => esc_html__('Without Featured', 'houzez'),
-                    'yes'  => esc_html__('Only Featured', 'houzez')
-                ],
-                "description" => esc_html__("You can make a post featured by clicking featured properties checkbox while add/edit post", "houzez-theme-functionality"),
-                'default' => '',
-            ]
-        );
+        $this->register_common_filters_controls();
 
         $this->end_controls_section();
 
@@ -254,7 +160,7 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
         global $ele_lazyloadbg; 
         
         $settings = $this->get_settings_for_display();
-        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = '';
+        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = $properties_by_agencies = '';
 
         if(!empty($settings['property_type'])) {
             $property_type = implode (",", $settings['property_type']);
@@ -288,10 +194,15 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
             $properties_by_agents = $settings['properties_by_agents'];
         }
 
+        if( !empty($settings['properties_by_agencies']) ) {
+            $properties_by_agencies = $settings['properties_by_agencies'];
+        }
+
         $args['prop_grid_type'] =  $settings['prop_grid_type'];
         $args['featured_prop'] =  $settings['featured_prop'];
         $args['posts_limit'] =  $settings['posts_limit'];
         $args['offset'] =  $settings['offset'];
+        $args['post_status'] =  $settings['post_status'];
 
         $args['property_type']    =  $property_type;
         $args['property_status']  =  $property_status;
@@ -301,8 +212,10 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
         $args['property_city']    =  $property_city;
         $args['property_area']    =  $property_area;
         $args['properties_by_agents'] = $properties_by_agents;
+        $args['properties_by_agencies'] = $properties_by_agencies;
         $args['min_price'] = $settings['min_price'];
         $args['max_price'] = $settings['max_price'];
+        $args['property_ids'] =  $settings['property_ids'];
 
         $ele_lazyloadbg = '';
         if ( ! Plugin::$instance->editor->is_edit_mode() ) {

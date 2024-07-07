@@ -38,7 +38,7 @@ if( !function_exists('houzez_property_by_id') ) {
         $args = array(
             'post_type' => 'property',
             'post__in' => array($property_id),
-            'post_status' => 'publish'
+            'post_status' => array('publish', 'houzez_sold')
         );
         //do the query
         $the_query = New WP_Query($args);

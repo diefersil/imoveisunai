@@ -138,6 +138,11 @@ class Houzez_Elementor_Open_Street_Map extends \Elementor\Widget_Base {
         // Property taxonomies controls
         $prop_taxonomies = get_object_taxonomies( 'property', 'objects' );
 
+        unset( $prop_taxonomies['property_country'] );
+        unset( $prop_taxonomies['property_state'] );
+        unset( $prop_taxonomies['property_city'] );
+        unset( $prop_taxonomies['property_area'] );
+
         if ( ! empty( $prop_taxonomies ) && ! is_wp_error( $prop_taxonomies ) ) {
             foreach ( $prop_taxonomies as $single_tax ) {
 
@@ -162,6 +167,58 @@ class Houzez_Elementor_Open_Street_Map extends \Elementor\Widget_Base {
                 );
             }
         }
+
+        $this->add_control(
+            'property_country',
+            [
+                'label'         => esc_html__('Country', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_country'),
+            ]
+        );
+
+        $this->add_control(
+            'property_state',
+            [
+                'label'         => esc_html__('State', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_state'),
+            ]
+        );
+
+        $this->add_control(
+            'property_city',
+            [
+                'label'         => esc_html__('City', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
+            ]
+        );
+
+        $this->add_control(
+            'property_area',
+            [
+                'label'         => esc_html__('Area', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_area'),
+            ]
+        );
 
         $this->add_control(
             'featured_prop',
@@ -288,7 +345,6 @@ class Houzez_Elementor_Open_Street_Map extends \Elementor\Widget_Base {
             'post_type'      => 'property',
             'posts_per_page' => $settings['posts_limit'],
             'offset'         => $offset,
-            'paged'          => $paged,
             'post_status'    => 'publish'
         );
 
@@ -405,6 +461,7 @@ class Houzez_Elementor_Open_Street_Map extends \Elementor\Widget_Base {
         $map_options['mapCluster'] = $settings['mapCluster'];
         $map_options['markerPricePins'] = houzez_option('markerPricePins');
         $map_options['marker_spiderfier'] = houzez_option('marker_spiderfier');
+        $map_options[ 'link_target' ] = houzez_option('listing_link_target', '_self');
         $map_options['closeIcon'] = get_template_directory_uri() . '/img/map/close.png';
         $map_options['infoWindowPlac'] = get_template_directory_uri() . '/img/pixel.gif';
         $map_options['mapbox_api_key'] = $settings['mapbox_api_key'];

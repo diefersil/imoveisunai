@@ -55,17 +55,16 @@ class Houzez_Fields_Builder {
 
         wp_register_script( 'houzez-jquery-cloneya', HOUZEZ_PLUGIN_URL . $path . 'jquery-cloneya.min.js', array('jquery') );
         wp_enqueue_script( 'houzez-jquery-cloneya' );
-
-        wp_register_script( 'houzez-admin-custom', HOUZEZ_PLUGIN_URL . $path . 'custom.js', array('jquery', 'houzez-jquery-cloneya') );
-        wp_enqueue_script( 'houzez-admin-custom' );
     }
 
     public static function get_form_fields() {
         global $wpdb;
 
-        $result = $wpdb->get_results(" SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder order by id ASC");
+        // Prepare and execute the SQL query
+        $query = "SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder ORDER BY id ASC";
+        $result = $wpdb->get_results($query);
 
-        if(!empty($result)) {
+        if (!empty($result)) {
             return $result;
         }
         return false;
@@ -74,29 +73,36 @@ class Houzez_Fields_Builder {
     public static function get_search_fields() {
         global $wpdb;
 
-        $result = $wpdb->get_results(" SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE is_search='yes' order by id ASC");
+        // Prepare and execute the SQL query
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE is_search = %s ORDER BY id ASC", 'yes');
+        $result = $wpdb->get_results($query);
 
-        if(!empty($result)) {
+        if (!empty($result)) {
             return $result;
         }
         return false;
     }
 
 
-    public static function delete_field() {
 
+    public static function delete_field() {
         $nonce = 'houzez-delete-field';
 
-        if ( ! empty( $_GET[ 'nonce' ] ) && wp_verify_nonce( $_GET[ 'nonce' ], $nonce ) && ! empty( $_GET['id'] ) ) {
-
+        if ( ! empty( $_GET['nonce'] ) && wp_verify_nonce( $_GET['nonce'], $nonce ) && ! empty( $_GET['id'] ) ) {
             global $wpdb;
 
-            $wpdb->delete( $wpdb->prefix . 'houzez_fields_builder', array( 'id' => $_GET['id'] ) );
-            wp_redirect( 'admin.php?page=houzez_fbuilder' ); die;
+            // Sanitize the ID
+            $id = intval($_GET['id']);
 
+            // Use wpdb->delete with sanitized data
+            $wpdb->delete($wpdb->prefix . 'houzez_fields_builder', array('id' => $id), array('%d'));
+
+            // Redirect after deletion
+            wp_redirect('admin.php?page=houzez_fbuilder');
+            exit;
         }
-
     }
+
 
     public static function load_select_options() {
 
@@ -173,30 +179,49 @@ class Houzez_Fields_Builder {
         return null;
     }
 
-    public static function get_field( $id ) {
+    public static function get_field($id) {
         global $wpdb;
-        $instance = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE id = '{$id}'", ARRAY_A );
 
-        if ( $instance ) {
-            $instance['fvalues'] = ! empty( $instance['fvalues'] ) ? unserialize( $instance['fvalues'] ) : array();
+        // Sanitize the ID
+        $id = intval($id);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE id = %d", $id);
+        $instance = $wpdb->get_row($query, ARRAY_A);
+
+        if ($instance) {
+            $instance['fvalues'] = !empty($instance['fvalues']) ? unserialize($instance['fvalues']) : array();
         }
 
         return $instance;
     }
 
-    public static function get_field_by_slug( $slug ) {
+    public static function get_field_by_slug($slug) {
         global $wpdb;
-        $instance = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE field_id = '{$slug}'", ARRAY_A );
+
+        // Sanitize the slug
+        $slug = sanitize_text_field($slug);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_fields_builder WHERE field_id = %s", $slug);
+        $instance = $wpdb->get_row($query, ARRAY_A);
 
         return $instance;
     }
 
-    public static function get_field_title_type_by_slug( $slug ) {
+    public static function get_field_title_type_by_slug($slug) {
         global $wpdb;
-        $result = $wpdb->get_row( "SELECT label, type FROM " . $wpdb->prefix . "houzez_fields_builder WHERE field_id = '{$slug}'", ARRAY_A );
+
+        // Sanitize the slug
+        $slug = sanitize_text_field($slug);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT label, type FROM " . $wpdb->prefix . "houzez_fields_builder WHERE field_id = %s", $slug);
+        $result = $wpdb->get_row($query, ARRAY_A);
 
         return $result;
     }
+
 
 
     public static function add_field_notice() { ?>
@@ -230,7 +255,7 @@ class Houzez_Fields_Builder {
     }
 
 
-    public static function save_fields() {
+    public static function save_fields_old() {
         global $wpdb;
 
         $nonce = 'houzez_fbuilder_save_field';
@@ -306,6 +331,119 @@ class Houzez_Fields_Builder {
 
     }
 
+    public static function save_fields() {
+        global $wpdb;
+
+        $nonce = 'houzez_fbuilder_save_field';
+
+        if (!empty($_REQUEST[$nonce]) && wp_verify_nonce($_REQUEST[$nonce], $nonce)) {
+            $data = $_POST['hz_fbuilder'];
+
+            $fvalues = !empty($data['fvalues']) ? stripslashes_deep($data['fvalues']) : null;
+
+            if (!empty($fvalues)) {
+                self::register_option_strings($fvalues);
+            }
+
+            $instance = self::prepare_instance_data($data, $fvalues);
+            self::register_label_and_placeholder_strings($instance);
+
+            if (!empty($data['id'])) {
+                self::update_field($wpdb, $data['id'], $instance);
+            } else {
+                self::insert_field($wpdb, $instance);
+            }
+        }
+    }
+
+    private static function register_option_strings($fvalues) {
+        foreach ($fvalues as $option) {
+            do_action('wpml_register_single_string', 'houzez_cfield', $option, $option);
+        }
+    }
+
+    private static function prepare_instance_data($data, $fvalues) {
+        $field_type = self::get_field_value($data, 'type');
+        $field_label = self::get_field_value($data, 'label');
+        $placeholder = self::get_field_value($data, 'placeholder');
+        $field_is_search = self::get_field_value($data, 'is_search');
+
+        if ($field_type == 'select' || $field_type == 'multiselect') {
+            $fvalues = $fvalues ? serialize(array_combine($fvalues, $fvalues)) : null;
+        } else {
+            $fvalues = $data['options'] ? serialize($data['options']) : null;
+        }
+
+        return apply_filters('houzez_fields_builder_before_fields_save', [
+            'label' => $field_label,
+            'type' => $field_type,
+            'fvalues' => $fvalues,
+            'is_search' => $field_is_search,
+            'placeholder' => $placeholder,
+            'options' => '',
+        ]);
+    }
+
+    private static function register_label_and_placeholder_strings($instance) {
+        do_action('wpml_register_single_string', 'houzez_cfield', $instance['label'], $instance['label']);
+        do_action('wpml_register_single_string', 'houzez_cfield', $instance['placeholder'], $instance['placeholder']);
+    }
+
+    private static function update_field($wpdb, $id, $instance) {
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'houzez_fields_builder',
+            $instance,
+            ['id' => $id]
+        );
+
+        if ($updated) {
+            add_action('admin_notices', [__CLASS__, 'update_field_notice']);
+        }
+    }
+
+    private static function insert_field($wpdb, $instance) {
+        $field_id = self::generate_field_id($instance['label']);
+        
+        if (self::field_id_exists($wpdb, $field_id) || in_array($field_id, self::builtInFields())) {
+            add_action('admin_notices', [__CLASS__, 'field_exists_notice']);
+            return;
+        }
+
+        $inserted = $wpdb->insert(
+            $wpdb->prefix . 'houzez_fields_builder',
+            array_merge(['field_id' => $field_id], $instance)
+        );
+
+        if ($inserted) {
+            add_action('admin_notices', [__CLASS__, 'add_field_notice']);
+        } else {
+            add_action('admin_notices', [__CLASS__, 'error_field_notice']);
+        }
+    }
+
+    private static function generate_field_id($label) {
+        if (is_rtl()) {
+            return self::houzez_slugify(uniqid('f'));
+        } else {
+            return self::houzez_slugify($label);
+        }
+    }
+
+    private static function field_id_exists($wpdb, $field_id) {
+        $table_name = $wpdb->prefix . 'houzez_fields_builder';
+        $query = $wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE field_id = %s", $field_id);
+        $count = $wpdb->get_var($query);
+
+        return $count > 0;
+    }
+
+    public static function field_exists_notice() {
+        $class = 'notice notice-error';
+        $message = __('A field with the name provided already exists', 'houzez-theme-functionality');
+        printf('<div class="%1$s"><p>%2$s</p></div>', esc_attr($class), esc_html($message));
+    }
+
+
     public static function builtInFields() {
         $array = array(
             'bed',
@@ -316,6 +454,29 @@ class Houzez_Fields_Builder {
             'land-area',
             'year-built',
             'property-id',
+            'property_price',
+            'property_price_prefix',
+            'location',
+            'type',
+            'country',
+            'states',
+            'areas',
+            'bathrooms',
+            'bedrooms',
+            'currency',
+            'use_radius',
+            'feature',
+            'search_location',
+            'keyword',
+            'label',
+            'max-area',
+            'max-land-area',
+            'max-price',
+            'min-area',
+            'min-land-area',
+            'min-price',
+            'property_id',
+            'year-built',
         );
         return $array;
     }

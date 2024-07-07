@@ -133,7 +133,7 @@ class Houzez_Post_Type_Packages {
                 break;
         }
 
-        $pack_time_frame = $seconds * $pack_billing_frequency;
+        $pack_time_frame = $seconds * intval($pack_billing_frequency);
         $expired_date    = $pack_date + $pack_time_frame;
         $expired_date    = date( 'Y-m-d', $expired_date );
 

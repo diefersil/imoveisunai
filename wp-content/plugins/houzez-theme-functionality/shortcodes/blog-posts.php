@@ -15,6 +15,9 @@ if( !function_exists('houzez_blog_posts') ) {
             'offset' => '',
         ), $atts));
 
+        global $houzez_local;
+        $houzez_local = houzez_get_localization();
+
         ob_start();
 
         $wp_query_args = array(

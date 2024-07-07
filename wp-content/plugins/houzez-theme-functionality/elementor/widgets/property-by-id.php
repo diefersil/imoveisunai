@@ -122,6 +122,24 @@ class Houzez_Elementor_Property_By_ID extends Widget_Base {
         );
 
         $this->add_control(
+            'hide_description',
+            [
+                'label' => esc_html__( 'Hide Description', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'none',
+                'default' => 'none',
+                'selectors' => [
+                    '{{WRAPPER}} .property-by-id-module .item-short-description' => 'display: {{VALUE}};',
+                ],
+                'condition' => [
+                    'prop_grid_style' => array('v_1', 'v_2'),
+                ]
+            ]
+        );
+
+        $this->add_control(
             'hide_compare',
             [
                 'label' => esc_html__( 'Hide Compare Button', 'houzez-theme-functionality' ),

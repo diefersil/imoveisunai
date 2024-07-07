@@ -2,11 +2,12 @@
     'use strict';
 
     
-    window.houzezOpenStreetMapElementor = function(mapID , propertiesData , mapOptions ) {
+    window.houzezOpenStreetMapElementor = function(mapID , houzez_map_properties , mapOptions ) {
 
-        if ( typeof propertiesData !== "undefined" ) {
+        if ( typeof houzez_map_properties !== "undefined" ) {
+        
+            if (0 < houzez_map_properties.length) {
 
-            if (0 < propertiesData.length) {
 
                 var houzezMap;
                 var mapBounds;
@@ -26,7 +27,10 @@
                 var zoom_control = mapOptions.zoomControl;
                 var infoWindowPlac = mapOptions.infoWindowPlac;
                 var clusterIcon = mapOptions.clusterIcon;
+                var link_target = mapOptions.link_target;
                 var clusterer_zoom = mapOptions.clusterer_zoom;
+                var default_lat = parseFloat(houzez_vars.default_lat);
+                var default_long = parseFloat(houzez_vars.default_long);
 
                 var hGet_boolean = function(data) {
                     if(data == 'yes') {
@@ -36,35 +40,6 @@
                 }
 
                 var map_cluster_enable = hGet_boolean(mapOptions.mapCluster);
-
-
-                var special_chars = {
-                    '&amp;': '&',
-                    '&quot;': '"',
-                    '&#039;': "'",
-                    '&#8217;': "’",
-                    '&#038;': "&",
-                    '&lt;': '<',
-                    '&gt;': '>',
-                    '&#8216;': "‘",
-                    '&#8230;': "…",
-                    '&#8221;': '”',
-                    '&#8211;': "–",
-                    '&#8212;': "—"
-                };
-
-                
-                var addCommas = function (nStr) {
-                    nStr += '';
-                    var x = nStr.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-                }
 
                 if( mapbox_api_key != '' ) {
 
@@ -83,99 +58,32 @@
                     } );
                 }
 
-                var houzez_map_next = function(hMap) {
-                    current_marker++;
-                    if ( current_marker > markers.length ){
-                        current_marker = 1;
+                var addCommas = (nStr) => {
+                    nStr += '';
+                    var x = nStr.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
                     }
-                    while( markers[current_marker-1].visible===false ){
-                        current_marker++;
-                        if ( current_marker > markers.length ){
-                            current_marker = 1;
-                        }
-                    }
-                    if( hMap.getZoom() < 15 ){
-                        hMap.setZoom(15);
-                    }
-                    
-                    hMap.setView(markers[current_marker - 1].getLatLng());   
-                    if (! markers[current_marker - 1]._icon) {
-                        markers[current_marker - 1].__parent.spiderfy();
-                    }
-
-                    hMap.setZoom(20);
-               
-                    if( (current_marker - 1)==0 || (current_marker - 1)==markers.length ){
-                        setTimeout(function(){  markers[current_marker - 1].fire('click');  }, 500); 
-                    }else{
-                        markers[current_marker - 1].fire('click');
-                    }
-                    
-
+                    return x1 + x2;
                 }
 
-                var houzez_map_prev = function(hMap) {
-                    current_marker--;
-                    if (current_marker < 1){
-                        current_marker = markers.length;
-                    }
-                    while( markers[current_marker-1].visible===false ){
-                        current_marker--;
-                        if ( current_marker > markers.length ){
-                            current_marker = 1;
+                var thousandSeparator = (n) => {
+                    if (typeof n === 'number') {
+                        n += '';
+                        var x = n.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + thousands_separator + '$2');
                         }
+                        return x1 + x2;
+                    } else {
+                        return n;
                     }
-                    if( hMap.getZoom() < 15 ){
-                        hMap.setZoom(15);
-                    }
-                   
-                    hMap.setView(markers[current_marker - 1].getLatLng());   
-                    if (! markers[current_marker - 1]._icon) {
-                        markers[current_marker - 1].__parent.spiderfy();
-                    }
-
-                    hMap.setZoom(20);
-                   
-                    if( (current_marker - 1)==0 || (current_marker )==markers.length ){
-                        setTimeout(function(){  markers[current_marker - 1].fire('click');  }, 500); 
-                    }else{
-                        markers[current_marker - 1].fire('click');
-                    }
-                }
-
-                $('#houzez-gmap-next').on('click', function(){
-                    houzez_map_next(houzezMap);
-                });
-
-                $('#houzez-gmap-prev').on('click', function(){           
-                    houzez_map_prev(houzezMap);
-                });
-
-
-                var houzez_map_zoomin = function(hMap) {
-                    $('#listing-mapzoomin').on('click', function() {
-                        var current= parseInt( hMap.getZoom(),10);
-                        console.log(current);
-                        current++;
-                        if(current > 20){
-                            current = 20;
-                        }
-                        console.log('=='+current+' ++ ');
-                        hMap.setZoom(current);
-                    });
-                }
-
-                var houzez_map_zoomout = function(hMap) {
-                    $('#listing-mapzoomout').on('click', function() {
-                        var current= parseInt( hMap.getZoom(),10);
-                        console.log(current);
-                        current--;
-                        if(current < 0){
-                            current = 0;
-                        }
-                        console.log('=='+current+' -- ');
-                        hMap.setZoom(current);
-                    });
                 }
 
                 var reloadOSMMarkers = function() {
@@ -203,7 +111,6 @@
 
                     return mapBounds;
                 }
-                
 
                 /*--------------------------------------------------------------------
                 * Add Marker
@@ -217,7 +124,7 @@
                         houzezMap.fitBounds( mBounds );
                     }
 
-                    if( map_cluster_enable ) {
+                    if(map_cluster_enable == 1) {
                         osm_markers_cluster = new L.MarkerClusterGroup({ 
                             iconCreateFunction: function (cluster) {
                                 var markers1 = cluster.getAllChildMarkers();
@@ -296,15 +203,15 @@
                                 innerHTML += '<div class="item-header">';
                     
                                     if( map_properties[i].thumbnail ) {
-                                        innerHTML += '<a href="' + map_properties[i].url + '">' + '<img class="img-fluid" src="' + map_properties[i].thumbnail + '" alt="' + map_properties[i].title + '"/>' + '</a>';
+                                        innerHTML += '<a target="'+ link_target +'" href="' + map_properties[i].url + '">' + '<img class="img-fluid" src="' + map_properties[i].thumbnail + '" alt="' + map_properties[i].title + '"/>' + '</a>';
                                     } else {
-                                        innerHTML += '<a href="' + map_properties[i].url + '">' + '<img class="img-fluid" src="' + infoWindowPlac + '" alt="' + map_properties[i].title + '"/>' + '</a>';
+                                        innerHTML += '<a target="'+ link_target +'" href="' + map_properties[i].url + '">' + '<img class="img-fluid" src="' + infoWindowPlac + '" width="120" height="90" alt="' + map_properties[i].title + '"/>' + '</a>';
                                     }
                                 innerHTML += '</div>';
 
                                 innerHTML += '<div class="item-body flex-grow-1">';
                                     innerHTML += '<h2 class="item-title">';
-                                        innerHTML += '<a href="' + map_properties[i].url + '">'+map_properties[i].title+'</a>';
+                                        innerHTML += '<a target="'+ link_target +'" href="' + map_properties[i].url + '">'+map_properties[i].title+'</a>';
                                     innerHTML += '</h2>';
 
                                     innerHTML += '<ul class="list-unstyled item-info">';
@@ -325,6 +232,8 @@
 
                             mainContent.innerHTML = innerHTML;
 
+                            propertyMarker.id = mapData.property_id;
+
                             markers.push(propertyMarker);
                             propertyMarker.bindPopup( mainContent );
 
@@ -339,11 +248,11 @@
                     
                 } //end houzezAddMarkers
 
-                if ( propertiesData.length > 0 ) {
+                if ( houzez_map_properties.length > 0 ) {
                     
-                    var mapBounds = getMapBounds(propertiesData);
+                    var mapBounds = getMapBounds(houzez_map_properties);
                     // Basic map
-                    var mapCenter = L.latLng( 25.686540,-80.431345 ); 
+                    var mapCenter = L.latLng( default_lat, default_long ); 
                     if ( 1 == mapBounds.length ) {
                         mapCenter = L.latLng( mapBounds[0] );
                     }
@@ -351,9 +260,8 @@
                     var mapOptions = {
                         dragging: mapDragging,
                         center: mapCenter,
-                        zoomControl: hGet_boolean(zoom_control),
                         zoom: 10,
-                        tap: true
+                        tap: false
                     };
                     houzezMap = L.map( document.getElementById( mapID ), mapOptions );
 
@@ -365,18 +273,11 @@
 
                     houzezMap.addLayer( tileLayer );
 
+                    houzezAddMarkers(houzez_map_properties, houzezMap);
 
-                    if( document.getElementById('listing-mapzoomin') ) {
-                        houzez_map_zoomin(houzezMap);
-                    }
-                    if( document.getElementById('listing-mapzoomout') ) {
-                        houzez_map_zoomout(houzezMap);
-                    }
-
-                    houzezAddMarkers(propertiesData, houzezMap);
 
                 } else {
-                    
+
                     var fallbackMapOptions = {
                         center : [25.686540,-80.431345],
                         zoom : 10
@@ -387,11 +288,10 @@
                     houzezMap.scrollWheelZoom.disable();
 
                 }
-                
 
+            } // #houzez-properties-map").length
 
-            }
-        }
+        } // end typeof
     }
     
 } )( jQuery );

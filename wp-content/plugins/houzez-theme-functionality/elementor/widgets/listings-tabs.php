@@ -73,13 +73,11 @@ class Houzez_Elementor_Listings_Tabs extends Widget_Base {
      */
     protected function register_controls() {
 
-        $prop_cities = array();
         $prop_types = array();
         $prop_status = array();
         
         houzez_get_terms_array( 'property_status', $prop_status );
         houzez_get_terms_array( 'property_type', $prop_types );
-        houzez_get_terms_array( 'property_city', $prop_cities );
 
        
         $this->start_controls_section(
@@ -135,15 +133,17 @@ class Houzez_Elementor_Listings_Tabs extends Widget_Base {
             ]
         );
 
+
         $this->add_control(
             'city_data',
             [
-                'label'     => esc_html__( 'Select Cities', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT2,
-                'options'   => $prop_cities,
-                'description' => '',
-                'multiple' => true,
-                'default' => '',
+                'label'         => esc_html__( 'Select Cities', 'houzez-theme-functionality' ),
+                'multiple'      => true,
+                'label_block'   => false,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
                 'condition' => [
                     'tabs_field' => 'property_city',
                 ],

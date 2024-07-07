@@ -112,46 +112,62 @@ class Houzez_Post_Type_Invoice {
         global $post;
 
         $invoice_meta = get_post_meta( $post->ID, '_houzez_invoice_meta', true );
-        switch ($column)
-        {
-            case 'invoice_price':
-                echo esc_attr( $invoice_meta['invoice_item_price'] );
-                break;
+        $billing_for_if = get_post_meta( $post->ID, 'HOUZEZ_invoice_for', true );
+        
+        if( $invoice_meta != '' ) {
+            switch ($column)
+            {
+                case 'invoice_price':
+                    echo esc_attr( $invoice_meta['invoice_item_price'] );
+                    break;
 
-            case 'invoice_payment_method':
-                if( $invoice_meta['invoice_payment_method'] == 'Direct Bank Transfer' ) {
-                    esc_html_e( 'Direct Bank Transfer', 'houzez-theme-functionality' );
-                } else {
-                    echo $invoice_meta['invoice_payment_method'];
-                }
-                break;
+                case 'invoice_payment_method':
+                    if( $invoice_meta['invoice_payment_method'] == 'Direct Bank Transfer' ) {
+                        esc_html_e( 'Direct Bank Transfer', 'houzez-theme-functionality' );
+                    } else {
+                        echo $invoice_meta['invoice_payment_method'];
+                    }
+                    break;
 
-            case 'invoice_type':
-                echo esc_attr( $invoice_meta['invoice_billing_type'] );
-                break;
+                case 'invoice_type':
+                    echo esc_attr( $invoice_meta['invoice_billing_type'] );
+                    break;
 
-            case 'billing_for':
-                echo esc_attr( $invoice_meta['invoice_billion_for'] );
-                break;
+                case 'billing_for':
+                    if( $invoice_meta['invoice_billion_for'] != 'package' && $invoice_meta['invoice_billion_for'] != 'Package' ) {
+                
+                        if( $billing_for_if == 'listing' || $billing_for_if == 'Listing' ) {
+                            echo esc_html__('Listing', 'houzez');
+                        } elseif ( $billing_for_if == 'UPGRADE TO FEATURED' || $billing_for_if == 'Upgrade to Featured' ) {
+                            echo esc_html__('Upgrade to Featured', 'houzez');
+                        } else {
+                            echo esc_html($invoice_meta['invoice_billion_for']);
+                        }
 
-            case 'invoice_buyer':
-                $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
-                echo isset($user_info->display_name) ? esc_attr( $user_info->display_name ) : '';
-                break;
+                    } else {
+                        echo get_the_title( get_post_meta( get_the_ID(), 'HOUZEZ_invoice_item_id', true) );
+                    }
+                    break;
 
-            case 'invoice_buyer_email':
-                $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
-                echo  isset($user_info->user_email) ? esc_attr( $user_info->user_email ) : '';
-                break;
+                case 'invoice_buyer':
+                    $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
+                    echo isset($user_info->display_name) ? esc_attr( $user_info->display_name ) : '';
+                    break;
 
-            case 'invoice_status':
-                $invoice_status = get_post_meta(  $post->ID, 'invoice_payment_status', true );
-                if( $invoice_status == 0 ) {
-                    echo '<span class="fave_admin_label float-none label-red">'.__('Not Paid','houzez-theme-functionality').'</span>';
-                } else {
-                    echo '<span class="fave_admin_label float-none label-green">'.__('Paid','houzez-theme-functionality').'</span>';
-                }
-                break;
+                case 'invoice_buyer_email':
+                    $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
+                    echo  isset($user_info->user_email) ? esc_attr( $user_info->user_email ) : '';
+                    break;
+
+                case 'invoice_status':
+                    $invoice_status = get_post_meta(  $post->ID, 'invoice_payment_status', true );
+                    if( $invoice_status == 0 ) {
+                        echo '<span class="fave_admin_label float-none label-red">'.__('Not Paid','houzez-theme-functionality').'</span>';
+                    } else {
+                        echo '<span class="fave_admin_label float-none label-green">'.__('Paid','houzez-theme-functionality').'</span>';
+                    }
+                    break;
+            }
         }
     }
 

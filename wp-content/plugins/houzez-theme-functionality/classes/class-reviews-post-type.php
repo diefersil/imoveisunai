@@ -13,8 +13,10 @@ class Houzez_Post_Type_Reviews {
     public static function init() {
         add_action( 'init', array( __CLASS__, 'definition' ) );
         add_action( 'save_post_houzez_reviews', array( __CLASS__, 'save_reviews_meta' ), 10, 3 );
-        /*add_filter( 'manage_edit-houzez_agent_columns', array( __CLASS__, 'custom_columns' ) );
-        add_action( 'manage_houzez_agent_posts_custom_column', array( __CLASS__, 'custom_columns_manage' ) );*/
+        add_filter( 'manage_edit-houzez_reviews_columns', array( __CLASS__, 'custom_columns' ) );
+        add_action( 'manage_houzez_reviews_posts_custom_column', array( __CLASS__, 'custom_columns_manage' ) );
+        add_action( 'admin_action_houzez_review_accept', array( __CLASS__, 'review_accept' ) );
+        add_action( 'admin_action_houzez_review_reject', array( __CLASS__, 'review_reject' ) );
     }
 
     /**
@@ -50,6 +52,7 @@ class Houzez_Post_Type_Reviews {
             'query_var' => false,
             'has_archive' => false,
             'capability_type' => 'post',
+            'exclude_from_search' => true,
             'hierarchical' => true,
             'can_export' => true,
             'menu_position' => 15,
@@ -63,27 +66,6 @@ class Houzez_Post_Type_Reviews {
         $args = apply_filters( 'houzez_post_type_review_args', $args );
 
         register_post_type('houzez_reviews',$args);
-    }
-
-    /**
-     * Custom admin columns for post type
-     *
-     * @access public
-     * @return array
-     */
-    public static function custom_columns() {
-        $fields = array(
-            'cb'                => '<input type="checkbox" />',
-            'agent_id'          => esc_html__( 'Agent ID', 'houzez-theme-functionality' ),
-            'title'             => esc_html__( 'Agent Name', 'houzez-theme-functionality' ),
-            'agent_thumbnail'       => esc_html__( 'Picture', 'houzez-theme-functionality' ),
-            'category'          => esc_html__( 'Category', 'houzez-theme-functionality' ),
-            'email'             => esc_html__( 'E-mail', 'houzez-theme-functionality' ),
-            'web'               => esc_html__( 'Web', 'houzez-theme-functionality' ),
-            'mobile'            => esc_html__( 'Mobile', 'houzez-theme-functionality' ),
-        );
-
-        return $fields;
     }
 
     /**
@@ -109,12 +91,30 @@ class Houzez_Post_Type_Reviews {
         $review_id = isset($_POST['post_ID']) ? $_POST['post_ID'] : '';
         
         if(!empty($review_id)) {
-            houzez_admin_review_meta_on_save($review_id, $_POST);
+            houzez_admin_review_meta_on_save($post_id);
         }
 
         return;
     }
 
+    /**
+     * Custom admin columns for post type
+     *
+     * @access public
+     * @return array
+     */
+    public static function custom_columns() {
+        $fields = array(
+            'cb'                => '<input type="checkbox" />',
+            'title'             => esc_html__( 'Title', 'houzez-theme-functionality' ),
+            'ratings'       => esc_html__( 'Stars', 'houzez-theme-functionality' ),
+            'post_title'          => esc_html__( 'Review On', 'houzez-theme-functionality' ),
+            'review_actions' => __( 'Actions','houzez-theme-functionality' ),
+            'date' => esc_html__('Date', 'houzez-theme-functionality')
+        );
+
+        return $fields;
+    }
 
     /**
      * Custom admin columns implementation
@@ -126,53 +126,134 @@ class Houzez_Post_Type_Reviews {
     public static function custom_columns_manage( $column ) {
         global $post;
         switch ( $column ) {
-            case 'agent_thumbnail':
-                if ( has_post_thumbnail() ) {
-                    the_post_thumbnail( 'thumbnail', array(
-                        'class'     => 'attachment-thumbnail attachment-thumbnail-small',
-                    ) );
-                } else {
-                    echo '-';
-                }
+            case 'ratings':
+                echo get_post_meta($post->ID, 'review_stars', true);
                 break;
-            case 'agent_id':
-                echo $post->ID;
-                break;
-            case 'category':
-                echo Houzez::admin_taxonomy_terms ( $post->ID, 'agent_category', 'houzez_agent' );
-                break;
-            case 'email':
-                $email = get_post_meta( get_the_ID(),  'fave_agent_email', true );
+            case 'post_title':
+                $review_id = $post->ID;
+                $review_post_type = get_post_meta($review_id, 'review_post_type', true);
+                if($review_post_type == 'property') {
+                    $listing_id = get_post_meta($review_id, 'review_property_id', true);
+                    $meta_key = 'review_property_id';
 
-                if ( ! empty( $email ) ) {
-                    echo esc_attr( $email );
-                } else {
-                    echo '-';
-                }
-                break;
-            case 'web':
-                $web = get_post_meta( get_the_ID(), 'fave_agent_website', true );
+                } else if($review_post_type == 'houzez_agent') {
+                    $listing_id = get_post_meta($review_id, 'review_agent_id', true);
+                    $meta_key = 'review_agent_id';
 
-                if ( ! empty( $web ) ) {
-                    echo '<a target="_blank" href="'.esc_url( $web ).'">'.esc_url( $web ).'</a>';
-                } else {
-                    echo '-';
-                }
-                break;
-            case 'mobile':
-                $phone = get_post_meta( get_the_ID(), 'fave_agent_mobile', true );
+                } else if($review_post_type == 'houzez_agency') {
+                    $listing_id = get_post_meta($review_id, 'review_agency_id', true);
+                    $meta_key = 'review_agency_id';
 
-                if ( ! empty( $phone ) ) {
-                    echo esc_attr( $phone );
-                } else {
-                    echo '-';
+                } else if($review_post_type == 'houzez_author') {
+                    $listing_id = get_post_meta($review_id, 'review_author_id', true);
+                    $meta_key = 'review_author_id';
                 }
+
+                echo '<a target="_blank" href="'.get_permalink( $listing_id ).'">';
+                echo get_the_title($listing_id);
+                echo '</a>';
                 break;
-            /*case 'agents':
-                $agents_count = Houzez_Query::get_agency_agents( $post_id = get_the_ID() )->post_count;
-                echo esc_attr( $agents_count );
-                break;*/
+            case 'review_actions':
+                
+                echo '<div class="actions">';
+
+                $admin_actions = apply_filters( 'post_row_actions', array(), $post );
+
+
+                $user = wp_get_current_user();
+
+                if ( in_array( $post->post_status, array( 'pending', 'review_rejected' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['review_accept']   = array(
+                        'class'  => 'accept',
+                        'name'    => __( 'Approve', 'houzez-theme-functionality' ),
+                        'icon'    => 'dashicons dashicons-yes',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_review_accept',
+                            'review_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+                
+                if ( in_array( $post->post_status, array( 'pending', 'publish' ) ) && (in_array( 'administrator', (array) $user->roles ) || in_array( 'editor', (array) $user->roles ) || in_array( 'houzez_manager', (array) $user->roles )) ) {
+                    $admin_actions['review_reject']   = array(
+                        'class'  => 'reject',
+                        'name'    => __( 'Unapprove', 'houzez-theme-functionality' ),
+                        'icon'    => 'dashicons dashicons-no-alt',
+                        'url' => add_query_arg( array(
+                            'action' => 'houzez_review_reject',
+                            'review_id' => $post->ID,
+                        ), 'admin.php' )
+                    );
+                }
+
+                $admin_actions = apply_filters( 'review_admin_actions', $admin_actions, $post );
+
+                foreach ( $admin_actions as $action ) {
+                    if ( is_array( $action ) ) {
+                        printf( '<a class="button houzez-button-icon tips icon-%1$s" href="%2$s" data-tip="%3$s"><span class="%4$s"></span></a>', $action['class'], esc_url( $action['url'] ), esc_attr( $action['name'] ), esc_html( $action['icon'] ) );
+                    } else {
+                        
+                    }
+                }
+
+
+                echo '</div>';
+
+                break;
+
         }
+    }
+
+    public static function review_accept() {
+
+        if (! ( isset( $_GET['review_id']) || isset( $_POST['review_id'])  || ( isset($_REQUEST['action']) && 'houzez_review_accept' == $_REQUEST['action'] ) ) ) {
+            wp_die('No review exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $review_id = (isset($_GET['review_id']) ? $_GET['review_id'] : $_POST['review_id']);
+
+        $post_id = absint($review_id);
+        $agrs = array(
+            'ID' => $post_id,
+            'post_status' => 'publish'
+        );
+        wp_update_post($agrs);
+
+        if(!empty($post_id)) {
+            houzez_admin_review_meta_on_save($post_id);
+        }
+
+        wp_redirect( admin_url( 'edit.php?post_type=houzez_reviews') );
+        exit;
+    }
+
+    public static function review_reject() {
+
+        if (! ( isset( $_GET['review_id']) || isset( $_POST['review_id'])  || ( isset($_REQUEST['action']) && 'houzez_review_accept' == $_REQUEST['action'] ) ) ) {
+            wp_die('No review exist');
+        }
+     
+        /*
+         * get the original listing id
+         */
+        $review_id = (isset($_GET['review_id']) ? $_GET['review_id'] : $_POST['review_id']);
+
+        $post_id = absint($review_id);
+        $agrs = array(
+            'ID' => $post_id,
+            'post_status' => 'review_rejected'
+        );
+        wp_update_post($agrs);
+
+        if(!empty($post_id)) {
+            houzez_admin_review_meta_on_save($post_id);
+        }
+
+        wp_redirect( admin_url( 'edit.php?post_type=houzez_reviews') );
+        exit;
     }
 
 }

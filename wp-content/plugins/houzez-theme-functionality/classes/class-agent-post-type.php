@@ -46,7 +46,6 @@ class Houzez_Post_Type_Agent {
             'labels' => $labels,
             'public' => true,
             'publicly_queryable' => true,
-            'exclude_from_search' => true,
             'show_in_menu'        => false,
             'show_in_admin_bar'   => true,
             'show_ui' => true,
@@ -256,6 +255,8 @@ class Houzez_Post_Type_Agent {
         $fave_agent_tax_no = wp_kses($_POST['fave_agent_tax_no'], $allowed_html);
         $fave_agent_mobile = wp_kses($_POST['fave_agent_mobile'], $allowed_html);
         $fave_agent_whatsapp = wp_kses($_POST['fave_agent_whatsapp'], $allowed_html);
+        $fave_agent_telegram = wp_kses($_POST['fave_agent_telegram'], $allowed_html);
+        $fave_agent_line_id = wp_kses($_POST['fave_agent_line_id'], $allowed_html);
         $fave_agent_office_num = wp_kses($_POST['fave_agent_office_num'], $allowed_html);
         $fave_agent_fax = wp_kses($_POST['fave_agent_fax'], $allowed_html);
         $fave_agent_skype = wp_kses($_POST['fave_agent_skype'], $allowed_html);
@@ -283,6 +284,8 @@ class Houzez_Post_Type_Agent {
         update_user_meta( $user_id, 'fave_author_fax' , $fave_agent_fax) ;
         update_user_meta( $user_id, 'fave_author_mobile' , $fave_agent_mobile) ;
         update_user_meta( $user_id, 'fave_author_whatsapp' , $fave_agent_whatsapp) ;
+        update_user_meta( $user_id, 'fave_author_telegram' , $fave_agent_telegram) ;
+        update_user_meta( $user_id, 'fave_author_line_id' , $fave_agent_line_id) ;
         update_user_meta( $user_id, 'description' , $fave_agent_des) ;
         update_user_meta( $user_id, 'fave_author_skype' , $fave_agent_skype) ;
         update_user_meta( $user_id, 'fave_author_title', $fave_agent_position) ;

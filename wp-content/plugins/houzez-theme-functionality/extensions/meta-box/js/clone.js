@@ -71,6 +71,13 @@
 		 */
 		nextIndex: function ( $container ) {
 			var nextIndex = $container.data( 'next-index' );
+
+			// If we render cloneable fields via AJAX, the mb_ready event is not fired.
+			// so nextIndex is undefined. In this case, we get the next index from the number of existing clones.
+			if ( nextIndex === undefined ) {
+				nextIndex = $container.children( '.rwmb-clone' ).length;
+			}
+
 			$container.data( 'next-index', nextIndex + 1 );
 			return nextIndex;
 		}
@@ -95,20 +102,20 @@
 			} else if ( $field.hasClass( 'rwmb-checkbox_list' ) ) {
 				var value = $field.val();
 				$field.prop( 'checked', Array.isArray( defaultValue ) ? -1 !== defaultValue.indexOf( value ) : value == defaultValue );
-			} else if ( 'select' === type ) {
+			} else if ( $field.is( 'select' ) ) {
 				$field.find( 'option[value="' + defaultValue + '"]' ).prop( 'selected', true );
 			} else if ( ! $field.hasClass( 'rwmb-hidden' ) ) {
 				$field.val( defaultValue );
 			}
 		},
 		clear: function() {
-			var $field = $( this ),
+			const $field = $( this ),
 				type = $field.attr( 'type' );
 
 			if ( 'radio' === type || 'checkbox' === type ) {
 				$field.prop( 'checked', false );
-			} else if ( 'select' === type ) {
-				$field.prop( 'selectedIndex', - 1 );
+			} else if ( $field.is( 'select' ) ) {
+				$field.prop( 'selectedIndex', 0 );
 			} else if ( ! $field.hasClass( 'rwmb-hidden' ) ) {
 				$field.val( '' );
 			}
@@ -127,6 +134,9 @@
 		// Clear fields' values.
 		var $inputs = $clone.find( rwmb.inputSelectors );
 		$inputs.each( cloneValue.clear );
+
+		// Remove validation errors.
+		$clone.find( 'p.rwmb-error' ).remove();
 
 		// Insert clone.
 		$clone.insertAfter( $last );
@@ -156,8 +166,14 @@
 	 * @param $container .rwmb-input container
 	 */
 	function toggleRemoveButtons( $container ) {
-		var $clones = $container.children( '.rwmb-clone' );
-		$clones.children( '.remove-clone' ).toggle( $clones.length > 1 );
+
+		var $clones = $container.children( '.rwmb-clone' ),
+		    minClone = 1;
+
+		if ( $container.data( 'min-clone' ) ) {
+			minClone = parseInt( $container.data( 'min-clone' ) );
+		}
+		$clones.children( '.remove-clone' ).toggle( $clones.length > minClone );
 
 		// Recursive for nested groups.
 		$container.find( '.rwmb-input' ).each( function () {
@@ -255,4 +271,11 @@
 		.on( 'mb_ready', init )
 		.on( 'click', '.add-clone', addClone )
 		.on( 'click', '.remove-clone', removeClone );
+
+	// Export for use outside.
+	rwmb.cloneIndex = cloneIndex;
+	rwmb.cloneValue = cloneValue;
+	rwmb.sortClones = sortClones;
+	rwmb.toggleRemoveButtons = toggleRemoveButtons;
+	rwmb.toggleAddButton = toggleAddButton;
 } )( jQuery, rwmb );

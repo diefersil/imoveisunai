@@ -78,7 +78,7 @@ class Houzez_Site_Logo extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'houzez-elements', 'favethemes_studio_header', 'favethemes_studio_footer' ];
+        return [ 'houzez-elements', 'houzez-header-footer' ];
     }
 
     /**
@@ -107,6 +107,23 @@ class Houzez_Site_Logo extends Widget_Base {
 			[
 				'label' => esc_html__( 'Site logo', 'houzez-theme-functionality' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_responsive_control(
+			'padding_vertical_logo',
+			[
+				'label' => esc_html__( 'Vertical Padding', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 50,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .favethemes-site-logo' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+				],
 			]
 		);
 
@@ -169,9 +186,6 @@ class Houzez_Site_Logo extends Widget_Base {
 				'selectors'      => [
 					'{{WRAPPER}} .favethemes-site-logo img' => 'width: {{SIZE}}{{UNIT}};',
 				],
-				'condition' => [
-					'logo_source' => 'custom_logo',
-				],
 			]
 		);
 
@@ -197,10 +211,7 @@ class Houzez_Site_Logo extends Widget_Base {
 					],
 				],
 				'selectors'      => [
-					'{{WRAPPER}} .favethemes-site-logo img' => 'max-width: {{SIZE}}{{UNIT}};',
-				],
-				'condition' => [
-					'logo_source' => 'custom_logo',
+					'{{WRAPPER}} .favethemes-site-logo' => 'max-width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -445,7 +456,7 @@ class Houzez_Site_Logo extends Widget_Base {
 					'yes' => __( 'Yes', 'houzez-theme-functionality' ),
 				],
 				'default' => 'no',
-				'condition' => [
+				'condition'   => [
 					'logo_source' => 'custom_logo',
 				],
 			]
@@ -478,8 +489,8 @@ class Houzez_Site_Logo extends Widget_Base {
 					'custom'  => __( 'Custom URL', 'houzez-theme-functionality' ),
 				],
 				'condition' => [
-					'logo_source' => 'custom_logo',
-				],
+					'logo_source' => 'custom_logo'
+				]
 			]
 		);
 
@@ -494,7 +505,6 @@ class Houzez_Site_Logo extends Widget_Base {
 				'placeholder' => __( 'https://your-link.com', 'houzez-theme-functionality' ),
 				'condition'   => [
 					'link_to' => 'custom',
-					'logo_source' => 'custom_logo',
 				],
 				'show_label'  => false,
 			]

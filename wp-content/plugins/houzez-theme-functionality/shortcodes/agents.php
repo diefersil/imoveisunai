@@ -20,6 +20,9 @@ if( !function_exists('houzez_agents') ) {
             'order' => '',
         ), $atts));
 
+        global $houzez_local;
+        $houzez_local = houzez_get_localization();
+        
         ob_start();
 
         if(empty($columns)) {
@@ -94,8 +97,8 @@ if( !function_exists('houzez_agents') ) {
                         get_template_part('template-parts/realtors/agent/agent-item');
 
                     endwhile;
-                    wp_reset_postdata();
                 endif;
+                wp_reset_postdata();
                 ?>
             </div><!-- agent-module -->
 
@@ -162,8 +165,8 @@ if( !function_exists('houzez_agents') ) {
                             get_template_part('template-parts/realtors/agent/agent-item');
 
                         endwhile;
-                        wp_reset_postdata();
                     endif;
+                    wp_reset_postdata();
                     ?>
                 </div>
             </div>

@@ -16,7 +16,7 @@ class Houzez_Elementor_Contact_Form extends Widget_Base {
         parent::__construct( $data, $args );
 
         $js_path = 'assets/frontend/js/';
-        wp_register_script( 'validate', 'https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js', array('jquery'), '1.19.2', false );
+        wp_register_script( 'validate', HOUZEZ_PLUGIN_URL . $js_path . 'jquery.validate.min.js', array( 'jquery' ), '1.19.2' );
 
         wp_register_script( 'houzez-validate-js', HOUZEZ_PLUGIN_URL . $js_path . 'houzez-validate.js', array( 'jquery' ), '1.0.0' );
 
@@ -1067,7 +1067,6 @@ class Houzez_Elementor_Contact_Form extends Widget_Base {
                 ],
                 'button' => [
                     'class' => [
-                        'btn',
                         'houzez-submit-button',
                         'houzez-contact-form-js',
                         'elementor-button',
@@ -1114,6 +1113,9 @@ class Houzez_Elementor_Contact_Form extends Widget_Base {
         if ( ! empty( $settings['button_css_id'] ) ) {
             $this->add_render_attribute( 'button', 'id', $settings['button_css_id'] );
         }
+
+        $webhook_url = isset($settings['webhook_url']) ? esc_url($settings['webhook_url']) : '';
+        $redirect_to = isset($settings['redirect_to']) ? esc_url($settings['redirect_to']) : '';
         ?>
 
         <script type="application/javascript">
@@ -1133,8 +1135,9 @@ class Houzez_Elementor_Contact_Form extends Widget_Base {
             <input type="hidden" name="email_to_cc" value="<?php echo esc_attr($email_to_cc); ?>" />
             <input type="hidden" name="email_to_bcc" value="<?php echo esc_attr($email_to_bcc); ?>" />
             <input type="hidden" name="webhook" value="<?php echo esc_attr($settings['webhook']); ?>" />
-            <input type="hidden" name="webhook_url" value="<?php echo esc_url($settings['webhook_url']); ?>" />
-            <input type="hidden" name="redirect_to" value="<?php echo esc_url($settings['redirect_to']); ?>" />
+            <input type="hidden" name="webhook_url" value="<?php echo $webhook_url; ?>" />
+            <input type="hidden" name="redirect_to" value="<?php echo $redirect_to; ?>" />
+            <input type="hidden" name="google_recaptcha" value="<?php echo esc_attr($settings['con_google_recaptcha']); ?>" />
             
 
             <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>

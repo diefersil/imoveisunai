@@ -1,9 +1,8 @@
 <?php
 /**
  * Custom Post Type Testimmonials
- * Created by PhpStorm.
  * User: waqasriaz
- * Date: 07/01/16
+ * Date: 07/01/16 
  * Time: 2:45 PM
  */
 

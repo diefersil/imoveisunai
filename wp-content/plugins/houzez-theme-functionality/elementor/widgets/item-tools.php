@@ -54,6 +54,18 @@ class Houzez_Item_Tools extends Widget_Base {
         );
 
         $this->add_control(
+            'show_favorite',
+            [
+                'label' => esc_html__( 'Favorite Button', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
             'show_print',
             [
                 'label' => esc_html__( 'Print Button', 'houzez-theme-functionality' ),
@@ -63,8 +75,80 @@ class Houzez_Item_Tools extends Widget_Base {
                 'return_value' => 'yes',
                 'default' => 'yes',
             ]
+        );		
+		
+        $this->add_control(
+            'buttons_bg_color',
+            [
+                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span' => 'background-color: {{VALUE}}',
+                ],
+            ]
         );
 
+        $this->add_control(
+            'buttons_bg_color_hover',
+            [
+                'label'     => esc_html__( 'Background Color Hover', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span:hover' => 'background-color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'buttons_color',
+            [
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'buttons_color_hover',
+            [
+                'label'     => esc_html__( 'Color Hover', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span:hover' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'buttons_border_color',
+            [
+                'label'     => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span' => 'border-color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'buttons_border_color_hover',
+            [
+                'label'     => esc_html__( 'Border Color Hover', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .item-tool > span:hover' => 'border-color: {{VALUE}}',
+                ],
+            ]
+        );	
+		
         $this->add_responsive_control(
 			'share_align',
 			[
@@ -116,7 +200,7 @@ class Houzez_Item_Tools extends Widget_Base {
 		?>
 		<ul class="ele-item-tools">
 
-		    <?php if( $settings['show_print'] == 'yes' ) { ?>
+		    <?php if( $settings['show_favorite'] == 'yes' ) { ?>
 		    <li class="item-tool">
 		        <span class="add-favorite-js item-tool-favorite" data-listid="<?php echo intval($post->ID)?>">
 		            <i class="houzez-icon icon-love-it <?php echo esc_attr($icon); ?>"></i>
@@ -134,6 +218,15 @@ class Houzez_Item_Tools extends Widget_Base {
 		        </div>
 		    </li><!-- item-tool -->
 		    <?php } ?>
+			
+			<?php if( $settings['show_print'] == 'yes') {?>
+    		<li class="item-tool houzez-print" data-propid="<?php echo intval($post->ID); ?>">
+        		<span class="item-tool-compare">
+            		<i class="houzez-icon icon-print-text"></i>
+        		</span><!-- item-tool-compare -->
+    		</li><!-- item-tool -->
+    		<?php } ?>	
+			
 		</ul><!-- item-tools -->
 
 	<?php

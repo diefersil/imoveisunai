@@ -9,8 +9,94 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			add_action( 'wp_ajax_get_single_enquiry', array( $this, 'get_single_enquiry' ) );
 			add_action( 'wp_ajax_houzez_delete_enquiry', array( $this, 'delete_enquiry') );
 			add_action( 'wp_ajax_houzez_match_listing_email', array( $this, 'send_match_listing_email') );
+			add_action( 'wp_ajax_crm_export_inquiries', array( $this, 'crm_export_inquiries') );
 			
 		}
+
+		public function crm_export_inquiries() {
+		    global $wpdb;
+		    $enquiries_table = $wpdb->prefix . 'houzez_crm_enquiries';
+		    $leads_table = $wpdb->prefix . 'houzez_crm_leads';
+		    $current_user_id = get_current_user_id();
+
+		    // Build the JOIN query with user_id condition
+		    $query = $wpdb->prepare(
+		        "SELECT e.*, l.display_name, l.prefix, l.email, l.mobile 
+		        FROM {$enquiries_table} e 
+		        LEFT JOIN {$leads_table} l ON e.lead_id = l.lead_id 
+		        WHERE e.user_id = %d AND l.user_id = %d 
+		        GROUP BY e.enquiry_id",
+		        $current_user_id, $current_user_id
+		    );
+		    $results = $wpdb->get_results($query, ARRAY_A);
+
+		    // Output headers to force download
+		    header('Content-Type: text/csv');
+		    header('Content-Disposition: attachment; filename="inquiries_export.csv"');
+
+		    // Open the file stream
+		    $output = fopen('php://output', 'w');
+
+		    // Headings for the CSV
+		    $Headings = [
+		        'Contact', 'Email', 'Mobile', 'Inquiry Type', 'Property Type', 'Property Status', 'Price', 'Bedrooms', 
+		        'Bathrooms', 'Area Size', 'Location', 'Message', 'Private Note'
+		    ];
+
+		    // Add the headings to the CSV
+		    fputcsv($output, $Headings);
+
+		    // Iterate over the results and add them to the CSV
+		    foreach ($results as $row) {
+		        // Unserialize the enquiry_meta field
+		        $meta = maybe_unserialize($row['enquiry_meta']);
+		        
+		        // Extract the necessary data
+		        $propertyType = $meta['property_type']['name'] ?? '';
+		        $propertyStatus = $meta['property_status']['name'] ?? '';
+		        
+		        // Extract and format the necessary data
+		        $price = $meta['min_price'] ?? '';
+		        $price .= (!empty($meta['max_price']) && $meta['max_price'] != $meta['min_price']) ? ' - ' . $meta['max_price'] : '';
+
+		        $bedrooms = $meta['min_beds'] ?? '';
+		        $bedrooms .= (!empty($meta['max_beds']) && $meta['max_beds'] != $meta['min_beds']) ? ' - ' . $meta['max_beds'] : '';
+
+		        $bathrooms = $meta['min_baths'] ?? '';
+		        $bathrooms .= (!empty($meta['max_baths']) && $meta['max_baths'] != $meta['min_baths']) ? ' - ' . $meta['max_baths'] : '';
+
+		        $areaSize = $meta['min_area'] ?? '';
+		        $areaSize .= (!empty($meta['max_area']) && $meta['max_area'] != $meta['min_area']) ? ' - ' . $meta['max_area'] : '';
+
+		        $location = implode(', ', array_filter([
+		            $meta['area']['name'] ?? '',
+		            $meta['state']['name'] ?? '',
+		            $meta['country']['name'] ?? ''
+		        ]));
+
+		        // Add the row to the CSV
+		        fputcsv($output, [
+		            $row['display_name'] ?? 'N/A', // Contact
+		            $row['email'] ?? '-', // Contact
+		            $row['mobile'] ?? '-', // Contact
+		            $row['enquiry_type'] ?? '',
+		            $propertyType,
+		            $propertyStatus,
+		            $price,
+		            $bedrooms,
+		            $bathrooms,
+		            $areaSize,
+		            $location,
+		            $row['message'] ?? '',
+		            $row['private_note'] ?? ''
+		        ]);
+		    }
+
+		    // Close the file stream
+		    fclose($output);
+		    exit;
+		}
+
 
 		public function add_enquiry() {
 			$lead_id = sanitize_text_field( $_POST['lead_id'] );
@@ -275,39 +361,57 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 		}
 
 		public static function get_enquires() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
 
-            $andwhere = '';
-			if(isset($_GET['lead-id']) && !empty($_GET['lead-id'])) {
-				$andwhere = 'AND lead_id="'.$_GET['lead-id'].'"';
-			}
-            
-            $items_per_page = isset($_GET['records']) ? intval($_GET['records']) : 10;
-			$page = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;
-			$offset = ( $page * $items_per_page ) - $items_per_page;
-			$query = 'SELECT * FROM '.$table_name.' WHERE user_id= '.get_current_user_id().' '.$andwhere;
-			$total_query = "SELECT COUNT(1) FROM (${query}) AS combined_table";
-			$total = $wpdb->get_var( $total_query );
+		    $andwhere = '';
+		    if(isset($_GET['lead-id']) && !empty($_GET['lead-id'])) {
+		        $lead_id = intval($_GET['lead-id']);
+		        $andwhere .= $wpdb->prepare(' AND lead_id = %d ', $lead_id);
+		    }
 
-			$results = $wpdb->get_results( $query.' ORDER BY enquiry_id DESC LIMIT '. $offset.', '. $items_per_page, OBJECT );
+		    if(isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+		        $keyword = sanitize_text_field($_GET['keyword']);
+		        $andwhere .= $wpdb->prepare(' AND (enquiry_type LIKE %s)', "%$keyword%");
+		    }
 
-			$return_array['data'] = array(
-				'results' => $results,
-				'total_records' => $total,
-				'items_per_page' => $items_per_page,
-				'page' => $page,
-			);
+		    $items_per_page = isset($_GET['records']) ? intval($_GET['records']) : 10;
+		    $page = isset($_GET['cpage']) ? abs((int) $_GET['cpage']) : 1;
+		    $offset = ($page * $items_per_page) - $items_per_page;
+		    $user_id = get_current_user_id();
 
-			return $return_array;
+		    $query = $wpdb->prepare('SELECT * FROM '.$table_name.' WHERE user_id = %d '.$andwhere, $user_id);
+		    $total_query = "SELECT COUNT(1) FROM ({$query}) AS combined_table";
+		    $total = $wpdb->get_var($total_query);
+
+		    $results = $wpdb->get_results($wpdb->prepare($query.' ORDER BY enquiry_id DESC LIMIT %d, %d', $offset, $items_per_page), OBJECT);
+
+		    $return_array = array(
+		        'data' => array(
+		            'results' => $results,
+		            'total_records' => $total,
+		            'items_per_page' => $items_per_page,
+		            'page' => $page,
+		        ),
+		    );
+
+		    return $return_array;
 		}
 
+
+
 		public function get_property_info($listing_id) {
+			
 			$enquiry_meta = array();
 
-			if(empty($listing_id)) {
-				return $enquiry_meta;
-			}
+		    // Check if the listing ID is an integer before proceeding
+		    if(empty($listing_id) || !is_int($listing_id)) {
+		        return $enquiry_meta;
+		    }
+
+		    $listing_id = absint($listing_id);  // Make sure it's a positive integer
+
+
 			$enquiry_meta['property_type'] = $this->crm_taxonomy( 'property_type', $listing_id );
 			$enquiry_meta['property_status'] = $this->crm_taxonomy( 'property_status', $listing_id );
 			$enquiry_meta['property_label'] = $this->crm_taxonomy( 'property_label', $listing_id );
@@ -328,6 +432,7 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			$enquiry_meta['min_area'] = get_post_meta( $listing_id, 'fave_property_size', true );
 			$enquiry_meta['max_area'] = get_post_meta( $listing_id, 'fave_property_size', true );
 			$enquiry_meta['zipcode'] = get_post_meta( $listing_id, 'fave_property_zip', true );
+			$enquiry_meta['streat_address'] = get_post_meta( $listing_id, 'fave_property_address', true );
 
 			return $enquiry_meta;
 		}
@@ -356,6 +461,7 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			$enquiry_meta['min_area'] = sanitize_text_field($meta['min-area']);
 			$enquiry_meta['max_area'] = sanitize_text_field($meta['max-area']);
 			$enquiry_meta['zipcode'] = sanitize_text_field($meta['zipcode']);
+			$enquiry_meta['streat_address'] = sanitize_text_field($meta['streat_address']);
 
 			return $enquiry_meta;
 
@@ -372,6 +478,7 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			$area_size = isset($meta['area-size']) ? $meta['area-size'] : '';
 			$max_area_size = isset($meta['max-area-size']) ? $meta['max-area-size'] : '';
 			$zipcode = isset($meta['zipcode']) ? $meta['zipcode'] : '';
+			$streat_address = isset($meta['streat_address']) ? $meta['streat_address'] : '';
 
 			$property_type = isset($meta['property_type']) ? sanitize_text_field($meta['property_type']) : '';
 			$property_status = isset($meta['property_status']) ? sanitize_text_field($meta['property_status']) : '';
@@ -400,6 +507,7 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			$enquiry_meta['min_area'] = sanitize_text_field($area_size);
 			$enquiry_meta['max_area'] = sanitize_text_field($max_area_size);
 			$enquiry_meta['zipcode'] = sanitize_text_field($zipcode);
+			$enquiry_meta['streat_address'] = sanitize_text_field($streat_address);
 
 			return $enquiry_meta;
 
@@ -419,84 +527,107 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 	    }
 
 	    public static function get_enquiry($enquiry_id) {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
 
-            $sql = "SELECT * FROM $table_name WHERE enquiry_id = ".$enquiry_id.' AND user_id = '.get_current_user_id();
-			
-			$result = $wpdb->get_row( $sql, OBJECT );
+		    // Make sure the ID is a positive integer
+		    $enquiry_id = absint($enquiry_id);
 
-            if( is_object( $result ) && ! empty( $result ) ) {
-            	return $result;
-            }
+		    $user_id = get_current_user_id();
 
-			return '';
+		    $sql = $wpdb->prepare("SELECT * FROM $table_name WHERE enquiry_id = %d AND user_id = %d", $enquiry_id, $user_id);
+
+		    $result = $wpdb->get_row($sql, OBJECT);
+
+		    if( is_object( $result ) && ! empty( $result ) ) {
+		        return $result;
+		    }
+
+		    return '';
 		}
+
 
 		public function get_single_enquiry() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
-            
-            $enquiry_id = '';
-			if ( isset( $_POST['enquiry_id'] ) ) {
-				$enquiry_id = intval( $_POST['enquiry_id'] );
-			}
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+		    
+		    $enquiry_id = '';
+		    if ( isset( $_POST['enquiry_id'] ) ) {
+		        $enquiry_id = intval( $_POST['enquiry_id'] );
+		    }
 
-			if(empty($enquiry_id)) {
-				echo json_encode( 
-					array( 
-						'success' => false, 
-						'msg' => esc_html__('Something went wrong!', 'houzez-crm') 
-					) 
-				);
-	            wp_die();
-			}
+		    if(empty($enquiry_id)) {
+		        echo json_encode( 
+		            array( 
+		                'success' => false, 
+		                'msg' => esc_html__('Something went wrong!', 'houzez-crm') 
+		            ) 
+		        );
+		        wp_die();
+		    }
 
-            $sql = "SELECT * FROM {$table_name} WHERE enquiry_id = {$enquiry_id}";
+		    $sql = $wpdb->prepare("SELECT * FROM {$table_name} WHERE enquiry_id = %d", $enquiry_id);
 
-            $result = $wpdb->get_row( $sql, OBJECT );
+		    $result = $wpdb->get_row( $sql, OBJECT );
 
-            $meta = maybe_unserialize($result->enquiry_meta);
-            
-
-            if( is_object( $result ) && ! empty( $result ) ) {
-            	echo json_encode( 
-					array( 
-						'success' => true, 
-						'data' => $result,
-						'meta' => $meta
-					) 
-				);
-	            wp_die();
-            }
-            return '';
+		    $meta = maybe_unserialize($result->enquiry_meta);
+		    
+		    if( is_object( $result ) && ! empty( $result ) ) {
+		        echo json_encode( 
+		            array( 
+		                'success' => true, 
+		                'data' => $result,
+		                'meta' => $meta
+		            ) 
+		        );
+		        wp_die();
+		    }
+		    return '';
 		}
+
 		
 
 		public function delete_enquiry() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+		    global $wpdb;
 
-	        if ( !isset( $_REQUEST['ids'] ) ) {
-	            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No enquiry selected', 'houzez-crm' ) );
-	            echo json_encode( $ajax_response );
-	            die;
-	        }
-	        $ids = $_REQUEST['ids'];
-	        
-	        $wpdb->query("DELETE FROM {$table_name} WHERE enquiry_id IN ($ids)");
-	        $ajax_response = array( 'success' => true , 'reason' => '' );
-            echo json_encode( $ajax_response );
-            die;
+		    $user_id = get_current_user_id();
+		    $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+
+		    if ( !isset( $_POST['ids'] ) ) {
+		        $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No enquiry selected', 'houzez-crm' ) );
+		        echo json_encode( $ajax_response );
+		        die;
+		    }
+		    $ids = $_POST['ids'];
+
+		    // Ensure each id is an integer
+		    $ids_array = explode(',', $ids);
+		    $ids_array = array_map('intval', $ids_array);
+
+		    // Create placeholders for each ID
+		    $placeholders = implode(',', array_fill(0, count($ids_array), '%d'));
+
+		    // Merge ids_array with user_id for the preparation
+		    $query_data = array_merge($ids_array, array($user_id));
+
+		    $query = $wpdb->prepare("DELETE FROM {$table_name} WHERE enquiry_id IN ($placeholders) AND user_id = %d", ...$query_data);
+		    $deleted = $wpdb->query($query);
+
+		    if( $deleted ) {
+		        $ajax_response = array( 'success' => true , 'reason' => '' );
+		    } else {
+		        $ajax_response = array( 'success' => false , 'reason' => esc_html__("You don't have rights to perform this action", 'houzez-crm') );
+		    }
+		    echo json_encode( $ajax_response );
+		    die;
 		}
-
 
 		public function send_match_listing_email() {
 			$current_user = wp_get_current_user();
 			$from_email = $current_user->user_email;
 			$display_name = $current_user->display_name;
 
-			$listing_ids = sanitize_text_field($_REQUEST['ids']);
+			$listing_ids = sanitize_text_field($_POST['ids']);
 			
 			$target_email = $_POST['email_to'];
 			$target_email = is_email($target_email);

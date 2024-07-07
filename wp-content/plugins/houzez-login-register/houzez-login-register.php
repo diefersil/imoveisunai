@@ -3,7 +3,7 @@
 Plugin Name: Houzez Login Register
 Plugin URI:  http://themeforest.net/user/favethemes
 Description: Adds login register functionality for houzez theme
-Version:     2.8.2
+Version:     3.2.1
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 License:     GPL2

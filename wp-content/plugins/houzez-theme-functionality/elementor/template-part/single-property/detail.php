@@ -10,6 +10,7 @@ $default_fields = array(
 		'property_land',
 		'property_bedrooms',
 		'property_bathrooms',
+		'property_rooms',
 		'property_garage',
 		'property_garage_size',
 		'property_year',
@@ -44,7 +45,7 @@ $default_fields = array(
 	                } else {
 
 	                	$custom_field = Houzez_Fields_Builder::get_field_title_type_by_slug($data);
-	                	$field_type = $custom_field['type'];
+	                	$field_type = $custom_field['type'] ?? '';
 	                	$meta_type = true;
 
 	                    if( $field_type == 'checkbox_list' || $field_type == 'multiselect' ) {
@@ -60,7 +61,7 @@ $default_fields = array(
 	                    }
 
 	                	 
-	                	$field_title = $custom_field['label'];
+	                	$field_title = $custom_field['label'] ?? '';
 	                	$field_title = houzez_wpml_translate_single_string($field_title);
 
 	                	if( !empty($data_value) && !empty($field_title) ) {

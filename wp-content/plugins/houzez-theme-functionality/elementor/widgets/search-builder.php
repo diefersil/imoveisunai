@@ -638,13 +638,11 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->end_controls_section();
 
         /*------------------------------ Tabs ---------------------------*/
-        $prop_cities = array();
         $prop_types = array();
         $prop_status = array();
         
         houzez_get_terms_array( 'property_status', $prop_status );
         houzez_get_terms_array( 'property_type', $prop_types );
-        houzez_get_terms_array( 'property_city', $prop_cities );
 
         $this->start_controls_section(
             'content_section',
@@ -696,6 +694,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'default' => '',
                 'condition' => [
                     'tabs_field' => 'property_type',
+                    'show_tabs' => 'yes'
                 ],
             ]
         );
@@ -712,6 +711,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'default' => '',
                 'condition' => [
                     'tabs_field' => 'property_status',
+                    'show_tabs' => 'yes'
                 ],
             ]
         );
@@ -719,15 +719,16 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->add_control(
             'city_data',
             [
-                'label'     => esc_html__( 'Select Cities', 'houzez-theme-functionality' ),
-                'type'      => \Elementor\Controls_Manager::SELECT2,
-                'options'   => $prop_cities,
-                'description' => '',
-                'multiple' => true,
-                'label_block' => true,
-                'default' => '',
+                'label'         => esc_html__( 'Select Cities', 'houzez-theme-functionality' ),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
                 'condition' => [
                     'tabs_field' => 'property_city',
+                    'show_tabs' => 'yes'
                 ],
             ]
         );
@@ -1183,16 +1184,19 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'label' => esc_html__( 'Alignment', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::CHOOSE,
                 'options' => [
-                    ''    => [
+                    'left'    => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
                         'icon' => 'fa fa-align-left',
                     ],
-                    'justify-content-center' => [
+                    'center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
                         'icon' => 'fa fa-align-center',
                     ]
                 ],
-                'default' => 'justify-content-center',
+                'default' => 'center',
+                'selectors' => [
+                    '{{WRAPPER}} .houzez-status-tabs' => 'justify-content: {{VALUE}};',
+                ],
             ]
         );
 
@@ -1399,7 +1403,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
             <?php if( $settings['show_tabs'] == 'yes' ) { ?>
 
-            <ul id="houzez-search-tabs-wrap" class="houzez-status-tabs nav nav-pills <?php echo esc_attr($settings['houzez_search_tabs_align']); ?>" role="tablist" data-toggle="buttons">
+            <ul id="houzez-search-tabs-wrap" class="houzez-status-tabs nav nav-pills" role="tablist" data-toggle="buttons">
             
                 <?php if($show_all == 'yes') { ?>
                 <li class="nav-item">
@@ -1511,6 +1515,10 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                             echo $this->houzez_beds_baths_field( $item, $item_index, 'bathrooms');
                             break;
 
+                        case 'garage':
+                            echo $this->houzez_beds_baths_field( $item, $item_index, 'garage');
+                            break;
+
                         case 'min-price':
                             echo $this->houzez_min_price( $item, $item_index );
                             break;
@@ -1535,7 +1543,6 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                             echo $this->houzez_search_currency( $item, $item_index );
                             break;
 
-                        case 'garage':
                         case 'year-built':
                         case 'min-area':
                         case 'max-area':
@@ -1682,6 +1689,16 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         return "{$item['field_type']}";
     }
 
+    public function houzez_get_attribute_value( $item ) {
+
+        $item_value = $_GET[$item['field_type']] ?? '';
+        if (is_array($item_value)) {
+            $item_value = implode(", ", $item_value);
+        }
+        return "{$item_value}";
+
+    }
+
     public function houzez_get_attribute_id( $item ) {
         return 'form-field-' . $item['_id'];
     }
@@ -1704,6 +1721,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'input' . $i => [
                     'name' => $this->houzez_get_attribute_name( $item ),
                     'id' => $this->houzez_get_attribute_id( $item ),
+                    'value' => $this->houzez_get_attribute_value( $item ),
                     'class' => [
                         'elementor-field',
                         'form-control',
@@ -1719,7 +1737,6 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 ],
                 'button' . $i => [
                     'class' => [
-                        'btn',
                         'houzez-search-button',
                         'elementor-button',
                         'elementor-size-' . $item['button_size'],
@@ -1771,6 +1788,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
         if( $item['data_live_search'] ) {
             $this->add_render_attribute( 'select' . $i, 'data-live-search', 'true');
+            $this->add_render_attribute( 'select' . $i, 'data-live-search-normalize', 'true');
         }
 
         $this->add_render_attribute( 'select' . $i, 'data-size', 5);
@@ -1921,6 +1939,10 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             <select <?php echo $this->get_render_attribute_string( 'select' . $i ); ?>>
                 <?php
 
+                $field_name = $this->houzez_get_attribute_name( $item );
+
+                $selected_val = $_GET[$field_name] ?? '';
+
                 if( isset($item['placeholder']) && !empty($item['placeholder']) ) {
                     echo '<option value="">'.esc_attr($item['placeholder']).'</option>';
                 }
@@ -1929,7 +1951,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
                     if(!empty($key)) {
                         $option = houzez_wpml_translate_single_string($option);
-                        echo '<option value="'.esc_attr($key).'">'.esc_html($option).'</option>';
+                        echo '<option class="'.sanitize_title_with_dashes($key).'" '.selected($selected_val, $key, false).' value="'.esc_attr($key).'">'.esc_html($option).'</option>';
                     }
 
                 }
@@ -1956,6 +1978,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     'name' => $this->houzez_get_attribute_name( $item ),
                     'id' => $this->houzez_get_attribute_id( $item ),
                     'data-live-search' => 'true',
+                    'data-live-search-normalize' => 'true',
                     'class' => [
                         'selectpicker',
                         'bs-select-hidden',
@@ -1982,6 +2005,10 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             <select <?php echo $this->get_render_attribute_string( 'select' . $i ); ?>>
                 <?php
 
+                $field_name = $this->houzez_get_attribute_name( $item );
+
+                $selected_val = $_GET[$field_name] ?? '';
+
                 if( isset($item['placeholder']) && !empty($item['placeholder']) ) {
                     echo '<option value="">'.esc_attr($item['placeholder']).'</option>';
                 }
@@ -1990,7 +2017,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
                     if(!empty($option)) {
                         $option = houzez_wpml_translate_single_string($option);
-                        echo '<option value="'.esc_attr($option).'">'.esc_html($option).'</option>';
+                        echo '<option '.selected($selected_val, $option, false).' value="'.esc_attr($option).'">'.esc_html($option).'</option>';
                     }
                 }    
                 ?>
@@ -2015,6 +2042,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     'name' => $this->houzez_get_attribute_name( $item ).'[]',
                     'id' => $this->houzez_get_attribute_id( $item ),
                     'data-live-search' => 'true',
+                    'data-live-search-normalize' => 'true',
                     'data-actions-box' => 'true',
                     'title' => $item['placeholder'],
                     'data-selected-text-format' => 'count > 1',
@@ -2048,17 +2076,29 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             return '';
         }
 
+        $field_name = $this->houzez_get_attribute_name( $item );
+        $selected_vals = $_GET[$field_name] ?? '';
+
         ob_start();
         ?>
         <div <?php echo $this->get_render_attribute_string( 'select-wrapper' . $i ); ?>>
             <select <?php echo $this->get_render_attribute_string( 'select' . $i ); ?>>
                 <?php
+                // Ensure $selected_vals is an array
+                if (!is_array($selected_vals)) {
+                    $selected_vals = array($selected_vals);
+                }
+
                 foreach ($options as $key => $option) {
 
                     if(!empty($key)) {
+
+                        $selected = in_array($key, $selected_vals) ? 'selected' : '';
+
                         $option = houzez_wpml_translate_single_string($option);
-                        echo '<option value="'.esc_attr($key).'">'.esc_html($option).'</option>';
+                        echo '<option '.$selected.' value="'.esc_attr($key).'">'.esc_html($option).'</option>';
                     }
+
                 }    
                 ?>
             </select>
@@ -2243,6 +2283,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     'name' => $this->houzez_get_attribute_name( $item ),
                     'id' => $this->houzez_get_attribute_id( $item ),
                     "data-live-search" => "true",
+                    "data-live-search-normalize" => "true",
                     'class' => [
                         'selectpicker',
                         'bs-select-hidden',

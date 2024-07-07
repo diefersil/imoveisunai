@@ -3,7 +3,7 @@
 Plugin Name: Houzez CRM
 Plugin URI:  http://themeforest.net/user/favethemes
 Description: Add insights for favethemes themes
-Version:     1.2.8
+Version:     1.4.3
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 */
@@ -45,6 +45,8 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
 
             $this->plugin_name = 'houzez-crm';
             $this->version     = '1.0.0';
+
+            add_action( 'admin_notices', array( $this, 'admin_error_notices') );
 
             $this->define_constants();
 
@@ -119,6 +121,10 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
                     'delete_btn_text' => esc_html__('Delete', 'houzez-crm'),
                     'cancel_btn_text' => esc_html__('Cancel', 'houzez-crm'),
                     'confirm_btn_text' => esc_html__('Confirm', 'houzez-crm'),
+                    'select_text' => esc_html__('Select', 'houzez-crm'),
+                    'import_text' => esc_html__('Import', 'houzez-crm'),
+                    'map_fields_text'  => esc_html__('Please map at least one field.', 'houzez-crm'),
+                    'error_import'  => esc_html__('Error in Importing Data.', 'houzez-crm'),
                     'houzez_date_language' => $houzez_date_language,
                     'delete_confirmation' => esc_html__('Are you sure you want to delete?', 'houzez-crm'),
                     'email_confirmation' => esc_html__('Are you sure you want to send email?', 'houzez-crm'),
@@ -173,6 +179,67 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
          */
         public function load_plugin_textdomain() {
             load_plugin_textdomain( 'houzez-crm', false, dirname( HOUZEZ_CRM_BASENAME ) . '/languages' );
+        }
+
+        /**
+         * Output error messages when necessary
+         */
+        public function admin_error_notices() 
+        {            
+            global $wpdb;
+            
+            $error = '';    
+            $uploads_dir = wp_upload_dir();
+            if( $uploads_dir['error'] === FALSE )
+            {
+                $uploads_dir_import = $uploads_dir['basedir'] . '/houzez-crm/';
+                
+                if ( ! @file_exists($uploads_dir_import) )
+                {
+                    if ( ! @mkdir($uploads_dir_import) )
+                    {
+                        $error = 'Unable to create subdirectory in uploads folder for use by Houzez CRM plugin. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
+                    }
+                }
+                else
+                {
+                    if ( ! @is_writeable($uploads_dir_import) )
+                    {
+                        $error = 'The uploads folder is not currently writeable and will need to be before properties can be imported. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
+                    }
+                }
+
+                $uploads_dir_export = $uploads_dir['basedir'] . '/houzez-crm/';
+                
+                if ( ! @file_exists($uploads_dir_export) )
+                {
+                    if ( ! @mkdir($uploads_dir_export) )
+                    {
+                        $error = 'Unable to create subdirectory in uploads folder for use by Houzez CRM plugin. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
+                    }
+                }
+                else
+                {
+                    if ( ! @is_writeable($uploads_dir_export) )
+                    {
+                        $error = 'The uploads folder is not currently writeable and will need to be before properties can be exported. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
+                    }
+                }
+            }
+            else
+            {
+                $error = 'An error occured whilst trying to create the uploads folder. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set. '.$uploads_dir['error'];
+            }
+
+            if ( !function_exists('houzez_option') )
+            { 
+                $error = 'The Houzez theme must be active to use the Houzez CRM plugin';
+            }
+            
+            if( $error != '' )
+            {
+                echo '<div class="error"><p><strong>' . $error . '</strong></p></div>';
+            }
         }
 
         /**

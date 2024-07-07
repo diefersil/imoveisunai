@@ -12,7 +12,7 @@ class FCC_Rates {
      * @access protected
      * @var string
      */
-    protected static $currencies_list = 'http://openexchangerates.org/api/currencies.json';
+    protected static $currencies_list = 'https://openexchangerates.org/api/currencies.json';
 
     /**
      * Exchange rates API
@@ -21,7 +21,7 @@ class FCC_Rates {
      * @access protected
      * @var string
      */
-    protected static $currencies_rates = 'http://openexchangerates.org/api/latest.json?app_id=';
+    protected static $currencies_rates = 'https://openexchangerates.org/api/latest.json?app_id=';
 
     /**
      * Initialize
@@ -30,8 +30,8 @@ class FCC_Rates {
      * @return void
      */
     public static function init() {
-        static::$currencies_list  = 'http://openexchangerates.org/api/currencies.json';
-        static::$currencies_rates = 'http://openexchangerates.org/api/latest.json?app_id=';
+        static::$currencies_list  = 'https://openexchangerates.org/api/currencies.json';
+        static::$currencies_rates = 'https://openexchangerates.org/api/latest.json?app_id=';
     }
 
 
@@ -212,33 +212,37 @@ class FCC_Rates {
         $currencies = array();
 
         $currency_data = wp_remote_get( static::$currencies_list );
-        $currency_data = isset( $currency_data['body'] ) ? (array) json_decode( $currency_data['body'] ) : $currency_data;
 
-        if ( ! $currency_data instanceof \WP_Error ) {
+        if ( ! is_wp_error( $currency_data ) ) {
 
-            if ( is_array( $currency_data ) && count( $currency_data ) > 99 ) {
+            $currency_data = isset( $currency_data['body'] ) ? (array) json_decode( $currency_data['body'] ) : $currency_data;
 
-                foreach ( $currency_data as $currency_code => $currency_name ) {
+            if ( ! $currency_data instanceof \WP_Error ) {
 
-                    if ( ! is_string( $currency_code ) || ! is_string( $currency_name ) ) {
-                        continue;
+                if ( is_array( $currency_data ) && count( $currency_data ) > 99 ) {
+
+                    foreach ( $currency_data as $currency_code => $currency_name ) {
+
+                        if ( ! is_string( $currency_code ) || ! is_string( $currency_name ) ) {
+                            continue;
+                        }
+
+                        $currency_code = strtoupper( substr( sanitize_key( $currency_code ), 0, 3 ) );
+                        // Defaults values
+                        $currencies[$currency_code] = array(
+                            'name'          => sanitize_text_field( $currency_name ),
+                            'symbol'        => $currency_code,
+                            'position'      => 'before',
+                            'decimals'      => 2,
+                            'thousands_sep' => ',',
+                            'decimals_sep'  => '.'
+                        );
+
                     }
-
-                    $currency_code = strtoupper( substr( sanitize_key( $currency_code ), 0, 3 ) );
-                    // Defaults values
-                    $currencies[$currency_code] = array(
-                        'name'          => sanitize_text_field( $currency_name ),
-                        'symbol'        => $currency_code,
-                        'position'      => 'before',
-                        'decimals'      => 2,
-                        'thousands_sep' => ',',
-                        'decimals_sep'  => '.'
-                    );
 
                 }
 
             }
-
         }
 
         $currency_data = self::fcc_currencies_format_currency_data( $currencies );

@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
 "Project-Id-Version: Houzez Theme Functionality Plugin\n"
-"Language: es\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #: classes/class-settings.php:53
 msgid "Portfolio Settings"
@@ -783,7 +783,7 @@ msgstr "Ver"
 
 #: statistics/houzez-statistics.php:246
 msgid "Favourite Count "
-msgstr "Conteo favorito"
+msgstr "Conteo favorito "
 
 #: statistics/houzez-statistics.php:326
 msgid "Favourite Count"
@@ -811,7 +811,7 @@ msgstr "Baños"
 
 #: statistics/houzez-statistics.php:517 statistics/houzez-statistics.php:520
 msgid "Size"
-msgstr "tamaño"
+msgstr "Tamaño"
 
 #: statistics/houzez-statistics.php:548
 msgid "No Search found"

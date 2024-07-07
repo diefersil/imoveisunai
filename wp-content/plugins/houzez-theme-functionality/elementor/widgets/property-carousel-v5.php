@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.0
  */
 class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
+    use Houzez_Property_Card_Common_Filters;
+    use Houzez_Property_Filters_2;
 
     /**
      * Get widget name.
@@ -98,9 +100,12 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
                 'label'     => esc_html__('Slides To Show', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::SELECT,
                 'options'   => [
-                    '3' => '3',
-                    '2' => '2',
                     '1' => '1',
+                    '2' => '2',
+                    '3' => '3',
+                    '4' => '4',
+                    '5' => '5',
+                    '6' => '6',
                 ],
                 "description" => '',
                 'default' => '3',
@@ -114,7 +119,10 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
                 'options'   => [
                     '1' => '1',
                     '2' => '2',
-                    '3' => '3'
+                    '3' => '3',
+                    '4' => '4',
+                    '5' => '5',
+                    '6' => '6',
                 ],
                 "description" => '',
                 'default' => '1',
@@ -196,126 +204,9 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
             ]
         );
 
-        // Property taxonomies controls
-        $prop_taxonomies = get_object_taxonomies( 'property', 'objects' );
-        unset( $prop_taxonomies['property_feature'] );
+        $this->register_common_filters_controls();
 
-        $page_filters = houzez_option('houzez_page_filters');
-
-        if( isset($page_filters) && !empty($page_filters) ) {
-            foreach ($page_filters as $filter) {
-                unset( $prop_taxonomies[$filter] );
-            }
-        }
-
-        if ( ! empty( $prop_taxonomies ) && ! is_wp_error( $prop_taxonomies ) ) {
-            foreach ( $prop_taxonomies as $single_tax ) {
-
-                $options_array = array();
-                $terms   = get_terms( $single_tax->name );
-
-                if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-                    foreach ( $terms as $term ) {
-                        $options_array[ $term->slug ] = $term->name;
-                    }
-                }
-
-                $this->add_control(
-                    $single_tax->name,
-                    [
-                        'label'    => $single_tax->label,
-                        'type'     => Controls_Manager::SELECT2,
-                        'multiple' => true,
-                        'label_block' => true,
-                        'options'  => $options_array,
-                    ]
-                );
-            }
-        }
-
-        $this->add_control(
-            'properties_by_agents',
-            [
-                'label'    => esc_html__('Properties by Agents', 'houzez'),
-                'type'     => Controls_Manager::SELECT2,
-                'multiple' => true,
-                'label_block' => true,
-                'options'  => array_slice( houzez_get_agents_array(), 1, null, true ),
-            ]
-        );
-
-        $this->add_control(
-            'min_price',
-            [
-                'label'    => esc_html__('Minimum Price', 'houzez'),
-                'type'     => Controls_Manager::NUMBER,
-                'label_block' => false,
-            ]
-        );
-        $this->add_control(
-            'max_price',
-            [
-                'label'    => esc_html__('Maximum Price', 'houzez'),
-                'type'     => Controls_Manager::NUMBER,
-                'label_block' => false,
-            ]
-        );
-
-        $this->add_control(
-            'property_ids',
-            [
-                'label'     => esc_html__( 'Properties IDs', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::TEXT,
-                'description'   => esc_html__( 'Enter properties ids comma separated. Ex 12,305,34', 'houzez-theme-functionality' ),
-            ]
-        );
-
-        $this->add_control(
-            'featured_prop',
-            [
-                'label'     => esc_html__( 'Featured Properties', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => [
-                    ''  => esc_html__( '- Any -', 'houzez-theme-functionality'),
-                    'no'    => esc_html__('Without Featured', 'houzez'),
-                    'yes'  => esc_html__('Only Featured', 'houzez')
-                ],
-                "description" => esc_html__("You can make a post featured by clicking featured properties checkbox while add/edit post", "houzez-theme-functionality"),
-                'default' => '',
-            ]
-        );
-
-        $this->add_control(
-            'sort_by',
-            [
-                'label'     => esc_html__( 'Sort By', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => houzez_sorting_array(),
-                'description' => '',
-                'default' => '',
-            ]
-        );
-
-        $this->add_control(
-            'posts_limit',
-            [
-                'label'     => esc_html__('Number of properties', 'houzez-theme-functionality'),
-                'type'      => Controls_Manager::NUMBER,
-                'min'     => 1,
-                'max'     => 500,
-                'step'    => 1,
-                'default' => 9,
-            ]
-        );
-
-        $this->add_control(
-            'offset',
-            [
-                'label'     => 'Offset',
-                'type'      => Controls_Manager::TEXT,
-                'description' => '',
-            ]
-        );
+        $this->register_common_filter_controls_2();
 
         $this->add_control(
             'all_btn',
@@ -750,6 +641,14 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
                 'tab'   => Controls_Manager::TAB_STYLE,
             ]
         );
+
+        $this->start_controls_tabs( 'image_effects' );
+
+        $this->start_controls_tab( 'normal',
+            array(
+                'label' => __( 'Normal', 'houzez-theme-functionality' ),
+            )
+        );
         $this->add_control(
             'np_bg_color',
             [
@@ -787,11 +686,18 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
                 ],
             ]
         );
+        $this->end_controls_tab();
 
+        $this->start_controls_tab( 'hover',
+            array(
+                'label' => __( 'Hover', 'houzez-theme-functionality' ),
+            )
+        );
+    
         $this->add_control(
             'np_bg_color_hover',
             [
-                'label'     => esc_html__( 'Background Color Hover', 'houzez-theme-functionality' ),
+                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::COLOR,
                 'default'   => '',
                 'selectors' => [
@@ -803,7 +709,7 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
         $this->add_control(
             'np_color_hover',
             [
-                'label'     => esc_html__( 'Color Hover', 'houzez-theme-functionality' ),
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::COLOR,
                 'default'   => '',
                 'selectors' => [
@@ -816,12 +722,141 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
         $this->add_control(
             'np_border_color_hover',
             [
-                'label'     => esc_html__( 'Border Color Hover', 'houzez-theme-functionality' ),
+                'label'     => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::COLOR,
                 'default'   => '',
                 'selectors' => [
                     '{{WRAPPER}} .property-carousel-buttons-wrap button:hover' => 'border: 1px solid {{VALUE}}',
                     '{{WRAPPER}} .btn-view-all:hover' => 'border: 1px solid {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+        
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'hz_dots',
+            [
+                'label' => esc_html__( 'Carousel Dots', 'houzez-theme-functionality' ),
+                'tab'   => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'slide_dots' => 'true'
+                ]
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_size',
+            [
+                'label' => esc_html__( 'Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li button:before' => 'font-size: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_space',
+            [
+                'label' => esc_html__( 'Space Between', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li' => 'margin: 0 {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_top',
+            [
+                'label' => esc_html__( 'Margin Top', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'min' => -50,
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li button:before' => 'top: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_opacity',
+            [
+                'label' => esc_html__( 'Opacity', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px' ],
+                'range'          => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 99,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li button:before' => 'opacity: 0.{{SIZE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_active_opacity',
+            [
+                'label' => esc_html__( 'Opacity Active', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px' ],
+                'range'          => [
+                    'px' => [
+                        'min' => 1,
+                        'max' => 99,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li.slick-active button:before' => 'opacity: 0.{{SIZE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'np_dots_color',
+            [
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li button:before' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'np_dots_active_color',
+            [
+                'label'     => esc_html__( 'Active Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .slick-dots li.slick-active button:before' => 'color: {{VALUE}}',
                 ],
             ]
         );
@@ -842,7 +877,7 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
 
         $settings = $this->get_settings_for_display();
 
-        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = '';
+        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = $properties_by_agencies = '';
 
         if(!empty($settings['property_type'])) {
             $property_type = implode (",", $settings['property_type']);
@@ -854,6 +889,10 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
 
         if(!empty($settings['property_label'])) {
             $property_label = implode (",", $settings['property_label']);
+        }
+
+        if(!empty($settings['property_country'])) {
+            $property_country = implode (",", $settings['property_country']);
         }
 
         if(!empty($settings['property_state'])) {
@@ -872,6 +911,11 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
             $properties_by_agents = $settings['properties_by_agents'];
         }
 
+        if( !empty($settings['properties_by_agencies']) ) {
+            $properties_by_agencies = $settings['properties_by_agencies'];
+        }
+        $args['properties_by_agencies'] = $properties_by_agencies;
+
         $args['property_type']   =  $property_type;
         $args['property_status']   =  $property_status;
         $args['property_label']   =  $property_label;
@@ -885,6 +929,7 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
         $args['posts_limit'] =  $settings['posts_limit'];
         $args['sort_by'] =  $settings['sort_by'];
         $args['offset'] =  $settings['offset'];
+        $args['post_status'] =  $settings['post_status'];
 
         $args['all_btn'] = $settings['all_btn'];
         $args['all_url'] = $settings['all_url'];
@@ -936,7 +981,8 @@ class Houzez_Elementor_Properties_Carousels_v5 extends Widget_Base {
 
                 var houzezCarousel = jQuery('#houzez-properties-carousel-'+token);
 
-                jQuery('.houzez-properties-carousel-js').not('.slick-initialized').slick({
+                houzezCarousel.not('.slick-initialized').slick({
+                    rtl: houzez_rtl,
                     lazyLoad: 'ondemand',
                     infinite: slide_infinite,
                     speed: 300,

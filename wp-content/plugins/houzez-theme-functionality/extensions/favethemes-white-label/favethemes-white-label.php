@@ -27,7 +27,7 @@ if( ! class_exists('Favethemes_White_Label') ) {
 		public function __construct( $widget_areas = array() ) {
 	
 			add_action( 'init', array( $this, 'setup' ) );
-			add_filter('houzez_admin_sub_menus', array($this, 'admin_menu'), 11, 3);
+			add_filter('houzez_admin_sub_menus', array($this, 'admin_menu'), 10, 2);
 
 			if ( true == get_option( 'fave_hide_themes_customizer', false ) ) {
 				add_action( 'customize_register', array( $this, 'remove_themes_section' ), 30 );

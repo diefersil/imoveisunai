@@ -33,6 +33,24 @@ if(!class_exists('Fave_Insights')) {
 
         public static function get_user_stats($user_id) {
 
+            if( houzez_is_admin() || houzez_is_editor() ) {
+                $user_id = '';
+            } else if( houzez_is_agency() ) {
+                $agents = houzez_get_agency_agents($user_id);
+
+                if( $agents ) {
+                    if (!in_array($user_id, $agents)) {
+                        $agents[] = $user_id;
+                    }
+                    $user_id = $agents;
+                } else {
+                    $user_id = $user_id;
+                }
+
+            } else {
+                $user_id = $user_id;
+            }
+
             $stats = array();
             $args = array('user_id' => $user_id);
 
@@ -72,35 +90,60 @@ if(!class_exists('Fave_Insights')) {
             return $stats;
         }
 
-        public static function get_views( $args = array() ) {
-            $return = array();
-            $user_id = isset( $args['user_id'] ) ? $args['user_id'] : false;
-            $listing_id = isset( $args['listing_id'] ) ? $args['listing_id'] : false;
-            
-            $return['lastday'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastday' ] );
-            $return['lasttwo'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lasttwo' ] );
-            $return['lastweek'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastweek' ] );
-            $return['last2week'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'last2week' ] );
-            $return['lastmonth'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastmonth' ] );
-            $return['last2month'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'last2month' ] );
-            
-            return $return;
+        public static function get_views($args = []) {
+            // Extract user_id and listing_id from the input arguments
+            $user_id = $args['user_id'] ?? false;
+            $listing_id = $args['listing_id'] ?? false;
+
+            // Define an array of time periods to retrieve insights for
+            $time_periods = [
+                'lastday', 'lasttwo', 'lastweek', 'last2week', 'lastmonth', 'last2month'
+            ];
+
+            // Initialize an array to store views data for each time period
+            $views = [];
+
+            // Retrieve views data for each time period and store it in the array
+            foreach ($time_periods as $time_period) {
+                $views[$time_period] = self::get_insights([
+                    'user_id' => $user_id,
+                    'listing_id' => $listing_id,
+                    'time' => $time_period
+                ]);
+            }
+
+            // Return the array containing views data for each time period
+            return $views;
         }
 
-        public static function get_unique_views( $args = array() ) {
-            $return = array();
-            $user_id = isset( $args['user_id'] ) ? $args['user_id'] : false;
-            $listing_id = isset( $args['listing_id'] ) ? $args['listing_id'] : false;
-            
-            $return['lastday'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastday', 'unique' => true ] );
-            $return['lasttwo'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lasttwo', 'unique' => true ] );
-            $return['lastweek'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastweek', 'unique' => true ] );
-            $return['last2week'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'last2week', 'unique' => true ] );
-            $return['lastmonth'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'lastmonth', 'unique' => true ] );
-            $return['last2month'] = self::get_insights( [ 'user_id' => $user_id, 'listing_id' => $listing_id, 'time' => 'last2month', 'unique' => true ] );
-            
-            return $return;
+
+        public static function get_unique_views($args = []) {
+            // Extract user_id and listing_id from the input arguments
+            $user_id = $args['user_id'] ?? false;
+            $listing_id = $args['listing_id'] ?? false;
+
+            // Define an array of time periods to retrieve insights for
+            $time_periods = [
+                'lastday', 'lasttwo', 'lastweek', 'last2week', 'lastmonth', 'last2month'
+            ];
+
+            // Initialize an array to store unique views data for each time period
+            $unique_views = [];
+
+            // Retrieve unique views data for each time period and store it in the array
+            foreach ($time_periods as $time_period) {
+                $unique_views[$time_period] = self::get_insights([
+                    'user_id' => $user_id,
+                    'listing_id' => $listing_id,
+                    'time' => $time_period,
+                    'unique' => true
+                ]);
+            }
+
+            // Return the array containing unique views data for each time period
+            return $unique_views;
         }
+
 
         public static function get_bcpdr_data( $args = array() ) {
             $visits_obj = new Fave_Visits();
@@ -195,28 +238,28 @@ if(!class_exists('Fave_Insights')) {
                     'modifier' => '-1 hour',
                     'id' => 'Y-m-d H:00:00',
                     'count' => function( $a ) { return $a * 24; },
-                    'label' => function( $date ) { return $date->format( 'H:00' ); },
+                    'label' => function( $date ) { return date_i18n( 'H:00', $date->getTimestamp() ); },
                 ],
                 'day' => [
                     'query' => "DATE( {$table_name}.time )",
                     'modifier' => '-1 day',
                     'id' => 'Y-m-d',
                     'count' => function( $b ) { return $b; },
-                    'label' => function( $date ) { return $date->format( 'M j' ); },
+                    'label' => function( $date ) { return date_i18n( 'M j', $date->getTimestamp() ); },
                 ],
                 'week' => [
                     'query' => "DATE_FORMAT( {$table_name}.time, '%x-%v' )",
                     'modifier' => '-1 week',
                     'count' => function( $c ) { return $c / 7; },
                     'id' => 'o-W',
-                    'label' => function( $date ) { return $date->format( 'M j' ); },
+                    'label' => function( $date ) { return date_i18n( 'M j', $date->getTimestamp() ); },
                 ],
                 'month' => [
                     'query' => "DATE_FORMAT( {$table_name}.time, '%Y-%m-01' )",
                     'modifier' => '-1 month',
                     'id' => 'Y-m-01',
                     'count' => function( $d ) { return $d / 31; },
-                    'label' => function( $date ) { return $date->format( 'M' ); },
+                    'label' => function( $date ) { return date_i18n( 'M', $date->getTimestamp() ); },
                 ],
             ];
 

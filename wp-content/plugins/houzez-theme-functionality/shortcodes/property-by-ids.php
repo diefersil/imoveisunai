@@ -53,7 +53,7 @@ if( !function_exists('houzez_property_by_ids') ) {
             'post_type' => 'property',
             'post__in' => $ids_array,
             'posts_per_page' => -1,
-            'post_status' => 'publish'
+            'post_status' => array('publish', 'houzez_sold')
         );
 
         //do the query

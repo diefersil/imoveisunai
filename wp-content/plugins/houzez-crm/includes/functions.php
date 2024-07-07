@@ -1,5 +1,4 @@
 <?php
-
 if(!function_exists('get_crm_deal_group')) {
     function get_crm_deal_group() {
         $group_array = array(); 
@@ -121,6 +120,21 @@ if(!function_exists('houzez_matched_prop_type')) {
     }
 
     add_filter('houzez_tax_crm_filter', 'houzez_matched_prop_type', 10, 2);
+}
+
+if(!function_exists('houzez_matched_prop_status')) {
+    function houzez_matched_prop_status($tax_query, $meta) {
+        if ( isset( $meta['property_status']['slug'] ) && !empty($meta['property_status']['slug']) ) {
+            $tax_query[] = array(
+                'taxonomy' => 'property_status',
+                'field' => 'slug',
+                'terms' => $meta['property_status']['slug']
+            );
+        }
+        return $tax_query;
+    }
+
+    add_filter('houzez_tax_crm_filter', 'houzez_matched_prop_status', 10, 2);
 }
 
 
@@ -469,6 +483,41 @@ function hcrm_get_taxonomy($taxonomy_name, $taxonomy_terms, $searched_term = "",
             if (!empty($child_terms)) {
                 hcrm_get_taxonomy( $taxonomy_name, $child_terms, $searched_term, "- ".$prefix );
             }
+        }
+    }
+}
+
+
+if( ! function_exists('houzez_crm_pagination') ) {
+    function houzez_crm_pagination($total_pages, $current_page) {
+        
+        // Generate pagination links
+        $pagination_links = paginate_links( array(
+            'base' => add_query_arg( 'cpage', '%#%' ),
+            'format' => '',
+            'prev_text' => __('&laquo;'),
+            'next_text' => __('&raquo;'),
+            'total' => $total_pages,
+            'current' => $current_page,
+            'type' => 'array'
+        ));
+
+        if (!empty($pagination_links)) {
+            echo '<div class="pagination-wrap"><nav><ul class="pagination justify-content-center">';
+
+            foreach ($pagination_links as $link) {
+                // Replace 'page-numbers' class with 'page-link'
+                $link = str_replace('page-numbers', 'page-link', $link);
+
+                // Check if the link is for the current page and wrap in <li> tag
+                if (strpos($link, 'current') !== false) {
+                    echo '<li class="page-item active">' . $link . '</li>';
+                } else {
+                    echo '<li class="page-item">' . $link . '</li>';
+                }
+            }
+
+            echo '</ul></nav></div>';
         }
     }
 }

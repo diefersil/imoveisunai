@@ -32,6 +32,7 @@ class Houzez {
         }
 
         //add_action( 'current_screen', array( $this, 'conditional_includes' ) );
+        add_action( 'plugins_loaded', array( $this, 'add_plugin_version' ) );
 
         do_action( 'houzez_core' ); 
     }
@@ -69,6 +70,17 @@ class Houzez {
         }
     }
 
+    /**
+     * Add plugin versio.
+     *
+     * @return void
+     */
+    public function add_plugin_version() {
+        update_option('houzez_plugin_core_version', HOUZEZ_PLUGIN_CORE_VERSION);
+        update_option('houzez_theme_version', HOUZEZ_VERSION);
+        update_option('houzez_db_version', HOUZEZ_DB_VERSION);
+    }
+
 
     /**
      * include files
@@ -92,6 +104,8 @@ class Houzez {
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v4.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v5.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v6.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v7.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v8.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-by-id.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-by-ids.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/recent-viewed-properties.php');
@@ -101,9 +115,16 @@ class Houzez {
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/properties.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v5.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v6.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v7.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/properties-grids.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/grids.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-cards.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-cards-carousel.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-grids.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-grids-carousel.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-list.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/agents.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/agents-grid.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/testimonials.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/testimonials-v2.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/partners.php');
@@ -206,7 +227,7 @@ class Houzez {
      * @return void
      */
     public function actions() {
-
+    
     }
 
     /**
@@ -308,6 +329,7 @@ class Houzez {
 
             FCC_API_Settings::init();
             Houzez_Menu::instance();
+            Houzez_Import_Locations::instance();
 
             FCC_Rates::init();
             if(isset($_GET['fcc-update']) && $_GET['fcc-update'] == 1) {
@@ -325,6 +347,23 @@ class Houzez {
         $css_path = 'assets/admin/css/';
 
         wp_enqueue_style('houzez-admin-style', HOUZEZ_PLUGIN_URL . $css_path . 'style.css', array(), '1.0.0', 'all');
+
+        wp_register_script( 'houzez-admin-custom', HOUZEZ_PLUGIN_URL . $js_path . 'custom.js', array('jquery') );
+        wp_enqueue_script( 'houzez-admin-custom' );
+
+        $locals = array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'processing_text' => esc_html__('Processing, Please wait...', 'houzez-theme-functionality'),
+            'are_you_sure_text' => esc_html__('Are you sure you want to do this?', 'houzez-theme-functionality'),
+            'delete_btn_text' => esc_html__('Delete', 'houzez-theme-functionality'),
+            'cancel_btn_text' => esc_html__('Cancel', 'houzez-theme-functionality'),
+            'confirm_btn_text' => esc_html__('Confirm', 'houzez-theme-functionality'),
+            'select_text' => esc_html__('Select', 'houzez-theme-functionality'),
+            'import_text' => esc_html__('Import', 'houzez-theme-functionality'),
+            'map_fields_text'  => esc_html__('Please map at least one field.', 'houzez-theme-functionality'),
+            'error_import'  => esc_html__('Error in Importing Data.', 'houzez-theme-functionality'),
+        );
+        wp_localize_script( 'houzez-admin-custom', 'Houzez_admin_vars', $locals ); 
     }
 
 
@@ -354,8 +393,11 @@ class Houzez {
             HOUZEZ_PLUGIN_PATH . '/classes/class-cron.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-api-settings.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-taxonomies.php',
+            HOUZEZ_PLUGIN_PATH . '/classes/class-import-locations.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-menu.php',
             HOUZEZ_PLUGIN_PATH . '/classes/menu-walker.php',
+            HOUZEZ_PLUGIN_PATH . '/classes/mobile-menu-walker.php',
+            HOUZEZ_PLUGIN_PATH . '/classes/class-html.php',
         ) );
 
         foreach ( $files as $file ) {
@@ -391,7 +433,7 @@ class Houzez {
 
         $terms = get_the_terms( $post_id, $taxonomy );
 
-        if ( ! empty ( $terms ) ) {
+        if ( ! empty ( $terms ) && ! is_wp_error( $terms ) ) {
             $out = array();
             /* Loop through each term, linking to the 'edit posts' page for the specific term. */
             foreach ( $terms as $term ) {
@@ -660,13 +702,13 @@ class Houzez {
 
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'houzez_search';
+        /*$table_name = $wpdb->prefix . 'houzez_search';
         $sql        = "DROP TABLE ". $table_name;
 
-        $wpdb->query( $sql );
+        $wpdb->query( $sql );*/
 
         wp_clear_scheduled_hook('houzez_check_new_listing_action_hook');
-        wp_clear_scheduled_hook( 'favethemes_currencies_update' );
+        wp_clear_scheduled_hook('favethemes_currencies_update');
 
     }
 

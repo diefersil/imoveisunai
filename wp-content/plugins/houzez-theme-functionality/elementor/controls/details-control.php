@@ -26,6 +26,7 @@ class Houzez_Property_Details_Control extends \Elementor\Base_Control {
 			'property_size',
 			'property_land',
 			'property_bedrooms',
+			'property_rooms',
 			'property_bathrooms',
 			'property_garage',
 			'property_garage_size',
@@ -45,6 +46,7 @@ class Houzez_Property_Details_Control extends \Elementor\Base_Control {
 			'property_size'       => esc_html__('Property Size', 'houzez-theme-functionality'),
 			'property_land'       => esc_html__('Property Land Size', 'houzez-theme-functionality'),
 			'property_bedrooms'   => esc_html__('Property Bedrooms', 'houzez-theme-functionality'),
+			'property_rooms'   	  => esc_html__('Property Rooms', 'houzez-theme-functionality'),
 			'property_bathrooms'  => esc_html__('Property Bathrooms', 'houzez-theme-functionality'),
 			'property_garage'     => esc_html__('Property Garages', 'houzez-theme-functionality'),
 			'property_garage_size'=> esc_html__('Property Garage Size', 'houzez-theme-functionality'),
@@ -62,7 +64,7 @@ class Houzez_Property_Details_Control extends \Elementor\Base_Control {
             if(!empty($fields_array)) {
                 foreach ( $fields_array as $value ) {
                     $field_title = $value->label;
-                    $field_id = houzez_clean_20($value->field_id);
+                    $field_id = houzez_plugin_20($value->field_id);
                     $field_title = houzez_wpml_translate_single_string($field_title);
                     
                     $custom_fields_array[ $field_id ] = $field_title;

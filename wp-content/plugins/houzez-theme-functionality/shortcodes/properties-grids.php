@@ -21,6 +21,8 @@ if( !function_exists('houzez_prop_grids') ) {
             'featured_prop' => '',
             'posts_limit' => '',
             'offset' => '',
+            'property_ids' => '',
+            'post_status' => '',
             'min_price' => '',
             'max_price' => '',
             'ele_lazyloadbg' => '',
@@ -78,6 +80,7 @@ if( !function_exists('houzez_prop_grids') ) {
 
                 endwhile;
             endif;
+            wp_reset_postdata();
             ?>
         </div>
 

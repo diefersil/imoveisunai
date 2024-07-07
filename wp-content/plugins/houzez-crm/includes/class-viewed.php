@@ -19,18 +19,29 @@ if(!class_exists('Houzez_Viewed_Listings')) {
             global $wpdb;
             $table_name = $wpdb->prefix . 'houzez_crm_viewed_listings';
 
-            if ( !isset( $_REQUEST['ids'] ) ) {
+            // Check if 'ids' is set in POST request
+            if ( !isset( $_POST['ids'] ) ) {
                 $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No listing selected', 'houzez-crm' ) );
                 echo json_encode( $ajax_response );
-                die;
+                die();
             }
-            $ids = $_REQUEST['ids'];
-            
-            $wpdb->query("DELETE FROM {$table_name} WHERE id IN ($ids)");
+
+            // Sanitize and validate the IDs
+            $ids = sanitize_text_field($_POST['ids']);
+            $id_array = explode(',', $ids);
+            $id_array = array_map('intval', $id_array); // Convert each ID to an integer
+            $ids = implode(',', $id_array);
+
+            // Prepare and execute the SQL query
+            $query = "DELETE FROM {$table_name} WHERE id IN ($ids)";
+            $wpdb->query($query);
+
+            // Return success response
             $ajax_response = array( 'success' => true , 'reason' => '' );
             echo json_encode( $ajax_response );
-            die;
+            die();
         }
+
 
         //Add visits data
         public function add_views() { 
@@ -69,17 +80,21 @@ if(!class_exists('Houzez_Viewed_Listings')) {
         public function checklisting($listing_id, $user_id) {
             global $wpdb;
             $table_name = $wpdb->prefix . 'houzez_crm_viewed_listings';
-            
 
-            $sql = "SELECT * FROM {$table_name} WHERE listing_id = {$listing_id} AND user_id = {$user_id}";
+            // Sanitize and validate the inputs
+            $listing_id = intval($listing_id); // Ensure $listing_id is an integer
+            $user_id = intval($user_id); // Ensure $user_id is an integer
 
-            $result = $wpdb->get_row( $sql, OBJECT );
-            
-            if( is_object( $result ) && ! empty( $result ) ) {
+            // Secure the SQL query using prepare()
+            $sql = $wpdb->prepare("SELECT * FROM {$table_name} WHERE listing_id = %d AND user_id = %d", $listing_id, $user_id);
+            $result = $wpdb->get_row($sql, OBJECT);
+
+            if (is_object($result) && !empty($result)) {
                 return true;
             }
             return false;
         }
+
 
 
     } // end class

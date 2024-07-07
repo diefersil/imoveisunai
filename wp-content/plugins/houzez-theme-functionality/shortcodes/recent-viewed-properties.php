@@ -36,6 +36,9 @@ if( !function_exists('houzez_recent_viewed_properties') ) {
         } elseif( $prop_grid_style == "v_6" ) {
             $cards_version = 'v6';
             
+        } elseif( $prop_grid_style == "v_7" ) {
+            $cards_version = 'v7';
+            
         } 
 
         if($columns == '2cols') {

@@ -6,3 +6,6 @@ ul.houzez-sortable-css li.ui-sortable-handle {
     vertical-align: middle;
     cursor: pointer;
 }
+.houzez-custom-autocomplete-field .select2-search--inline input.select2-search__field {
+    min-width: 50px;
+}

@@ -3,7 +3,7 @@
 Plugin Name: Favethemes Insights
 Plugin URI:  http://themeforest.net/user/favethemes
 Description: Add insights for favethemes themes
-Version:     1.2.3
+Version:     1.2.9
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 */
@@ -176,13 +176,12 @@ if ( ! class_exists( 'Favethemes_Insights' ) ) :
          * plugin activation
          */
         public function plugin_activation() {
-
             global $wpdb;
 
-            $table_name         = $wpdb->prefix . 'favethemes_insights';
+            $table_name = $wpdb->prefix . 'favethemes_insights';
             $sql = "CREATE TABLE $table_name (
-                id bigint(25) unsigned NOT NULL AUTO_INCREMENT,
-                listing_id bigint(25) unsigned NOT NULL,
+                id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                listing_id bigint(20) unsigned NOT NULL,
                 time datetime NOT NULL,
                 ip_address varchar(35),
                 unique_identifier varchar(70) NOT NULL,
@@ -196,16 +195,16 @@ if ( ! class_exists( 'Favethemes_Insights' ) ) :
                 country_code varchar(35),
                 country varchar(35),
                 city varchar(64),
-                PRIMARY KEY  (id)
+                PRIMARY KEY  (id),
+                INDEX referral_domain (referral_domain),
+                INDEX referral_url (referral_url),
+                INDEX unique_identifier (unique_identifier),
+                INDEX time (time)
             );";
 
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
             dbDelta( $sql );
 
-            $wpdb->query( "ALTER TABLE $table_name ADD INDEX `referral_domain` (`referral_domain`)" );
-            $wpdb->query( "ALTER TABLE $table_name ADD INDEX `referral_url` (`referral_url`)" );
-            $wpdb->query( "ALTER TABLE $table_name ADD INDEX `unique_identifier` (`unique_identifier`)" );
-            $wpdb->query( "ALTER TABLE $table_name ADD INDEX `time` (`time`)" );
 
             if (!wp_next_scheduled('favethemes_insights')) {
                 wp_schedule_event(time(), 'daily', 'favethemes_insights');

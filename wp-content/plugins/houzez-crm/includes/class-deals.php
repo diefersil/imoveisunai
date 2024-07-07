@@ -17,22 +17,24 @@ if ( ! class_exists( 'Houzez_Deals' ) ) {
 			global $wpdb;
             $table_name = $wpdb->prefix . 'houzez_crm_deals';
 
-			$nonce = $_REQUEST['security'];
+            $user_id = get_current_user_id();
+
+			$nonce = $_POST['security'];
 	        if ( ! wp_verify_nonce( $nonce, 'delete_deal_nonce' ) ) {
 	            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'Security check failed!', 'houzez-crm' ) );
 	            echo json_encode( $ajax_response );
 	            die;
 	        }
 
-	        if ( !isset( $_REQUEST['deal_id'] ) ) {
+	        if ( !isset( $_POST['deal_id'] ) ) {
 	            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No lead id found', 'houzez-crm' ) );
 	            echo json_encode( $ajax_response );
 	            die;
 	        }
-	        $deal_id = $_REQUEST['deal_id'];
+	        $deal_id = $_POST['deal_id'];
 
 	        $where = array(
-            	'deal_id' => $deal_id
+            	'deal_id' => $deal_id,
             );
 
             $where_format = array(
@@ -40,53 +42,60 @@ if ( ! class_exists( 'Houzez_Deals' ) ) {
             );
 
 	        
-	        $wpdb->query( 
+	        $deleted = $wpdb->query( 
 				$wpdb->prepare( 
 					"DELETE FROM {$table_name}
-					 WHERE deal_id = %d
+					 WHERE deal_id = %d AND user_id = %d
 					",
-				        $deal_id
+				        $deal_id,
+				        $user_id
 			        )
 			);
-	        $ajax_response = array( 'success' => true , 'reason' => '' );
-            echo json_encode( $ajax_response );
+	       
+            if( $deleted ) {
+		        $ajax_response = array( 'success' => true , 'reason' => '' );
+		    } else {
+		    	$ajax_response = array( 'success' => false , 'reason' => esc_html__("You don't have rights to perform this action", 'houzez-crm') );
+		    }
+		    echo json_encode( $ajax_response );
             die;
 		}
 
 		public function get_single_deal() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_deals';
-            
-            $deal_id = '';
-			if ( isset( $_POST['deal_id'] ) ) {
-				$deal_id = intval( $_POST['deal_id'] );
-			}
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_deals';
+		    
+		    $deal_id = '';
+		    if ( isset( $_POST['deal_id'] ) ) {
+		        $deal_id = intval( $_POST['deal_id'] );
+		    }
 
-			if(empty($deal_id)) {
-				echo json_encode( 
-					array( 
-						'success' => false, 
-						'msg' => esc_html__('Something went wrong!', 'houzez-crm') 
-					) 
-				);
-	            wp_die();
-			}
+		    if(empty($deal_id)) {
+		        echo json_encode( 
+		            array( 
+		                'success' => false, 
+		                'msg' => esc_html__('Something went wrong!', 'houzez-crm') 
+		            ) 
+		        );
+		        wp_die();
+		    }
 
-            $sql = "SELECT * FROM {$table_name} WHERE deal_id = {$deal_id}";
+		    $sql = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE deal_id = %d", $deal_id);
 
-            $result = $wpdb->get_row( $sql, OBJECT );
+		    $result = $wpdb->get_row( $sql, OBJECT );
 
-            if( is_object( $result ) && ! empty( $result ) ) {
-            	echo json_encode( 
-					array( 
-						'success' => true, 
-						'data' => $result 
-					) 
-				);
-	            wp_die();
-            }
-            return '';
+		    if( is_object( $result ) && ! empty( $result ) ) {
+		        echo json_encode( 
+		            array( 
+		                'success' => true, 
+		                'data' => $result 
+		            ) 
+		        );
+		        wp_die();
+		    }
+		    return '';
 		}
+
 
 		public function set_action_due_date() {
 			global $wpdb;
@@ -470,42 +479,58 @@ if ( ! class_exists( 'Houzez_Deals' ) ) {
 		}
 
 		public static function get_deals() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_deals';
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_deals';
 
-            $deal_group = isset($_GET['tab']) ? $_GET['tab'] : 'active';
-            
-            $items_per_page = isset($_GET['records']) ? $_GET['records'] : 10;
-			$page = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;
-			$offset = ( $page * $items_per_page ) - $items_per_page;
-			$query = 'SELECT * FROM '.$table_name.' WHERE user_id= '.get_current_user_id().' AND deal_group = '."'$deal_group'";
+		    $deal_group = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'active';
+		    $items_per_page = isset($_GET['records']) ? absint($_GET['records']) : 10;
+		    $page = isset($_GET['cpage']) ? absint($_GET['cpage']) : 1;
+		    $offset = ( $page * $items_per_page ) - $items_per_page;
 
-			$total_query = "SELECT COUNT(1) FROM (${query}) AS combined_table";
-			$total = $wpdb->get_var( $total_query );
-			$results = $wpdb->get_results( $query.' ORDER BY deal_id DESC LIMIT '. $offset.', '. $items_per_page, OBJECT );
+		    $sql = $wpdb->prepare(
+		        "SELECT * FROM {$table_name} WHERE user_id = %d AND deal_group = %s ORDER BY deal_id DESC LIMIT %d, %d", 
+		        get_current_user_id(),
+		        $deal_group,
+		        $offset,
+		        $items_per_page
+		    );
+		    $results = $wpdb->get_results($sql, OBJECT);
 
-			$return_array['data'] = array(
-				'results' => $results,
-				'total_records' => $total,
-				'items_per_page' => $items_per_page,
-				'page' => $page,
-			);
+		    $count_sql = $wpdb->prepare(
+		        "SELECT COUNT(1) FROM {$table_name} WHERE user_id = %d AND deal_group = %s", 
+		        get_current_user_id(), 
+		        $deal_group
+		    );
+		    $total = $wpdb->get_var($count_sql);
 
-			return $return_array;
+		    $return_array['data'] = array(
+		        'results' => $results,
+		        'total_records' => $total,
+		        'items_per_page' => $items_per_page,
+		        'page' => $page,
+		    );
+
+		    return $return_array;
 		}
+
 
 		public static function get_total_deals_by_group($group) {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_deals';
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_deals';
 
-            $deal_group = $group;
-            
-			$total_query = 'SELECT COUNT(*) FROM '.$table_name.' WHERE user_id= '.get_current_user_id().' AND deal_group = '."'$deal_group'";
-			$total = $wpdb->get_var( $total_query );
-			
-			$total_records = $total;
-			return $total_records;
+		    $deal_group = sanitize_text_field($group);
+		    
+		    $sql = $wpdb->prepare(
+		        "SELECT COUNT(*) FROM {$table_name} WHERE user_id = %d AND deal_group = %s",
+		        get_current_user_id(), 
+		        $deal_group
+		    );
+		    $total = $wpdb->get_var($sql);
+		    
+		    $total_records = $total;
+		    return $total_records;
 		}
+
 
 
 	}

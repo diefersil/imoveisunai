@@ -18,6 +18,8 @@ if( !function_exists('houzez_properties') ) {
 			'houzez_user_role' => '',
 			'featured_prop' => '',
 			'posts_limit' => '',
+			'property_ids' => '',
+			'post_status' => '',
 			'sort_by' => '',
 			'offset' => '',
 			'pagination_type' => '',

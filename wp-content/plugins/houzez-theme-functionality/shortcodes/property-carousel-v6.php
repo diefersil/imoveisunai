@@ -19,6 +19,7 @@ if( !function_exists('houzez_prop_carousel_v6') ) {
 			'posts_limit' => '',
 			'sort_by' => '',
 			'offset' => '',
+			'post_status' => '',
 			'all_btn' => '',
 			'all_url' => '',
 			'slides_to_show' => '',
@@ -31,7 +32,8 @@ if( !function_exists('houzez_prop_carousel_v6') ) {
 			'thumb_size' => '',
 			'min_price' => '',
 			'max_price' => '',
-			'properties_by_agents' => ''
+			'properties_by_agents' => '',
+			'properties_by_agencies' => ''
 		), $atts));
 
 		ob_start();

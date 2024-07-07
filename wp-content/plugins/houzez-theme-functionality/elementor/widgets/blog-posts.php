@@ -668,9 +668,10 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
      * @access protected
      */
     protected function render() {
-        global $ele_settings;
+        global $ele_settings, $houzez_local;
         $settings = $this->get_settings_for_display();
         $ele_settings = $settings;
+        $houzez_local = houzez_get_localization();
 
         $grid_style  =  $settings['grid_style'];
         $category_id =  $settings['category_id'];

@@ -39,7 +39,7 @@ if(!class_exists('Fave_Visits')) {
             $city              = isset($location[0]) ? $location[0] : null;
             $country           = isset($location[1]) ? $location[1] : null;
             $country_code      = isset($location[2]) ? $location[2] : null;
-
+            
             //wp_die($unique_identifier);
 
             $data = array(
@@ -89,14 +89,16 @@ if(!class_exists('Fave_Visits')) {
         public function get_countries( $args = array() ) {
             $countries = array();
             $results = $this->count_column_data( 'country', $args );
-            
-            foreach ( $results as $result ) {
-                
-                $countries[] = [
+
+            $countries = array_map( function($result) {
+
+                return [
                     'name' => $result->country,
                     'count' => $result->country_count,
                 ];
-            }
+
+            }, $results );
+
 
             return $countries;
         }
@@ -113,13 +115,14 @@ if(!class_exists('Fave_Visits')) {
 
             $results = $this->count_column_data( $column, $args );
 
-            foreach ( $results as $result ) {
-                
-                $browsers[] = [
+            $browsers = array_map( function($result) {
+
+                return [
                     'name' => $result->browser,
                     'count' => $result->browser_count,
                 ];
-            }
+
+            }, $results );
 
             return $browsers;
         }
@@ -134,14 +137,15 @@ if(!class_exists('Fave_Visits')) {
         public function get_platforms( $args = array() ) {
             $platforms = array();
             $results = $this->count_column_data( 'platform', $args );
-        
-            foreach ( $results as $result ) {
-            
-                $platforms[] = [
+
+            $platforms = array_map( function($result) {
+
+                return [
                     'name' => $result->platform,
                     'count' => $result->platform_count,
                 ];
-            }
+
+            }, $results );
 
             return $platforms;
         }
@@ -152,69 +156,65 @@ if(!class_exists('Fave_Visits')) {
          * @access public
          * @return array
          */
-        public function get_devices( $args = array() ) {
-            $devices = array();
-            $results = $this->count_column_data( 'device', $args );
-    
-            foreach ( $results as $result ) {
-                
-                $devices[] = [
+        public function get_devices($args = array()) {
+            $results = $this->count_column_data('device', $args);
+
+            $devices = array_map(function ($result) {
+                return [
                     'name' => $result->device,
                     'count' => $result->device_count,
                 ];
-            }
+            }, $results);
 
             return $devices;
         }
 
-        public static function get_referrers( $args = array() ) {
+        public static function get_referrers($args = array()) {
             global $wpdb;
-            $referrers = array();
             $table_name = $wpdb->prefix . 'favethemes_insights';
-            $query = array();
 
-            $args = wp_parse_args( $args, [
+            $args = wp_parse_args($args, [
                 'listing_id' => false,
                 'user_id' => false,
                 'time' => false,
-            ] );
+            ]);
 
-            
-            $query[] = "SELECT {$table_name}.referral_domain AS referral_domain,
-                    COUNT( {$table_name}.referral_domain ) AS referral_domain_count
-                    FROM {$table_name}
-                    INNER JOIN {$wpdb->posts} ON ( {$wpdb->posts}.ID = {$table_name}.listing_id )
-                    WHERE {$wpdb->posts}.post_status = 'publish'
-                    AND {$table_name}.referral_domain IS NOT NULL
-                    AND {$table_name}.referral_url IS NOT NULL
-            ";
+            $query = "SELECT {$table_name}.referral_domain AS referral_domain,
+                        COUNT( {$table_name}.referral_domain ) AS referral_domain_count
+                        FROM {$table_name}
+                        INNER JOIN {$wpdb->posts} ON ( {$wpdb->posts}.ID = {$table_name}.listing_id )
+                        WHERE {$wpdb->posts}.post_status = 'publish'
+                        AND {$table_name}.referral_domain IS NOT NULL
+                        AND {$table_name}.referral_url IS NOT NULL";
 
-            //apply fiter for user_id. listing_id and time
-            $query   = apply_filters('get_user_listing_time_query', $query, $args);
+            // Apply filter for user_id, listing_id, and time
+            $query_parts = array($query);
+            $query_parts = apply_filters('get_user_listing_time_query', $query_parts, $args);
 
-            $query[] = "GROUP BY referral_domain";
-            $query[] = "ORDER BY referral_domain_count DESC";
-            $query[] = "LIMIT 15";
+            $query_parts[] = "GROUP BY referral_domain";
+            $query_parts[] = "ORDER BY referral_domain_count DESC";
+            $query_parts[] = "LIMIT 15";
 
-            $query = join( "\n", $query );
-            $results = $wpdb->get_results( $query, OBJECT );
+            $final_query = join("\n", $query_parts);
+            $results = $wpdb->get_results($final_query, OBJECT);
 
-            if ( ! is_array( $results ) || empty( $results ) ) {
-                return $referrers;
+            if (!is_array($results) || empty($results)) {
+                return array();
             }
 
-            foreach ( $results as $result ) {
+            $referrers = array_map(function ($result) use ($table_name, $args) {
                 $domain = $result->referral_domain;
 
-                $referrers[] = [
+                return [
                     'domain' => $domain,
                     'count' => $result->referral_domain_count,
-                    'subrefs' => self::get_domain_referrers( $domain, $table_name, $args ),
+                    'subrefs' => self::get_domain_referrers($domain, $table_name, $args),
                 ];
-            }
+            }, $results);
 
             return $referrers;
         }
+
 
         public static function get_domain_referrers( $domain, $table_name, $args = array() ) {
             global $wpdb;
@@ -271,44 +271,42 @@ if(!class_exists('Fave_Visits')) {
          * @access public
          * @return object|null
          */
-        public function count_column_data( $column, $args = array() ) {
+        public function count_column_data($column, $args = array()) {
             global $wpdb;
-            $query = array();
-            $empty = array();
             $table_name = $wpdb->prefix . 'favethemes_insights';
 
-            $args = wp_parse_args( $args, array(
+            $args = wp_parse_args($args, array(
                 'user_id'    => false,
                 'listing_id' => false,
                 'time'       => false,
             ));
 
-            
-            $query[] = "SELECT {$table_name}.{$column} AS {$column},
-                    COUNT( {$table_name}.{$column} ) AS {$column}_count
-                    FROM {$table_name}
-                    INNER JOIN {$wpdb->posts} ON ( {$wpdb->posts}.ID = {$table_name}.listing_id )
-                    WHERE {$wpdb->posts}.post_status = 'publish'
-                    AND {$table_name}.{$column} IS NOT NULL
-            ";
+            $query = "SELECT {$table_name}.{$column} AS {$column},
+                        COUNT( {$table_name}.{$column} ) AS {$column}_count
+                        FROM {$table_name}
+                        INNER JOIN {$wpdb->posts} ON ( {$wpdb->posts}.ID = {$table_name}.listing_id )
+                        WHERE {$wpdb->posts}.post_status = 'publish'
+                        AND {$table_name}.{$column} IS NOT NULL";
 
-            //apply fiter for user_id. listing_id and time
-            $query   = apply_filters('get_user_listing_time_query', $query, $args);
+            // Apply filter for user_id, listing_id, and time
+            $query_parts = array($query);
+            $query_parts = apply_filters('get_user_listing_time_query', $query_parts, $args);
 
-            $query[] = "GROUP BY {$column}";
-            $query[] = "ORDER BY {$column}_count DESC";
-            $query[] = "LIMIT 15";
+            $query_parts[] = "GROUP BY {$column}";
+            $query_parts[] = "ORDER BY {$column}_count DESC";
+            $query_parts[] = "LIMIT 15";
 
-            $query = join( "\n", $query );
+            $final_query = join("\n", $query_parts);
 
-            $result = $wpdb->get_results( $query, OBJECT );
+            $result = $wpdb->get_results($final_query, OBJECT);
 
-            if ( ! is_array( $result ) || empty( $result ) ) {
-                return $empty;
+            if (!is_array($result) || empty($result)) {
+                return array();
             }
 
             return $result;
         }
+
 
         /**
          * Get query for single user, single listing and time frame
@@ -316,33 +314,60 @@ if(!class_exists('Fave_Visits')) {
          * @access public
          * @return array
          */
-        public function get_user_listing_time_query( $query, $args ) {
+        public function get_user_listing_time_query($query, $args) {
             global $wpdb;
             $table_name = $wpdb->prefix . 'favethemes_insights';
 
-            $DateTimeZone = wp_timezone();//new DateTimeZone( '+02:30' );
-            $DateTime = new DateTime('now', $DateTimeZone);
+            if (!empty($args['user_id'])) {
 
-            if ( !empty( $args['user_id'] ) ) {
-                $query[] = sprintf( " AND {$wpdb->posts}.post_author = %d ", $args['user_id'] );
+                if ( is_array( $args['user_id'] ) ) {
+                    // If user_id is an array, use IN clause
+                    $user_ids = implode( ',', array_map( 'intval', $args['user_id'] ) );
+                    $query[] = " AND {$wpdb->posts}.post_author IN ({$user_ids}) ";
+                } else {
+                    // If user_id is a single ID, use equality check
+                    $query[] = sprintf( " AND {$wpdb->posts}.post_author = %d ", intval( $args['user_id'] ) );
+                }
+
             }
 
-            if ( !empty( $args['listing_id'] ) ) {
-                $query[] = sprintf( " AND {$table_name}.listing_id = %d ", $args['listing_id'] );
+            if (!empty($args['listing_id'])) {
+                $query[] = sprintf(" AND {$table_name}.listing_id = %d ", $args['listing_id']);
             }
 
-            if ( !empty( $args['time'] ) && in_array( $args['time'], ['lastday', 'lasttwo', 'lastweek', 'last2week', 'lastmonth', 'last2month', 'lasthalfyear', 'lastyear'] ) ) {
+            if (!empty($args['time']) && in_array($args['time'], ['lastday', 'lasttwo', 'lastweek', 'last2week', 'lastmonth', 'last2month', 'lasthalfyear', 'lastyear'])) {
 
-                $time_token = [ 'lastday' => '-1 day', 'lasttwo' => '-2 day', 'lastweek' => '-7 days', 'last2week' => '-14 days', 'lastmonth' => '-30 days', 'last2month' => '-60 days', 'lasthalfyear' => '-182 days', 'lastyear' => '-365 days' ];
-
-                $modifiedTime = $DateTime->modify( $time_token[ $args['time'] ] )->format('Y-m-d H:i:s');
+                $modifiedTime = $this->get_modified_time($args['time']);
 
                 $query[] = sprintf(
-                    " AND {$table_name}.time >= '%s' ", $modifiedTime
+                    " AND {$table_name}.time >= '%s' ",
+                    $modifiedTime
                 );
             }
+
             return $query;
         }
+
+        private function get_modified_time($time)
+        {
+            $DateTimeZone = wp_timezone();
+            $DateTime = new DateTime('now', $DateTimeZone);
+
+            $time_token = [
+                'lastday' => '-1 day',
+                'lasttwo' => '-2 day',
+                'lastweek' => '-7 days',
+                'last2week' => '-14 days',
+                'lastmonth' => '-30 days',
+                'last2month' => '-60 days',
+                'lasthalfyear' => '-182 days',
+                'lastyear' => '-365 days'
+            ];
+
+            $modifiedTime = $DateTime->modify($time_token[$time])->format('Y-m-d H:i:s');
+            return $modifiedTime;
+        }
+
 
 
 

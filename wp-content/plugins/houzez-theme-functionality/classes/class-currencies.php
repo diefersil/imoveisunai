@@ -81,35 +81,51 @@ class Houzez_Currencies {
     public static function get_property_currency($property_id) {
         global $wpdb;
 
+        // Sanitize the property ID and get the currency code
+        $property_id = intval($property_id);
         $currency_code = get_post_meta( get_the_ID(), 'fave_currency', true);
-        
-        $result = $wpdb->get_results(" SELECT * FROM " . $wpdb->prefix . "houzez_currencies where currency_code='$currency_code'");
-        
-        if(!empty($result)) {
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE currency_code = %s", $currency_code);
+        $result = $wpdb->get_results($query);
+
+        if (!empty($result)) {
             return $result;
         }
         return false;
     }
+
 
     public static function get_property_currency_by_id($property_id) {
         global $wpdb;
 
-        $currency_code = get_post_meta( $property_id, 'fave_currency', true);
-        
-        $result = $wpdb->get_results(" SELECT * FROM " . $wpdb->prefix . "houzez_currencies where currency_code='$currency_code'");
-        
-        if(!empty($result)) {
+        // Sanitize the property ID and get the currency code
+        $property_id = intval($property_id);
+        $currency_code = get_post_meta($property_id, 'fave_currency', true);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE currency_code = %s", $currency_code);
+        $result = $wpdb->get_results($query);
+
+        if (!empty($result)) {
             return $result;
         }
         return false;
     }
 
+
     public static function get_property_currency_2($property_id, $currency_code) {
         global $wpdb;
-    
-        $result = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "houzez_currencies where currency_code='$currency_code'", ARRAY_A);
 
-        if(!empty($result)) {
+        // Sanitize the property ID and currency code
+        $property_id = intval($property_id);
+        $currency_code = sanitize_text_field($currency_code);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE currency_code = %s", $currency_code);
+        $result = $wpdb->get_row($query, ARRAY_A);
+
+        if (!empty($result)) {
             return $result;
         }
         return false;
@@ -117,10 +133,15 @@ class Houzez_Currencies {
 
     public static function get_currency_by_code($currency_code) {
         global $wpdb;
-    
-        $result = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "houzez_currencies where currency_code='$currency_code'", ARRAY_A);
 
-        if(!empty($result)) {
+        // Sanitize the currency code
+        $currency_code = sanitize_text_field($currency_code);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE currency_code = %s", $currency_code);
+        $result = $wpdb->get_row($query, ARRAY_A);
+
+        if (!empty($result)) {
             return $result;
         }
         return false;
@@ -276,12 +297,19 @@ class Houzez_Currencies {
         return null;
     }
 
-    public static function get_field( $id ) {
+    public static function get_field($id) {
         global $wpdb;
-        $instance = $wpdb->get_row( "SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE id = '{$id}'", ARRAY_A );
+
+        // Sanitize the ID
+        $id = intval($id);
+
+        // Secure the SQL query using prepare()
+        $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE id = %d", $id);
+        $instance = $wpdb->get_row($query, ARRAY_A);
 
         return $instance;
     }
+
 
     public static function get_field_value( $instance, $key, $default = null ) {
         return apply_filters( 'houzez_currencies_get_field_value', ! empty( $instance[ $key ] ) ? $instance[ $key ] : $default, $key, $instance );

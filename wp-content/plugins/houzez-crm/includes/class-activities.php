@@ -13,19 +13,21 @@ if ( ! class_exists( 'Houzez_Activities' ) ) {
 			global $wpdb;
             $table_name = $wpdb->prefix . 'houzez_crm_activities';
 
-			$nonce = $_REQUEST['security'];
+            $user_id = get_current_user_id();
+
+			$nonce = $_POST['security'];
 	        if ( ! wp_verify_nonce( $nonce, 'delete_activity_nonce' ) ) {
 	            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'Security check failed!', 'houzez-crm' ) );
 	            echo json_encode( $ajax_response );
 	            die;
 	        }
 
-	        if ( !isset( $_REQUEST['activity_id'] ) ) {
+	        if ( !isset( $_POST['activity_id'] ) ) {
 	            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No activity id found', 'houzez-crm' ) );
 	            echo json_encode( $ajax_response );
 	            die;
 	        }
-	        $activity_id = $_REQUEST['activity_id'];
+	        $activity_id = $_POST['activity_id'];
 
 	        $where = array(
             	'activity_id' => $activity_id
@@ -36,15 +38,20 @@ if ( ! class_exists( 'Houzez_Activities' ) ) {
             );
 
 	        
-	        $wpdb->query( 
+	        $deleted = $wpdb->query( 
 				$wpdb->prepare( 
 					"DELETE FROM {$table_name}
-					 WHERE activity_id = %d
+					 WHERE activity_id = %d AND user_id = %d
 					",
-				        $activity_id
+				        $activity_id,
+				        $user_id
 			        )
 			);
-	        $ajax_response = array( 'success' => true , 'reason' => '' );
+	        if( $deleted ) {
+		        $ajax_response = array( 'success' => true , 'reason' => '' );
+		    } else {
+		    	$ajax_response = array( 'success' => false , 'reason' => esc_html__("You don't have rights to perform this action", 'houzez-crm') );
+		    }
             echo json_encode( $ajax_response );
             die;
 		}
@@ -128,28 +135,32 @@ if ( ! class_exists( 'Houzez_Activities' ) ) {
 		}
 
 		public static function get_activities() {
-			global $wpdb;
-            $table_name = $wpdb->prefix . 'houzez_crm_activities';
-            
-            $items_per_page = isset($_GET['records']) ? $_GET['records'] : 15;
-			$page = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;
-			$offset = ( $page * $items_per_page ) - $items_per_page;
-			//$query = 'SELECT * FROM '.$table_name;
-			$query = 'SELECT * FROM '.$table_name.' WHERE user_id= '.get_current_user_id();
-			$total_query = "SELECT COUNT(1) FROM (${query}) AS combined_table";
-			$total = $wpdb->get_var( $total_query );
-			$results = $wpdb->get_results( $query.' ORDER BY activity_id DESC LIMIT '. $offset.', '. $items_per_page, OBJECT );
+		    global $wpdb;
+		    $table_name = $wpdb->prefix . 'houzez_crm_activities';
 
-			$return_array['data'] = array(
-				'results' => $results,
-				'total_records' => $total,
-				'items_per_page' => $items_per_page,
-				'page' => $page,
-			);
+		    // Sanitize and validate the inputs
+		    $items_per_page = isset($_GET['records']) ? intval($_GET['records']) : 15;
+		    $page = isset($_GET['cpage']) ? abs(intval($_GET['cpage'])) : 1;
+		    $offset = ($page * $items_per_page) - $items_per_page;
 
-			return $return_array;
+		    $current_user_id = get_current_user_id();
+
+		    // Secure the SQL query using prepare()
+		    $query = $wpdb->prepare("SELECT * FROM {$table_name} WHERE user_id = %d ORDER BY activity_id DESC LIMIT %d, %d", $current_user_id, $offset, $items_per_page);
+		    $total_query = $wpdb->prepare("SELECT COUNT(1) FROM {$table_name} WHERE user_id = %d", $current_user_id);
+
+		    $total = $wpdb->get_var($total_query);
+		    $results = $wpdb->get_results($query, OBJECT);
+
+		    $return_array['data'] = array(
+		        'results' => $results,
+		        'total_records' => $total,
+		        'items_per_page' => $items_per_page,
+		        'page' => $page,
+		    );
+
+		    return $return_array;
 		}
-
 		
 
 	}

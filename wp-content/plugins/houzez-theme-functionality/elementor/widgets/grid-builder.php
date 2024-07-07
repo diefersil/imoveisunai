@@ -173,6 +173,7 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
                     'property_state' => 'State',
                     'property_city' => 'City',
                     'property_area' => 'Area',
+                    'property_label' => 'Label',
                 ],
                 'description' => '',
                 'default' => 'property_type',
@@ -184,8 +185,6 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
 
         // Property taxonomies controls
         $prop_taxonomies = get_object_taxonomies( 'property', 'objects' );
-        unset( $prop_taxonomies['property_feature'] );
-        
         $page_filters = houzez_option('houzez_page_filters');
 
         if( isset($page_filters) && !empty($page_filters) ) {
@@ -195,13 +194,22 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
         }
 
         unset( $prop_taxonomies['property_status'] );
-        unset( $prop_taxonomies['property_label'] );
+        unset( $prop_taxonomies['property_feature'] );
+        unset( $prop_taxonomies['property_country'] );
+        unset( $prop_taxonomies['property_state'] );
+        unset( $prop_taxonomies['property_city'] );
+        unset( $prop_taxonomies['property_area'] );
 
         if ( ! empty( $prop_taxonomies ) && ! is_wp_error( $prop_taxonomies ) ) {
             foreach ( $prop_taxonomies as $single_tax ) {
 
                 $options_array = array();
-                $terms   = get_terms( array($single_tax->name) );
+                
+                $terms = get_terms( 
+                    array(
+                        'taxonomy' => $single_tax->name,
+                        'hide_empty' => true
+                )   );
 
                 if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
                     foreach ( $terms as $term ) {
@@ -209,6 +217,7 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
                     }
                 }
 
+                $tax_field_name = '';
                 $single_taxonomy = $single_tax->name;
 
                 if( $single_taxonomy == 'property_type' ) {
@@ -221,6 +230,8 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
                     $tax_field_name = 'tax_area';
                 } else if( $single_taxonomy == 'property_state' ) {
                     $tax_field_name = 'tax_state';
+                } else if( $single_taxonomy == 'property_label' ) {
+                    $tax_field_name = 'tax_label';
                 }
 
                 $this->add_control(
@@ -239,6 +250,74 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
                 );
             }
         }
+
+        $this->add_control(
+            'tax_country',
+            [
+                'label'         => esc_html__('Country', 'houzez'),
+                'multiple'      => false,
+                'label_block'   => false,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_country'),
+                'condition' => [
+                    'grid_taxonomy' => 'property_country',
+                    'grid_data' => 'dynamic',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'tax_state',
+            [
+                'label'         => esc_html__('State', 'houzez'),
+                'multiple'      => false,
+                'label_block'   => false,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_state'),
+                'condition' => [
+                    'grid_taxonomy' => 'property_state',
+                    'grid_data' => 'dynamic',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'tax_city',
+            [
+                'label'         => esc_html__('City', 'houzez'),
+                'multiple'      => false,
+                'label_block'   => false,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
+                'condition' => [
+                    'grid_taxonomy' => 'property_city',
+                    'grid_data' => 'dynamic',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'tax_area',
+            [
+                'label'         => esc_html__('Area', 'houzez'),
+                'multiple'      => false,
+                'label_block'   => false,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_area'),
+                'condition' => [
+                    'grid_taxonomy' => 'property_area',
+                    'grid_data' => 'dynamic',
+                ],
+            ]
+        );
 
 
         $this->add_control(
@@ -618,6 +697,9 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
 
             } else if ( $grid_taxonomy == 'property_state' ) {
                 $slug = $settings['tax_state'];
+
+            } else if ( $grid_taxonomy == 'property_label' ) {
+                $slug = $settings['tax_label'];
 
             } else {
                 $slug = $settings['tax_type'];

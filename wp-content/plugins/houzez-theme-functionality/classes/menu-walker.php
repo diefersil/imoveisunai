@@ -7,6 +7,7 @@ use Elementor\Plugin as Elementor;
  */
 class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
 
+
 	function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output )
 	{
         if ( $depth == "" ) {
@@ -46,11 +47,9 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
         $indent = ( $depth ) ? str_repeat( $t, $depth ) : '';
         
         $is_top_level   = $depth == 0;
-        $behavior       = get_post_meta( $item->ID, '_menu_item_behavior', true );
         $html_block     = get_post_meta( $item->ID, '_menu_item_html_block', true );
         $design         = get_post_meta( $item->ID, '_menu_item_design', true );
         $width          = get_post_meta( $item->ID, '_menu_item_width', true );
-        $height         = get_post_meta( $item->ID, '_menu_item_height', true );
         $icon_type      = get_post_meta( $item->ID, '_menu_item_icon_type', true );
         $icon_id        = get_post_meta( $item->ID, '_menu_item_icon_id', true );
         $icon_width     = get_post_meta( $item->ID, '_menu_item_icon_width', true );
@@ -58,10 +57,9 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
         $icon_html      = get_post_meta( $item->ID, '_menu_item_icon_html', true );
         $is_mega_menu   = ! empty( $html_block );
 
-
         $dropdown_anchor_calss = '';
         $classes   = empty ( $item->classes ) ? array() : (array) $item->classes;
-        $classes[] = 'menu-item-' . $item->ID;
+        $classes[] = 'nav-item menu-item-' . $item->ID;
 
         // Set Active Class.
         if ( in_array( 'current-menu-ancestor', $classes, true ) || in_array( 'current-menu-item', $classes, true ) || in_array( 'current-menu-parent', $classes, true ) ) {
@@ -72,15 +70,15 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
             $classes[] = 'menu-item-design-' . $design;
 
             if( $is_mega_menu ) {
-                $classes[] = 'menu-item-has-megamenu';
+                $classes[] = 'menu-item-has-megamenu megamenu-item';
             }
         }
 
-        if ( $is_top_level && ( $is_mega_menu || $args->has_children ) ) {
+        if ( $is_mega_menu || $args->has_children ) {
             $classes[] = 'dropdown';
 
             if( $is_mega_menu  ) {
-                $classes[] = 'yamm-fw';
+                $classes[] = '';
             }
             /*if ( 'click' === $behavior ) {
                 $classes[] = 'nav-dropdown-toggle';
@@ -143,10 +141,6 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
             $attributes .= $args->has_children ? ' data-toggle="dropdown" ' : '';
         }
 
-        if( ! wp_is_mobile() && $behavior == 'click' ) {
-            $attributes .= ( $args->has_children || $is_mega_menu ) ? ' data-toggle="dropdown" ' : '';
-        }
-
         ! empty( $item->attr_title )
             and $attributes .= ' title="'  . esc_attr( $item->attr_title ) .'"';
         ! empty( $item->target )
@@ -172,7 +166,7 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
             . $args->after;
 
         if ( $is_top_level && $is_mega_menu ) {
-            $dropdown_classes = array( 'dropdown-menu' );
+            $dropdown_classes = array( 'dropdown-menu megamenu' );
             $dropdown_classes = implode( ' ', $dropdown_classes );
 
             $item_output .= '<div class="' . esc_attr( $dropdown_classes ) . '">';
@@ -208,21 +202,17 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
 
     function start_lvl( &$output, $depth=0, $args = array() ) {
 
+        $classes = array('dropdown-menu');
 
         // depth dependent classes
         $indent = ( $depth > 0  ? str_repeat( "\t", $depth ) : '' ); // code indent
         $display_depth = ( $depth + 1); // because it counts the first submenu as 0
-        
+
+    
         if( $display_depth > 1 ) {
-            $classes = array(
-            'dropdown-menu',
-            'submenu'
-            );
-        } else {
-            $classes = array(
-            'dropdown-menu'
-            );
+            $classes[] = 'submenu';
         }
+
         $class_names = implode( ' ', $classes );
 
         // build html

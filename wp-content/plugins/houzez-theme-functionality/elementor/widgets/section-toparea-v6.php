@@ -557,63 +557,6 @@ class Property_Toparea_v6 extends Widget_Base {
         );
 
         $this->end_controls_section();
-
-        // Media Buttons
-        $this->start_controls_section(
-            'section_media',
-            [
-                'label' => __( 'Media Buttons', 'houzez-theme-functionality' ),
-                'tab'   => Controls_Manager::TAB_CONTENT,
-            ]
-        );
-
-        $this->add_control(
-            'btn_gallery',
-            [
-                'label' => esc_html__( 'Gallery Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'true',
-                'default' => 'true',
-            ]
-        );
-
-        $this->add_control(
-            'btn_map',
-            [
-                'label' => esc_html__( 'Map Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'true',
-                'default' => 'true',
-            ]
-        );
-
-        $this->add_control(
-            'map_note',
-            [
-                'label' => __( 'Map will only show if you have enabled when add/edit property', 'houzez-theme-functionality' ),
-                'type' => 'houzez-warning-note',
-                'condition' => [
-                    'btn_map' => 'true'
-                ]
-            ]
-        );
-
-        $this->add_control(
-            'btn_street',
-            [
-                'label' => esc_html__( 'Street View Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'true',
-                'default' => 'true',
-            ]
-        );
-
 		
 
 	}
@@ -710,7 +653,7 @@ class Property_Toparea_v6 extends Widget_Base {
                                     <?php } ?>
                                         <a <?php echo $g_data; ?> class="img-wrap-<?php echo esc_attr($i); ?>">
                                             <?php if($total_images > 3 && $i == 3) { ?>
-                                            <div class="img-wrap-3-text"><?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
+                                            <div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun mr-1"></i> <?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
                                             <?php } ?>
 
                                             <img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">

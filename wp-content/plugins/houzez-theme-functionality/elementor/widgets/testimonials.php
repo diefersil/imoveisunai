@@ -155,7 +155,9 @@ class Houzez_Elementor_Testimonials extends Widget_Base {
      */
     protected function render() {
 
+        global $houzez_local;
         $settings = $this->get_settings_for_display();
+        $houzez_local = houzez_get_localization();
                 
         $args['testimonials_type']        =  $settings['testimonials_type'];
         $args['posts_limit']     =  $settings['posts_limit'];

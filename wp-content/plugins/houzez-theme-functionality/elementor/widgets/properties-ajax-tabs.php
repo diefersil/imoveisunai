@@ -235,15 +235,6 @@ class Houzez_Properties_Tabs extends Widget_Base {
                 'default' => esc_html__('Tab Title', 'houzez-theme-functionality'),
             ]
         );
-
-        /*$repeater->add_control(
-            'show_as_default', [
-                'label' => esc_html__('Set as Default', 'houzez-theme-functionality'),
-                'type' => Controls_Manager::SWITCHER,
-                'default' => 'inactive',
-                'return_value' => 'active-default',
-            ]
-        );*/
         
         $repeater->add_control(
             'tabs_icon_type', [
@@ -306,6 +297,10 @@ class Houzez_Properties_Tabs extends Widget_Base {
         // Property taxonomies controls
         $prop_taxonomies = get_object_taxonomies( 'property', 'objects' );
         unset( $prop_taxonomies['property_feature'] );
+        unset( $prop_taxonomies['property_country'] );
+        unset( $prop_taxonomies['property_state'] );
+        unset( $prop_taxonomies['property_city'] );
+        unset( $prop_taxonomies['property_area'] );
 
         $page_filters = houzez_option('houzez_page_filters');
 
@@ -319,7 +314,11 @@ class Houzez_Properties_Tabs extends Widget_Base {
             foreach ( $prop_taxonomies as $single_tax ) {
 
                 $options_array = array();
-                $terms   = get_terms( $single_tax->name );
+                $terms = get_terms( 
+                    array(
+                        'taxonomy' => $single_tax->name,
+                        'hide_empty' => false
+                )   );
 
                 if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
                     foreach ( $terms as $term ) {
@@ -339,6 +338,58 @@ class Houzez_Properties_Tabs extends Widget_Base {
                 );
             }
         }
+
+        $repeater->add_control(
+            'property_country',
+            [
+                'label'         => esc_html__('Country', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_country'),
+            ]
+        );
+
+        $repeater->add_control(
+            'property_state',
+            [
+                'label'         => esc_html__('State', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_state'),
+            ]
+        );
+
+        $repeater->add_control(
+            'property_city',
+            [
+                'label'         => esc_html__('City', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
+            ]
+        );
+
+        $repeater->add_control(
+            'property_area',
+            [
+                'label'         => esc_html__('Area', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_area'),
+            ]
+        );
         
 
         $repeater->add_control(
@@ -349,6 +400,17 @@ class Houzez_Properties_Tabs extends Widget_Base {
                 'multiple' => true,
                 'label_block' => true,
                 'options'  => array_slice( houzez_get_agents_array(), 1, null, true ),
+            ]
+        );
+
+        $repeater->add_control(
+            'properties_by_agencies',
+            [
+                'label'    => esc_html__('Properties by Agencies', 'houzez'),
+                'type'     => Controls_Manager::SELECT2,
+                'multiple' => true,
+                'label_block' => true,
+                'options'  => array_slice( houzez_get_agency_array(), 1, null, true ),
             ]
         );
 
@@ -403,6 +465,17 @@ class Houzez_Properties_Tabs extends Widget_Base {
             ]
         );
 
+        $repeater->add_control(
+            'post_status',
+            [
+                'label'     => esc_html__( 'Post Status', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::SELECT,
+                'options'   => houzez_ele_property_status(),
+                'description' => '',
+                'default' => 'all',
+            ]
+        );
+
         $repeater->end_controls_tab();
 
     
@@ -452,6 +525,7 @@ class Houzez_Properties_Tabs extends Widget_Base {
                     'cards-v3'     => 'Property Cards v3',
                     'cards-v5'     => 'Property Cards v5',
                     'cards-v6'     => 'Property Cards v6',
+                    'cards-v7'     => 'Property Cards v7',
                 ),
             ]
         );
@@ -535,6 +609,24 @@ class Houzez_Properties_Tabs extends Widget_Base {
             [
                 'label'     => esc_html__( 'Show/Hide Data', 'houzez-theme-functionality' ),
                 'tab'       => Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'hide_description',
+            [
+                'label' => esc_html__( 'Hide Description', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'none',
+                'default' => 'none',
+                'selectors' => [
+                    '{{WRAPPER}} .property-cards-module .item-short-description' => 'display: {{VALUE}};',
+                ],
+                'condition' => [
+                    'grid_style' => array('cards-v1', 'cards-v2'),
+                ]
             ]
         );
 

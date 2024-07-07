@@ -618,6 +618,30 @@ class Property_Toparea_v3 extends Widget_Base {
         );
 
         $this->add_control(
+            'btn_video',
+            [
+                'label' => esc_html__( 'Video Button', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'true',
+                'default' => 'true',
+            ]
+        );
+
+        $this->add_control(
+            'btn_360_tour',
+            [
+                'label' => esc_html__( '360° Virtual Tour Button', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'true',
+                'default' => 'true',
+            ]
+        );
+
+        $this->add_control(
             'btn_map',
             [
                 'label' => esc_html__( 'Map Button', 'houzez-theme-functionality' ),
@@ -778,6 +802,20 @@ class Property_Toparea_v3 extends Widget_Base {
                             <div class="tab-pane" id="pills-street-view" role="tabpanel" aria-labelledby="pills-street-view-tab">
                             </div>
                             <?php } ?>
+                        <?php } ?>
+
+                        <?php if( $settings['btn_video'] ) {
+                            $prop_video_url = houzez_get_listing_data('video_url');
+                            ?>
+                            <div class="tab-pane houzez-top-area-video" id="pills-video" role="tabpanel" aria-labelledby="pills-video-tab">
+                                <?php $embed_code = wp_oembed_get($prop_video_url); echo $embed_code; ?>
+                            </div>
+                        <?php } ?>
+
+                        <?php if( $settings['btn_360_tour'] ) { ?>
+                            <div class="tab-pane houzez-360-virtual-tour" id="pills-360tour" role="tabpanel" aria-labelledby="pills-360tour-tab">
+                                <?php echo houzez_get_listing_data('virtual_tour'); ?>
+                            </div>
                         <?php } ?>
 
                     </div><!-- tab-content -->

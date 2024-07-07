@@ -355,7 +355,7 @@ class Property_Section_Features extends Widget_Base {
 
 	protected function render() {
 		
-		global $post, $features, $ele_settings;
+		global $post, $property_features, $ele_settings;
 
 		$settings = $this->get_settings_for_display();
 
@@ -363,9 +363,9 @@ class Property_Section_Features extends Widget_Base {
 
 		$section_title = isset($settings['section_title']) && !empty($settings['section_title']) ? $settings['section_title'] : houzez_option('sps_features', 'Features');
         
-        $features = wp_get_post_terms( get_the_ID(), 'property_feature', array("fields" => "all"));
+        $property_features = wp_get_post_terms( get_the_ID(), 'property_feature', array("fields" => "all"));
 
-        if (!empty($features)):
+        if (!empty($property_features)):
         ?>
         <div class="property-features-wrap property-section-wrap" id="property-features-wrap">
             <div class="block-wrap">

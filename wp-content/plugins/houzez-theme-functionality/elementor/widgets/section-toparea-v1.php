@@ -76,6 +76,10 @@ class Property_Toparea extends Widget_Base {
             [
                 'label' => esc_html__( 'height', 'houzez-theme-functionality' ),
                 'type' => Controls_Manager::SLIDER,
+                'default' => [
+                    'unit' => 'px',
+                    'size' => 700,
+                ],
                 'range' => [
                     'px' => [
                         'min' => 0,
@@ -621,6 +625,30 @@ class Property_Toparea extends Widget_Base {
         );
 
         $this->add_control(
+            'btn_video',
+            [
+                'label' => esc_html__( 'Video Button', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'true',
+                'default' => 'false',
+            ]
+        );
+
+        $this->add_control(
+            'btn_360_tour',
+            [
+                'label' => esc_html__( '360° Virtual Tour', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'true',
+                'default' => 'false',
+            ]
+        );
+
+        $this->add_control(
             'btn_map',
             [
                 'label' => esc_html__( 'Map Button', 'houzez-theme-functionality' ),
@@ -703,9 +731,8 @@ class Property_Toparea extends Widget_Base {
 
         $gallery_type = houzez_get_popup_gallery_type();
         $gallery_token = wp_generate_password(5, false, false);
-        ?>
 
-        <?php if( $settings['show_breadcrumb'] || $settings['show_title'] || $settings['show_price'] || $settings['show_address'] || $settings['show_labels'] ) { ?>
+        if( $settings['show_breadcrumb'] || $settings['show_title'] || $settings['show_price'] || $settings['show_address'] || $settings['show_labels'] ) { ?>
         <div class="property-wrap">
             <?php htf_get_template_part('elementor/template-part/single-property/property-title'); ?>
         </div>
@@ -716,7 +743,7 @@ class Property_Toparea extends Widget_Base {
                 <div class="container hidden-on-mobile">
                     <?php htf_get_template_part('elementor/template-part/single-property/media-btns'); ?>
                 </div><!-- container -->
-                <div class="tab-content" id="pills-tabContent">
+                <div class="tab-content tab-content-hele-v1" id="pills-tabContent">
                     
                     <div class="tab-pane show active" id="pills-gallery" role="tabpanel" aria-labelledby="pills-gallery-tab" style="background-image: url(<?php echo esc_url($featured_image_url[0]); ?>);">
                         <?php 
@@ -753,6 +780,20 @@ class Property_Toparea extends Widget_Base {
                         <div class="tab-pane" id="pills-street-view" role="tabpanel" aria-labelledby="pills-street-view-tab">
                         </div>
                         <?php } ?>
+                    <?php } ?>
+
+                    <?php if( $settings['btn_video'] ) {
+                        $prop_video_url = houzez_get_listing_data('video_url');
+                        ?>
+                        <div class="tab-pane houzez-top-area-video" id="pills-video" role="tabpanel" aria-labelledby="pills-video-tab">
+                            <?php $embed_code = wp_oembed_get($prop_video_url); echo $embed_code; ?>
+                        </div>
+                    <?php } ?>
+
+                    <?php if( $settings['btn_360_tour'] ) { ?>
+                        <div class="tab-pane houzez-360-virtual-tour" id="pills-360tour" role="tabpanel" aria-labelledby="pills-360tour-tab">
+                            <?php echo houzez_get_listing_data('virtual_tour'); ?>
+                        </div>
                     <?php } ?>
 
                 </div><!-- tab-content -->

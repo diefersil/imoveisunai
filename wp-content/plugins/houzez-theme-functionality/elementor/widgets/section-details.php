@@ -257,6 +257,23 @@ class Property_Section_Details extends Widget_Base {
         );
 
         $this->add_control(
+            'room_title',
+            [
+                'label' => esc_html__( 'Room', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::TEXT,
+                'default' => 'Room',
+            ]
+        );
+        $this->add_control(
+            'rooms_title',
+            [
+                'label' => esc_html__( 'Rooms', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::TEXT,
+                'default' => 'Rooms',
+            ]
+        );
+
+        $this->add_control(
             'bathroom_title',
             [
                 'label' => esc_html__( 'Bathroom', 'houzez-theme-functionality' ),

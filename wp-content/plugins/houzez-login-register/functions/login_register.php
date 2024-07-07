@@ -21,7 +21,7 @@ if( !function_exists('houzez_login') ) {
         $allowed_html_array = array('strong' => array());
         $username = wp_kses( $_POST['username'], $allowed_html );
         $pass = isset( $_POST['password'] ) ? $_POST['password'] : "";
-        $is_submit_listing = wp_kses( $_POST['is_submit_listing'], $allowed_html );
+        $is_submit_listing = isset($_POST['is_submit_listing']) ? wp_kses( $_POST['is_submit_listing'], $allowed_html ) : "";
         $response = isset( $_POST["g-recaptcha-response"] ) ? $_POST["g-recaptcha-response"] : "";
 
         do_action('houzez_before_login');
@@ -109,7 +109,9 @@ if( !function_exists('houzez_login') ) {
                 wp_die();
             } else {
 
-                wp_set_current_user ( $user->ID ); // Set the current user detail
+                wp_set_current_user($user->ID); // Set the current user detail
+                wp_set_auth_cookie($user->ID, true); // Set auth cookies
+                
                 echo json_encode( array( 
                     'success' => true,
                     'redirect_to' => esc_url($_POST['redirect_to']),
@@ -129,7 +131,6 @@ if( !function_exists('houzez_login') ) {
 // Register
 /*-----------------------------------------------------------------------------------*/
 add_action( 'wp_ajax_nopriv_houzez_register', 'houzez_register' );
-add_action( 'wp_ajax_houzez_register', 'houzez_register' );
 
 if( !function_exists('houzez_register') ) {
     function houzez_register() {
@@ -141,6 +142,7 @@ if( !function_exists('houzez_register') ) {
         $usermane          = trim( sanitize_text_field( wp_kses( $_POST['username'], $allowed_html ) ));
         $email             = trim( sanitize_text_field( wp_kses( $_POST['useremail'], $allowed_html ) ));
         $term_condition    = isset( $_POST['term_condition'] ) ? wp_kses( $_POST['term_condition'], $allowed_html ) : "off";
+        
         $enable_password   = houzez_option('enable_password');
 
         $response = isset( $_POST["g-recaptcha-response"] ) ? $_POST["g-recaptcha-response"] : "";
@@ -271,6 +273,7 @@ if( !function_exists('houzez_register') ) {
             update_user_meta( $user_id, 'first_name', $firstname);
             update_user_meta( $user_id, 'last_name', $lastname);
 
+
             if( $user_role == 'houzez_agency' ) {
                 update_user_meta( $user_id, 'fave_author_phone', $phone_number);
             } else {
@@ -298,6 +301,266 @@ if( !function_exists('houzez_register') ) {
         }
         wp_die();
 
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
+// Register
+/*-----------------------------------------------------------------------------------*/
+add_action( 'wp_ajax_nopriv_houzez_social_create_account', 'houzez_social_create_account' );
+
+if( !function_exists('houzez_social_create_account') ) {
+    function houzez_social_create_account() {
+        
+        check_ajax_referer('houzez_social_register_nonce', 'houzez_social_register_security');
+
+        $allowed_html = array();
+
+        $usermane          = trim( sanitize_text_field( wp_kses( $_POST['username'], $allowed_html ) ));
+        $email             = trim( sanitize_text_field( wp_kses( $_POST['useremail'], $allowed_html ) ));
+        $term_condition    = isset( $_POST['term_condition'] ) ? wp_kses( $_POST['term_condition'], $allowed_html ) : "off";
+        $fid = isset( $_POST['id'] ) ? $_POST['id'] : "";
+        
+        do_action('houzez_before_social_create_account');
+
+        $user_roles = array ( 'houzez_agency', 'houzez_agent', 'houzez_buyer', 'houzez_seller', 'houzez_owner', 'houzez_manager' );
+
+        $user_role = get_option( 'default_role' );
+
+        if( $user_role == 'administrator' ) {
+            $user_role = 'subscriber';
+        }
+
+        
+        if( isset( $_POST['role'] ) && $_POST['role'] != '' && in_array( $_POST['role'], $user_roles ) ) {
+            $user_role = isset( $_POST['role'] ) ? sanitize_text_field( wp_kses( $_POST['role'], $allowed_html ) ) : $user_role;
+        } else {
+            $user_role = $user_role;
+        }
+
+        if( houzez_option('header_register') != 1 ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Access denied.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+        if( get_option('users_can_register') != 1 ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Access denied.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+
+        $term_condition = ( $term_condition == 'on') ? true : false;
+
+        if( !$term_condition ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('You need to agree with terms & conditions.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+        if( empty( $usermane ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('The username field is empty.', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if( strlen( $usermane ) < 3 ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Minimum 3 characters required', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if (preg_match("/^[0-9A-Za-z_]+$/", $usermane) == 0) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Invalid username (do not use special characters or spaces)!', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if( username_exists( $usermane ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('This username is already registered.', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if( empty( $email ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('The email field is empty.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+        if( email_exists( $email ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('This email address is already registered.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+        if( !is_email( $email ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Invalid email address.', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+
+        $user_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
+
+        $user_id = wp_create_user( $usermane, $user_password, $email );
+
+        if ( is_wp_error($user_id) ) {
+            echo json_encode( array( 'success' => false, 'msg' => $user_id ) );
+            wp_die();
+        } else {
+
+            wp_update_user( array( 'ID' => $user_id, 'role' => $user_role ) );
+
+            update_user_meta( $user_id, 'houzez_user_facebook_id', $fid);
+            update_option( 'houzez_user_facebook_id_'.$fid, $email );
+
+            if( $user_role == 'houzez_agency' ) {
+                update_user_meta( $user_id, 'fave_author_phone', $phone_number);
+            } else {
+                update_user_meta( $user_id, 'fave_author_mobile', $phone_number);
+            }
+ 
+            $user_as_agent = houzez_option('user_as_agent');
+
+            if( $user_as_agent == 'yes' ) {
+
+                if( !empty($firstname) && !empty($lastname) ) {
+                    $usermane = $firstname.' '.$lastname;
+                }
+
+                if ($user_role == 'houzez_agent' || $user_role == 'author') {
+                    houzez_register_as_agent($usermane, $email, $user_id, $phone_number);
+
+                } else if ($user_role == 'houzez_agency') {
+                    houzez_register_as_agency($usermane, $email, $user_id, $phone_number);
+                }
+            }
+            houzez_wp_new_user_notification( $user_id, $user_password, $phone_number );
+
+            echo json_encode( array( 
+                'success' => true,
+                'redirect_to' => esc_url($_POST['redirect_to']),
+                'msg' => esc_html__('Login successful, redirecting...', 'houzez-login-register') 
+            ) );
+
+            do_action('houzez_after_social_create_account', $user_id);
+
+            wp_die();
+        }
+        wp_die();
+
+    }
+}
+
+add_action('houzez_after_social_create_account', 'houzez_social_auto_login');
+if( ! function_exists('houzez_social_auto_login') ) {
+    function houzez_social_auto_login($user_id) {
+
+        $fid = get_user_meta( $user_id, 'houzez_user_facebook_id', true);
+        $fb_info = get_option('houzez_user_facebook_info_'.$fid);
+        //$username = houzez_generate_unique_username( $username );
+
+        $picture_url = isset($fb_info['picture_url']) ? $fb_info['picture_url'] : '';
+        $first_name = isset($fb_info['first_name']) ? $fb_info['first_name'] : '';
+        $last_name = isset($fb_info['last_name']) ? $fb_info['last_name'] : '';
+        $display_name = $first_name.' '.$last_name;
+
+        wp_update_user(array('ID' => $user_id, 'display_name' => $display_name, 'first_name' => $first_name, 'last_name' => $last_name));
+        update_user_meta($user_id, 'fave_author_custom_picture', $picture_url);
+
+        if( ! empty($fid) ) {
+            wp_set_current_user($user_id); // Set the current user to the new user
+            wp_set_auth_cookie($user_id); // Set the auth cookie for the new user
+        }
+
+        return true;
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
+// Link Account
+/*-----------------------------------------------------------------------------------*/
+add_action( 'wp_ajax_nopriv_houzez_link_account', 'houzez_link_account' );
+
+if( !function_exists('houzez_link_account') ) {
+    function houzez_link_account() {
+        
+        check_ajax_referer('link_account_nonce', 'link_account_security');
+
+        $allowed_html = array();
+
+        $username = wp_kses( $_POST['lusername'], $allowed_html );
+        $password = isset( $_POST['lpassword'] ) ? $_POST['lpassword'] : "";
+        $id = isset( $_POST['lid'] ) ? $_POST['lid'] : "";
+
+        if( empty( $username ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('The username or email field is empty.', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if( empty( $password ) ) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('The password field is empty.', 'houzez-login-register') ) );
+            wp_die();
+        }
+        if( !username_exists( $username ) && !email_exists($username)) {
+            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Invalid username or email', 'houzez-login-register') ) );
+            wp_die();
+        }
+
+
+        wp_clear_auth_cookie();
+
+        $remember = ($remember == 'on') ? true : false;
+
+        if(is_email($username)) {
+            $user = get_user_by( 'email', $username );
+            $username = $user->user_login;
+        }
+
+        $creds = array();
+        $creds['user_login'] = $username;
+        $creds['user_password'] = $password;
+        $creds['remember'] = $remember;
+        $user = wp_signon( $creds, false );
+
+
+        if ( is_wp_error( $user ) ) {
+
+            $error_code = $user->get_error_code();
+
+            if( $error_code == 'incorrect_password' ) {
+
+                echo json_encode( array(
+                    'success' => false,
+                    'msg' => sprintf( wp_kses(__('The password you entered for the username <strong>%s</strong> is incorrect.', 'houzez-login-register'), $allowed_html_array), $username )
+                ) );
+
+            } else {
+
+                echo json_encode( array(
+                    'success' => false,
+                    'msg' => $user->get_error_message()
+                ) );
+
+            }
+            
+            wp_die();
+        } else {
+
+            $user_id = $user->ID;
+            $user_email = $user->user_email;
+            $email_verified = get_user_meta( $user_id, 'houzez_email_verified', true );
+            update_option( 'houzez_user_facebook_id_'.$id, $user_email );
+            update_user_meta( $user_id, 'houzez_user_facebook_id', $id);
+
+            if ( metadata_exists( 'user', $user_id, 'houzez_email_verified' ) && !$email_verified ) {
+                echo json_encode( array(
+                    'success' => false,
+                    'msg' => esc_html__( 'Please verify your email address before logging in. A verification email has been sent to your email address.', 'houzez-login-register' )
+                ) );
+                wp_logout();
+                wp_die();
+            } else {
+
+                wp_set_current_user ( $user->ID ); // Set the current user detail
+                echo json_encode( array( 
+                    'success' => true,
+                    'redirect_to' => esc_url($_POST['redirect_to']),
+                    'msg' => esc_html__('Login successful, redirecting...', 'houzez-login-register') 
+                ) );
+            }
+
+            do_action('houzez_after_login');
+
+        }
+        wp_die();
     }
 }
 
@@ -382,7 +645,6 @@ if( !function_exists('houzez_agency_agent') ) {
             wp_update_user( $update_args );
 
             update_user_meta( $user_id, 'fave_agent_agency', $agent_agency) ; // used for get user created by agency
-            update_user_meta( $user_id, 'fave_agent_agency', $agent_agency) ; // used for get user created by agency
 
             echo json_encode( array( 'success' => true, 'msg' => esc_html__('Agent account created!', 'houzez-login-register') ) );
 
@@ -396,7 +658,9 @@ if( !function_exists('houzez_agency_agent') ) {
                 houzez_register_agency_agent($username, $email, $user_id, $agency_id_cpt, $agency_ids_cpt, $agent_agency, $firstname, $lastname, $agent_category, $agent_city);
             }
 
-            houzez_wp_new_user_notification( $user_id, $user_password );
+            if($aa_notification) {
+                houzez_wp_new_user_notification( $user_id, $user_password );
+            }
         }
         wp_die();
 
@@ -514,12 +778,14 @@ if( !function_exists('houzez_wp_new_user_notification') ) {
         $user_email = stripslashes( $user->user_email );
 
         // Send notification to admin
-        $args = array(
-            'user_login_register' => $user_login,
-            'user_email_register' => $user_email,
-            'user_phone_register' => $phone_number
-        );
-        houzez_register_email_type( get_option('admin_email'), 'admin_new_user_register', $args );
+        if( houzez_option('nru_admin_email', 1) != 0 ) {
+            $args = array(
+                'user_login_register' => $user_login,
+                'user_email_register' => $user_email,
+                'user_phone_register' => $phone_number
+            );
+            houzez_register_email_type( get_option('admin_email'), 'admin_new_user_register', $args );
+        }
 
 
         // Return if password in empty
@@ -611,7 +877,7 @@ if( !function_exists('houzez_reset_password') ) {
         $message .= sprintf(esc_html__('Username: %s', 'houzez-login-register'), $user_login) . "\r\n\r\n";
         $message .= esc_html__('If this was a mistake, just ignore this email and nothing will happen.', 'houzez-login-register') . "\r\n\r\n";
         $message .= esc_html__('To reset your password, visit the following address:', 'houzez-login-register') . "\r\n\r\n";
-        $message .= '(' . network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . ")\r\n";
+        $message .= network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login'). "\r\n";
 
         if ( is_multisite() )
             $blogname = $GLOBALS['current_site']->site_name;

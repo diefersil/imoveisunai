@@ -17,13 +17,16 @@ if( !function_exists('houzez_property_card_v6') ) {
 			'houzez_user_role' => '',
 			'featured_prop' => '',
 			'posts_limit' => '',
+			'property_ids' => '',
 			'sort_by' => '',
 			'offset' => '',
 			'pagination_type' => '',
+			'post_status' => '',
 			'thumb_size' => '',
 			'min_price' => '',
 			'max_price' => '',
-			'properties_by_agents' => ''
+			'properties_by_agents' => '',
+			'properties_by_agencies' => ''
 		), $atts));
 
 		ob_start();

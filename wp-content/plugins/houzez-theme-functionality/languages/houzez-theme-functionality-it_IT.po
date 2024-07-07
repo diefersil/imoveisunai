@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: Houzez Theme Functionality Plugin\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-08 02:26+0500\n"
-"PO-Revision-Date: 2018-07-04 19:47+0500\n"
+"PO-Revision-Date: 2023-06-08 12:08-0400\n"
 "Last-Translator: mmaccio <matmacci@gmail.com>\n"
 "Language-Team: Italiano\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #: classes/class-agency-post-type.php:36 classes/class-agency-post-type.php:42
 #: classes/class-agency-post-type.php:48 classes/class-post-types.php:61
@@ -185,66 +185,60 @@ msgstr "Mobile"
 
 #: classes/class-currencies.php:160
 msgid "The currency has been added, excellent!"
-msgstr ""
+msgstr "La valuta è stata aggiunta, eccellente!"
 
 #: classes/class-currencies.php:167
 msgid "The currency has been updated, excellent!"
-msgstr ""
+msgstr "La valuta è stata aggiornata, eccellente!"
 
 #: classes/class-currencies.php:174 classes/class-fields-builder.php:160
 msgid "There has been an error. Bummer!"
-msgstr ""
+msgstr "Si è verificato un errore. Che sfortuna!"
 
 #: classes/class-fields-builder.php:84
 msgid "Text"
-msgstr ""
+msgstr "Testo"
 
 #: classes/class-fields-builder.php:85
 msgid "Text area"
-msgstr ""
+msgstr "Area di testo"
 
 #: classes/class-fields-builder.php:86
 msgid "Select"
-msgstr ""
+msgstr "Seleziona"
 
 #: classes/class-fields-builder.php:146
 msgid "The field has been added, excellent!"
-msgstr ""
+msgstr "Il campo è stato aggiunto, ottimo!"
 
 #: classes/class-fields-builder.php:153
 msgid "The field has been updated, excellent!"
-msgstr ""
+msgstr "Il campo è stato aggiornato, eccellente!"
 
 #: classes/class-houzez-init.php:417 classes/class-houzez-init.php:418
-#, fuzzy
-#| msgid "Houzez Invoice"
 msgid "Houzez"
-msgstr "Fattura di Houzez"
+msgstr "Houzez"
 
 #: classes/class-houzez-init.php:428 classes/class-houzez-init.php:429
 msgid "Dashboard"
-msgstr ""
+msgstr "Bacheca"
 
 #: classes/class-houzez-init.php:437 classes/class-houzez-init.php:438
 msgid "Fields builder"
-msgstr ""
+msgstr "Campi richiesti"
 
 #: classes/class-houzez-init.php:446 classes/class-houzez-init.php:447
 #: templates/currency/currency-list.php:3 templates/currency/form.php:16
-#, fuzzy
-#| msgid "Agencies"
 msgid "Currencies"
-msgstr "Agenzie"
+msgstr "Valute"
 
 #: classes/class-houzez-init.php:455 classes/class-houzez-init.php:456
 msgid "Changelog"
-msgstr ""
+msgstr "Log delle modifiche"
 
 #: classes/class-houzez-init.php:464 classes/class-houzez-init.php:465
-#, fuzzy
-#| msgid "Posts"
 msgid "Post Types"
-msgstr "Messaggi"
+msgstr "Tipi di post"
 
 #: classes/class-houzez-init.php:473 classes/class-houzez-init.php:474
 #: classes/class-permalinks.php:55 classes/class-permalinks_old.php:53
@@ -430,10 +424,8 @@ msgid "No Partner found in Trash"
 msgstr "Nessun partner trovato nel Cestino"
 
 #: classes/class-permalinks.php:42
-#, fuzzy
-#| msgid "Permalinks"
 msgid "Update Permalinks"
-msgstr "Permalink"
+msgstr "Aggiona Permalink"
 
 #: classes/class-permalinks.php:58 classes/class-permalinks_old.php:86
 msgid "Property Slug"
@@ -464,16 +456,12 @@ msgid "Property State Slug"
 msgstr "Slug stato della proprietà"
 
 #: classes/class-permalinks.php:72 classes/class-permalinks_old.php:94
-#, fuzzy
-#| msgid "Agent ID"
 msgid "Agent Slug"
-msgstr "ID agente"
+msgstr "Slug Agente"
 
 #: classes/class-permalinks.php:74 classes/class-permalinks_old.php:96
-#, fuzzy
-#| msgid "Agency"
 msgid "Agency Slug"
-msgstr "Agenzia"
+msgstr "Slug Agenzia"
 
 #: classes/class-permalinks.php:113 classes/class-permalinks_old.php:109
 msgid "Set up custom permalinks for the property section on your site."
@@ -487,15 +475,13 @@ msgstr "Impostazioni aggiornamento"
 
 #: classes/class-post-types.php:56 templates/tabs.php:13
 msgid "Custom Post Types"
-msgstr ""
+msgstr "Articoli Personalizzati"
 
 #: classes/class-post-types.php:69 classes/class-testimonials-post-type.php:34
 msgid "Testimonials"
 msgstr "Testimonianze"
 
 #: classes/class-post-types.php:71
-#, fuzzy
-#| msgid "Users Package Info"
 msgid "User Packages Info"
 msgstr "Informazioni sul pacchetto degli utenti"
 
@@ -504,6 +490,8 @@ msgid ""
 "Disable Custom Post Types which you do not want to show(if disabled then "
 "these will not show on back-end and front-end)"
 msgstr ""
+"Disabilitare i tipi di post personalizzati che non si desidera visualizzare "
+"(se disabilitati, non verranno visualizzati sul back-end e sul front-end)"
 
 #: classes/class-post-types.php:124 classes/class-post-types.php:143
 #: classes/class-post-types.php:161 classes/class-post-types.php:179
@@ -513,7 +501,7 @@ msgstr ""
 #: classes/class-taxonomies.php:179 classes/class-taxonomies.php:197
 #: classes/class-taxonomies.php:215 classes/class-taxonomies.php:233
 msgid "Enabled"
-msgstr ""
+msgstr "Abilitato"
 
 #: classes/class-post-types.php:125 classes/class-post-types.php:144
 #: classes/class-post-types.php:162 classes/class-post-types.php:180
@@ -523,7 +511,7 @@ msgstr ""
 #: classes/class-taxonomies.php:180 classes/class-taxonomies.php:198
 #: classes/class-taxonomies.php:216 classes/class-taxonomies.php:234
 msgid "Disabled"
-msgstr ""
+msgstr "Disabilitato"
 
 #: classes/class-property-post-type.php:72
 msgid "Properties"
@@ -677,7 +665,7 @@ msgstr "Azioni"
 
 #: classes/class-property-post-type.php:324
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: classes/class-property-post-type.php:360
 #: classes/class-property-post-type.php:402
@@ -764,7 +752,7 @@ msgstr "Tutte le città"
 
 #: classes/class-taxonomies.php:56 templates/tabs.php:14
 msgid "Taxonomies"
-msgstr ""
+msgstr "Tassonomie"
 
 #: classes/class-taxonomies.php:61
 msgid "status"
@@ -783,6 +771,8 @@ msgid ""
 "Disable Taxonomies which you do not want to show(if disabled then these will "
 "not show on back-end and front-end)"
 msgstr ""
+"Disabilitare le tassonomie che non si vogliono mostrare (se disabilitate, "
+"non verranno mostrate né sul back-end né sul front-end)"
 
 #: classes/class-testimonials-post-type.php:35
 msgid "Testimonial"
@@ -989,199 +979,189 @@ msgstr "Cerca parole chiave"
 
 #: templates/currency/currency-list.php:11
 msgid "Code"
-msgstr ""
+msgstr "Codice"
 
 #: templates/currency/currency-list.php:12
 msgid "Symbol"
-msgstr ""
+msgstr "Simbolo"
 
 #: templates/currency/currency-list.php:13
-#, fuzzy
-#| msgid "Location"
 msgid "Position"
 msgstr "Posizione"
 
 #: templates/currency/currency-list.php:14
 msgid "N. of Decimal Point"
-msgstr ""
+msgstr "N. di punto decimale"
 
 #: templates/currency/currency-list.php:15
 msgid "Decimal Point Separator"
-msgstr ""
+msgstr "Separatore dei decimali"
 
 #: templates/currency/currency-list.php:16
 msgid "Thousands Separator"
-msgstr ""
+msgstr "Separatore delle centinaia"
 
 #: templates/currency/currency-list.php:17
 #: templates/fields-builder/index.php:13
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #: templates/currency/currency-list.php:18
 #: templates/fields-builder/index.php:14
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
 #: templates/currency/currency-list.php:41
 #: templates/fields-builder/index.php:39
-#, fuzzy
-#| msgid "Edit Invoice"
 msgid "Edit field"
-msgstr "Modifica fattura"
+msgstr "Modifica campo"
 
 #: templates/currency/currency-list.php:46
 #: templates/fields-builder/index.php:44
 msgid "Delete field"
-msgstr ""
+msgstr "Elimina il campo"
 
 #: templates/currency/form.php:5
-#, fuzzy
-#| msgid "Update Settings"
 msgid "Update Currency"
-msgstr "Impostazioni aggiornamento"
+msgstr "Aggiornamento della valuta"
 
 #: templates/currency/form.php:6 templates/fields-builder/fields-form.php:6
 msgid "Update"
-msgstr ""
+msgstr "Aggiorna"
 
 #: templates/currency/form.php:9
 msgid "Create Currency"
-msgstr ""
+msgstr "Creazione di valuta"
 
 #: templates/currency/form.php:10 templates/fields-builder/fields-form.php:10
 msgid "Submit"
-msgstr ""
+msgstr "Invia"
 
 #: templates/currency/form.php:23
-#, fuzzy
-#| msgid "Agent Name"
 msgid "Currency Name"
-msgstr "Nome dell'agente"
+msgstr "Nome valuta"
 
 #: templates/currency/form.php:29
 msgid "Currency Code"
-msgstr ""
+msgstr "Codice Valuta"
 
 #: templates/currency/form.php:34
 msgid "Currency Symbol"
-msgstr ""
+msgstr "Simbolo valuta"
 
 #: templates/currency/form.php:39
 msgid "Currency Position"
-msgstr ""
+msgstr "Posizione valuta"
 
 #: templates/currency/form.php:40
 msgid "Before"
-msgstr ""
+msgstr "Prima"
 
 #: templates/currency/form.php:40
 msgid "After"
-msgstr ""
+msgstr "Dopo"
 
 #: templates/currency/form.php:45
 msgid "Number of decimal points?"
-msgstr ""
+msgstr "Numero di punti decimali?"
 
 #: templates/currency/form.php:63
 msgid "Decimal Point Separator(eg: .)"
-msgstr ""
+msgstr "Separatore punti decimali (es: ,)"
 
 #: templates/currency/form.php:68
 msgid "Thousands Separator(eg: ,)"
-msgstr ""
+msgstr "Separatore migliaia (es: .)"
 
 #: templates/dashboard.php:3
 msgid "Welcome to Houzez v.1.6.0"
-msgstr ""
+msgstr "Benvenuti a Houzez v.1.6.0"
 
 #: templates/dashboard.php:4
 msgid ""
 "Congratulations! You are about to use most customizable real estate "
 "WordPress theme by Favethemes."
 msgstr ""
+"Congratulazioni! State per utilizzare il tema WordPress immobiliare più "
+"personalizzabile di Favethemes."
 
 #: templates/dashboard.php:7
 msgid "Theme Options Panel"
-msgstr ""
+msgstr "Pannello delle opzioni del tema"
 
 #: templates/dashboard.php:11
 msgid "Resurces"
-msgstr ""
+msgstr "Resources"
 
 #: templates/dashboard.php:14
 msgid "Official Website"
-msgstr ""
+msgstr "Sito Ufficiale"
 
 #: templates/dashboard.php:15
 msgid "Official Documentation"
-msgstr ""
+msgstr "Documentazione ufficiale"
 
 #: templates/dashboard.php:16 templates/dashboard.php:24
 msgid "Customer Support"
-msgstr ""
+msgstr "Servizio Clienti"
 
 #: templates/dashboard.php:17
 msgid "Customization Service"
-msgstr ""
+msgstr "Servizio di personalizzazione"
 
 #: templates/dashboard.php:18
 msgid "Follow us on Facebook"
-msgstr ""
+msgstr "Seguici su Facebook"
 
 #: templates/dashboard.php:19
 msgid "Follow us on Twitter"
-msgstr ""
+msgstr "Seguici su Twitter"
 
 #: templates/dashboard.php:20
 msgid "Follow us on Instagram"
-msgstr ""
+msgstr "Seguici su Instagram"
 
 #: templates/dashboard.php:27
 msgid "purchase a support extension"
-msgstr ""
+msgstr "acquistare un'estensione di supporto"
 
 #: templates/dashboard.php:31
 msgid "Thank you for choosing Houzez."
-msgstr ""
+msgstr "Grazie per aver scelto Houzez."
 
 #: templates/fields-builder/fields-form.php:5
 msgid "Update field"
-msgstr ""
+msgstr "Campo di aggiornamento"
 
 #: templates/fields-builder/fields-form.php:9
 msgid "Create field"
-msgstr ""
+msgstr "Crea campo"
 
 #: templates/fields-builder/fields-form.php:15
 #: templates/fields-builder/index.php:5
 msgid "Fields Builder"
-msgstr ""
+msgstr "Costruttore di Campi"
 
 #: templates/fields-builder/fields-form.php:22
 #: templates/fields-builder/index.php:12
-#, fuzzy
-#| msgid "Agent Name"
 msgid "Field Name"
-msgstr "Nome dell'agente"
+msgstr "Campo Nome"
 
 #: templates/fields-builder/fields-form.php:30
 msgid "-- Choose field type --"
-msgstr ""
+msgstr "-- Scegliere il tipo di campo --"
 
 #: templates/fields-builder/fields-form.php:42
 msgid "Add in Search?"
-msgstr ""
+msgstr "Aggiungere la ricerca?"
 
 #: templates/fields-builder/multiple.php:9
 msgid "Enter Value"
-msgstr ""
+msgstr "Inserisci valore"
 
 #: templates/tabs.php:1
-#, fuzzy
-#| msgid "Houzez Statistic"
 msgid "Houzez Theme Settings"
-msgstr "Statistica di Houzez"
+msgstr "Impostazioni del tema Houzez"
 
 #: vc_shortcodes/properties.php:94
 msgid "Load More"

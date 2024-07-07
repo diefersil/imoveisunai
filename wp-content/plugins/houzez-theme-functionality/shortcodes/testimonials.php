@@ -47,6 +47,7 @@ if( !function_exists('houzez_testimonials') ) {
                     <?php
                         endwhile;
                     endif;
+                    wp_reset_postdata();
                     ?>
                 </div>
             </div><!-- testimonials-module -->
@@ -63,6 +64,7 @@ if( !function_exists('houzez_testimonials') ) {
                             
                         endwhile;
                     endif;
+                    wp_reset_postdata();
                     ?>
                 </div><!-- testimonials-slider -->
             </div><!-- testimonials-module -->

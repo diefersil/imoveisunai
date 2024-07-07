@@ -8,6 +8,10 @@
     var delete_btn_text = Houzez_crm_vars.delete_btn_text;
     var confirm_btn_text = Houzez_crm_vars.confirm_btn_text;
     var cancel_btn_text = Houzez_crm_vars.cancel_btn_text;
+    var map_fields_text = Houzez_crm_vars.map_fields_text;
+    var error_import_text = Houzez_crm_vars.error_import;
+    var select_text = Houzez_crm_vars.select_text;
+    var import_text = Houzez_crm_vars.import_text;
     var houzez_date_language = Houzez_crm_vars.houzez_date_language;
     var execute_muticheck = false;
 
@@ -89,6 +93,58 @@
     });
 
     /*--------------------------------------------------------------------------
+     *  Delete Leads CSV
+     * -------------------------------------------------------------------------*/
+    $( 'a.delete-lead-csv-js' ).on( 'click', function (){
+        
+            var $this = $( this );
+            var file = $this.data('file');
+
+            bootbox.confirm({
+            message: "<strong>"+delete_confirmation+"</strong>",
+            buttons: {
+                confirm: {
+                    label: confirm_btn_text,
+                    className: 'btn btn-primary'
+                },
+                cancel: {
+                    label: cancel_btn_text,
+                    className: 'btn btn-grey-outlined'
+                }
+            },
+            callback: function (result) {
+                if(result==true) {
+                    crm_processing_modal( processing_text );
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: ajaxurl,
+                        data: {
+                            'action': 'delete_leads_csv_file',
+                            'file_name': file,
+                        },
+                        success: function(data) {
+                            if ( data.success == true ) {
+                                window.location.reload();
+                            } else {
+                                jQuery('#fave_modal').modal('hide');
+                                alert( data.reason );
+                            }
+                        },
+                        error: function(errorThrown) {
+
+                        }
+                    }); // $.ajax
+                } // result
+            } // Callback
+        });
+
+        return false;
+        
+    });
+
+     /*--------------------------------------------------------------------------
      *  Delete Note
      * -------------------------------------------------------------------------*/
     function delete_note() {
@@ -123,43 +179,95 @@
     /*-------------------------------------------------------------------------------
     * Multi select
     *------------------------------------------------------------------------------*/
+    var checkboxConfigs = [
+        { selectAllId: 'enquiry_select_all', checkboxClass: 'enquiry_multi_delete' },
+        { selectAllId: 'listing_viewed_select_all', checkboxClass: 'listing_viewed_multi_delete' },
+        { selectAllId: 'listings_select_all', checkboxClass: 'listing_multi_id' },
+        { selectAllId: 'leads_select_all', checkboxClass: 'lead-bulk-delete' }
+    ];
 
-    if($('#enquiry_select_all').length > 0) {
-        var select_all = document.getElementById("enquiry_select_all"); //select all checkbox
-        var checkboxes = document.getElementsByClassName("enquiry_multi_delete"); //checkbox items
-        execute_muticheck = true;
-    } else if($('#listing_viewed_select_all').length > 0) {
-        var select_all = document.getElementById("listing_viewed_select_all"); //select all checkbox
-        var checkboxes = document.getElementsByClassName("listing_viewed_multi_delete"); //checkbox items
-        execute_muticheck = true;
-    } else if($('#listings_select_all').length > 0) {
-        var select_all = document.getElementById("listings_select_all"); //select all checkbox
-        var checkboxes = document.getElementsByClassName("listing_multi_id"); //checkbox items
-        execute_muticheck = true;
+    var execute_muticheck = false;
+    var select_all, checkboxes;
+
+    for (var config of checkboxConfigs) {
+        if (document.getElementById(config.selectAllId)) {
+            select_all = document.getElementById(config.selectAllId); //select all checkbox
+            checkboxes = document.getElementsByClassName(config.checkboxClass); //checkbox items
+            execute_muticheck = true;
+            break; // Break the loop once the matching configuration is found
+        }
     }
 
-    if(execute_muticheck) { 
-        //select all checkboxes
-        select_all.addEventListener("change", function(e){
-            for (i = 0; i < checkboxes.length; i++) { 
-                checkboxes[i].checked = select_all.checked;
+    if (execute_muticheck) {
+        // Select all checkboxes
+        select_all.addEventListener("change", function() {
+            for (let checkbox of checkboxes) {
+                checkbox.checked = this.checked;
             }
         });
 
-
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].addEventListener('change', function(e){ //".checkbox" change 
-                //uncheck "select all", if one of the listed checkbox item is unchecked
-                if(this.checked == false){
+        // Event listener for each checkbox
+        Array.from(checkboxes).forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                // Uncheck "select all" if any checkbox is unchecked
+                if (!this.checked) {
                     select_all.checked = false;
                 }
-                //check "select all" if all checkbox items are checked
-                if(document.querySelectorAll('.checkbox:checked').length == checkboxes.length){
+                // Check "select all" if all checkboxes are checked
+                else if (Array.from(checkboxes).every(chk => chk.checked)) {
                     select_all.checked = true;
                 }
             });
-        }
+        });
     }
+
+
+    /*-------------------------------------------------------------------------------
+    * Delete button enable/disable
+    *------------------------------------------------------------------------------*/
+    function initializeDeleteButton(checkboxClass, buttonId) {
+        var checkboxes = document.getElementsByClassName(checkboxClass);
+        var button = document.getElementById(buttonId);
+
+        if (!checkboxes.length || !button) {
+            console.warn('Checkboxes or button not found!');
+            return;
+        }
+
+        // Function to update the button based on checkbox state
+        var updateButton = function() {
+            var anyChecked = Array.from(checkboxes).some(function(checkbox) {
+                return checkbox.checked;
+            });
+
+            if (anyChecked) {
+                button.classList.remove("btn-grey-outlined");
+                button.classList.add("btn-primary");
+                button.disabled = false;  // Enable the button
+            } else {
+                button.classList.remove("btn-primary");
+                button.classList.add("btn-grey-outlined");
+                button.disabled = true;   // Disable the button
+            }
+        };
+
+        // Attach event listener to each checkbox
+        Array.from(checkboxes).forEach(function(checkbox) {
+            checkbox.addEventListener("change", updateButton);
+        });
+
+        // Initialize button state
+        updateButton();
+    }
+
+
+    // Usage
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeDeleteButton("checkbox-delete", "bulk-delete-leads");
+        initializeDeleteButton("enquiry_multi_delete", "enquiry_delete_multiple");
+    });
+
+
 
     /*--------------------------------------------------------------------------
      *  Delete property
@@ -313,6 +421,241 @@
             }
         })
 
+    });
+
+    /*-------------------------------------------------------------------
+    * Export leads
+    *------------------------------------------------------------------*/
+    $('#export-leads').on('click', function(e) {
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'houzez_crm_export_leads'
+            },
+            beforeSend: function( ) {
+                $('.houzez-loader-js').addClass('loader-show');
+            },
+            complete: function(){
+                $('.houzez-loader-js').removeClass('loader-show');
+            },
+            success: function(response) {
+                // Create a Blob from the CSV data and trigger download
+                var blob = new Blob([response], { type: 'text/csv' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'leads.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+    });
+
+
+    /*-------------------------------------------------------------------
+    * upload leads CSV file
+    *------------------------------------------------------------------*/
+    $('#upload-leads-csv').on( 'click', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData();
+        formData.append('action', 'houzez_crm_upload_csv');
+        formData.append('csv_import', $('input[type=file]')[0].files[0]);
+        formData.append('houzez_crm_leads_nonce_field', $('#houzez_crm_leads_nonce_field').val());
+        var message;
+
+        $.ajax({
+            url: ajaxurl, // ajaxurl is already defined in WordPress admin
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function( ) {
+                $('.houzez-loader-js').addClass('loader-show');
+            },
+            complete: function(){
+                $('.houzez-loader-js').removeClass('loader-show');
+            },
+            success: function(response) { 
+                // Load field mapping interface
+                if(response.success) {
+                    message = '<div class="alert alert-success" role="alert">'+response.data.message+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button></div>';
+                    window.location.href = response.data.redirect_to;
+                } else {
+                    message = '<div class="alert alert-danger" role="alert">'+response.data+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button></div>';
+                }
+                $('.dashboard-content-block-wrap').prepend(message);
+            },
+            error: function(response) {
+                // Handle error
+            }
+        });
+
+    } );
+
+    $('#fetch-data-btn').on('click', function() {
+        var selectedFile = $('#uploaded-csv-files').val();
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'get_leads_csv_headers',
+                file_name: selectedFile
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Call a function to display the field mapping interface
+                    displayMappingInterface(response.data);
+                } else {
+                    alert(response.data);
+                }
+            },
+            error: function() {
+                // Handle error
+            }
+        });
+    });
+
+    function displayMappingInterface(headers) {
+        var mappingHtml = '<form id="csv-mapping-form">';
+        
+        // Predefined database column names
+        var dbColumns = ['prefix', 'display_name', 'first_name', 'last_name', 'email', 'mobile', 'home_phone', 'work_phone', 'address', 'country', 'city', 'state', 'zipcode', 'type', 'source', 
+            'source_link', 'linkedin_url', 'facebook_url', 'twitter_url', 'private_note', 'message'];
+        
+        dbColumns.forEach(function(dbColumn) {
+            mappingHtml += '<div class="form-group"><label for="' + dbColumn + '">' + dbColumn.replace('_', ' ').charAt(0).toUpperCase() + dbColumn.replace('_', ' ').slice(1) + ' </label>';
+            mappingHtml += '<select name="field_mapping[' + dbColumn + ']" id="' + dbColumn + '" class="selectpicker form-control" data-live-search="true" title="'+select_text+'">';
+            
+            // Add options for each CSV header
+            headers.forEach(function(header) {
+                mappingHtml += '<option value="' + header + '">' + header + '</option>';
+            });
+            
+            mappingHtml += '</select></div>';
+        });
+        
+        mappingHtml += '<button type="submit" class="btn btn-primary"><span class="btn-loader houzez-loader-js"></span>'+import_text+'</button></form>';
+
+        // Append the form to a container in your HTML
+        $('#mapping-container').html(mappingHtml);
+
+        leads_csv_import();
+        $('.selectpicker').selectpicker('refresh');
+    }
+
+    function leads_csv_import() {
+        $('#csv-mapping-form').on('submit', function(e) {
+            e.preventDefault();
+
+            var $this = $(this);
+            var allFieldsEmpty = true;
+            $('#csv-mapping-form select').each(function() {
+                if (this.value.trim() !== '') {
+                    allFieldsEmpty = false;
+                    return false; // Break the loop
+                }
+            });
+
+            if (allFieldsEmpty) {
+                alert(map_fields_text);
+                return; // Prevent form submission
+            }
+
+            var formData = new FormData(this);
+            formData.append('action', 'houzez_crm_process_field_mapping');
+            formData.append('selected_csv_file', $('#uploaded-csv-files').val());
+
+            $.ajax({
+                url: ajaxurl, // ajaxurl is already defined in WordPress admin
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function( ) {
+                    $this.find('.houzez-loader-js').addClass('loader-show');
+                },
+                complete: function(){
+                    $this.find('.houzez-loader-js').removeClass('loader-show');
+                },
+                success: function(response) {
+                    // Handle success
+                    if( response.success ) {
+                        console.log(response.data.message);
+                        window.location.href = response.data.redirect_to;
+                    }
+                    console.log(response.data.message);
+                },
+                error: function(response) {
+                    // Handle error
+                    alert(error_import_text);
+                }
+            });
+        });
+    }
+
+    $('#uploaded-csv-files').on('change', function() {
+        $('#mapping-container').html('');
+    });
+
+    /*-------------------------------------------------------------------
+    * Delete Enquiries
+    *------------------------------------------------------------------*/
+    $('#bulk-delete-leads').on('click', function() {
+        var $this = $( this );
+        var ID = $this.data('id');
+        var Nonce = $this.data('nonce');
+
+        var checkboxVals = $('.lead-bulk-delete');
+
+        var vals = $('.lead-bulk-delete:checked').map(function() {return this.value;}).get().join(',')
+
+        if(vals == "") {
+            return;
+        }
+        bootbox.confirm({
+            message: "<strong>"+delete_confirmation+"</strong>",
+            buttons: {
+                confirm: {
+                    label: confirm_btn_text,
+                    className: 'btn btn-primary'
+                },
+                cancel: {
+                    label: cancel_btn_text,
+                    className: 'btn btn-grey-outlined'
+                }
+            },
+            callback: function (result) {
+                if(result==true) {
+                    crm_processing_modal( processing_text );
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: ajaxurl,
+                        data: {
+                            'action': 'bulk_delete_leads',
+                            'ids': vals,
+                        },
+                        success: function(data) {
+                            if ( data.success == true ) {
+                                window.location.reload();
+                            } else {
+                                jQuery('#fave_modal').modal('hide');
+                                alert( data.reason );
+                            }
+                        },
+                        error: function(errorThrown) {
+
+                        }
+                    }); // $.ajax
+                } // result
+            } // Callback
+        });
+
+        return false;
     });
 
     /*-------------------------------------------------------------------
@@ -558,7 +901,6 @@
         if(vals == "") {
             return;
         }
-        
         bootbox.confirm({
             message: "<strong>"+delete_confirmation+"</strong>",
             buttons: {
@@ -695,12 +1037,15 @@
                 if( response.success ) {
                     var res = response.data;
                     var meta = response.meta;
-
+                    
                     $('#lead_id').val(res.lead_id).attr("selected", "selected");
                     $('#enquiry_type').val(res.enquiry_type).attr("selected", "selected");
 
                     if(meta.property_type != undefined ) {
                         $('#property_type').val(meta.property_type.slug).attr("selected", "selected");
+                    }
+                    if(meta.property_status != undefined ) {
+                        $('#property_status').val(meta.property_status.slug).attr("selected", "selected");
                     }
                     $('#private_note').val(res.private_note);
                     $('#min-price').val(meta.min_price);
@@ -740,6 +1085,35 @@
             }
         })
 
+    });
+
+    /*-------------------------------------------------------------------
+    * Export inquiries
+    *------------------------------------------------------------------*/
+    $('#export-inquiries').on('click', function(e) {
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'crm_export_inquiries'
+            },
+            beforeSend: function( ) {
+                $('.houzez-loader-js').addClass('loader-show');
+            },
+            complete: function(){
+                $('.houzez-loader-js').removeClass('loader-show');
+            },
+            success: function(response) {
+                // Create a Blob from the CSV data and trigger download
+                var blob = new Blob([response], { type: 'text/csv' });
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'inquiries.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
     });
 
     $('.deal_status').on('change', function() {

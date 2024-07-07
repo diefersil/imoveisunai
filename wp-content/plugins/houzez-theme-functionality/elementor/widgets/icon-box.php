@@ -531,7 +531,13 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
                 $icon_type = $icon_box['icon_type'];
                 $title = $icon_box['title'];
                 $text = wp_kses_post($icon_box['text']);
-                $icon_image = wp_get_attachment_image( $icon_box['custom_icon']['id'] );
+
+                $custom_icon_id = isset( $icon_box['custom_icon']['id'] ) ? $icon_box['custom_icon']['id'] : '';
+
+                $icon_image = '';
+                if( ! empty( $custom_icon_id ) ) {
+                    $icon_image = wp_get_attachment_image( $icon_box['custom_icon']['id'] );
+                }
                 $icon_fontawesome = esc_attr($icon_box['icon']); 
 
                 $migration_allowed = Icons_Manager::is_migration_allowed();
@@ -606,7 +612,25 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
                                     <div class="houzez-icon">
                                         <i class="<?php echo esc_attr($icon_fontawesome); ?>"></i>
                                     </div>
-                                <?php } else {
+                                <?php } else if( $icon_type == "fontawesome_icon_n" ) {
+                                    
+                                    if ( ! empty( $icon_box['icon'] ) || ( ! empty( $icon_box['selected_icon']['value'] ) && $is_new ) ) {
+
+                                        if ( $is_new || $migrated ) { ?>
+                                            
+                                            <div class="houzez-icon">
+                                                <?php Icons_Manager::render_icon( $icon_box['selected_icon'], [ 'aria-hidden' => 'true' ] ); ?>
+                                            </div>
+
+                                        <?php
+                                        } else { ?>
+                                                <div class="houzez-icon">
+                                                    <i class="<?php echo esc_attr( $icon_box['icon'] ); ?>" aria-hidden="true"></i>
+                                                </div>
+                                        <?php }
+                                    }
+
+                                } else {
                                     echo $icon_image;
                                 }
                                 ?>

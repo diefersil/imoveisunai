@@ -130,6 +130,11 @@ class Houzez_Elementor_Grids extends Widget_Base {
             }
         }
 
+        unset( $prop_taxonomies['property_country'] );
+        unset( $prop_taxonomies['property_state'] );
+        unset( $prop_taxonomies['property_city'] );
+        unset( $prop_taxonomies['property_area'] );
+
         if ( ! empty( $prop_taxonomies ) && ! is_wp_error( $prop_taxonomies ) ) {
             foreach ( $prop_taxonomies as $single_tax ) {
 
@@ -157,6 +162,70 @@ class Houzez_Elementor_Grids extends Widget_Base {
                 );
             }
         }
+
+        $this->add_control(
+            'property_country',
+            [
+                'label'         => esc_html__('Country', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_country'),
+                'condition' => [
+                    'houzez_grid_from' => 'property_country',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'property_state',
+            [
+                'label'         => esc_html__('State', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_state'),
+                'condition' => [
+                    'houzez_grid_from' => 'property_state',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'property_city',
+            [
+                'label'         => esc_html__('City', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_city'),
+                'condition' => [
+                    'houzez_grid_from' => 'property_city',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'property_area',
+            [
+                'label'         => esc_html__('Area', 'houzez'),
+                'multiple'      => true,
+                'label_block'   => true,
+                'type'          => 'houzez_autocomplete',
+                'make_search'   => 'houzez_get_taxonomies',
+                'render_result' => 'houzez_render_taxonomies',
+                'taxonomy'      => array('property_area'),
+                'condition' => [
+                    'houzez_grid_from' => 'property_area',
+                ],
+            ]
+        );
         
 
         $this->add_control(

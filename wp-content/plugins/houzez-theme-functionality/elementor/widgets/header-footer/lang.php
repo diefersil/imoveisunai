@@ -1,5 +1,5 @@
 <?php
-namespace Shopely\Elementor\Widgets\HeaderFooter;
+namespace Houzez\Elementor\Widgets\HeaderFooter;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Site Language Switcher Widget.
  * @since 1.0.0
  */
-class Shopely_Lang_Switcher extends Widget_Base {
+class Houzez_Lang_Switcher extends Widget_Base {
 
     /**
      * Get widget name.
@@ -29,7 +29,7 @@ class Shopely_Lang_Switcher extends Widget_Base {
      * @return string Widget name.
      */
     public function get_name() {
-        return 'shopely_language_switcher';
+        return 'houzez_language_switcher';
     }
 
     /**
@@ -40,7 +40,7 @@ class Shopely_Lang_Switcher extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__( 'Language', 'shopely' );
+        return esc_html__( 'Language', 'houzez' );
     }
 
     /**
@@ -52,7 +52,7 @@ class Shopely_Lang_Switcher extends Widget_Base {
      * @return string Widget icon.
      */
     public function get_icon() {
-        return 'shopely-element-icon eicon-site-search';
+        return 'houzez-element-icon eicon-site-search';
     }
 
     public function get_keywords() {
@@ -70,7 +70,7 @@ class Shopely_Lang_Switcher extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'shopely-elements', 'favethemes_studio_header', 'favethemes_studio_footer' ];
+        return [ 'houzez-elements', 'houzez-header-footer' ];
     }
 
     /**
@@ -98,7 +98,7 @@ class Shopely_Lang_Switcher extends Widget_Base {
 		$this->start_controls_section(
 			'section_content',
 			[
-				'label' => __( 'Content', 'shopely' ),
+				'label' => __( 'Content', 'houzez' ),
 			]
 		);
 
@@ -106,10 +106,79 @@ class Shopely_Lang_Switcher extends Widget_Base {
 			'important_note',
 			[
 				'type' => 'raw_html',
-				'raw' => esc_html__('You need Polylang or WPML plugin for this to work', 'shopely'),
+				'raw' => esc_html__('You need Polylang or WPML plugin for this to work', 'houzez-theme-functionality'),
 				'content_classes' => 'elementor-control-field-description',
 			]
 		);
+
+        $this->add_responsive_control(
+            'padding_vertical_lang',
+            [
+                'label' => esc_html__( 'Vertical Padding', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .houzez-lang-ele' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'padding_horizontal_lang',
+            [
+                'label' => esc_html__( 'Horizontal Padding', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'max' => 50,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .houzez-lang-ele' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'lang_typography',
+                'global' => [
+                    'default' => Global_Typography::TYPOGRAPHY_ACCENT,
+                ],
+                'exclude' => [],
+                'selector' => '{{WRAPPER}} .houzez-lang-ele > a',
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'lang_color',
+            [
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .houzez-lang-ele > a' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'lang_color_hover',
+            [
+                'label' => esc_html__( 'Color :hover', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .houzez-lang-ele > a:hover' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
 
 	
 		$this->end_controls_section();
@@ -151,9 +220,9 @@ class Shopely_Lang_Switcher extends Widget_Base {
             }
         }
 		?>
-		<div class="dropdown">
+		<div class="houzez-lang-ele">
             <a class="btn dropdown-toggle" href="#" role="button" id="languageDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="shopely-icon shopely-icon-earth-1"></i> 
+                <i class="houzez-icon houzez-icon-earth-1"></i> 
                 <?php //echo $flag; ?>
                 <?php echo $current_lang; ?>
             </a>
@@ -183,4 +252,4 @@ class Shopely_Lang_Switcher extends Widget_Base {
     }
 
 }
-Plugin::instance()->widgets_manager->register( new Shopely_Lang_Switcher );
+Plugin::instance()->widgets_manager->register( new Houzez_Lang_Switcher );

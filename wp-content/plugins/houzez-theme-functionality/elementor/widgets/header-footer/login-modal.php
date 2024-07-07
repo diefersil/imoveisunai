@@ -24,7 +24,7 @@ class Houzez_Login_Modal extends Widget_Base {
 	}
 
 	public function get_categories() {
-		return [ 'houzez-elements', 'favethemes_studio_header', 'favethemes_studio_footer' ];
+		return [ 'houzez-elements', 'houzez-header-footer' ];
 	}
 
 	public function get_keywords() {
@@ -167,6 +167,40 @@ class Houzez_Login_Modal extends Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'padding_horizontal_loggedIn',
+			[
+				'label' => esc_html__( 'LoggedIn Horizontal Padding', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 50,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .navbar-logged-in-wrap' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'padding_vertical_loggedIn',
+			[
+				'label' => esc_html__( 'LoggedIn Vertical Padding', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 50,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .navbar-logged-in-wrap' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
 			'login_padding',
 			[
 				'label' => __( 'Padding', 'houzez-theme-functionality' ),
@@ -253,26 +287,21 @@ class Houzez_Login_Modal extends Widget_Base {
             ]
         );
 
+		$this->start_controls_tabs( 'login_color_options' );
+
+		$this->start_controls_tab( 'login_color_normal_options', [
+			'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
+		] );
+
 		$this->add_control(
 			'login_icon_color',
 			[
 				'label' => __( 'Icon Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .btn-icon-login-register' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .btn-icon-login-register i' => 'color: {{VALUE}}',
 				],
 				'default' => '#004274'
-			]
-		);
-		$this->add_control(
-			'login_icon_color_hover',
-			[
-				'label' => __( 'Icon Color Hover', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} .btn-icon-login-register:hover' => 'color: {{VALUE}}',
-				],
-				'default' => '#00aeef'
 			]
 		);
 
@@ -284,19 +313,6 @@ class Houzez_Login_Modal extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .login-link a' => 'color: {{VALUE}}',
 					'{{WRAPPER}} .register-link a' => 'color: {{VALUE}}',
-				],
-				'default' => '#00aeef'
-			]
-		);
-
-		$this->add_control(
-			'login_regis_text_color_hover',
-			[
-				'label' => __( 'Login/Register Text Hover', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} .login-link a:hover' => 'color: {{VALUE}}',
-					'{{WRAPPER}} .register-link a:hover' => 'color: {{VALUE}}',
 				],
 				'default' => '#00aeef'
 			]
@@ -338,10 +354,41 @@ class Houzez_Login_Modal extends Widget_Base {
 			]
 		);
 
+        $this->end_controls_tab();
+
+        $this->start_controls_tab( 'login_color_hover_options', [
+			'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
+		] );
+
+		$this->add_control(
+			'login_icon_color_hover',
+			[
+				'label' => __( 'Icon Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .btn-icon-login-register:hover i' => 'color: {{VALUE}}',
+				],
+				'default' => '#00aeef'
+			]
+		);
+
+		$this->add_control(
+			'login_regis_text_color_hover',
+			[
+				'label' => __( 'Login/Register Text', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .login-link a:hover' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .register-link a:hover' => 'color: {{VALUE}}',
+				],
+				'default' => '#00aeef'
+			]
+		);
+
 		$this->add_control(
 			'dropdown_bg_hover',
 			[
-				'label' => __( 'Drop Down Hover Background', 'houzez-theme-functionality' ),
+				'label' => __( 'Drop Down Background', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .logged-in-nav a:hover' => 'background-color: {{VALUE}}',
@@ -353,7 +400,7 @@ class Houzez_Login_Modal extends Widget_Base {
 		$this->add_control(
 			'dropdown_border_color_hover',
 			[
-				'label' => __( 'Drop Down border hover', 'houzez-theme-functionality' ),
+				'label' => __( 'Drop Down border', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .logged-in-nav a:hover' => 'border-color: {{VALUE}}',
@@ -365,7 +412,7 @@ class Houzez_Login_Modal extends Widget_Base {
 		$this->add_control(
 			'dropdown_text_color_hover',
 			[
-				'label' => __( 'User Nav Links Hover', 'houzez-theme-functionality' ),
+				'label' => __( 'User Nav Links', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .logged-in-nav a:hover' => 'color: {{VALUE}}',
@@ -373,6 +420,11 @@ class Houzez_Login_Modal extends Widget_Base {
 				'default' => '#00aeff'
 			]
 		);
+		
+        $this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
 
 		$this->end_controls_section();
 

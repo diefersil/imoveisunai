@@ -411,7 +411,7 @@ class Property_Section_Description extends Widget_Base {
                 <?php } ?>
 
                 <div class="block-content-wrap">
-                    <?php get_the_content( get_the_ID() ); ?>
+                    <?php the_content(); ?>
 
                     <?php 
                     if(!empty($attachments) && $section_attachments) { ?>

@@ -91,7 +91,8 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                     'v_2'    => esc_html__( 'Property Card v2', 'houzez-theme-functionality'),
                     'v_3'    => esc_html__( 'Property Card v3', 'houzez-theme-functionality'),
                     'v_5'    => esc_html__( 'Property Card v5', 'houzez-theme-functionality'),
-                    'v_6'    => esc_html__( 'Property Card v6', 'houzez-theme-functionality')
+                    'v_6'    => esc_html__( 'Property Card v6', 'houzez-theme-functionality'),
+                    'v_7'    => esc_html__( 'Property Card v7', 'houzez-theme-functionality'),
                 ],
                 'description' => esc_html__('Choose grid style, default will be propety card v1', 'homey'),
                 'default' => 'v_1',
