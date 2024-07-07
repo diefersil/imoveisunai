@@ -13,88 +13,92 @@ if ( !is_user_logged_in() || !houzez_check_role() ) {
 global $houzez_local, $prop_featured, $current_user, $post;
 
 wp_get_current_user();
-$userID         = $current_user->ID;
+$userID         = get_current_user_id();
 $user_login     = $current_user->user_login;
 $paid_submission_type = esc_html ( houzez_option('enable_paid_submission','') );
 $packages_page_link = houzez_get_template_link('template/template-packages.php');
 $dashboard_add_listing = houzez_get_template_link_2('template/user_dashboard_submit.php');
 
+$dashboard_listings = houzez_get_template_link_2('template/user_dashboard_properties.php');
+$all = add_query_arg( 'prop_status', 'all', $dashboard_listings );
+$mine_link = add_query_arg( 'prop_status', 'mine', $dashboard_listings );
+
 get_header();
 
-if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'approved' ) {
-    $qry_status = 'publish';
-
-} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'pending' ) {
-    $qry_status = 'pending';
-
-} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'expired' ) {
-    $qry_status = 'expired';
-} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'disapproved' ) {
-    $qry_status = 'disapproved';
-} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'draft' ) {
-    $qry_status = 'draft';
-} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'on_hold' ) {
-    $qry_status = 'on_hold';
-} else {
-    $qry_status = 'any';
-}
-$sortby = '';
-if( isset( $_GET['sortby'] ) ) {
-    $sortby = $_GET['sortby'];
-}
-$no_of_prop   =  12;
-$paged = 1;
-if ( get_query_var( 'paged' ) ) {
-    $paged = get_query_var( 'paged' );
-} elseif ( get_query_var( 'page' ) ) { // if is static front page
-    $paged = get_query_var( 'page' );
+// Get 'prop_status' parameter from URL and set 'qry_status' accordingly
+$prop_status = isset($_GET['prop_status']) ? $_GET['prop_status'] : null;
+switch ($prop_status) {
+    case 'approved':
+        $qry_status = 'publish';
+        break;
+    case 'pending':
+    case 'expired':
+    case 'disapproved':
+    case 'draft':
+    case 'on_hold':
+        $qry_status = $prop_status;
+        break;
+    default:
+        $qry_status = 'any';
 }
 
+// Get 'sortby' parameter if set
+$sortby = isset($_GET['sortby']) ? $_GET['sortby'] : '';
 
-$agents_array = array();
+// Default number of properties and page number
+$no_of_prop = 12;
+$paged = get_query_var('paged') ?: get_query_var('page') ?: 1;
 
-$args = array(
-    'post_type'        =>  'property',
-    'author'           =>  $userID,
-    'paged'             => $paged,
-    'posts_per_page'    => $no_of_prop,
-    'post_status'      =>  array( $qry_status ),
+// Define the initial args for the WP query
+$args = [
+    'post_type'      => 'property',
+    'paged'          => $paged,
+    'posts_per_page' => $no_of_prop,
+    'post_status'    => [$qry_status],
     'suppress_filters' => false
-);
+];
 
-/*if(houzez_is_agency()) {
-    $wp_user_query = new WP_User_Query( array(
-        array( 'role' => 'houzez_agent' ),
-        'meta_key' => 'fave_agent_agency',
-        'meta_value' => $userID
-    ));
-    $agents = $wp_user_query->get_results();
+$args = houzez_prop_sort ( $args );
 
-    foreach ($agents as $agent) {
-        $agents_array[] = $agent->ID;
+if( houzez_is_admin() || houzez_is_editor() ) {
+    if( isset( $_GET['user'] ) && $_GET['user'] != '' ) {
+        $args['author'] = intval($_GET['user']);
+
+    } else if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
+        $args['author'] = $userID;
     }
+} else if( houzez_is_agency() ) {
 
-    $agents_array[] = $userID;
+    $agents = houzez_get_agency_agents($userID);
+    
+    if( isset( $_GET['user'] ) && $_GET['user'] != '' ) {
+        $args['author'] = intval($_GET['user']);
 
-    $args['author__in'] = $agents_array;
+    } else if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
+        $args['author'] = $userID;
+
+    } else if( $agents ) {
+        if (!in_array($userID, $agents)) {
+            $agents[] = $userID;
+        }
+        $args['author__in'] = $agents;
+    } else {
+        $args['author'] = $userID;
+    }
 
 } else {
     $args['author'] = $userID;
-}*/
-
-
-
-if( isset ( $_GET['keyword'] ) ) {
-    $keyword = trim( $_GET['keyword'] );
-    if ( ! empty( $keyword ) ) {
-        $args['s'] = $keyword;
-    }
 }
 
-$meta_query = array();
 
-if( isset( $_GET['property_id'] ) && $_GET['property_id'] != "" ) {
+// Add keyword search to args if set
+if (!empty($_GET['keyword'])) {
+    $args['s'] = trim($_GET['keyword']);
+}
 
+// Add property ID to meta query if set
+if (!empty($_GET['property_id'])) {
+    
     $meta_query[] = array(
         'key' => 'fave_property_id',
         'value' => $_GET['property_id'],
@@ -112,8 +116,6 @@ if( isset( $_GET['property_id'] ) && $_GET['property_id'] != "" ) {
         $args['meta_query'] = $meta_query;
     }
 }
-
-$args = houzez_prop_sort ( $args );
 ?>
 
 <header class="header-main-wrap dashboard-header-main-wrap">
@@ -152,7 +154,7 @@ $args = houzez_prop_sort ( $args );
             $prop_qry = new WP_Query($args); 
             if( $prop_qry->have_posts() ): ?>
                 <div id="dash-prop-msg"></div>
-                <table class="dashboard-table dashboard-table-properties table-lined responsive-table">
+                <table class="dashboard-table dashboard-table-properties table-lined table-hover responsive-table">
                 <thead>
                     <tr>
                         <th><?php echo esc_html__('Thumbnail', 'houzez'); ?></th>
@@ -162,6 +164,7 @@ $args = houzez_prop_sort ( $args );
                         <th><?php echo esc_html__('Status', 'houzez'); ?></th>
                         <th><?php echo esc_html__('Price', 'houzez'); ?></th>
                         <th><?php echo esc_html__('Featured', 'houzez'); ?></th>
+                        <th><?php echo esc_html__('Posted', 'houzez'); ?></th>
                         <th class="action-col"><?php echo esc_html__('Actions', 'houzez'); ?></th>
                     </tr>
                 </thead>

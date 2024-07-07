@@ -49,7 +49,7 @@ $layout = $layout['enabled'];
 						<?php } ?>
 							<a href="#" data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" <?php echo $dataModal; ?> class="<?php echo esc_attr($css_class); ?> swipebox img-wrap-<?php echo esc_attr($i); ?>">
 								<?php if($total_images > 3 && $i == 3) { ?>
-								<div class="img-wrap-3-text"><?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
+								<div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun mr-1"></i> <?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
 								<?php } ?>
 
 								<img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">

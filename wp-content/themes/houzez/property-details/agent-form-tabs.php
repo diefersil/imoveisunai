@@ -10,6 +10,8 @@ $hide_form_fields = houzez_option('hide_prop_contact_form_fields');
 $agent_display = houzez_get_listing_data('agent_display_option');
 $property_id = houzez_get_listing_data('property_id');
 $schedule_time_slots = houzez_option('schedule_time_slots');
+$gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
+$schedule_num_days = houzez_option('schedule_num_days', 14);
 
 $agent_number = $return_array['agent_mobile'];
 $agent_whatsapp_call = $return_array['agent_whatsapp_call'];
@@ -73,14 +75,10 @@ if(houzez_form_type()) {
 	<div class="property-form-tabs">
         <ul class="nav nav-tabs">
         	<li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#tab_tour" role="tab">
-                    <span class="tab-title"><?php esc_html_e('Schedule a tour', 'houzez'); ?></span>
-                </a>
+                <a class="nav-link active" data-toggle="tab" href="#tab_tour" role="tab"><span class="tab-title"><?php esc_html_e('Schedule a tour', 'houzez'); ?></span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab_agent_form" role="tab">
-                    <span class="tab-title"><?php esc_html_e('Request Info', 'houzez'); ?></span>
-                </a>
+                <a class="nav-link" data-toggle="tab" href="#tab_agent_form" role="tab"><span class="tab-title"><?php esc_html_e('Request Info', 'houzez'); ?></span></a>
             </li>
         </ul>
         <div class="tab-content">
@@ -107,40 +105,48 @@ if(houzez_form_type()) {
 		               
 
 		                <div class="property-schedule-tour-day-form">
-		                    <div class="tour-day-form-slide-arrow next">
+		                    <div class="tour-day-form-slide-arrow next sche-tabs-next-js">
 		                        <i class="houzez-icon icon-arrow-right-1"></i>
 		                    </div>
-		                    <div class="tour-day-form-slide-arrow prev">
+		                    <div class="tour-day-form-slide-arrow prev sche-tabs-prev-js">
 		                        <i class="houzez-icon icon-arrow-left-1"></i>
 		                    </div>
 		                    <div class="property-schedule-tour-day-form-slide-wrap">
-		                        <div class="property-schedule-tour-day-form-slide start">
+		                        <div class="property-schedule-tour-day-form-slide-v2">
 		                            
 		                            <?php
-		                            $m = date("m");
-		                            $de = date("d");
-		                            $y = date("Y");
+	                                $m = date("m"); // Current month
+	                                $de = date("d"); // Current day
+	                                $y = date("Y"); // Current year
 
-		                            for( $i = 0; $i <= 7; $i++ ) { 
+	                                $schedule_num_days = intval($schedule_num_days);
 
-		                                $day = date_i18n('D',mktime(0,0,0,$m,($de+$i),$y)); 
-		                                $day_number = date_i18n('d',mktime(0,0,0,$m,($de+$i),$y));
-		                                $month = date_i18n('M',mktime(0,0,0,$m,($de+$i),$y));
+	                                if (!$schedule_num_days) {
+	                                    $schedule_num_days = 14; // Set default to 14 if not specified or invalid
+	                                }
+
+	                                // Adjust $i <= 20 for 21 days range (0 to 20 equals 21 days)
+	                                for($i = 0; $i <= $schedule_num_days; $i++) { 
+
+	                                    $day = date_i18n('D', mktime(0, 0, 0, $m, ($de + $i), $y)); 
+	                                    $day_number = date_i18n('d', mktime(0, 0, 0, $m, ($de + $i), $y));
+	                                    $month = date_i18n('M', mktime(0, 0, 0, $m, ($de + $i), $y));
 		                            ?>
+		                            	<div class="hz-date-item">
+			                                <div class="form-group">
+			                                    <label class="control control--radio">
+			                                        <input name="schedule_date" type="radio" value="<?php echo $day.' '.$day_number.' '.$month; ?>">
+			                                        <span class="control__indicator">
+			                                            <?php echo $day ?><br>
+			                                            <span class="control__indicator_day"><?php echo $day_number ?></span><br>
+			                                            <?php echo $month ?>
+			                                        </span>
+			                                    </label>
+			                                </div>
+			                            </div>
 
-		                                <div class="form-group">
-		                                    <label class="control control--radio">
-		                                    <input name="schedule_date" type="radio" value="<?php echo $day.' '.$day_number.' '.$month; ?>">
-		                                    <span class="control__indicator">
-		                                    <?php echo $day ?><br>
-		                                    <span class="control__indicator_day"><?php echo $day_number ?></span><br>
-		                                    <?php echo $month ?>
-		                                    </span>
-		                                    </label>
-		                                </div>
-		                    
 		                            <?php
-		                            }
+		                                }
 		                            ?>
 		                
 		                        </div>
@@ -194,9 +200,14 @@ if(houzez_form_type()) {
 		                
 		                <?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
 		                <div class="form-group form-group-terms">
-		                    <label class="control control--checkbox">
-		                        <input type="checkbox" name="privacy_policy"><?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
-		                        <span class="control__indicator"></span>
+		                    <label class="control control--checkbox <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+		                        <?php if( ! $gdpr_checkbox ) { ?>
+								<input type="checkbox" name="privacy_policy">
+								<span class="control__indicator"></span>
+								<?php } ?>
+								<div class="gdpr-text-wrap">
+			                        <?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+			                    </div>
 		                    </label>
 		                </div><!-- form-group -->
 		                <?php } ?>
@@ -264,9 +275,14 @@ if(houzez_form_type()) {
 
 							<?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
 							<div class="form-group">
-								<label class="control control--checkbox m-0 hz-terms-of-use">
-									<input type="checkbox" name="privacy_policy"><?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+								<label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+									<?php if( ! $gdpr_checkbox ) { ?>
+									<input type="checkbox" name="privacy_policy">
 									<span class="control__indicator"></span>
+									<?php } ?>
+									<div class="gdpr-text-wrap">
+										<?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+									</div>
 								</label>
 							</div><!-- form-group -->	
 							<?php } ?>		

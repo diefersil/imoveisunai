@@ -6,10 +6,16 @@
  * Date: 06/10/15
  * Time: 3:49 PM
  */
-global $houzez_local, $current_user, $properties_page, $hide_prop_fields, $is_multi_steps;
+global $houzez_local, $properties_page, $hide_prop_fields, $is_multi_steps;
 
-wp_get_current_user();
-$userID = $current_user->ID;
+$current_user = wp_get_current_user();
+$userID = get_current_user_id();
+$packageUserId = $userID;
+
+$agent_agency_id = houzez_get_agent_agency_id( $userID );
+if( $agent_agency_id ) {
+    $packageUserId = $agent_agency_id;
+}
 
 if( is_user_logged_in() && !houzez_check_role() ) {
     wp_redirect(  home_url() );
@@ -276,7 +282,7 @@ if( isset( $_POST['action'] ) ) {
                 houzez_email_type( $admin_email, 'admin_update_listing', $args);
             }
 
-            if (houzez_user_has_membership($userID)) {
+            if (houzez_user_has_membership($packageUserId)) {
                 
                 if (!empty($submit_property_link)) {
                     $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
@@ -465,42 +471,44 @@ if( is_user_logged_in() ) { ?>
     </header><!-- .header-main-wrap -->
     <section class="dashboard-content-wrap <?php echo esc_attr($dash_main_class); ?>">
         
-        <?php 
-        if(houzez_edit_property()) { ?>
-            <div class="d-flex">
-                <div class="order-2">
-                    <?php get_template_part('template-parts/dashboard/submit/partials/menu-edit-property');?>
-                </div><!-- order-2 -->
-                <div class="order-1 flex-grow-1">
-        <?php                 
-        } ?>
+        
+        <div class="d-flex">
+            <div class="order-2">
+                <?php
+                if( houzez_edit_property() ) {
+                    get_template_part('template-parts/dashboard/submit/partials/menu-edit-property');
+                } else { 
+                    echo '<div class="menu-edit-property-wrap">';
+                    get_template_part( 'template-parts/dashboard/submit/partials/author');
+                    echo '</div>';
+                }?>
+            </div><!-- order-2 -->
+            <div class="order-1 flex-grow-1">
+        
 
-        <div class="dashboard-content-inner-wrap">
-            
-            <?php
-            if (is_plugin_active('houzez-theme-functionality/houzez-theme-functionality.php')) {
-                if (houzez_edit_property()) {
+                <div class="dashboard-content-inner-wrap">
+                    
+                    <?php
+                    if (is_plugin_active('houzez-theme-functionality/houzez-theme-functionality.php')) {
+                        if (houzez_edit_property()) {
 
-                    get_template_part('template-parts/dashboard/submit/edit-property-form');
+                            get_template_part('template-parts/dashboard/submit/edit-property-form');
 
-                } else {
+                        } else {
 
-                    get_template_part('template-parts/dashboard/submit/submit-property-form');
+                            get_template_part('template-parts/dashboard/submit/submit-property-form');
 
-                } /* end of add/edit property*/
-            } else {
-                echo $houzez_local['houzez_plugin_required'];
-            }
-            
-            ?>
-            
-        </div><!-- dashboard-content-inner-wrap -->
+                        } /* end of add/edit property*/
+                    } else {
+                        echo $houzez_local['houzez_plugin_required'];
+                    }
+                    
+                    ?>
+                    
+                </div><!-- dashboard-content-inner-wrap -->
 
-        <?php 
-        if(houzez_edit_property()) { ?>
             </div><!-- order-1 -->
         </div><!-- d-flex -->
-        <?php } ?>
         
     </section><!-- dashboard-content-wrap -->
 
@@ -511,17 +519,20 @@ if( is_user_logged_in() ) { ?>
 <?php
 } else { // End if user logged-in ?>
 
-<header class="header-main-wrap <?php houzez_transparent(); ?>">
-    <?php
-        if( houzez_option('top_bar') ) {
-            get_template_part('template-parts/topbar/top', 'bar');
-        }
+<?php 
+do_action( 'houzez_before_header' );
 
-        $header = houzez_option('header_style'); 
-        
-        get_template_part('template-parts/header/header', $header);
-    ?>
-</header><!-- .header-main-wrap -->
+if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) {
+    
+    if( function_exists('fts_header_enabled') && fts_header_enabled() ) {
+        do_action( 'houzez_header_studio' );
+    } else { 
+        do_action( 'houzez_header' );
+    }
+}
+
+do_action( 'houzez_after_header' );
+?>
 <section class="frontend-submission-page dashboard-content-inner-wrap">
     
     <div class="container">
@@ -542,7 +553,21 @@ if( is_user_logged_in() ) { ?>
     </div><!-- container -->
 </section><!-- frontend-submission-page -->
 
-<?php get_template_part('template-parts/footer/main');  ?>
+<?php 
+do_action( 'houzez_before_footer' );
+
+if ((!function_exists('elementor_theme_do_location') || !elementor_theme_do_location('footer')) && 
+    (!houzez_is_half_map() || (houzez_is_half_map() && houzez_option('halfmap-footer', 1) == 1))) 
+{
+    
+    if( function_exists('fts_footer_enabled') && fts_footer_enabled() ) {
+        do_action( 'houzez_footer_studio' );
+    } else { 
+        do_action( 'houzez_footer' );
+    }
+}
+do_action( 'houzez_after_footer' );
+?>
 
 <?php
 } // End logged-in else

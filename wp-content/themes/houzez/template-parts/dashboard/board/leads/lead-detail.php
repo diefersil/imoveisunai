@@ -1,7 +1,10 @@
 <?php
-$dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
+global $all_enquires;
 
-$lead_id = isset($_GET['lead-id']) ? $_GET['lead-id'] : 0;
+$dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
+$all_enquires = Houzez_Enquiry::get_enquires();
+
+$lead_id = isset($_GET['lead-id']) ? intval($_GET['lead-id']) : 0;
 
 $lead_data = Houzez_Leads::get_lead($lead_id);
 

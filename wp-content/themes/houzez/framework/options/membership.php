@@ -72,8 +72,29 @@ Redux::setSection( $houzez_opt_name, array(
             'subtitle' => esc_html__('It starts from the moment the property is set to featured', 'houzez'),
             'desc'     => esc_html__('Enter the number of days', 'houzez'),
             'required' => array('enable_paid_submission', '=', 'free_paid_listing'),
-            //'default'  => '30',
         ),
+
+        array(
+            'id'       => 'auto_delete_expired_listings',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Auto Delete Expired Listings.', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable/Disable auto delete expired listings.', 'houzez' ),
+            'desc'     => '',
+            'default'  => 0,
+            'on'       => esc_html__( 'Enabled', 'houzez' ),
+            'off'      => esc_html__( 'Disabled', 'houzez' ),
+        ),
+
+        array(
+            'id'       => 'auto_delete_expired_listings_days',
+            'type'     => 'text',
+            'title'    => esc_html__('Auto Delete Days', 'houzez'),
+            'subtitle' => esc_html__('Enter number of days after expired listings will be deleted', 'houzez'),
+            'desc'     => '',
+            'required' => array('auto_delete_expired_listings', '=', '1'),
+            'validate' => 'numeric'
+        ),
+
         array(
             'id'       => 'currency_paid_submission',
             'type'     => 'select',

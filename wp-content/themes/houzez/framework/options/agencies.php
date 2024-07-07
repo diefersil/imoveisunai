@@ -34,6 +34,16 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
+            'id'        => 'houzez_agency_placeholder',
+            'url'       => false,
+            'type'      => 'media',
+            'title'     => esc_html__( 'Placeholder', 'houzez' ),
+            'default'   => array( 'url' => '' ),
+            'subtitle'  => esc_html__( 'Upload default placeholder. Recommended Size 350 x 350 pixels', 'houzez' ),
+            'desc'      => '',
+        ),
+
+        array(
             'id'       => 'agency_address',
             'type'     => 'switch',
             'title'    => esc_html__('Address', 'houzez'),

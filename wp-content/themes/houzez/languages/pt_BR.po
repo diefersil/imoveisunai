@@ -3,21 +3,20 @@ msgstr ""
 "Project-Id-Version: Houzez v1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/tags/_s\n"
 "POT-Creation-Date: 2023-08-07 17:33+0500\n"
-"PO-Revision-Date: 2023-12-04 03:41+0000\n"
-"Last-Translator: \n"
-"Language-Team: Português do Brasil\n"
+"PO-Revision-Date: 2023-08-07 17:37+0500\n"
+"Last-Translator: nandopimentel <nandopimentel78@gmail.com>\n"
+"Language-Team: Portuguese (Brazil)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Loco https://localise.biz/\n"
+"X-Generator: Poedit 3.3.1\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e;esc_html_x;esc_attr__;"
 "esc_attr_e;esc_attr_x;_x;_ex;_n;_nx;_n_noop;_nx_noop\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
-"X-Loco-Version: 2.6.6; wp-6.4.1"
 
 #: ../archive.php:29 ../archive.php:32 ../archive.php:35
 #: ../framework/functions/helper_functions.php:7097
@@ -6096,14 +6095,14 @@ msgstr ""
 
 #: ../framework/options/add-new-property.php:72
 msgid ""
-"Note: Set search query Like for bedrooms, bathrooms and Rooms under <strong>"
-"Searches -> Settings</strong> to make it searchable."
+"Note: Set search query Like for bedrooms, bathrooms and Rooms under "
+"<strong>Searches -> Settings</strong> to make it searchable."
 msgstr ""
 
 #: ../framework/options/add-new-property.php:73
 msgid ""
-"Enable range inputs for bedrooms, rooms and bathrooms fields. Example( 3 - 5,"
-" 2 - 4)"
+"Enable range inputs for bedrooms, rooms and bathrooms fields. Example( 3 - "
+"5, 2 - 4)"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:81
@@ -7493,8 +7492,8 @@ msgstr ""
 
 #: ../framework/options/contact-forms.php:28
 msgid ""
-"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-"
-"us/articles/360061352091-HubSpot\">HubSpot Documentation</a>"
+"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/"
+"articles/360061352091-HubSpot\">HubSpot Documentation</a>"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:29
@@ -7897,8 +7896,8 @@ msgstr ""
 #, php-format
 msgid ""
 "%user_login_register as username, %user_pass_register as user password, "
-"%user_email_register as new user email, %user_phone_register as phone number,"
-" %email_verification_link as email verification"
+"%user_email_register as new user email, %user_phone_register as phone "
+"number, %email_verification_link as email verification"
 msgstr ""
 
 #: ../framework/options/emails.php:353
@@ -9536,8 +9535,7 @@ msgid "Maximum 6 options allowed"
 msgstr ""
 
 #: ../framework/options/listing-options.php:363
-msgid ""
-"Drag and drop layout manager, to quickly organize your preview meta.\n"
+msgid "Drag and drop layout manager, to quickly organize your preview meta.\n"
 msgstr ""
 
 #: ../framework/options/listing-options.php:375
@@ -10081,9 +10079,9 @@ msgstr ""
 #: ../framework/options/map.php:26
 msgid ""
 "We strongly encourage you to get an APIs Console key and post the code in "
-"Theme Options. You can get it from <a target=\"_blank\" href=\"https:"
-"//developers.google.com/maps/documentation/javascript/tutorial#api_key\">"
-"here</a>."
+"Theme Options. You can get it from <a target=\"_blank\" href=\"https://"
+"developers.google.com/maps/documentation/javascript/tutorial#api_key\">here</"
+"a>."
 msgstr ""
 
 #: ../framework/options/map.php:27
@@ -10379,8 +10377,8 @@ msgstr ""
 
 #: ../framework/options/membership.php:235
 msgid ""
-"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-"
-"us/articles/360045293072\">WooCommerce Documentation</a>"
+"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/"
+"articles/360045293072\">WooCommerce Documentation</a>"
 msgstr ""
 
 #: ../framework/options/membership.php:236
@@ -12608,7 +12606,7 @@ msgstr ""
 #: ../framework/options/translation.php:154
 #: ../framework/options/translation.php:155
 msgid "No results matched"
-msgstr "Nenhum imóvel encontrado"
+msgstr ""
 
 #: ../framework/options/translation.php:175
 msgid "Manage labels for searches accross the site"
@@ -15050,8 +15048,9 @@ msgstr ""
 
 #: ../framework/vc_extend.php:3752 ../framework/vc_extend.php:3862
 msgid ""
-"Please set an icon. The entire list of icons can be found at <a href='https:"
-"//fontawesome.com/icons' target='_blank'>FontAwesome project page</a>."
+"Please set an icon. The entire list of icons can be found at <a "
+"href='https://fontawesome.com/icons' target='_blank'>FontAwesome project "
+"page</a>."
 msgstr ""
 
 #: ../framework/vc_extend.php:3942
@@ -17031,14 +17030,14 @@ msgstr ""
 #: ../template-parts/normal-page-search-results.php:129
 #: ../template/property-listings-map.php:160
 msgid "Results Found"
-msgstr "resultados"
+msgstr ""
 
 #: ../template-parts/half-map-search-results.php:183
 #: ../template-parts/normal-page-search-results.php:196
 #: ../template/property-listings-map.php:185
 #: ../template/user_dashboard_properties.php:188
 msgid "No results found"
-msgstr "Nenhum imóvel encontrado"
+msgstr ""
 
 #: ../template-parts/listing/compare-properties.php:17
 msgid "Compare listings"
@@ -17132,8 +17131,6 @@ msgstr "Redigisse a senha"
 msgid ""
 "I agree with your <a target=\"_blank\" href=\"%s\">Terms & Conditions</a>"
 msgstr ""
-"Estou de acordo com os <a target=\"_blank\" href=\"%s\">Termos & "
-"Condições</a>"
 
 #: ../template-parts/login-register/register-form.php:149
 msgid "User registration is disabled for demo purpose."
@@ -17293,7 +17290,7 @@ msgstr "Alterar pacote"
 
 #: ../template-parts/normal-page-search-results.php:127
 msgid "Result Found"
-msgstr "resultados"
+msgstr ""
 
 #: ../template-parts/realtors/contact-form.php:111
 #, php-format
@@ -17502,3 +17499,1502 @@ msgstr ""
 #: ../woocommerce/loop/sale-flash.php:27
 msgid "Sale!"
 msgstr ""
+
+#~ msgid "Show Details"
+#~ msgstr "Mostrar detalhes"
+
+#~ msgid "Hide Details"
+#~ msgstr "Ocultar detalhes"
+
+#~ msgid " Featured Payment"
+#~ msgstr " Pagamento em destaque"
+
+#~ msgid "Sorry No Result Found"
+#~ msgstr "Desculpa, nenhum resultado encontrado"
+
+#~ msgid "%1$s at %2$s"
+#~ msgstr "%1$s a %2$s"
+
+#~ msgid "Reply <i class=\"fa fa-angle-right\"></i>"
+#~ msgstr "Responda <i class=“fa fa-angle-right”></i>"
+
+#~ msgid "Database need to be update for Houzez 1.5.0"
+#~ msgstr "O banco de dados precisa ser atualizado para Houzez 1.5.0"
+
+#~ msgid "Click here for database update, It is required"
+#~ msgstr "Clique aqui para atualizar o banco de dados, é necessário"
+
+#~ msgid "Best if used on new WordPress install."
+#~ msgstr "Melhor se usado na nova instalação do WordPress."
+
+#~ msgid "Images are for demo purpose only."
+#~ msgstr "As imagens são apenas para fins de demonstração."
+
+#~ msgid ""
+#~ "<strong>HOUZEZ09:</strong> Only homepage revolution slider will be "
+#~ "import, other sliders can be find in download zip file in \"houzez09 "
+#~ "slider\" folder."
+#~ msgstr ""
+#~ "<Strong> HOUZEZ09: </ strong> Somente o slide de revolução da página "
+#~ "inicial será importado, outros controles deslizantes podem ser "
+#~ "encontrados no arquivo zip de download na pasta “houzez09 slides”."
+
+#~ msgid "Property Title : "
+#~ msgstr "Título de imóvel : "
+
+#~ msgid "Property URL : "
+#~ msgstr "URL do imóvel : "
+
+#~ msgid "Additional message is."
+#~ msgstr "Mensagem adicional é."
+
+#~ msgid "New message sent by %s using schedule contact form at %s"
+#~ msgstr ""
+#~ "Nova mensagem enviada por% s usando o formulário de contato da agenda em "
+#~ "% s"
+
+#~ msgid "Date : "
+#~ msgstr "Data : "
+
+#~ msgid "Time : "
+#~ msgstr "Hora : "
+
+#~ msgid "more details here"
+#~ msgstr "mais detalhes aqui"
+
+#~ msgid "Switzerland, Swiss Confederation"
+#~ msgstr "Suiça"
+
+#~ msgid "Photos"
+#~ msgstr "Fotos"
+
+#~ msgid "Enter keyword..."
+#~ msgstr "Digite a palavra-chave…"
+
+#~ msgid "Enter a Location"
+#~ msgstr "Digite um local"
+
+#~ msgid "All Types"
+#~ msgstr "Todos tipos"
+
+#~ msgid "All Labels"
+#~ msgstr "Todos rótulos"
+
+#~ msgid "Min.Bedrooms"
+#~ msgstr "Min. Quartos"
+
+#~ msgid "Available from"
+#~ msgstr "Disponível a partir de"
+
+#~ msgid "Price Range:"
+#~ msgstr "Faixa de preço:"
+
+#~ msgid "to"
+#~ msgstr "até"
+
+#~ msgid "OFFICE:"
+#~ msgstr "ESCRITÓRIO:"
+
+#~ msgid "MOBILE:"
+#~ msgstr "CELULAR:"
+
+#~ msgid "FAX:"
+#~ msgstr "FAX:"
+
+#~ msgid "License:"
+#~ msgstr "CRECI:"
+
+#~ msgid "Tax Number:"
+#~ msgstr "CPF:"
+
+#~ msgid "Language:"
+#~ msgstr "Línguas:"
+
+#~ msgid "Properties listed:"
+#~ msgstr "Imóveis listados:"
+
+#~ msgid "Website:"
+#~ msgstr "Site:"
+
+#~ msgid "View My Properties"
+#~ msgstr "Exibir minhas propriedades"
+
+#~ msgid "office:"
+#~ msgstr "escritório:"
+
+#~ msgid "mobile:"
+#~ msgstr "celular:"
+
+#~ msgid "fax:"
+#~ msgstr "fax:"
+
+#~ msgid "Floor Plans for"
+#~ msgstr "Plantas do imóvel para"
+
+#~ msgid "Plan Postfix"
+#~ msgstr "Planta postfix"
+
+#~ msgid "Upload"
+#~ msgstr "Upload"
+
+#~ msgid "Add More"
+#~ msgstr "Adicionar mais"
+
+#~ msgid "Multi Units / Sub Properties for"
+#~ msgstr "Multi Unidades/ Sub imóveis para"
+
+#~ msgid "Property description and price"
+#~ msgstr "Descrição e preço da propriedade"
+
+#~ msgid "Enter Sale or Rent Price"
+#~ msgstr "Digite Preço de venda ou aluguel"
+
+#~ msgid "Enter your property second price"
+#~ msgstr "Digite seu segundo valor do imóvel"
+
+#~ msgid "After Price Label (ex: monthly)"
+#~ msgstr "Após etiqueta de preço (ex: mensalmente)"
+
+#~ msgid "Price Prefix (ex: Start from)"
+#~ msgstr "Prefixo de preço (ex: Iniciar a partir de)"
+
+#~ msgid "Enter before price label"
+#~ msgstr "Insira antes do rótulo de preço"
+
+#~ msgid "Enter after price label"
+#~ msgstr "Insira após o rótulo do preço"
+
+#~ msgid "Author Data."
+#~ msgstr "Dados do autor."
+
+#~ msgid "Agency Data."
+#~ msgstr "Dados da agência."
+
+#~ msgid "Agent Data (Choose agent from the list below)"
+#~ msgstr "Dados do agente (escolha o agente na lista abaixo)"
+
+#~ msgid "Membership Payment"
+#~ msgstr "Pagamento de associação"
+
+#~ msgid "Old password is not correct"
+#~ msgstr "A senha antiga não está correta"
+
+#~ msgid "Contact Agent"
+#~ msgstr "Contato do corretor"
+
+#~ msgid "Mobile:"
+#~ msgstr "Celular:"
+
+#~ msgid "Phone:"
+#~ msgstr "Telefone:"
+
+#~ msgid "Skype:"
+#~ msgstr "Skype:"
+
+#~ msgid "Price:"
+#~ msgstr "Preço:"
+
+#~ msgid "Property Size:"
+#~ msgstr "Tamanho do imóvel:"
+
+#~ msgid "Bedrooms:"
+#~ msgstr "Quartos:"
+
+#~ msgid "Bathrooms:"
+#~ msgstr "Banheiros:"
+
+#~ msgid "Garage:"
+#~ msgstr "Vagas:"
+
+#~ msgid "Garage Size:"
+#~ msgstr "Tamanho da vaga:"
+
+#~ msgid "Year Built:"
+#~ msgstr "Ano de Construção:"
+
+#~ msgid "Size:"
+#~ msgstr "Tamanho:"
+
+#~ msgid "Rooms:"
+#~ msgstr "Quartos:"
+
+#~ msgid "Baths:"
+#~ msgstr "Banheiros:"
+
+#~ msgid "CONTACT AGENT"
+#~ msgstr "CONTATO CORRETOR"
+
+#~ msgid "CONTACT OWNER"
+#~ msgstr "CONTATO PROPRIETÁRIO"
+
+#~ msgid "CONTACT SELLER"
+#~ msgstr "CONTATO VENDEDOR"
+
+#~ msgid "CONTACT MANAGER"
+#~ msgstr "CONTATO GERENTE"
+
+#~ msgid "CONTACT AGENCY"
+#~ msgstr "CONTATO IMOBILIÁRIA"
+
+#~ msgid "View listings"
+#~ msgstr "Ver listagens"
+
+#~ msgid "INVOCE"
+#~ msgstr "FATURA"
+
+#~ msgid "DATE"
+#~ msgstr "DATA"
+
+#~ msgid "Memebership Plan"
+#~ msgstr "Plano de membro"
+
+#~ msgid "Property Setting"
+#~ msgstr "Configuração de imóvel"
+
+#~ msgid "Home plans"
+#~ msgstr "Plantas do imóvel"
+
+#~ msgid "Eg: 700"
+#~ msgstr "Ex: 700"
+
+#~ msgid "Before Price Label"
+#~ msgstr "Antes do rótulo de preço"
+
+#~ msgid "Eg: Start From"
+#~ msgstr "Ex: Começa em"
+
+#~ msgid "Eg: Per Month"
+#~ msgstr "Ex: por mês"
+
+#~ msgid "Area Size ( Only digits )"
+#~ msgstr "Tamanho da Área (somente digitos )"
+
+#~ msgid "Eg: 1500"
+#~ msgstr "Ex: 1500"
+
+#~ msgid "Size Prefix"
+#~ msgstr "Prefixo de tamanho"
+
+#~ msgid "Eg: Sq Ft"
+#~ msgstr "Ex: m2"
+
+#~ msgid "Land Area ( Only digits )"
+#~ msgstr "Área do terreno (somente dígitos)"
+
+#~ msgid "Land Area Postfix"
+#~ msgstr "Área do Terreno postfix"
+
+#~ msgid "Eg: SqFt"
+#~ msgstr "Ex: m2"
+
+#~ msgid "Eg: 4"
+#~ msgstr "Ex: 4"
+
+#~ msgid "Eg: 3"
+#~ msgstr "Ex: 3"
+
+#~ msgid "Eg: 1"
+#~ msgstr "Ex: 1"
+
+#~ msgid "Garages Size"
+#~ msgstr "Tamanho da vaga"
+
+#~ msgid "yy-mm-dd"
+#~ msgstr "yy-mm-dd"
+
+#~ msgid "Property ID will help to search property directly."
+#~ msgstr "Id do imóvel irá ajudar a buscar o imóvel rapidamente."
+
+#~ msgid "Property Map?"
+#~ msgstr "Mapa do imóvel?"
+
+#~ msgid "Show "
+#~ msgstr "Mostrar "
+
+#~ msgid "Property Full Address"
+#~ msgstr "Endereço completo do imóvel"
+
+#~ msgid ""
+#~ "if donnot add address then map will not show on property detail page."
+#~ msgstr ""
+#~ "se não encontrar endereço, o mapa não será exibido na página de detalhes "
+#~ "da propriedade."
+
+#~ msgid ""
+#~ "Drag and drop marker on map to find exact location or use property add "
+#~ "field above."
+#~ msgstr ""
+#~ "Arraste e solte o marcador no mapa para encontrar a localização exata ou "
+#~ "use o campo de propriedade adicionar acima."
+
+#~ msgid "Google Map Street View"
+#~ msgstr "Google Map Street View"
+
+#~ msgid "Address(*only street name and building no)"
+#~ msgstr "Endereço (* apenas o nome da rua e o edifício não)"
+
+#~ msgid "Zip"
+#~ msgstr "Cel"
+
+#~ msgid "Mark this property as featured?"
+#~ msgstr "Marque esta propriedade como destaque?"
+
+#~ msgid "Yes "
+#~ msgstr "Sim "
+
+#~ msgid "Images uploader"
+#~ msgstr "Carregador de Imagens"
+
+#~ msgid "Recommend image size 1170 x 738"
+#~ msgstr "Tamanho da imagem recomendada 1170 x 738"
+
+#~ msgid "Enter video link/url. Supported format: YouTube, Vimeo, SWF and MOV"
+#~ msgstr ""
+#~ "Entre video link/url. Formato suportado: YouTube, Vimeo, SWF and MOV"
+
+#~ msgid ""
+#~ "Upload an image that will be used as cover for the video. Image size have "
+#~ "to be at least 810px x 430px."
+#~ msgstr ""
+#~ "Upload uma imagem que será usada como capa para o vídeo. Tamanho da "
+#~ "imagem deve ser ao menos  810px x 430px."
+
+#~ msgid "Virtual Tour"
+#~ msgstr "Tour Virtual"
+
+#~ msgid "Enter virtual tour embeded code"
+#~ msgstr "Entre o código de embedar o virtual tour"
+
+#~ msgid "Author data"
+#~ msgstr "Dados do autor"
+
+#~ msgid "Agent data (Choose agent from the list below)"
+#~ msgstr "Dados do agente (escolha o agente da lista abaixo)"
+
+#~ msgid "Do not display data container"
+#~ msgstr "Não exibir contêiner de dados"
+
+#~ msgid "Agent Responsible"
+#~ msgstr "Corretor responsável"
+
+#~ msgid "Do you want to display this property in the slider?"
+#~ msgstr "Você quer mostrar este imóvel no slider?"
+
+#~ msgid "Enable/Disable"
+#~ msgstr "Habilitar/Desabilitar"
+
+#~ msgid "Enable/Disable floor plans"
+#~ msgstr "Habilitar/Desabilitar plantas"
+
+#~ msgid ""
+#~ "You can attach PDF files, Map images OR other documents to provide "
+#~ "further details related to property."
+#~ msgstr ""
+#~ "Você pode anexar arquivos PDF, imagens do mapa OU outros documentos para "
+#~ "fornecer mais detalhes relacionados à propriedade."
+
+#~ msgid "Write private note for this property, it will not display for public"
+#~ msgstr ""
+#~ "Escreva uma nota privada para esta propriedade, ela não será exibida para "
+#~ "público"
+
+#~ msgid "Set property top area type."
+#~ msgstr "Defina o tipo de área superior da propriedade."
+
+#~ msgid "Luxury Homes ( Since v1.4.0 )"
+#~ msgstr "Casas de luxo ( Desde v1.4.0)"
+
+#~ msgid ""
+#~ "Provide agent email address, Agent related messages from contact form on "
+#~ "property details page, will be sent on this email address. "
+#~ msgstr ""
+#~ "Disponibilizar o endereço de email do Corretor, mensagens relacionadas "
+#~ "com o Corretor a partir do formulário de contato na página dos detalhes "
+#~ "do imóvel serão enviadas para este endereço de email. "
+
+#~ msgid "Ex: Founder & CEO."
+#~ msgstr "Ex: Fundador & CEO."
+
+#~ msgid "ie: english, spanish, french "
+#~ msgstr "inglês, Espanhol, Francês "
+
+#~ msgid "Enter your address, it will use for invoices "
+#~ msgstr "Digite seu endereço, ele usará para faturas "
+
+#~ msgid "Unlimited listings ?"
+#~ msgstr "Anúncios ilimitados ?"
+
+#~ msgid "Package stripe id (ex: gold_pack)"
+#~ msgstr "ID do plano (ex: gold_pack)"
+
+#~ msgid "Is Visible?"
+#~ msgstr "É visível?"
+
+#~ msgid "Property Listing Advanced Options"
+#~ msgstr "Opções avançadas da listagem de imóveis"
+
+#~ msgid "Default View"
+#~ msgstr "Visualização padrão"
+
+#~ msgid "List View"
+#~ msgstr "Exibição de lista"
+
+#~ msgid "Grid View"
+#~ msgstr "Visualização em grade"
+
+#~ msgid ""
+#~ "Grid View 3 col ( Only for \"Property listing full width template\" )"
+#~ msgstr ""
+#~ "Modelo de visualização com 3 colunas (somente para \"anúncios de imóveis "
+#~ "com template largura completa\")"
+
+#~ msgid ""
+#~ "Select default view for listing page( will not work for listing template "
+#~ "style 3 )"
+#~ msgstr ""
+#~ "Selecionar visualização padrão para a página de anúncios ( não funciona "
+#~ "no template estilo 3)"
+
+#~ msgid "Enable/Disable listing tabs"
+#~ msgstr "Ativar / Desativar listagem de guias"
+
+#~ msgid "Choose property status for this tab"
+#~ msgstr "Escolher a finalidade do imóvel para esta guia"
+
+#~ msgid ""
+#~ "Enable/Disable featured listings on top. Ex: Show first (x) listings "
+#~ "featured then non-featured"
+#~ msgstr ""
+#~ "Ativar / Desativar destaque listagens no topo. Ex: Mostrar primeira (x) "
+#~ "Destaque em seguida, sem destaque"
+
+#~ msgid "Number of featured listings to show"
+#~ msgstr "Número de destaques para exibir"
+
+#~ msgid "Number of listings to show"
+#~ msgstr "Número de anúncios a exibir"
+
+#~ msgid "Choose page background"
+#~ msgstr "Escolha página de fundo"
+
+#~ msgid "Properties Google Map"
+#~ msgstr "Pesquisa do Google Maps"
+
+#~ msgid "Choose page header type"
+#~ msgstr "Tipo de cabeçalho da página"
+
+#~ msgid "If \"Yes\" it will fit according to screen size"
+#~ msgstr "Se \"Sim\" ele irá encaixar de acordo com o tamanho da tela"
+
+#~ msgid "Full Screen Type"
+#~ msgstr "Tipo de tela cheia"
+
+#~ msgid "Screen fix"
+#~ msgstr "Correção de tela"
+
+#~ msgid "Auto fix"
+#~ msgstr "Correção automática"
+
+#~ msgid "Image Height"
+#~ msgstr "Altura da imagem"
+
+#~ msgid "Default 600px"
+#~ msgstr "Padrão 600px"
+
+#~ msgid "Overlay Color"
+#~ msgstr "Cor da Sobreposição"
+
+#~ msgid "Video Overlay"
+#~ msgstr "Sobreposição de fundo de vídeo"
+
+#~ msgid "Overlay Image"
+#~ msgstr "Imagem de Sobreposição"
+
+#~ msgid ""
+#~ "Choose city for proeprties on map header, you can select multiple cities "
+#~ "or keep all un-select to show from all cities"
+#~ msgstr ""
+#~ "Escolha a cidade do imóvel no cabeçalho do mapa. Você pode selecionar "
+#~ "várias cidades ou manter todos sem selecionar para mostrar todas as "
+#~ "cidades"
+
+#~ msgid "Main Menu Transparent ?"
+#~ msgstr "Menu principal transparente?"
+
+#~ msgid ""
+#~ "Will only work with header 4, you can choose header 4 from theme options"
+#~ msgstr ""
+#~ "Só funcionará com header 4, você pode escolher header 4 de opções de tema"
+
+#~ msgid "Add video page url: "
+#~ msgstr "Adicionar URL de página de vídeo: "
+
+#~ msgid " - For exmaple https://vimeo.com/120596335"
+#~ msgstr " - Por exemplo https://vimeo.com/120596335"
+
+#~ msgid "Add SoundCloud Audio: "
+#~ msgstr "Adicionar Áudio SoundCloud: "
+
+#~ msgid " - Paste page URL from SoundCloud"
+#~ msgstr " - Colar URL de página do SoundCloud"
+
+#~ msgid "Hide for This Page"
+#~ msgstr "Esconder"
+
+#~ msgid "Show for This Page"
+#~ msgstr "Mostrar para esta página"
+
+#~ msgid "Under Banners ( Sliders, Map, Video etc )"
+#~ msgstr "Abaixo dos Banners ( Sliders, Mapa, Vídeo etc )"
+
+#~ msgid "Testimonial Text"
+#~ msgstr "Texto do Testemunho"
+
+#~ msgid "Write a testimonial into the textarea."
+#~ msgstr "Escreva um depoimento na área de texto."
+
+#~ msgid "By who?"
+#~ msgstr "Por quem?"
+
+#~ msgid "Name of the client who gave feedback"
+#~ msgstr "Nome do cliente que deu o feedback"
+
+#~ msgid "Enter website address"
+#~ msgstr "Insira o endereço do seu site"
+
+#~ msgid "Enter email address"
+#~ msgstr "Digitar endereço de email"
+
+#~ msgid "Licenses"
+#~ msgstr "CRECI"
+
+#~ msgid "Provide website url."
+#~ msgstr "Fornecer url do site."
+
+#~ msgid "Agency Location"
+#~ msgstr "Localização da Imobiliária"
+
+#~ msgid "Leave it empty if you want to hide map on agency detail page."
+#~ msgstr ""
+#~ "Deixe em branco se você quiser esconder o mapa na página de detalhes da "
+#~ "imobiliária."
+
+#~ msgid "Agency Location at Google Map*"
+#~ msgstr "Localização da Imobiliária no Google Map*"
+
+#~ msgid ""
+#~ "Drag the google map marker to point your agency location. You can also "
+#~ "use the address field above to search for your agency."
+#~ msgstr ""
+#~ "Arraste o marcador do google maps para o local da imobiliária. Você "
+#~ "também pode utilizar o campo de endereço abaixo para procurar sua "
+#~ "imobiliária."
+
+#~ msgid "Invoice ID:"
+#~ msgstr "ID da Cobrança:"
+
+#~ msgid "Billing For:"
+#~ msgstr "Faturar Para:"
+
+#~ msgid "Billing Type:"
+#~ msgstr "Tipo de Cobrança:"
+
+#~ msgid "Payment Method:"
+#~ msgstr "Método de Pagamento:"
+
+#~ msgid "Item ID (Listing or Package id ):"
+#~ msgstr "Código do item (Anúncios ou código do pacote):"
+
+#~ msgid "Username ( Buyer Name ):"
+#~ msgstr "Usuário (Nome do comprador):"
+
+#~ msgid "User ID ( Buyer ):"
+#~ msgstr "Código de usuário (Comprador):"
+
+#~ msgid "Select default country"
+#~ msgstr "Escolher país padrão"
+
+#~ msgid "Enable/Disable agent name info on grid/list view"
+#~ msgstr ""
+#~ "Habilitar/Desabilitar informação nome de corretor em grade/ver lista"
+
+#~ msgid "Enable/Disable date info on grid/list view"
+#~ msgstr "Habilitar/Desabilitar informação de data em grade/ver lista"
+
+#~ msgid "Photos Count"
+#~ msgstr "Contagem de Fotos"
+
+#~ msgid "Enable/Disable photo count info on grid/list view"
+#~ msgstr ""
+#~ "Habilitar/Desabilitar a  informação da  contagem de foto em  grade/ver "
+#~ "lista"
+
+#~ msgid "Enable/Disable property compare"
+#~ msgstr "Ativar/desativar a comparação de imóveis"
+
+#~ msgid "Enable/Disable property favorite"
+#~ msgstr "Ativar/desativar imóveis favoritos"
+
+#~ msgid "Advanced Search Measurement Unit"
+#~ msgstr "Pesquisa Avançada: Unidade de Medida"
+
+#~ msgid "Select the measurement unit for advanced searches"
+#~ msgstr "Selecione a unidades de periodo limite para downloads"
+
+#~ msgid "Video Loop"
+#~ msgstr "Loop de Video"
+
+#~ msgid "Enable/Disable video loop on splash page and video header"
+#~ msgstr ""
+#~ "Habilitar/desabilitar loop de vídeo na página splash e cabeçalho de vídeo"
+
+#~ msgid "Video Audio"
+#~ msgstr "Áudio do Víde"
+
+#~ msgid "Enable/Disable video audio on splash page and video header"
+#~ msgstr ""
+#~ "Habilitar/desabilitar loop de vídeo na página splash e cabeçalho de vídeo"
+
+#~ msgid "Images overlay ?"
+#~ msgstr "Sobreposição de imagem em foco?"
+
+#~ msgid "Remove dark gradient overlay over the images"
+#~ msgstr "Remover a sobreposição de degradê escura sobre as imagens"
+
+#~ msgid "Enable/Disable breadcrumb"
+#~ msgstr "Ativar / desativar o breadcrumb"
+
+#~ msgid "Scroll To Top?"
+#~ msgstr "Desloque-se para o topo?"
+
+#~ msgid "Enable/Disable Scroll to top"
+#~ msgstr "Ativar/desativar rolar para o topo"
+
+#~ msgid "Choose which sidebars you want to be sticky?"
+#~ msgstr "Escolher que barras laterais quer ter como Sticky?"
+
+#~ msgid "Property listings"
+#~ msgstr "Listagem de Imóveis"
+
+#~ msgid "Create listing Sidebar"
+#~ msgstr "Criar Listagem lateral"
+
+#~ msgid "Upload your custom site logo."
+#~ msgstr "Carregue o seu logomarca de site personalizado."
+
+#~ msgid "Retina Logo"
+#~ msgstr "Sua Retina Logo"
+
+#~ msgid "Upload your retina logo (optional)."
+#~ msgstr "Carregar seu logotipo de retina (opcional)."
+
+#~ msgid "Upload your custom site logo for mobiles."
+#~ msgstr "Upload do logomarca para celulares."
+
+#~ msgid "Mobile Retina Logo"
+#~ msgstr "Logo Retina Para Celular"
+
+#~ msgid "Upload your retina logo for mobiles (optional)."
+#~ msgstr "Carregue o seu logo de retina para dispositivos móveis (opcional)."
+
+#~ msgid "Logo Splash & Transparent Header"
+#~ msgstr "Logomarca Splash & Cabeçalho Transparente"
+
+#~ msgid "Upload your custom logo for splash page and transparent header."
+#~ msgstr ""
+#~ "Carregue o seu logo personalizado para a página splash e cabeçalho "
+#~ "transparente."
+
+#~ msgid "Retina Logo Splash  & Transparent Header"
+#~ msgstr "Logomarca de Retina Splash & Cabeçalho Transparente"
+
+#~ msgid ""
+#~ "Upload your retina logo for splash page and transparent header (optional)."
+#~ msgstr ""
+#~ "Carregue o seu logo de retina para a página splash e cabeçalho "
+#~ "transparente (opcional)."
+
+#~ msgid "Mobile Logo Splash"
+#~ msgstr "Logo Para Celular da Página Splash"
+
+#~ msgid "Mobile Retina Logo Splash"
+#~ msgstr "Logo Retina splash Para Celular"
+
+#~ msgid "Upload your retina logo for mobile splash page(optional)."
+#~ msgstr ""
+#~ "Carregar seu logotipo personalizado para a página inicial móvel splash."
+
+#~ msgid "Desktop logo (Width/Height) Option"
+#~ msgstr "Opção de logomarca (Largura/Altura) de desktop"
+
+#~ msgid "Tablet & Mobile logo (Width/Height) Option"
+#~ msgstr "Opção de logomarca (Largura/Altura) para tablet & celular"
+
+#~ msgid "Enter your standard logo height. Used for retina logo."
+#~ msgstr "Introduza a altura do seu logo padrão. Usado para o logo de retina."
+
+#~ msgid "Enter your standard logo width. Used for retina logo."
+#~ msgstr ""
+#~ "Introduza a largura do seu logo padrão. Usado para o logo de retina."
+
+#~ msgid "Upload your custom site favicon."
+#~ msgstr "Carregue seu favicon do site personalizado."
+
+#~ msgid "Upload your custom iPhone icon (57px by 57px)."
+#~ msgstr "Upload seu ícone de iPhone personalizado (57px por 57px)."
+
+#~ msgid "Upload your custom iPhone retina icon (114px by 114px)."
+#~ msgstr ""
+#~ "Faça upload do seu ícone personalizado para iPhone retina (114px por "
+#~ "114px), ou especifique a URL online para o favicon."
+
+#~ msgid "Upload your custom iPad icon (72px by 72px)."
+#~ msgstr "Carregar seu ícone personalizado iPad (72px por 72px)."
+
+#~ msgid "Upload your custom iPad retina icon (144px by 144px)."
+#~ msgstr ""
+#~ "Faça upload de seu ícone de retina iPad personalizado (144px por 144px)."
+
+#~ msgid "Select header style"
+#~ msgstr "Selecione o estilo de cabeçalho"
+
+#~ msgid "Select navigation align"
+#~ msgstr "Alinhamento do Texto"
+
+#~ msgid "Sticky Menu"
+#~ msgstr "Menu Fixo"
+
+#~ msgid "Enable/Disable sticky menu"
+#~ msgstr "Habilita ou desabilita o menu fixo"
+
+#~ msgid "Mobile Sticky Menu"
+#~ msgstr "Menu fixo mobile"
+
+#~ msgid "Enable/Disable sticky menu in mobiles"
+#~ msgstr "Habilitar/Desabilitar menu fixo em celulares"
+
+#~ msgid "Enable/Disable call us in header"
+#~ msgstr "Habilitar/Desabilitar Ligue para nós no cabeçalho"
+
+#~ msgid "Enable/Disable Contact Info"
+#~ msgstr "Habilitar/Desabilitar Informação de Contato"
+
+#~ msgid "Contact Info Icon"
+#~ msgstr "Ícone de informação de contato"
+
+#~ msgid "Font Awesome Icon"
+#~ msgstr "Ícone Font Awesome"
+
+#~ msgid "Enable/Disable Address"
+#~ msgstr "Ativar/desativar Endereço"
+
+#~ msgid "Address Icon"
+#~ msgstr "Ícone Endereço"
+
+#~ msgid "Enable/Disable Office Timing"
+#~ msgstr "Ativar/Desativar Horário do Escritório"
+
+#~ msgid "Style One"
+#~ msgstr "Estilo 1"
+
+#~ msgid "Style Two"
+#~ msgstr "Estilo 2"
+
+#~ msgid "Search Width"
+#~ msgstr "Largura de pesquisa"
+
+#~ msgid "Select search width"
+#~ msgstr "Selecionar Visão da Pesquisa"
+
+#~ msgid "Select search position"
+#~ msgstr "Selecionar posição de pesquisa"
+
+#~ msgid "Select on which pages you want to show search"
+#~ msgstr "Selecione quais páginas você quer mostrar a pesquisa"
+
+#~ msgid "Sticky Advanced Search"
+#~ msgstr "Pesquisa Avançada fixa"
+
+#~ msgid "Enable/Disable advnaced search sticky"
+#~ msgstr "Ativar/desativar pesquisa avançada fixa"
+
+#~ msgid "Note: will only work when main menu sticky disabled"
+#~ msgstr ""
+#~ "Nota: irá apenas funcionar quando o menu principal do celular estiver "
+#~ "desabilitado"
+
+#~ msgid "Sticky Mobile"
+#~ msgstr "Mobile Cabeçalho Fixo"
+
+#~ msgid "Enable/Disable advnaced search sticky on mobiles"
+#~ msgstr "Ativar/desativar pesquisa avançada em dispositivos móveis"
+
+#~ msgid "Note: will only work when mobile menu sticky disabled"
+#~ msgstr ""
+#~ "Nota: irá apenas funcionar quando o menu principal do celular estiver "
+#~ "desabilitado"
+
+#~ msgid "Enable/Disable header social media"
+#~ msgstr "Habilitar o cabeçalho com ícones Sociais"
+
+#~ msgid "Only for header style two, three and top bar"
+#~ msgstr "Somente para o estilo de cabeçalho de dois, três e barra superior"
+
+#~ msgid "Enter google plus profile url"
+#~ msgstr "Digite a sua URL do seu Google Plus"
+
+#~ msgid "Enter linked in profile url"
+#~ msgstr "Digite a URL do seu perfil do LinkedIn"
+
+#~ msgid "Create Listing"
+#~ msgstr "Criar Anúncio"
+
+#~ msgid "Header create listing button required login or not"
+#~ msgstr "Criar no cabeçalho um botão de anúncio pedido login ou não"
+
+#~ msgid "Contact Info + Social Icons"
+#~ msgstr "Informação de contato + ícones Social"
+
+#~ msgid "About WP Currencies"
+#~ msgstr "Sobre WP moedas"
+
+#~ msgid ""
+#~ "Please find full list of available currencies at <a target=\"_blank\" "
+#~ "href=\"https://openexchangerates.org/currencies\">https://"
+#~ "openexchangerates.org/currencies</a><br/>wp-currencies plugin is required "
+#~ "- https://wordpress.org/plugins/wp-currencies/"
+#~ msgstr ""
+#~ "Por favor, encontrar lista completa de moedas disponíveis no <a "
+#~ "target=\"_blank\" href=\"https://openexchangerates.org/"
+#~ "currencies\">https://openexchangerates.org/currencies</a> <br/> wp-moedas "
+#~ "plugin é necessário - https://wordpress.org/plugins/wp-currencies/"
+
+#~ msgid "Enable/Disable login register in header menu"
+#~ msgstr "Habilitar/Desabilitar o login e registro no menu de cabeçalho"
+
+#~ msgid "Select terms & conditions page"
+#~ msgstr " Selecione a página Termos & condições"
+
+#~ msgid "Name for agent role"
+#~ msgstr "Nome da Função do Corretor"
+
+#~ msgid "Default: Agent"
+#~ msgstr "Padrão: Corretor"
+
+#~ msgid "Name for agency role"
+#~ msgstr "Nome da Função da Imobiliária"
+
+#~ msgid "Default: Agency"
+#~ msgstr "Padrão: Imobiliária"
+
+#~ msgid "Name for owner role"
+#~ msgstr "Nome da Função do Proprietário"
+
+#~ msgid "Default: Owner"
+#~ msgstr "Padrão: Proprietário"
+
+#~ msgid "Name for buyer role"
+#~ msgstr "Nome da Função do Comprador"
+
+#~ msgid "Default: Buyer"
+#~ msgstr "Padrão: Comprador"
+
+#~ msgid "Name for seller role"
+#~ msgstr "Nome para a Função do Vendedor"
+
+#~ msgid "Default: Seller"
+#~ msgstr "Padrão: Vendedor"
+
+#~ msgid "Name for manager role"
+#~ msgstr "Nome da Função do Administrador"
+
+#~ msgid "Default: Manager"
+#~ msgstr "Padrão: Administrador"
+
+#~ msgid "Splash Page Layout"
+#~ msgstr "Layout da página splash"
+
+#~ msgid "Background Type"
+#~ msgstr "Tipo de Fundo"
+
+#~ msgid "Enable/Disable splash page navigation"
+#~ msgstr "Ativar / Desativar guias de navegação"
+
+#~ msgid "Overlay"
+#~ msgstr "Overlay"
+
+#~ msgid "Enable/Disable splash page overlay"
+#~ msgstr "Habilitar/Desabilitar carregamento da página"
+
+#~ msgid "Overlay Image "
+#~ msgstr "Imagem de Sobreposição "
+
+#~ msgid "Opacity"
+#~ msgstr "Opacidade"
+
+#~ msgid "Overlay Opacity"
+#~ msgstr "Opacidade da Sobreposição"
+
+#~ msgid "The recommended image size in 2000 x 1000."
+#~ msgstr "O tamanho da imagem recomendada em 2000 x 1000."
+
+#~ msgid "Delay"
+#~ msgstr "Atraso"
+
+#~ msgid "Default delay is 7000"
+#~ msgstr "Atraso de padrão é 7000"
+
+#~ msgid "Upload video image"
+#~ msgstr "Upload de imagem de vídeo"
+
+#~ msgid "Splash Page Title"
+#~ msgstr "Título da Página Splash"
+
+#~ msgid "Enter title for splash page"
+#~ msgstr "Digitar o título da página splash"
+
+#~ msgid "Enter subtitle for splash page"
+#~ msgstr "Digite o subtítulo para página splash"
+
+#~ msgid "Enter Link"
+#~ msgstr "Digitar Link"
+
+#~ msgid "Provide currency sign. For Example: $."
+#~ msgstr "Fornecer sinal de moeda. Por exemplo: R$."
+
+#~ msgid "Where to Show the currency?"
+#~ msgstr "Onde mostrar a moeda?"
+
+#~ msgid "Before"
+#~ msgstr "Antes"
+
+#~ msgid "After"
+#~ msgstr "Depois"
+
+#~ msgid "Number of decimal points?"
+#~ msgstr "Número de casas decimais?"
+
+#~ msgid "Decimal Point Separator"
+#~ msgstr "Separador Ponto decimal"
+
+#~ msgid "Provide the decimal point separator. For Example: ."
+#~ msgstr "Informe o separador de ponto decimal. Por Exemplo: ."
+
+#~ msgid "Provide the thousands separator. For Example: ,"
+#~ msgstr "Fornecer o separador de milhares. Por Exemplo: ,"
+
+#~ msgid "Select your custom font options for your main body font."
+#~ msgstr ""
+#~ "Seleccione as suas opções de fonte personalizada para sua fonte de corpo "
+#~ "principal."
+
+#~ msgid "Select your custom font options for your headers."
+#~ msgstr ""
+#~ "Seleccione as suas opções de fonte personalizada para seus cabeçalhos."
+
+#~ msgid "Select your custom font options for your mobile menu."
+#~ msgstr ""
+#~ "Seleccione as suas opções de fonte personalizada para seu menu móvel."
+
+#~ msgid "Select your custom font options for headings ( h1, h2, h3, h3 etc )."
+#~ msgstr ""
+#~ "Seleccione as suas opções de fonte personalizada para títulos (h1, h2, "
+#~ "h3, h3 etc)."
+
+#~ msgid "Choose body background color"
+#~ msgstr "Escolha a cor de fundo do Corpo"
+
+#~ msgid "Pick website primary color."
+#~ msgstr "Selecione a cor primária do site."
+
+#~ msgid "Pick website primary hover color."
+#~ msgstr "Button Primary Text Hover Color."
+
+#~ msgid "Select Term"
+#~ msgstr "Selecione o termo"
+
+#~ msgid "Select yelp terms."
+#~ msgstr "Selecione termos do Yelp."
+
+#~ msgid "Result Limit"
+#~ msgstr "Limite do Resultado"
+
+#~ msgid "Yelp result limit"
+#~ msgstr "Limite de resultado do Yelp"
+
+#~ msgid "Distance Unit"
+#~ msgstr "Unidade de distância"
+
+#~ msgid "Yelp Distance Unit."
+#~ msgstr "Yelp Unidade de Distância."
+
+#~ msgid "Property Detail Data"
+#~ msgstr "Dados dos Detalhes do Imóvel"
+
+#~ msgid "Choose which data you want to hide on property detail page?"
+#~ msgstr ""
+#~ "Escolher quais dados deseja esconder na página de detalhes do imóvel?"
+
+#~ msgid "Icons for luxury home type property detail page"
+#~ msgstr "Ícones para a página de detalhes do imóvel  tipo casa de luxo"
+
+#~ msgid "Upload icon for property ID."
+#~ msgstr "Carregar o ícone para o código do imóvel."
+
+#~ msgid "Upload icon for bedrooms."
+#~ msgstr "Carregar ícone para Quartos."
+
+#~ msgid "Upload icon for Rooms."
+#~ msgstr "Carregar ícone para sala."
+
+#~ msgid "Upload icon for bathrooms."
+#~ msgstr "Carregar ícone para banheiro."
+
+#~ msgid "Upload icon for property size."
+#~ msgstr "Upload de ícone para tamanho de imóvel."
+
+#~ msgid "Upload icon for property land size."
+#~ msgstr "Carregar o ícone para o área do terreno."
+
+#~ msgid "Upload icon for garage size."
+#~ msgstr "Carregar ícone para tamanho da vaga de automóvel."
+
+#~ msgid "Upload icon for garage."
+#~ msgstr "Carregar ícone para vaga de automóvel."
+
+#~ msgid "Upload icon for year built."
+#~ msgstr "Carregar o ícone para o ano de construção."
+
+#~ msgid "Half Map Template"
+#~ msgstr "Modelo de meio mapa"
+
+#~ msgid "Number of Agencies to Display"
+#~ msgstr "Número de imobiliárias a apresentar"
+
+#~ msgid "Number of Agents to Display"
+#~ msgstr "Número de Corretores a Mostrar"
+
+#~ msgid "Page Description"
+#~ msgstr "Descrição da Página"
+
+#~ msgid "Number of Posts ( for masonry blog template )"
+#~ msgstr "Número de palavras no (modelo de blog em ladrilho)"
+
+#~ msgid "Enable/Disable blog featured image"
+#~ msgstr "Ativar/Desativar Desabilitar Imagem Destacada"
+
+#~ msgid "Enable/Disable blog posts date"
+#~ msgstr "Ativar / desativar data de postagens de blog"
+
+#~ msgid "Enable/Disable blog posts author"
+#~ msgstr "Ativar / desativar autor de postagens de blog"
+
+#~ msgid "Enable/Disable author box on post detail page"
+#~ msgstr "Ativar / desativar caixa de autor na página de detalhes de postagem"
+
+#~ msgid "Amount Financed:"
+#~ msgstr "Total financiado:"
+
+#~ msgid "Annual cost of Loan:"
+#~ msgstr "Taxa anual de financiamento:"
+
+#~ msgid "Houzez: Twitter Feeds"
+#~ msgstr "Mostrar seus feeds do twitter"
+
+#~ msgid "A widget that shows latest tweets from twitter profile"
+#~ msgstr "Um widget que mostra os últimos tweets de perfil do twitter"
+
+#~ msgid "Latest Tweets"
+#~ msgstr "Ultimos Tweets"
+
+#~ msgid "Contact info"
+#~ msgstr "Informação de Contato"
+
+#~ msgid "Inquire about this property"
+#~ msgstr "Pergunte sobre este imóvel"
+
+#~ msgid "Request info"
+#~ msgstr "Solicitar informação"
+
+#~ msgid "Send Direct Message"
+#~ msgstr "Enviar mensagem direta"
+
+#~ msgid "Near by"
+#~ msgstr "Próximo a"
+
+#~ msgid "Floor plans"
+#~ msgstr "Plantas"
+
+#~ msgid "Print"
+#~ msgstr "Imprimir"
+
+#~ msgid "Loading Slider..."
+#~ msgstr "Carregando Slider ..."
+
+#~ msgid "View Photos"
+#~ msgstr "Visualizar fotos"
+
+#~ msgid "PREVIOUS PROPERTY"
+#~ msgstr "IMÓVEL ANTERIOR"
+
+#~ msgid "NEXT PROPERTY"
+#~ msgstr "PRÓXIMO IMÓVEL"
+
+#~ msgid "State/county:"
+#~ msgstr "Estado:"
+
+#~ msgid "Zip/Postal Code:"
+#~ msgstr "Cep:"
+
+#~ msgid "Neighborhood:"
+#~ msgstr "Bairro:"
+
+#~ msgid "Country:"
+#~ msgstr "País:"
+
+#~ msgid "DOWNLOAD"
+#~ msgstr "DOWNLOAD"
+
+#~ msgid "Land Area:"
+#~ msgstr "Área do terreno:"
+
+#~ msgid "Property Type:"
+#~ msgstr "Tipo de imóvel:"
+
+#~ msgid "Property Status:"
+#~ msgstr "Status do Imóvel:"
+
+#~ msgid "No Review"
+#~ msgstr "Sem avaliações"
+
+#~ msgid "Write a Review"
+#~ msgstr "Escreva um comentário"
+
+#~ msgid "Waiting for approval."
+#~ msgstr "Esperado aprovação."
+
+#~ msgid "Login for Review"
+#~ msgstr "Login para avaliação"
+
+#~ msgid "Review Title"
+#~ msgstr "Titulo do comentário"
+
+#~ msgid "Enter a title for your review"
+#~ msgstr "Digite um título para seu comentário"
+
+#~ msgid "Rate This Property"
+#~ msgstr "Avalie este imóvel"
+
+#~ msgid "Your review"
+#~ msgstr "Seu comentário"
+
+#~ msgid "Page Views"
+#~ msgstr "Visualizações"
+
+#~ msgid "Floor Plan"
+#~ msgstr "Planta"
+
+#~ msgid "powered by"
+#~ msgstr "powered by"
+
+#~ msgid "OVERVIEW"
+#~ msgstr "INFORMAÇÕES GERAIS"
+
+#~ msgid "AGENTS"
+#~ msgstr "CORRETORES"
+
+#~ msgid "MAP"
+#~ msgstr "MAPA"
+
+#~ msgid "Previous post"
+#~ msgstr "Post Anterior"
+
+#~ msgid "Tags:"
+#~ msgstr "Tags:"
+
+#~ msgid "Radius:"
+#~ msgstr "Raio:"
+
+#~ msgid "CONTACT"
+#~ msgstr "CONTATO"
+
+#~ msgid ""
+#~ "Hi %s, I saw your profile on %s and wanted to see if you could help me"
+#~ msgstr ""
+#~ "Olá %s,Eu vi seu perfil no %s e gostaria de saber se você poderia me "
+#~ "ajudar"
+
+#~ msgid "SEND MESSAGE"
+#~ msgstr "Enviar mensagem"
+
+#~ msgid "Update Agent"
+#~ msgstr "Atualizar Corretor"
+
+#~ msgid "Compare Listings"
+#~ msgstr "Comparar listagens"
+
+#~ msgid "%s Select a %s Package"
+#~ msgstr "%s Selecionar o %s Pacote"
+
+#~ msgid "Payment"
+#~ msgstr "Pagamento"
+
+#~ msgid "Done"
+#~ msgstr "Pronto"
+
+#~ msgid "Save as draft"
+#~ msgstr "Salvar como rascunho"
+
+#~ msgid "Edit Property"
+#~ msgstr "Editar imóvel"
+
+#~ msgid "Under Approved"
+#~ msgstr "Em aprovação"
+
+#~ msgid "Status:"
+#~ msgstr "Status:"
+
+#~ msgid "Select Attachment"
+#~ msgstr "Selecionar anexo"
+
+#~ msgid "Enter property land area size"
+#~ msgstr "Digite o tamanho da área do terreno do imóvel"
+
+#~ msgid "Enter garage size"
+#~ msgstr "Digite tamanho da vaga"
+
+#~ msgid "Enter your property country"
+#~ msgstr "Digite o país de seu imóvel"
+
+#~ msgid "Enter your property county/state"
+#~ msgstr "Digite o estado do imóvel"
+
+#~ msgid "Enter your property city"
+#~ msgstr "Digite a cidade do imóvel"
+
+#~ msgid "Enter your property neighborhood"
+#~ msgstr "Digite o Bairro do imóvel"
+
+#~ msgid "Enter your property zip code"
+#~ msgstr "Digite o CEP do imóvel"
+
+#~ msgid "Place the pin the address above"
+#~ msgstr "Coloque o pin em cima do endereço"
+
+#~ msgid "Google Maps latitude"
+#~ msgstr "Latitude do Google Maps"
+
+#~ msgid "Enter google maps latitude"
+#~ msgstr "Informe a latitude no Google Maps"
+
+#~ msgid "Google Maps longitude"
+#~ msgstr "Longitude do Google Maps"
+
+#~ msgid "Enter google maps longitude"
+#~ msgstr "Informe a longitude no Google Maps"
+
+#~ msgid "Property media"
+#~ msgstr "Mídia do Imóvel"
+
+#~ msgid "Drag and drop images here"
+#~ msgstr "Arraste e solte as imagens aqui"
+
+#~ msgid "Select Images"
+#~ msgstr "Selecione Imagens"
+
+#~ msgid "Price Postfix "
+#~ msgstr "Sufixo do preço "
+
+#~ msgid "INVOICE"
+#~ msgstr "FATURA"
+
+#~ msgid "ALL"
+#~ msgstr "TODOS"
+
+#~ msgid "login with facebook"
+#~ msgstr "login com facebook"
+
+#~ msgid "login with yahoo"
+#~ msgstr "login com yahoo"
+
+#~ msgid "login with google"
+#~ msgstr "login com google"
+
+#~ msgid "Select Type"
+#~ msgstr "Selecione o tipo"
+
+#~ msgid "I agree with your <a href=\"%s\">Terms & Conditions</a>"
+#~ msgstr "Eu concordo com seus  <a href=“%s”> termos e condições</a>"
+
+#~ msgid "User registration is disabled in this demo."
+#~ msgstr ""
+#~ "O Cadastro de usuário está desabilitado neste momento. Tente depois."
+
+#~ msgid "Credit Card"
+#~ msgstr "Cartão de crédito"
+
+#~ msgid ""
+#~ "By clicking \"Complete Membership\" you agree to our <a href=\"%s\">Terms "
+#~ "& Conditions</a>"
+#~ msgstr ""
+#~ "Ao clicar em “Associação Completa”, você concorda com nossos <a "
+#~ "href=“%s”> Termos e Condições </a>"
+
+#~ msgid "Package Time:"
+#~ msgstr "Tempo do pacote:"
+
+#~ msgid "Listing Included:"
+#~ msgstr "Listagem incluída:"
+
+#~ msgid "Featured Listing Included:"
+#~ msgstr "Lista destacada incluída:"
+
+#~ msgid "status"
+#~ msgstr "status"
+
+#~ msgid "Send"
+#~ msgstr "Enviar"
+
+#~ msgid "Google Map Search"
+#~ msgstr "Pesquisa do Google Maps"
+
+#~ msgid "My location"
+#~ msgstr "Minha localização"
+
+#~ msgid "Author Archive"
+#~ msgstr "Arquivo do autor"
+
+#~ msgid "Submission Fee:"
+#~ msgstr "Taxa de Envio:"
+
+#~ msgid "Featured Fee:"
+#~ msgstr "Taxa de Destaque:"
+
+#~ msgid "Total Fee:"
+#~ msgstr "Taxa total:"
+
+#~ msgid "Pay with PayPal"
+#~ msgstr "Pagar com PayPal"
+
+#~ msgid "Pay with Wire Transfer"
+#~ msgstr "Pagar com transferência bancária"
+
+#~ msgid ""
+#~ "By clicking \"Complete Payment\" you agree to our <a href=\"%s\">Terms & "
+#~ "Conditions</a>"
+#~ msgstr ""
+#~ "Ao clicar em “Pagamento completo” você concorda com nossos <a href=“%s”> "
+#~ "Termos e Condições </a>"
+
+#~ msgid "Update Property"
+#~ msgstr "Atualizar imóvel"
+
+#~ msgid "Sorry No Results Found"
+#~ msgstr "Desculpe não foram encontrados resultado"
+
+#~ msgid ""
+#~ "Your current package doesn't let you publish more properties! You need to "
+#~ "upgrade your membership."
+#~ msgstr ""
+#~ "Seu pacote atual não deixa você publicar mais imóveis. Você precisa fazer "
+#~ "um upgrade de usuário."
+
+#~ msgid "Login here"
+#~ msgstr "Entre aqui"
+
+#~ msgid "Register here"
+#~ msgstr "Crie seu acesso aqui"
+
+#~ msgid "Select Role"
+#~ msgstr "Selecionar função"
+
+#~ msgid "in"
+#~ msgstr "em"
+
+#~ msgid "Search Parameters:"
+#~ msgstr "Pesquisar parâmetros:"
+
+#~ msgid "share"
+#~ msgstr "compartilhar"
+
+#~ msgid "*minimum 270px x 270px"
+#~ msgstr "*minimo 270px x 270px"
+
+#~ msgid "Agency License"
+#~ msgstr "Creci da corretora"
+
+#~ msgid "Website URL"
+#~ msgstr "Website URL"
+
+#~ msgid "Facebook URL"
+#~ msgstr "Facebook URL"
+
+#~ msgid "Twitter URL"
+#~ msgstr "Twitter URL"
+
+#~ msgid "Linkedin URL"
+#~ msgstr "LinkedIn URL"
+
+#~ msgid "Instagram URL"
+#~ msgstr "Instagram URL"
+
+#~ msgid "Google Plus Url"
+#~ msgstr "Google Plus Url"
+
+#~ msgid "Youtube Url"
+#~ msgstr "Youtube Url"
+
+#~ msgid "Pinterest Url"
+#~ msgstr "Pinterest Url"
+
+#~ msgid "Vimeo Url"
+#~ msgstr "Vimeo Url"
+
+#~ msgid "Change password"
+#~ msgstr "Mudar senha"
+
+#~ msgid "Old Password"
+#~ msgstr "Antiga senha"
+
+#~ msgid "New Password "
+#~ msgstr "Nova senha "
+
+#~ msgid "Account role"
+#~ msgstr "Papel da conta"
+
+#~ msgid "No record found"
+#~ msgstr "Nenhum registro encontrado"
+
+#~ msgid "Email Address *"
+#~ msgstr "E-mail*"
+
+#~ msgid "Search listing"
+#~ msgstr "Pesquisar listagem"
+
+#~ msgid "Hello,"
+#~ msgstr "Olá,"
+
+#~ msgid ""
+#~ "A new submission matching your chosen criteria has been published at "
+#~ msgstr ""
+#~ "Uma nova apresentação que corresponde aos critérios escolhidos foi "
+#~ "publicada em "
+
+#~ msgid "These are the new submissions:"
+#~ msgstr "Estas são as novas submissões:"
+
+#~ msgid "You are a bot! Go away!"
+#~ msgstr "Você é um bot! Vá embora!"
+
+#~ msgid "We didn’t found any results"
+#~ msgstr "Não encontramos resultados"
+
+#~ msgid "Eg: 557000 or See opan request"
+#~ msgstr "Exemplo: 557000 ou Consulte pedido"
+
+#~ msgid ""
+#~ "Make your payment direct into your bank account. Please use order ID as "
+#~ "the payment reference"
+#~ msgstr ""
+#~ "Faça seu pagamento direto em sua conta bancária. Por favor, use o ID de "
+#~ "ordem como a referência de pagamento"

@@ -175,6 +175,8 @@ if( !function_exists( 'houzez_get_google_map_properties' ) ) {
             'post_status' => 'publish'
         );
 
+        $wp_query_args = apply_filters( 'houzez_sold_status_filter', $wp_query_args );
+
         if(houzez_is_listings_template()) {
 
             $wp_query_args = apply_filters( 'houzez20_property_filter', $wp_query_args );
@@ -194,8 +196,6 @@ if( !function_exists( 'houzez_get_google_map_properties' ) ) {
             $wp_query_args['posts_per_page'] = $properties_limit;
 
             $wp_query_args['paged'] = $paged;
-
-            $wp_query_args['post_status'] = array( 'publish', 'houzez_sold' );
 
             $wp_query_args = houzez_prop_sort ( $wp_query_args );
             
@@ -475,33 +475,53 @@ if( ! function_exists('houzez_getLatLongFromAddress') ) {
     }
 }
 
-if( ! function_exists('houzezOSM_getLatLngFromAddress') ) {
-    function houzezOSM_getLatLngFromAddress($address) {       
-        
-        if ( false === ( $agent_address = get_transient( 'agent-'.$address ) ) ) {
 
-            $url = "https://nominatim.openstreetmap.org/search?q=$address&format=json";
-            // send api request
+if (!function_exists('houzezOSM_getLatLngFromAddress')) {
+    function houzezOSM_getLatLngFromAddress($address) {
+
+        // Sanitize the address input
+        $safe_address = sanitize_text_field($address);
+        $transient_name = 'agent-' . md5($safe_address); // Use MD5 to ensure the transient name is unique and valid
+
+        // Check if the coordinates are already cached
+        $cached_coordinates = get_transient($transient_name);
+        if (false !== $cached_coordinates) {
+            // Return the cached coordinates
+            return $cached_coordinates;
+        } else {
+            // Prepare the request URL, making sure the address is URL-encoded
+            $url = 'https://nominatim.openstreetmap.org/search?q=' . urlencode($safe_address) . '&format=json';
+
+            // Send the API request
             $response = wp_safe_remote_get($url);
-            //$json = json_decode($geocode);
 
-            if ( is_wp_error( $response ) ) {
+            // Check for errors in the response
+            if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
+                // Return false if there was an error with the request
                 return false;
             }
 
-            if ( ! empty( $response['body'] ) && is_ssl() ) {
-                $response['body'] = str_replace( 'http:', 'https:', $response['body'] );
-            } elseif ( is_ssl() ) {
-                $response = str_replace( 'http:', 'https:', $response );
+            // Decode the response body
+            $body = wp_remote_retrieve_body($response);
+            $json = json_decode($body);
+
+            // Check if the response is valid and contains coordinates
+            if (empty($json) || empty($json[0]->lat) || empty($json[0]->lon)) {
+                // Return false if the response is invalid
+                return false;
             }
 
-            $json = json_decode($response['body']);
+            // Extract latitude and longitude
+            $coordinates = array(
+                'lat' => $json[0]->lat,
+                'lng' => $json[0]->lon,
+            );
 
-            $data['lat'] = $json[0]->lat;
-            $data['lng'] = $json[0]->lon;
-            return $data;
-        } else {
-            return get_transient( 'agent-'.$address );
+            // Cache the coordinates for future use to reduce API calls
+            set_transient($transient_name, $coordinates, 12 * HOUR_IN_SECONDS);
+
+            // Return the coordinates
+            return $coordinates;
         }
     }
 }

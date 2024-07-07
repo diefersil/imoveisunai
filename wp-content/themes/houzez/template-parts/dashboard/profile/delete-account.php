@@ -1,3 +1,4 @@
+<?php if( ! isset( $_GET['edit_user'] ) ) { ?>
 <div class="dashboard-content-block">
     <div class="row">
         <div class="col-md-3 col-sm-12">
@@ -13,3 +14,4 @@
         </div><!-- col-md-9 col-sm-12 -->
     </div><!-- row -->
 </div><!-- dashboard-content-block -->
+<?php } ?>

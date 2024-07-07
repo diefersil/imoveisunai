@@ -167,6 +167,22 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                     'columns'   => 6
                 ),
                 array(
+                    'id' => "{$houzez_prefix}agent_line_id",
+                    'name' => esc_html__("LINE ID", 'houzez'),
+                    'placeholder'      => esc_html__('Enter the line id', 'houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agent_telegram",
+                    'name' => "Telegram Username",
+                    'placeholder'      => esc_html__('Enter your telegram username','houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
                     'id' => "{$houzez_prefix}agent_office_num",
                     'name' => esc_html__("Office Number", 'houzez'),
                     'placeholder'      => esc_html__('Enter the office number', 'houzez'),
@@ -216,6 +232,22 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                     'columns'   => 6
                 ),
                 array(
+                    'id' => "{$houzez_prefix}agent_zillow",
+                    'name' => esc_html__("Zillow", 'houzez'),
+                    'placeholder'      => esc_html__('Enter your zillow URL', 'houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agent_realtor_com",
+                    'name' => esc_html__("Realtor.com", 'houzez'),
+                    'placeholder'      => esc_html__('Enter your realtor.com URL', 'houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
                     'id' => "{$houzez_prefix}agent_facebook",
                     'name' => "Facebook URL",
                     'placeholder'      => esc_html__('Enter your Facebook profile URL','houzez'),
@@ -225,8 +257,8 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                 ),
                 array(
                     'id' => "{$houzez_prefix}agent_twitter",
-                    'name' => "Twitter URL",
-                    'placeholder'      => esc_html__('Enter your Twitter profile URL','houzez'),
+                    'name' => "X URL",
+                    'placeholder'      => esc_html__('Enter your X profile URL','houzez'),
                     'type' => 'text',
                     'std' => "",
                     'columns'   => 6
@@ -241,8 +273,8 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                 ),
                 array(
                     'id' => "{$houzez_prefix}agent_googleplus",
-                    'name' => "Google Plus URL",
-                    'placeholder'      => esc_html__('Enter your Google Plus profile URL','houzez'),
+                    'name' => "Google URL",
+                    'placeholder'      => esc_html__('Enter your Google profile URL','houzez'),
                     'type' => 'text',
                     'std' => "",
                     'columns'   => 6
@@ -259,14 +291,6 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                     'id' => "{$houzez_prefix}agent_tiktok",
                     'name' => "Tiktok URL",
                     'placeholder'      => esc_html__('Enter your Tiktok profile URL','houzez'),
-                    'type' => 'text',
-                    'std' => "",
-                    'columns'   => 6
-                ),
-                array(
-                    'id' => "{$houzez_prefix}agent_telegram",
-                    'name' => "Telegram URL",
-                    'placeholder'      => esc_html__('Enter your telegram profile URL','houzez'),
                     'type' => 'text',
                     'std' => "",
                     'columns'   => 6

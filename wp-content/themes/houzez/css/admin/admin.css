@@ -295,10 +295,12 @@ ul.fave-img-select-wrap li {float: left; margin-right: 1px;}
 /* fields builder
 /* ------------------------------------------------------ */
 .field-column-1 {
-    width: 86%;
+    width: 25%;
 }
-.field-column-2,
-.field-column-3 {
+.field-column-2 {
+    width: 56%;
+}
+.field-column-3, .field-column-4  {
     width: 7%;
 }
 .form-wrap {

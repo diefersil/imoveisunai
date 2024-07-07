@@ -57,6 +57,16 @@ class Houzez_Admin {
             array( $this, 'plugins' ),
         );
 
+        if( class_exists('\HouzezStudio\Houzez_Studio') ) {
+        	$sub_menus['houzez_studio'] = array( 
+	            'houzez_dashboard', 
+	            esc_html__( 'Header & Footer Builder', 'houzez' ),
+	            esc_html__( 'Header & Footer Builder', 'houzez' ),
+	            'edit_pages', 
+	            'edit.php?post_type=fts_builder',
+	        );
+        }
+
         if( class_exists('Houzez') ) {
 	        $sub_menus['houzez_fbuilder'] = array( 
 	            'houzez_dashboard', 
@@ -111,6 +121,15 @@ class Houzez_Admin {
 	            'houzez_permalinks',
 	            array( 'Houzez_Permalinks', 'render' )
 	        );
+
+	        $sub_menus['houzez_import_locations'] = array(
+	            'houzez_dashboard',
+	            esc_html__( 'Import Locations', 'houzez' ),
+	            esc_html__( 'Import Locations', 'houzez' ),
+	            'manage_options',
+	            'import_locations',
+	            array( 'Houzez_Import_Locations', 'render' )
+	        );
 	    }
 
 	    // Add filter for third party uses
@@ -153,6 +172,15 @@ class Houzez_Admin {
 				'admin.php?page=houzez-one-click-demo-import',
 			);
 		}
+
+		/*$sub_menus['houzez_new_html'] = array(
+	            'houzez_dashboard',
+	            esc_html__( 'New HTML', 'houzez' ),
+	            esc_html__( 'New HTML', 'houzez' ),
+	            'manage_options',
+	            'houzez_new_html',
+	            array( 'Houzez_HTML', 'render' )
+	        );*/
 
         if ( $sub_menus ) {
             foreach ( $sub_menus as $sub_menu ) {

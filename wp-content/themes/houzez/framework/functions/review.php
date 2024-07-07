@@ -223,6 +223,18 @@ if( !function_exists('houzez_submit_review') ) {
 	        ));
 	    }
 
+	    $notificationArgs = array(
+			'title' => $subject,
+			'message' => $body,
+			'type' => 'review',
+			'listing_id' => $listing_id,
+			'listing_title' => $listing_title,
+			'review_post_type' => $review_post_type,
+			'to' => $admin_email,
+		);
+		
+		do_action('houzez_send_notification', $notificationArgs);
+
 	    $activity_args = array(
             'type' => 'review',
             'review_title' => $review_title,
@@ -242,11 +254,10 @@ if( !function_exists('houzez_submit_review') ) {
 }
 
 if(!function_exists('houzez_admin_review_meta_on_save')) {
-	function houzez_admin_review_meta_on_save($review_id, $postdata) {
+	function houzez_admin_review_meta_on_save($review_id) {
 
-
-    	$review_post_type = isset($postdata['review_post_type']) ? $postdata['review_post_type'] : '';
-    	$review_stars = isset($postdata['review_stars']) ? $postdata['review_stars'] : '';
+		$review_post_type = get_post_meta($review_id, 'review_post_type', true);
+		$review_stars = get_post_meta($review_id, 'review_stars', true);
 
   		if(empty($review_post_type)) {
   			return;
@@ -254,21 +265,20 @@ if(!function_exists('houzez_admin_review_meta_on_save')) {
     	
     	$meta_key = '';
     	if($review_post_type == 'property') {
-    		$listing_id = isset($postdata['review_property_id']) ? $postdata['review_property_id'] : '';
+    		$listing_id = get_post_meta($review_id, 'review_property_id', true);
     		$meta_key = 'review_property_id';
 
     	} else if($review_post_type == 'houzez_agent') {
-    		$listing_id = isset($postdata['review_agent_id']) ? $postdata['review_agent_id'] : '';
+    		$listing_id = get_post_meta($review_id, 'review_agent_id', true);
     		$meta_key = 'review_agent_id';
 
     	} else if($review_post_type == 'houzez_agency') {
-    		$listing_id = isset($postdata['review_agency_id']) ? $postdata['review_agency_id'] : '';
+    		$listing_id = get_post_meta($review_id, 'review_agency_id', true);
     		$meta_key = 'review_agency_id';
 
     	} else if($review_post_type == 'houzez_author') {
-    		$listing_id = isset($postdata['review_author_id']) ? $postdata['review_author_id'] : '';
+    		$listing_id = get_post_meta($review_id, 'review_author_id', true);
     		$meta_key = 'review_author_id';
-
     	}
     	
     	houzez_add_listing_rating($listing_id, $meta_key, $review_stars);
@@ -453,6 +463,8 @@ if(!function_exists('houzez_add_listing_rating')) {
 		if($review_query->have_posts()) {
 			$total_review = $review_query->found_posts;
 
+			$test_total_reiews = $total_review;
+
 			while($review_query->have_posts()): $review_query->the_post();
 				$review_stars = get_post_meta(get_the_ID(), 'review_stars', true);
 				$total_stars = $total_stars + $review_stars;
@@ -460,18 +472,11 @@ if(!function_exists('houzez_add_listing_rating')) {
 			endwhile; 
 			wp_reset_postdata();
 
-			$total_review = $total_review+1;
-			$total_stars = $total_stars+$new_stars;
-
 			$rating = $total_stars/$total_review;
-
 			update_post_meta($listing_id, 'houzez_total_rating', $rating);
 			return true;
 
-		} else {
-			
-			update_post_meta($listing_id, 'houzez_total_rating', $new_stars);
-		}
+		} 
 
 		return true;
 	}
@@ -573,12 +578,14 @@ if( !function_exists('houzez_ajax_review') ) {
 
     	}
 
-		$meta_query[] = array(
-            'key' => $meta_key,
-            'value' => $listing_id,
-            'type' => 'NUMERIC',
-            'compare' => '=',
-        );
+    	if( ! empty( $meta_key ) ) {
+			$meta_query[] = array(
+	            'key' => $meta_key,
+	            'value' => $listing_id,
+	            'type' => 'NUMERIC',
+	            'compare' => '=',
+	        );
+		}
 
 		if ( $sort_by == 'a_rating' ) {
             $args['orderby'] = 'meta_value_num';
@@ -776,4 +783,24 @@ if(!function_exists('houzez_get_stars')) {
 		return $output;
 
 	}
+}
+
+/*-----------------------------------------------------------------------------------*/
+// Add custom post status Hold
+/*-----------------------------------------------------------------------------------*/
+if ( ! function_exists('houzez_custom_review_status_rejected') ) {
+    function houzez_custom_review_status_rejected() {
+
+        $args = array(
+            'label'                     => _x( 'Rejected', 'Status General Name', 'houzez' ),
+            'label_count'               => _n_noop( 'Rejected (%s)',  'Rejected (%s)', 'houzez' ),
+            'public'                    => true,
+            'show_in_admin_all_list'    => true,
+            'show_in_admin_status_list' => true,
+            'exclude_from_search'       => false,
+        );
+        register_post_status( 'review_rejected', $args );
+
+    }
+    add_action( 'init', 'houzez_custom_review_status_rejected', 1 );
 }

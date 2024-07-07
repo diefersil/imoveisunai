@@ -12,7 +12,7 @@ if( $sticky_sidebar['default_sidebar'] != 0 ) {
 }
 $blog_author_box = houzez_option('blog_author_box');
 
-$blog_layout = houzez_option('blog_pages_s_layout');
+$blog_layout = houzez_option('blog_single_layout');
 
 if( $blog_layout == 'no-sidebar' ) {
     $content_classes = 'col-lg-12 col-md-12';
@@ -106,9 +106,11 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                     endwhile; ?>
                 </div><!-- article-wrap -->
             </div><!-- bt-content-wrap -->
+            <?php if( $blog_layout != 'no-sidebar' ) { ?>
             <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
                 <?php get_sidebar(); ?>
             </div><!-- bt-sidebar-wrap -->
+            <?php } ?>
         </div><!-- row -->
     </div><!-- container -->
 </section><!-- blog-wrap -->

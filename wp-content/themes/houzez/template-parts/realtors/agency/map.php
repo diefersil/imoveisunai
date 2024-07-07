@@ -1,4 +1,5 @@
 <?php
+global $agency_address, $mapData;
 $agency_address = get_post_meta( get_the_ID(), 'fave_agency_address', true ); 
 
 if( ! empty( $agency_address ) ) {

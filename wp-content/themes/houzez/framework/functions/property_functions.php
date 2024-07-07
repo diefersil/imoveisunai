@@ -28,7 +28,13 @@ if( !function_exists('houzez_listing_expire')) {
                 }
             } elseif( $submission_type == 'membership' ) {
                 $post_author = get_post_field( 'post_author', $post->ID );
+                $agent_agency_id = houzez_get_agent_agency_id( $post_author );
+                if( $agent_agency_id ) {
+                    $post_author = $agent_agency_id;
+                }
+
                 $package_id = get_user_meta( $post_author, 'package_id', true );
+
                 if( !empty($package_id) ) {
                     $billing_time_unit = get_post_meta( $package_id, 'fave_billing_time_unit', true );
                     $billing_unit = get_post_meta( $package_id, 'fave_billing_unit', true );
@@ -42,8 +48,9 @@ if( !function_exists('houzez_listing_expire')) {
                     elseif( $billing_time_unit == 'Year')
                         $billing_time_unit = 'years';
 
-                    $publish_date = $post->post_date;
-                    echo date_i18n( get_option('date_format').' '.get_option('time_format'), strtotime( $publish_date. ' + '.$billing_unit.' '.$billing_time_unit ) );
+                    $pack_date =  get_user_meta( $post_author, 'package_activation',true );
+                    $expired_date = strtotime($pack_date. ' + '.$billing_unit.' '.$billing_time_unit);
+                    echo date_i18n( get_option('date_format').' '.get_option('time_format'),  $expired_date ); 
                 }
             }
         }
@@ -84,8 +91,15 @@ if( !function_exists('houzez_get_property_gallery') ) {
             
             if ( has_post_thumbnail() && houzez_option('featured_img_in_gallery', 0) != 1 ) {
                 $thumb_id = get_post_thumbnail_id($post);
+                $thumb_meta = wp_get_attachment_metadata($thumb_id);
                 $temp_array['image'] = get_the_post_thumbnail_url($post, $size);
                 $temp_array['alt'] = get_post_meta( $thumb_id, '_wp_attachment_image_alt', true );
+
+                if (isset($thumb_meta['sizes'][$size])) {
+                    $temp_array['width'] = $thumb_meta['sizes'][$size]['width'];
+                    $temp_array['height'] = $thumb_meta['sizes'][$size]['height'];
+                }
+
                 $images[] = $temp_array;
             }
 
@@ -94,10 +108,16 @@ if( !function_exists('houzez_get_property_gallery') ) {
             }
             foreach ( $gallery_ids as $id ) {
                 $img = wp_get_attachment_image_url($id, $size);
+                $img_meta = wp_get_attachment_metadata($id);
                 $alt_text = get_post_meta( $id, '_wp_attachment_image_alt', true );
                 if ( $img ) {
                     $temp_array['image'] = $img;
                     $temp_array['alt'] = $alt_text;
+                    
+                    if (isset($img_meta['sizes'][$size])) {
+                        $temp_array['width'] = $img_meta['sizes'][$size]['width'];
+                        $temp_array['height'] = $img_meta['sizes'][$size]['height'];
+                    }
                     $images[] = $temp_array;
                 }
             }
@@ -141,9 +161,16 @@ if( !function_exists('houzez_submit_listing') ) {
     function houzez_submit_listing($new_property) {
 
         $userID = get_current_user_id();
+        $post_author = $userID;
+        $userIdPackage = $userID;
         $listings_admin_approved = houzez_option('listings_admin_approved');
         $edit_listings_admin_approved = houzez_option('edit_listings_admin_approved');
         $enable_paid_submission = houzez_option('enable_paid_submission');
+
+        $agent_agency_id = houzez_get_agent_agency_id( $userID );
+        if( $agent_agency_id ) {
+            $userIdPackage = $agent_agency_id;
+        }
 
         // Title
         if( isset( $_POST['prop_title']) ) {
@@ -161,7 +188,11 @@ if( !function_exists('houzez_submit_listing') ) {
             $new_property['post_content'] = wp_kses_post( wpautop( wptexturize( $_POST['prop_des'] ) ) );
         }
 
-        $new_property['post_author'] = $userID;
+        if( isset($_POST['property_author']) && ! empty( $_POST['property_author'] ) ) {
+            $post_author = $_POST['property_author'];
+        }
+
+        $new_property['post_author'] = $post_author;
 
         $submission_action = $_POST['action'];
         $prop_id = 0;
@@ -195,7 +226,7 @@ if( !function_exists('houzez_submit_listing') ) {
             if( $prop_id > 0 ) {
                 $submitted_successfully = true;
                 if( $enable_paid_submission == 'membership'){ // update package status
-                    houzez_update_package_listings( $userID );
+                    houzez_update_package_listings( $userIdPackage );
                 }
             }
 
@@ -205,7 +236,7 @@ if( !function_exists('houzez_submit_listing') ) {
 
             if( get_post_status( intval( $_POST['prop_id'] ) ) == 'draft' ) {
                 if( $enable_paid_submission == 'membership') {
-                    houzez_update_package_listings($userID);
+                    houzez_update_package_listings($userIdPackage);
                 }
                 if( $listings_admin_approved != 'yes' && ( $enable_paid_submission == 'no' || $enable_paid_submission == 'free_paid_listing' || $enable_paid_submission == 'membership' ) ) {
                     $new_property['post_status'] = 'publish';
@@ -216,7 +247,7 @@ if( !function_exists('houzez_submit_listing') ) {
                     $new_property['post_status'] = 'pending';
             }
 
-            if( ! houzez_user_has_membership($userID) && $enable_paid_submission == 'membership' ) {
+            if( ! houzez_user_has_membership($userIdPackage) && $enable_paid_submission == 'membership' ) {
                 $new_property['post_status'] = 'draft';
 
             }
@@ -275,6 +306,24 @@ if( !function_exists('houzez_submit_listing') ) {
                 if( isset( $_POST['prop_label'] ) ) {
                     update_post_meta( $prop_id, 'fave_property_price_postfix', sanitize_text_field( $_POST['prop_label']) );
                 }
+            }
+
+
+            // Show Price Placeholder
+            update_post_meta($prop_id, 'fave_show_price_placeholder', 0);
+
+            if (isset($_POST['show_price_placeholder'])) {
+                $show_placeholder = $_POST['show_price_placeholder'];
+                if ($show_placeholder == 'on') {
+                    $show_placeholder = 1;
+                }
+
+                update_post_meta($prop_id, 'fave_show_price_placeholder', sanitize_text_field($show_placeholder));
+            }
+
+            //price placeholder
+            if( isset( $_POST['prop_price_placeholder'] ) ) {
+                update_post_meta( $prop_id, 'fave_property_price_placeholder', sanitize_text_field( $_POST['prop_price_placeholder']) );
             }
 
             //price prefix
@@ -375,7 +424,9 @@ if( !function_exists('houzez_submit_listing') ) {
                 $property_video_image_id = get_post_meta( $prop_id, 'fave_video_image', true );
                 if ( ! empty ( $property_video_image_id ) ) {
                     $property_video_image_src = wp_get_attachment_image_src( $property_video_image_id, 'houzez-property-detail-gallery' );
-                    $property_video_image = $property_video_image_src[0];
+                    if( $property_video_image_src ) {
+                        $property_video_image = $property_video_image_src[0];
+                    }
                 }
             }
 
@@ -395,6 +446,12 @@ if( !function_exists('houzez_submit_listing') ) {
                     foreach ($_POST['propperty_image_ids'] as $prop_img_id ) {
                         $property_image_ids[] = intval( $prop_img_id );
                         add_post_meta($prop_id, 'fave_property_images', $prop_img_id);
+
+                        // Update the post_parent field for each attachment
+                        wp_update_post(array(
+                            'ID' => $prop_img_id,
+                            'post_parent' => $prop_id
+                        ));
                     }
 
                     // featured image
@@ -633,8 +690,8 @@ if( !function_exists('houzez_submit_listing') ) {
 
                 if( $prop_agent_display_option == 'agent_info' ) {
 
-                    $prop_agent = $_POST['fave_agents'];
-
+                    $prop_agent = isset( $_POST['fave_agents'] ) ? $_POST['fave_agents'] : '';
+ 
                     if(is_array($prop_agent)) {
                         foreach ($prop_agent as $agent) {
                             add_post_meta($prop_id, 'fave_agents', intval($agent) );
@@ -651,7 +708,7 @@ if( !function_exists('houzez_submit_listing') ) {
 
                 } elseif( $prop_agent_display_option == 'agency_info' ) {
 
-                    $user_agency_ids = $_POST['fave_property_agency'];
+                    $user_agency_ids = isset($_POST['fave_property_agency']) ? $_POST['fave_property_agency'] : '';
 
                     if (houzez_is_agency()) {
                         $user_agency_id = get_user_meta( $userID, 'fave_author_agency_id', true );
@@ -1304,7 +1361,7 @@ if ( ! function_exists('houzez_custom_post_status_on_hold') ) {
 if ( ! function_exists('houzez_custom_post_status_sold') ) {
     function houzez_custom_post_status_sold() {
 
-        if( ! houzez_option('enable_mark_as_sold', 0) ) {
+        if( ! fave_option('enable_mark_as_sold', 0) ) {
             return;
         }
         $args = array(
@@ -1472,6 +1529,21 @@ if( !function_exists('houzez_resend_for_approval_perlisting') ):
 endif; // end
 
 /*-----------------------------------------------------------------------------------*/
+// Houzez sold status 
+/*-----------------------------------------------------------------------------------*/
+
+add_filter('houzez_sold_status_filter', 'houzez_sold_status_filter_callback');
+if( !function_exists('houzez_sold_status_filter_callback') ) {
+    function houzez_sold_status_filter_callback( $query_args ) {
+        if( houzez_option('show_sold_listings', 1) ) {
+            $query_args['post_status'] = array('publish', 'houzez_sold');
+        }
+
+        return $query_args;
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
 // Houzez listings template filter for version 2.0 and above
 /*-----------------------------------------------------------------------------------*/
 add_filter('houzez20_property_filter', 'houzez20_property_filter_callback');
@@ -1492,6 +1564,10 @@ if( !function_exists('houzez20_property_filter_callback') ) {
 
         $property_query_args['paged'] = $paged;
 
+        if( houzez_option('show_sold_listings', 1) ) {
+            $property_query_args['post_status'] = array('publish', 'houzez_sold');
+        }
+
         $fave_prop_no = get_post_meta( $page_id, 'fave_prop_no', true );
         $fave_listings_tabs = get_post_meta( $page_id, 'fave_listings_tabs', true );
 
@@ -1508,6 +1584,15 @@ if( !function_exists('houzez20_property_filter_callback') ) {
                 'taxonomy' => 'property_status',
                 'field' => 'slug',
                 'terms' => esc_attr($_GET['tab'])
+            );
+        }
+
+        $countries = get_post_meta( $page_id, 'fave_countries', false );
+        if ( ! empty( $countries ) && is_array( $countries ) ) {
+            $tax_query[] = array(
+                'taxonomy' => 'property_country',
+                'field' => 'slug',
+                'terms' => $countries
             );
         }
 
@@ -1649,6 +1734,11 @@ if( !function_exists('houzez20_property_filter_callback') ) {
                 'value'   => $agents,
                 'compare' => 'IN',
             );
+            $meta_query[] = array(
+                'key'     => 'fave_agent_display_option',
+                'value'   => 'agent_info',
+                'compare' => '=',
+            );
         }
 
         $agencies = array_filter( get_post_meta( $page_id, 'fave_properties_by_agency', false ) );
@@ -1657,6 +1747,11 @@ if( !function_exists('houzez20_property_filter_callback') ) {
                 'key'     => 'fave_property_agency',
                 'value'   => $agencies,
                 'compare' => 'IN',
+            );
+            $meta_query[] = array(
+                'key'     => 'fave_agent_display_option',
+                'value'   => 'agency_info',
+                'compare' => '=',
             );
         }
 
@@ -2615,6 +2710,10 @@ if( !function_exists( 'houzez_prop_sort' ) ){
             $query_args['meta_key'] = 'fave_featured';
             $query_args['meta_value'] = '1';
             $query_args['orderby'] = 'meta_value date';
+        } else if ( $sort_by == 'featured_random' ) {
+            $query_args['meta_key'] = 'fave_featured';
+            $query_args['meta_value'] = '1';
+            $query_args['orderby'] = 'meta_value DESC rand';
         } else if ( $sort_by == 'a_date' ) {
             $query_args['orderby'] = 'date';
             $query_args['order'] = 'ASC';
@@ -2624,11 +2723,15 @@ if( !function_exists( 'houzez_prop_sort' ) ){
         } else if ( $sort_by == 'featured_first' ) {
             $query_args['orderby'] = 'meta_value date';
             $query_args['meta_key'] = 'fave_featured';
+        } else if ( $sort_by == 'featured_first_random' ) {
+            $query_args['meta_key'] = 'fave_featured';
+            $query_args['orderby'] = 'meta_value DESC rand'; 
         } else if ( $sort_by == 'featured_top' ) {
             $query_args['orderby'] = 'meta_value date';
             $query_args['meta_key'] = 'fave_featured';
         } else if ( $sort_by == 'random' ) {
             $query_args['orderby'] = 'rand';
+            $query_args['order'] = 'DESC';
         }
 
         return apply_filters( 'houzez_sort_properties', $query_args );
@@ -2768,6 +2871,17 @@ if( !function_exists( 'houzez_property_img_upload' ) ) {
             $attach_data    =   wp_generate_attachment_metadata( $attach_id, $uploaded_image['file'] );
             wp_update_attachment_metadata( $attach_id, $attach_data );
 
+            $user_id = get_current_user_id();
+            $watermark_image_url = get_user_meta($user_id, 'fave_watermark_image', true);
+            
+            // Only proceed if a watermark image is set
+            /*if (!empty($watermark_image_url)) {
+                // Apply watermark
+                $source_image_path = $uploaded_image['url'];//$uploaded_image['file'];
+                $watermark_image_path = houzez_get_local_path($watermark_image_url); // Convert URL to local path
+                houzez_apply_watermark($source_image_path, $watermark_image_path);
+            }*/
+
             $thumbnail_url = wp_get_attachment_image_src( $attach_id, 'houzez-item-image-1' );
 
             $feat_image_url = wp_get_attachment_url( $attach_id );
@@ -2790,6 +2904,96 @@ if( !function_exists( 'houzez_property_img_upload' ) ) {
 
     }
 }
+
+// Utility function to convert URL to local file path
+function houzez_get_local_path($url) {
+    $parsed_url = parse_url($url);
+    $path = $_SERVER['DOCUMENT_ROOT'] . $parsed_url['path'];
+    return $path;
+}
+
+function houzez_apply_watermark($image_path, $watermark_path, $position = 'bottom-right', $size_percentage = 10) {
+    // Load the image and watermark
+    list($image_width, $image_height) = getimagesize($image_path);
+    $image = imagecreatefromstring(file_get_contents($image_path));
+    $watermark = imagecreatefrompng($watermark_path);
+
+    // Calculate watermark size based on user preference
+    $watermark_width = imagesx($watermark);
+    $watermark_height = imagesy($watermark);
+    $scale = ($image_width * ($size_percentage / 100.0)) / $watermark_width;
+    $new_watermark_width = $watermark_width * $scale;
+    $new_watermark_height = $watermark_height * $scale;
+
+    // Create a new watermark with the scaled size
+    $scaled_watermark = imagecreatetruecolor($new_watermark_width, $new_watermark_height);
+    imagealphablending($scaled_watermark, false);
+    imagesavealpha($scaled_watermark, true);
+    imagecopyresampled($scaled_watermark, $watermark, 0, 0, 0, 0, $new_watermark_width, $new_watermark_height, $watermark_width, $watermark_height);
+
+    // Calculate the position of the watermark
+    switch ($position) {
+        case 'top-left':
+            $dest_x = 10;
+            $dest_y = 10;
+            break;
+        case 'top-right':
+            $dest_x = $image_width - $new_watermark_width - 10;
+            $dest_y = 10;
+            break;
+        case 'bottom-left':
+            $dest_x = 10;
+            $dest_y = $image_height - $new_watermark_height - 10;
+            break;
+        case 'bottom-right':
+            $dest_x = $image_width - $new_watermark_width - 10;
+            $dest_y = $image_height - $new_watermark_height - 10;
+            break;
+        default:
+            // Default to bottom-right
+            $dest_x = $image_width - $new_watermark_width - 10;
+            $dest_y = $image_height - $new_watermark_height - 10;
+            break;
+    }
+
+    // Combine the images
+    imagealphablending($image, true);
+    imagesavealpha($image, true);
+    imagecopy($image, $scaled_watermark, $dest_x, $dest_y, 0, 0, $new_watermark_width, $new_watermark_height);
+
+    // Get WordPress upload directory info
+    $upload_dir = wp_upload_dir();
+    $local_path = str_replace(home_url('/wp-content/uploads/'), $upload_dir['basedir'] . '/', $image_path);
+
+    // Ensure the directory exists and is writable
+    if (!file_exists(dirname($local_path))) {
+        mkdir(dirname($local_path), 0777, true);
+    }
+
+    // Save the image back to the filesystem
+    switch (strtolower(pathinfo($image_path, PATHINFO_EXTENSION))) {
+        case 'jpeg':
+        case 'jpg':
+            //imagejpeg($image, $image_path);
+            imagejpeg($image, $local_path); 
+            break;
+        case 'png':
+            imagepng($image, $image_path);
+            break;
+        case 'gif':
+            imagegif($image, $image_path);
+            break;
+        default:
+            // Unsupported image type
+            break;
+    }
+
+    // Clean up
+    imagedestroy($image);
+    imagedestroy($watermark);
+    imagedestroy($scaled_watermark);
+}
+
 
 
 /*-----------------------------------------------------------------------------------*/
@@ -2827,15 +3031,13 @@ if( !function_exists( 'houzez_property_attachment_upload' ) ) {
             $attach_data    =   wp_generate_attachment_metadata( $attach_id, $uploaded_image['file'] );
             wp_update_attachment_metadata( $attach_id, $attach_data );
 
-            $thumbnail_url = wp_get_attachment_image_src( $attach_id, 'full' );
             $attachment_title = get_the_title($attach_id);
-            $fullimage_url = wp_get_attachment_url( $attach_id );
+            $attachment_url = wp_get_attachment_url( $attach_id );
 
             $ajax_response = array(
                 'success'   => true,
-                'url' => $thumbnail_url[0],
+                'url' => $attachment_url,
                 'attachment_id'    => $attach_id,
-                'full_image'    => $fullimage_url,
                 'attach_title'    => $attachment_title,
             );
 
@@ -3026,7 +3228,7 @@ if( !function_exists('houzez_create_print')) {
                         <div class="print-banner-wrap">
                             <?php if($print_gr_code != 0) { ?>
                             <div class="qr-code">
-                                <img class="img-fluid" src="https://chart.googleapis.com/chart?chs=105x104&cht=qr&chl=<?php echo esc_url( get_permalink($property_id) ); ?>&choe=UTF-8" title="<?php echo esc_attr(get_the_title()); ?>" />
+                                <img class="img-fluid" src="https://qrcode.tec-it.com/API/QRCode?size=small&dpi=120&data=<?php echo esc_url( get_permalink($property_id) ); ?>" title="<?php echo esc_attr(get_the_title()); ?>" />
                             </div>
                             <?php } ?>
                             <img class="img-fluid" src="<?php echo esc_url( $full_img ); ?>" alt="<?php echo esc_attr(get_the_title()); ?>">
@@ -3037,7 +3239,7 @@ if( !function_exists('houzez_create_print')) {
                         if( $print_agent != 0 && !empty($agent_array)) { ?>
                         <div class="print-agent-info-wrap">
                             
-                            <h2 class="print-title"><?php echo esc_html__('Contact Information', 'houzez'); ?></h2>
+                            <h2 class="print-title"><?php echo houzez_option('sps_contact_info', 'Contact Information'); ?></h2>
                             
                             <?php 
                             if( isset( $agent_array['agent_info'] ) ) {
@@ -3088,7 +3290,7 @@ if( !function_exists('houzez_create_print')) {
                         if( $print_description != 0 ) { ?>
 
                             <div class="print-section">
-                                <h2 class="print-title"><?php echo esc_html__('Description', 'houzez'); ?></h2>
+                                <h2 class="print-title"><?php echo houzez_option('sps_description', 'Description'); ?></h2>
                                 <?php the_content(); ?>       
                             </div>
 
@@ -3098,7 +3300,7 @@ if( !function_exists('houzez_create_print')) {
                         if( $print_details != 0 ) { ?>
 
                             <div class="print-section">
-                                <h2 class="print-title"><?php echo esc_html__('Detail', 'houzez'); ?></h2>
+                                <h2 class="print-title"><?php echo houzez_option('sps_details', 'Details'); ?></h2>
                                 <div class="block-content-wrap">
                                     <?php get_template_part('property-details/partials/details'); ?> 
                                 </div><!-- block-content-wrap -->
@@ -3110,7 +3312,7 @@ if( !function_exists('houzez_create_print')) {
                         if( $print_features != 0 && !empty($property_features)) { ?>
 
                             <div class="print-section">
-                                <h2 class="print-title"><?php echo esc_html__('Features', 'houzez'); ?></h2>
+                                <h2 class="print-title"><?php echo houzez_option('sps_features', 'Features'); ?></h2>
                                 <div class="block-content-wrap">
                                     <?php get_template_part('property-details/partials/features'); ?>  
                                 </div><!-- block-content-wrap -->
@@ -3121,7 +3323,7 @@ if( !function_exists('houzez_create_print')) {
                         <?php
                         if( houzez_option('print_energy_class') != 0 && !empty($energy_class) ) { ?>
                             <div class="print-section">
-                                <h2 class="print-title"><?php echo esc_html__('Energy Efficiency', 'houzez'); ?></h2>
+                                <h2 class="print-title"><?php echo houzez_option('sps_energy_class', 'Energy Class'); ?></h2>
                                 <div class="block-content-wrap">
                                     <?php get_template_part('property-details/partials/energy-class'); ?> 
                                 </div><!-- block-content-wrap -->
@@ -3132,7 +3334,7 @@ if( !function_exists('houzez_create_print')) {
                         if( !empty( $floor_plans ) && $print_floorplans != 0 ) { ?>
 
                             <div class="print-section">
-                                <h2 class="print-title"><?php echo esc_html__('Floor Plans', 'houzez'); ?></h2>
+                                <h2 class="print-title"><?php echo houzez_option('sps_floor_plans', 'Floor Plans'); ?></h2>
                                 
                                 <?php 
                                 foreach( $floor_plans as $plan ):
@@ -3505,16 +3707,18 @@ if( !function_exists('houzez_invoices_ajax_search') ){
             $date_query[] = $temp_array;
         }
 
-        $meta_query[] = array(
+        if ( ! houzez_is_admin() && ! houzez_is_editor() || (isset($_GET['mine']) && $_GET['mine']) ) { 
+            $meta_query[] = array(
                 'key' => 'HOUZEZ_invoice_buyer',
                 'value' => get_current_user_id(),
                 'compare' => '='
             );
+        }
 
 
         $invoices_args = array(
             'post_type' => 'houzez_invoice',
-            'posts_per_page' => '-1',
+            'posts_per_page' => 10,
             'date_query' => $date_query,
         );
 
@@ -3960,7 +4164,7 @@ if ( !function_exists( 'houzez_get_auto_complete_search' ) ) {
                 $new_data = array();
 
                 foreach ( $data as $term ) {
-                    
+        
                     $term_language = apply_filters( 'wpml_element_language_code', null, array('element_id' => $term->term_id, 'element_type' => 'category'));
 
                     if ($term_language !== $current_language) {
@@ -3968,8 +4172,20 @@ if ( !function_exists( 'houzez_get_auto_complete_search' ) ) {
                     }
 
                     $new_data [] = $term;
+                }
+
+                // Sort the $new_data array based on the taxonomy
+                usort($new_data, function($a, $b) {
+                    $order = ['property_state' => 1, 'property_city' => 2, 'property_area' => 3];
+                    return $order[$a->taxonomy] - $order[$b->taxonomy];
+                });
+
+                // Display the sorted terms
+                foreach ($new_data as $term) {
+                    
 
                     $taxonomy_img_id = get_term_meta( $term->term_id, 'fave_taxonomy_img', true );
+
                     $term_type = explode( 'property_', $term->taxonomy );
                     $term_type = $term_type[1];
                     $prop_count = $term->count;
@@ -3980,13 +4196,13 @@ if ( !function_exists( 'houzez_get_auto_complete_search' ) ) {
                         $term_img = wp_get_attachment_image( $taxonomy_img_id, array( 40, 40 ), array( "class" => "img-fluid rounded" ) );
                    }
 
-                    if ( $term_type == 'city' ) {
-                        $term_type = $houzez_local['auto_city'];
-                    } elseif ( $term_type == 'area' ) {
-                        $term_type = $houzez_local['auto_area'];
-                    } else {
+                   if( $term_type == 'state' ) {
                         $term_type = $houzez_local['auto_state'];
-                    }
+                   } else if( $term_type == 'city' ) {
+                        $term_type = $houzez_local['auto_city'];
+                   } else if( $term_type == 'area' ) {
+                        $term_type = $houzez_local['auto_area'];
+                   }
 
                     ?>
                     <li class="list-group-item" data-text="<?php echo $term->name; ?>">
@@ -4215,7 +4431,7 @@ if ( !function_exists( 'houzez_get_agent_info_bottom' ) ) {
                                 if( !empty( $args[ 'twitter' ] ) ) :
                                 $output .= '<span>';
                                     $output .= '<a class="btn-twitter" target="_blank" href="'.esc_url($args['twitter']).'">';
-                                        $output .= '<i class="houzez-icon icon-social-media-twitter mr-2"></i>';
+                                        $output .= '<i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i>';
                                     $output .= '</a>';
                                 $output .= '</span>';
                                 endif;
@@ -4321,7 +4537,7 @@ if ( !function_exists( 'houzez_get_agent_info_bottom_v2' ) ) {
                     <?php } ?>
 
                     <?php if( !empty( $args['twitter'] ) ) { ?>
-                        <span><a class="btn-twitter" target="_blank" href="<?php echo esc_url( $args['twitter'] ); ?>"><i class="houzez-icon icon-social-media-twitter mr-2"></i></a></span>
+                        <span><a class="btn-twitter" target="_blank" href="<?php echo esc_url( $args['twitter'] ); ?>"><i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i></a></span>
                     <?php } ?>
 
                     <?php if( !empty( $args['linkedin'] ) ) { ?>
@@ -4426,7 +4642,7 @@ if(!function_exists('houzez20_property_contact_form')) {
             )
         );
         $listing_agent = $prop_agent = $prop_agent_phone = $prop_agent_mobile = $picture = $agent_id = '';
-        $prop_agent_num = $agent_num_call = $prop_agent_email = $prop_agent_permalink = $linkedin = '';
+        $prop_agent_num = $agent_num_call = $prop_agent_email = $prop_agent_permalink = $linkedin = $prop_agent_whatsapp = $agent_telegram = $agent_lineapp = '';
         $return_array = array();
         $listing_agent_info = array();
 
@@ -4437,6 +4653,7 @@ if(!function_exists('houzez20_property_contact_form')) {
             if( $agent_display == 'agent_info' ) {
 
                 $agents_ids = houzez_get_listing_data('agents', false);
+                $prop_agent_photo_url = '';
 
                 $agents_ids = array_filter( $agents_ids, function($hz){
                     return ( $hz > 0 );
@@ -4457,13 +4674,18 @@ if(!function_exists('houzez20_property_contact_form')) {
                             $prop_agent_phone = get_post_meta( $agent_id, 'fave_agent_office_num', true );
                             $prop_agent_mobile = get_post_meta( $agent_id, 'fave_agent_mobile', true );
                             $prop_agent_whatsapp = get_post_meta( $agent_id, 'fave_agent_whatsapp', true );
+                            $agent_telegram = get_post_meta( $agent_id, 'fave_agent_telegram', true );
+                            $agent_lineapp = get_post_meta( $agent_id, 'fave_agent_line_id', true );
                             $prop_agent_email = get_post_meta( $agent_id, 'fave_agent_email', true );
                             $linkedin = get_post_meta( $agent_id, 'fave_agent_linkedin', true );
                             $agent_num_call = str_replace(array('(',')',' ','-'),'', $prop_agent_mobile);
                             $prop_agent = get_the_title( $agent_id );
                             $thumb_id = get_post_thumbnail_id( $agent_id );
-                            $thumb_url_array = wp_get_attachment_image_src( $thumb_id, array(150,150), true );
-                            $prop_agent_photo_url = $thumb_url_array[0];
+                            if($thumb_id) {
+                                $thumb_url_array = wp_get_attachment_image_src( $thumb_id, array(150,150), true );
+                                $prop_agent_photo_url = $thumb_url_array[0];
+                            }
+                            
                             $prop_agent_permalink = get_post_permalink( $agent_id );
 
                             $agent_args = array();
@@ -4490,10 +4712,20 @@ if(!function_exists('houzez20_property_contact_form')) {
                             $agent_args[ 'googleplus' ] = get_post_meta( $agent_id, 'fave_agent_googleplus', true );
                             $agent_args[ 'youtube' ] = get_post_meta( $agent_id, 'fave_agent_youtube', true );
                             $agent_args[ 'instagram' ] = get_post_meta( $agent_id, 'fave_agent_instagram', true );
+                            $agent_args[ 'telegram' ] = $agent_telegram;
+                            $agent_args[ 'lineapp' ] = $agent_lineapp;
 
                             if( empty( $prop_agent_photo_url )) {
-                                $agent_args[ 'picture' ] = HOUZEZ_IMAGE. 'profile-avatar.png';
-                                $picture = HOUZEZ_IMAGE. 'profile-avatar.png';
+
+                                $agent_placeholder_url = houzez_option( 'houzez_agent_placeholder', false, 'url' );
+                                if( ! empty($agent_placeholder_url) ) {
+                                    $agent_args[ 'picture' ] = $agent_placeholder_url;
+                                    $picture = $agent_placeholder_url;
+                                } else {
+                                    $agent_args[ 'picture' ] = HOUZEZ_IMAGE. 'profile-avatar.png';
+                                    $picture = HOUZEZ_IMAGE. 'profile-avatar.png';
+                                }
+
                             } else {
                                 $agent_args[ 'picture' ] = $prop_agent_photo_url;
                                 $picture = $prop_agent_photo_url;
@@ -4518,18 +4750,27 @@ if(!function_exists('houzez20_property_contact_form')) {
                 }
 
             } elseif( $agent_display == 'agency_info' ) {
+
+                $prop_agent_photo_url = '';
                 $agent_id = get_post_meta( get_the_ID(), 'fave_property_agency', true );
 
                 $prop_agent_phone = get_post_meta( $agent_id, 'fave_agency_phone', true );
                 $prop_agent_mobile = get_post_meta( $agent_id, 'fave_agency_mobile', true );
                 $prop_agent_whatsapp = get_post_meta( $agent_id, 'fave_agency_whatsapp', true );
+
+                $agent_telegram = get_post_meta( $agent_id, 'fave_agency_telegram', true );
+                $agent_lineapp = get_post_meta( $agent_id, 'fave_agency_line_id', true );
+
                 $prop_agent_email = get_post_meta( $agent_id, 'fave_agency_email', true );
                 $linkedin = get_post_meta( $agent_id, 'fave_agency_linkedin', true );
                 $agent_num_call = str_replace(array('(',')',' ','-'),'', $prop_agent_mobile);
                 $prop_agent = get_the_title( $agent_id );
                 $thumb_id = get_post_thumbnail_id( $agent_id );
-                $thumb_url_array = wp_get_attachment_image_src( $thumb_id, array(150,150), true );
-                $prop_agent_photo_url = $thumb_url_array[0];
+
+                if($thumb_id) {
+                    $thumb_url_array = wp_get_attachment_image_src( $thumb_id, array(150,150), true );
+                    $prop_agent_photo_url = $thumb_url_array[0];
+                }
                 $prop_agent_permalink = get_post_permalink( $agent_id );
 
                 $agent_args = array();
@@ -4548,8 +4789,8 @@ if(!function_exists('houzez20_property_contact_form')) {
 
                 $agent_args[ 'agent_position' ] = '';
                 $agent_args[ 'agent_company' ] = '';
-                $agent_args[ 'agent_service_area' ] = '';
-                $agent_args[ 'agent_specialties' ] = '';
+                $agent_args[ 'agent_service_area' ] = get_post_meta( $agent_id, 'fave_agency_service_area', true );
+                $agent_args[ 'agent_specialties' ] = get_post_meta( $agent_id, 'fave_agency_specialties', true );
                 $agent_args[ 'agent_tax_no' ] = '';
 
                 $agent_args[ 'facebook' ] = get_post_meta( $agent_id, 'fave_agency_facebook', true );
@@ -4558,14 +4799,25 @@ if(!function_exists('houzez20_property_contact_form')) {
                 $agent_args[ 'googleplus' ] = get_post_meta( $agent_id, 'fave_agency_googleplus', true );
                 $agent_args[ 'youtube' ] = get_post_meta( $agent_id, 'fave_agency_youtube', true );
                 $agent_args[ 'instagram' ] = get_post_meta( $agent_id, 'fave_agency_instagram', true );
+                $agent_args[ 'telegram' ] = $agent_telegram;
+                $agent_args[ 'lineapp' ] = $agent_lineapp;
 
                 if( empty( $prop_agent_photo_url )) {
-                    $agent_args[ 'picture' ] = HOUZEZ_IMAGE. 'profile-avatar.png';
-                    $picture = HOUZEZ_IMAGE. 'profile-avatar.png';
+                    
+                    $agency_placeholder_url = houzez_option( 'houzez_agency_placeholder', false, 'url' );
+                    if( ! empty($agency_placeholder_url) ) {
+                        $agent_args[ 'picture' ] = $agency_placeholder_url;
+                        $picture = $agency_placeholder_url;
+                    } else {
+                        $agent_args[ 'picture' ] = HOUZEZ_IMAGE. 'profile-avatar.png';
+                        $picture = HOUZEZ_IMAGE. 'profile-avatar.png';
+                    }
+
                 } else {
                     $agent_args[ 'picture' ] = $prop_agent_photo_url;
                     $picture = $prop_agent_photo_url;
                 }
+
                 $listing_agent_info[] = $agent_args;
                 if($is_top) {
                     $listing_agent .= houzez_get_agent_info_top( $agent_args, 'agent_form' );
@@ -4587,6 +4839,10 @@ if(!function_exists('houzez20_property_contact_form')) {
                 $prop_agent_whatsapp = get_the_author_meta( 'fave_author_whatsapp' );
                 $agent_num_call = str_replace(array('(',')',' ','-'),'', $prop_agent_num);
                 $prop_agent_photo_url = get_the_author_meta( 'fave_author_custom_picture' );
+
+                $agent_telegram = get_the_author_meta( 'fave_author_telegram' );
+                $agent_lineapp = get_the_author_meta( 'fave_author_line_id' );
+
                 $prop_agent_email = get_the_author_meta( 'email' );
                 $linkedin = get_the_author_meta( 'fave_author_linkedin' );
 
@@ -4618,6 +4874,8 @@ if(!function_exists('houzez20_property_contact_form')) {
                 $agent_args[ 'googleplus' ] = get_the_author_meta( 'fave_author_googleplus' );
                 $agent_args[ 'youtube' ] = get_the_author_meta( 'fave_author_youtube' );
                 $agent_args[ 'instagram' ] = get_the_author_meta( 'fave_author_instagram' );
+                $agent_args[ 'telegram' ] = $agent_telegram;
+                $agent_args[ 'lineapp' ] = $agent_lineapp;
 
                 if( empty( $prop_agent_photo_url )) {
                     $agent_args[ 'picture' ] = HOUZEZ_IMAGE. 'profile-avatar.png';
@@ -4652,6 +4910,8 @@ if(!function_exists('houzez20_property_contact_form')) {
 
             $return_array['agent_whatsapp'] = $prop_agent_whatsapp;
             $return_array['agent_whatsapp_call'] = str_replace(array('(',')',' ','-'),'', $prop_agent_whatsapp);
+            $return_array['agent_telegram'] = $agent_telegram;
+            $return_array['agent_lineapp'] = $agent_lineapp;
             $return_array['picture'] = $picture;
             $return_array['link'] = $prop_agent_permalink;
             $return_array['agent_type'] = $agent_display;
@@ -4877,13 +5137,21 @@ if ( !function_exists( 'houzez_create_invoice_print' ) ) {
         print  '<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script><script>$(window).load(function(){ print(); });</script>';
         print  '<body class="print-page">';
 
-        global $current_user;
-        wp_get_current_user();
-        $userID         = $current_user->ID;
-        $user_login     = $current_user->user_login;
-        $user_email     = $current_user->user_email;
-        $first_name     = $current_user->first_name;
-        $last_name     = $current_user->last_name;
+        // Get user ID from the invoice post meta or similar
+        $user_id_from_invoice = get_post_meta($invoice_id, 'HOUZEZ_invoice_buyer', true);
+
+        // Get user info by user ID
+        $user_info = get_userdata($user_id_from_invoice);
+
+        // Check if user exists
+        if ($user_info) {
+            $userID = $user_info->ID;
+            $user_login = $user_info->user_login;
+            $user_email = $user_info->user_email;
+            $first_name = $user_info->first_name;
+            $last_name = $user_info->last_name;
+        } 
+
         $user_address = get_user_meta( $userID, 'fave_author_address', true);
         if( !empty($first_name) && !empty($last_name) ) {
             $fullname = $first_name.' '.$last_name;
@@ -5040,13 +5308,24 @@ if ( !function_exists( 'houzez_create_invoice_print' ) ) {
 /* --------------------------------------------------------------------------
 * Property delete ajax
 * --------------------------------------------------------------------------- */
-add_action( 'wp_ajax_nopriv_houzez_delete_property', 'houzez_delete_property' );
 add_action( 'wp_ajax_houzez_delete_property', 'houzez_delete_property' );
 
 if ( !function_exists( 'houzez_delete_property' ) ) {
 
-    function houzez_delete_property()
-    {
+    function houzez_delete_property() {
+        $userID = get_current_user_id();
+
+        $packageUserId = $userID;
+        $agent_agency_id = houzez_get_agent_agency_id( $userID );
+        if( $agent_agency_id ) {
+            $packageUserId = $agent_agency_id;
+        }
+
+        $agencyAgentsArray = array();
+        $agencyAgents = houzez_get_agency_agents( $userID );
+        if( $agencyAgents ) {
+            $agencyAgentsArray = $agencyAgents;
+        }
 
         $dashboard_listings = houzez_get_template_link_2('template/user_dashboard_properties.php');
         $dashboard_listings = add_query_arg( 'deleted', 1, $dashboard_listings );
@@ -5067,17 +5346,13 @@ if ( !function_exists( 'houzez_delete_property' ) ) {
         $propID = $_REQUEST['prop_id'];
         $post_author = get_post_field( 'post_author', $propID );
 
-        global $current_user;
-        wp_get_current_user();
-        $userID      =   $current_user->ID;
-
-        if ( $post_author == $userID ) {
+        if ( $post_author == $userID || houzez_is_admin() || houzez_is_editor() || in_array($post_author, $agencyAgentsArray) ) {
 
             if( get_post_status($propID) != 'draft' ) {
                 houzez_delete_property_attachments_frontend($propID);
             }
             wp_delete_post( $propID );
-            houzez_plusone_package_listings($userID);
+            houzez_plusone_package_listings($packageUserId);
             $ajax_response = array( 'success' => true , 'redirect' => $dashboard_listings, 'mesg' => esc_html__( 'Property Deleted', 'houzez' ) );
             echo json_encode( $ajax_response );
             die;
@@ -5207,8 +5482,16 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
             $wp_query_args['orderby'] = 'meta_value';
             $wp_query_args['meta_key'] = 'fave_featured';
             $wp_query_args['order'] = 'DESC';
+        } else if ( $sort_by == 'featured_first_random' ) {
+            $wp_query_args['meta_key'] = 'fave_featured';
+            $wp_query_args['orderby'] = 'meta_value DESC rand'; 
+        } else if ( $sort_by == 'featured_random' ) {
+            $wp_query_args['meta_key'] = 'fave_featured';
+            $wp_query_args['meta_value'] = '1';
+            $wp_query_args['orderby'] = 'meta_value DESC rand';
         } else if ( $sort_by == 'random' ) {
             $wp_query_args['orderby'] = 'rand';
+            $wp_query_args['order'] = 'DESC';
         }
 
         if (!empty($featured_prop)) {
@@ -6051,32 +6334,36 @@ if( !function_exists('houzez_listing_model')) {
     }
 }
 
-if( ! function_exists('houzez_property_images_for_photoswipe') ) {
+if( !function_exists('houzez_property_images_for_photoswipe') ) {
     function houzez_property_images_for_photoswipe($with_featured = false) {
         global $post;
         $size = 'full';
-        $properties_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
+        $properties_images = rwmb_meta('fave_property_images', 'type=plupload_image&size=' . $size, $post->ID);
         $featured_image = houzez_get_image_url('full');
         
         $items = array();
-        $i = 0;
 
-        if( !empty($properties_images) && count($properties_images) ) {
+        if ($with_featured && !empty($featured_image)) {
+            $items[$featured_image[0]] = [
+                'src' => $featured_image[0],
+                'w'   => $featured_image[1],
+                'h'   => $featured_image[2]
+            ];
+        }
 
-            if( $with_featured ) {
-                $items[$i]['src'] = $featured_image[0];
-                $items[$i]['w'] = $featured_image[1];
-                $items[$i]['h'] = $featured_image[2];
-            }
-
-            foreach( $properties_images as $image_meta ) { $i++;
-                $items[$i]['src'] = $image_meta['url'];
-                $items[$i]['w'] = $image_meta['width'];
-                $items[$i]['h'] = $image_meta['height'];
+        if (!empty($properties_images)) {
+            foreach ($properties_images as $image_meta) {
+                if (!array_key_exists($image_meta['url'], $items)) { // Check for duplicate
+                    $items[$image_meta['url']] = [
+                        'src' => $image_meta['url'],
+                        'w'   => $image_meta['width'],
+                        'h'   => $image_meta['height']
+                    ];
+                }
             }
         }
 
-        return $items;
+        return array_values($items); // Return re-indexed array
     }
 }
 
@@ -6186,6 +6473,7 @@ if( ! function_exists('houzez_products_tab') ) {
                 $args['posts_limit'] =  $settings['posts_limit'];
                 $args['sort_by'] =  $settings['sort_by'];
                 $args['offset'] =  $settings['offset'];
+                $args['post_status'] =  $settings['post_status'];
                 $args['pagination_type'] =  $settings['pagination_type'];
 
                 $args['property_type']   =  $property_type;
@@ -6358,5 +6646,3 @@ if( ! function_exists( 'houzez_get_leaf_terms' ) ) {
     }
 
 }
-
-

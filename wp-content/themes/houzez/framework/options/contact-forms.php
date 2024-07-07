@@ -308,6 +308,16 @@ Redux::setSection( $houzez_opt_name, array(
             'off'      => 'No',
         ),
 
+        array(
+            'id'       => 'gdpr_hide_checkbox',
+            'type'     => 'switch',
+            'title'    => '',
+            'subtitle' => esc_html__( 'Hide checkbox and show only text', 'houzez' ),
+            'default'  => 1,
+            'on'       => 'Yes',
+            'off'      => 'No',
+        ),
+
 
         array(
             'id'       => 'show_gdpr_section-end',

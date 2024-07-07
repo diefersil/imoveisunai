@@ -1652,6 +1652,26 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
+            'id'       => 'cl_show_price_placeholder',
+            'type'     => 'text',
+            'title'    => esc_html__("Enable Price Placeholder", 'houzez'),
+            'default' => esc_html__("Enable Price Placeholder", 'houzez')
+        ),
+
+        array(
+            'id'       => 'cl_price_placeholder',
+            'type'     => 'text',
+            'title'    => esc_html__("Price Placeholder", 'houzez'),
+            'default' => esc_html__("Price Placeholder", 'houzez')
+        ),
+        array(
+            'id'       => 'cl_price_placeholder_plac',
+            'type'     => 'text',
+            'title'    => esc_html__("Price Placeholder - Placeholder", 'houzez'),
+            'default' => esc_html__("Price on Request", 'houzez')
+        ),
+
+        array(
             'id'       => 'cl_second_price',
             'type'     => 'text',
             'title'    => esc_html__("Second Price", 'houzez'),
@@ -2036,7 +2056,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'cl_virtual_plac',
             'type'     => 'text',
             'title'    => esc_html__("Virtual Tour Placeholder", 'houzez'),
-            'default' => esc_html__("Enter virtual tour iframe/embeded code", 'houzez')
+            'default' => esc_html__("Enter virtual tour link OR iframe/embeded code", 'houzez')
         ),
 
         array(
@@ -2834,6 +2854,12 @@ Redux::setSection( $houzez_opt_name, array(
             'type'     => 'text',
             'title'    => esc_html__("All", 'houzez'),
             'default' => esc_html__("All", 'houzez')
+        ),
+        array(
+            'id'       => 'dsh_mine',
+            'type'     => 'text',
+            'title'    => esc_html__("Mine", 'houzez'),
+            'default' => esc_html__("Mine", 'houzez')
         ),
         array(
             'id'       => 'dsh_published',

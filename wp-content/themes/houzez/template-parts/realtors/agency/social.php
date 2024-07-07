@@ -13,6 +13,9 @@ $agency_mobile_call = str_replace(array('(',')',' ','-'),'', $agency_mobile);
 $agency_whatsapp_call = str_replace(array('(',')',' ','-'),'', $agency_whatsapp);
 $agency_tiktok = get_post_meta( get_the_ID(), 'fave_agency_tiktok', true );
 $agency_telegram = get_post_meta( get_the_ID(), 'fave_agency_telegram', true );
+$agency_line_id = get_post_meta( get_the_ID(), 'fave_agency_line_id', true );
+$agency_zillow = get_post_meta( get_the_ID(), 'fave_agency_zillow', true );
+$agency_realtor_com = get_post_meta( get_the_ID(), 'fave_agency_realtor_com', true );
 ?>
 
 <?php if( !empty( $agency_facebook ) ) { ?>
@@ -34,7 +37,7 @@ $agency_telegram = get_post_meta( get_the_ID(), 'fave_agency_telegram', true );
 <?php if( !empty( $agency_twitter ) ) { ?>
 <span>
 	<a class="btn-twitter" target="_blank" href="<?php echo esc_url( $agency_twitter ); ?>">
-		<i class="houzez-icon icon-social-media-twitter mr-2"></i>
+		<i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i>
 	</a>
 </span>
 <?php } ?>
@@ -71,15 +74,6 @@ $agency_telegram = get_post_meta( get_the_ID(), 'fave_agency_telegram', true );
 </span>
 <?php } ?>
 
-
-<?php if( !empty( $agency_telegram ) ) { ?>
-<span>
-	<a class="btn-telegram" target="_blank" href="<?php echo esc_url( $agency_telegram ); ?>">
-		<i class="houzez-icon icon-telegram-logos-24 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
 <?php if( !empty( $agency_pinterest ) ) { ?>
 <span>
 	<a class="btn-pinterest" target="_blank" href="<?php echo esc_url( $agency_pinterest ); ?>">
@@ -95,6 +89,39 @@ $agency_telegram = get_post_meta( get_the_ID(), 'fave_agency_telegram', true );
 	</a>
 </span>
 <?php } ?>
+
+<?php if( !empty( $agency_telegram ) ) { ?>
+<span>
+	<a class="btn-telegram" target="_blank" href="<?php echo houzezStandardizeTelegramURL($agency_telegram); ?>">
+		<i class="houzez-icon icon-telegram-logos-24 mr-2"></i>
+	</a>
+</span>
+<?php } ?>
+
+<?php if( !empty( $agency_realtor_com ) ) { ?>
+<span>
+	<a class="btn-realtor-com" target="_blank" href="<?php echo esc_url( $agency_realtor_com ); ?>">
+		<i class="houzez-icon icon-realtor-com mr-2"></i>
+	</a>
+</span>
+<?php } ?>
+
+<?php if( !empty( $agency_zillow ) ) { ?>
+<span>
+	<a class="btn-zillow" target="_blank" href="<?php echo esc_url( $agency_zillow ); ?>">
+		<i class="houzez-icon icon-zillow mr-2"></i>
+	</a>
+</span>
+<?php } ?>
+
+<?php if( !empty( $agency_line_id ) ) { ?>
+<span>
+	<a class="btn-lineapp" target="_blank" href="https://line.me/ti/p/~<?php echo esc_attr( $agency_line_id ); ?>">
+		<i class="houzez-icon icon-lineapp-5 mr-2"></i>
+	</a>
+</span>
+<?php } ?>
+
 <?php if( !empty( $agency_whatsapp ) ) { ?>
 <span class="agent-whatsapp">
 	<a class="btn-whatsapp" target="_blank" href="https://wa.me/<?php echo esc_attr($agency_whatsapp_call); ?>">

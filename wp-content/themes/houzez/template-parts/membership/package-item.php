@@ -101,7 +101,7 @@ while( $fave_qry->have_posts() ): $fave_qry->the_post(); $i++;
                 <ul class="list-unstyled">
                     <li>
                         <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
-                        <<?php echo $houzez_local['time_period']; ?>: 
+                        <?php echo $houzez_local['time_period']; ?>: 
                         <strong><?php echo esc_attr( $pack_billing_frquency ).' '.HOUZEZ_billing_period( $pack_billing_period ); ?></strong>
                     </li>
                     <li>

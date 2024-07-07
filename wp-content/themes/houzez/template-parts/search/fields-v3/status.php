@@ -6,6 +6,7 @@
 		
 		<?php
 		if( taxonomy_exists('property_status') ) {
+
 		    $prop_status = get_terms(
 		        array(
 		            "property_status"
@@ -14,7 +15,8 @@
 		            'orderby' => 'name',
 		            'order' => 'ASC',
 		            'hide_empty' => false,
-		            'parent' => 0
+		            'parent' => 0,
+		            'exclude' => houzez_option('search_exclude_status')
 		        )
 		    );
 		

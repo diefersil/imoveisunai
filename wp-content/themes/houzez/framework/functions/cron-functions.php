@@ -53,6 +53,10 @@ function houzez_schedule_checks() {
         wp_schedule_event(time(), 'twicedaily', 'houzez_check_featured_listing_expiry');
     }
 
+    if (!wp_next_scheduled('houzez_check_expired_listings')) {
+        wp_schedule_event(time(), 'daily', 'houzez_check_expired_listings');
+    }
+
     /*if (!wp_next_scheduled('houzez_check_cron')) {
         wp_schedule_event(time(), 'one_minute', 'houzez_check_cron');
     }*/
@@ -240,6 +244,52 @@ if( !function_exists( 'houzez_setup_saved_search_weekly_schedule' ) ) {
 /*-----------------------------------------------------------------------------------*/
 // Add Weekly crop interval
 /*-----------------------------------------------------------------------------------*/
+add_action('houzez_check_expired_listings', 'houzez_check_expired_listings');
+
+if( !function_exists('houzez_check_expired_listings') ) {
+    function houzez_check_expired_listings() {
+
+        $auto_delete_expired_listings = fave_option('auto_delete_expired_listings', 0);
+        $auto_delete_expired_listings_days = fave_option('auto_delete_expired_listings_days');
+
+        if( $auto_delete_expired_listings && ! empty($auto_delete_expired_listings_days) ) {
+
+            $days_ago = intval($auto_delete_expired_listings_days); // Number of days ago
+            $date_threshold = date('Y-m-d H:i:s', strtotime("-{$days_ago} days")); // 10 days ago
+
+            $args = array(
+                'post_type' => 'property',
+                'post_status' => 'expired',
+                'posts_per_page' => -1, // Query all expired properties
+                'meta_query' => array(
+                    array(
+                        'key' => 'houzez_expired_listing_date',
+                        'value' => $date_threshold,
+                        'compare' => '<=',
+                        'type' => 'DATETIME'
+                    )
+                )
+            );
+
+            $expired_properties_query = new WP_Query($args);
+
+            if ($expired_properties_query->have_posts()) {
+                while ($expired_properties_query->have_posts()) {
+                    $expired_properties_query->the_post();
+                    $post_id = get_the_ID();
+                    wp_delete_post($post_id, true); // Set to true to bypass trash and permanently delete
+                }
+            }
+
+            wp_reset_postdata();
+        }
+
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
+// Add Weekly crop interval
+/*-----------------------------------------------------------------------------------*/
 add_action('houzez_check_new_listing_action_hook', 'houzez_check_new_listing');
 
 if( !function_exists('houzez_check_new_listing') ) {
@@ -296,6 +346,17 @@ if( !function_exists('houzez_check_saved_search') ) :
 
                     $value_message = apply_filters('wpml_translate_single_string', $value_message, 'houzez', 'houzez_email_' . $value_message );
                     $value_subject = apply_filters('wpml_translate_single_string', $value_subject, 'houzez', 'houzez_email_subject_' . $value_subject );
+
+                    $notificationArgs = array(
+                        'title' => $value_subject,
+                        'message' => $value_message,
+                        'type' => 'matching_submissions',
+                        'to' => $user_email,
+                        'search_url' => $houzez_saved_search->url,
+                    );
+                    $notifArgs = array_merge($notificationArgs, $args);
+                    
+                    do_action('send_houzi_notification', $notificationArgs);
 
                     houzez_emails_filter_replace_2( $user_email, $value_message, $value_subject, $args);
 

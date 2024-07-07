@@ -30,7 +30,7 @@ get_header();
 if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
     get_template_part('template-parts/dashboard/agents/main');
 
-} elseif( isset( $_GET['agent'] ) && $_GET['agent'] == 'add_new' ) {
+} elseif( isset( $_GET['agents'] ) && $_GET['agents'] == 'add_new' ) {
     get_template_part('template-parts/dashboard/agents/add-agent');
 
 } else {

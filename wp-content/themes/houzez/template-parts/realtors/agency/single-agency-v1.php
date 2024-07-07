@@ -145,6 +145,8 @@ $args = array(
     'post_status' => 'publish',
 );
 
+$args = apply_filters( 'houzez_sold_status_filter', $args );
+
 $agents_array = array();
 $agency_properties_ids = array();
 $agents_properties_ids = array();
@@ -214,7 +216,12 @@ if( houzez_option( 'agency_sidebar', 0 ) == 0 ) {
                     <div class="agent-profile-content">
                         <ul class="list-unstyled">
                             <?php get_template_part('template-parts/realtors/agency/license'); ?>
+
                             <?php get_template_part('template-parts/realtors/agency/tax-number'); ?>
+
+                            <?php get_template_part('template-parts/realtors/agency/service-area'); ?>
+
+                            <?php get_template_part('template-parts/realtors/agency/specialties'); ?>
                         </ul>
                     </div><!-- agent-profile-content -->
                     <div class="agent-profile-buttons">
@@ -366,6 +373,7 @@ if( houzez_option( 'agency_sidebar', 0 ) == 0 ) {
             <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
                 <aside class="sidebar-wrap">
                     <?php get_template_part('template-parts/realtors/agency/agency-contacts'); ?> 
+                    <?php do_action('houzez_agency_sidebar') ?> 
                     <?php 
                     if (is_active_sidebar('agency-sidebar')) {
                         dynamic_sidebar('agency-sidebar');

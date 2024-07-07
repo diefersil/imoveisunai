@@ -14,13 +14,15 @@ $insights_page = houzez_get_template_link_2('template/user_dashboard_insight.php
 $payment_page_link = add_query_arg( 'prop-id', $post_id, $payment_page );
 $payment_page_link_featured = add_query_arg( 'upgrade_id', $post_id, $payment_page );
 $insights_page_link = add_query_arg( 'listing_id', $post_id, $insights_page );
+$fave_featured = get_post_meta( $post->ID, 'fave_featured', true );
+
+$is_user_can_manage = houzez_is_admin() || houzez_is_editor();
 
 if( $paid_submission_type == 'membership' ) {
     $put_on_hold_class = 'put-on-hold-package';
 } else {
     $put_on_hold_class = 'put-on-hold';
 }
-
 
 if( $property_status == 'publish' ) {
     $status_badge = '<span class="badge badge-success">'.esc_html__('Approved', 'houzez').'</span>';
@@ -60,7 +62,10 @@ if( $property_status != 'expired' && $property_status != 'disapproved' ) {
 	<td class="property-table-thumbnail" data-label="<?php echo esc_html__('Thumbnail', 'houzez'); ?>">
 		<div class="table-property-thumb">
 			
-			<?php echo $payment_status_label; ?>
+			<?php 
+            if( houzez_user_role_by_post_id($post_id) != 'administrator' ) {
+                echo $payment_status_label; 
+            }?>
 
 			<a href="<?php echo esc_url(get_permalink()); ?>">
 			<?php
@@ -78,7 +83,12 @@ if( $property_status != 'expired' && $property_status != 'disapproved' ) {
 		<a href="<?php echo esc_url(get_permalink()); ?>"><strong><?php the_title(); ?></strong></a><br>
 		<?php echo houzez_get_listing_data('property_map_address'); ?><br>
 		<?php if( houzez_user_role_by_post_id($post_id) != 'administrator' && get_post_status ( $post_id ) == 'publish' ) { ?>
-                <?php if($paid_submission_type != 'no' && houzez_option('per_listing_expire_unlimited') ) { ?>
+                <?php if( $paid_submission_type == 'membership' ) { ?>
+                <span class="expiration_date">
+                    <?php echo esc_html__('Expiration:', 'houzez'); ?> <?php houzez_listing_expire(); ?>
+                    <?php houzez_featured_listing_expire(); ?><br>
+                </span>
+                <?php } else if($paid_submission_type != 'no' && houzez_option('per_listing_expire_unlimited') ) { ?>
                 <span class="expiration_date">
                     <?php echo esc_html__('Expiration:', 'houzez'); ?> <?php houzez_listing_expire(); ?>
                     <?php houzez_featured_listing_expire(); ?><br>
@@ -112,6 +122,15 @@ if( $property_status != 'expired' && $property_status != 'disapproved' ) {
 		}
 		?>
 	</td>
+    <td>
+        <?php
+        echo date_i18n( get_option('date_format'), strtotime( $post->post_date ) );
+        echo '<br>';
+        echo date_i18n( get_option('time_format'), strtotime( $post->post_date ) );
+        echo '<br>';
+        echo ( empty( $post->post_author ) ? __( 'by a guest', 'houzez' ) : sprintf( __( 'by %s', 'houzez' ), '<a href="' . esc_url( add_query_arg( 'user', $post->post_author, $listings_page ) ) . '">' . get_the_author() . '</a>' ) );
+        ?>
+    </td>
 
 	<td class="property-table-actions" data-label="<?php echo esc_html__('Actions', 'houzez'); ?>">
 		<div class="dropdown property-action-menu">
@@ -152,78 +171,108 @@ if( $property_status != 'expired' && $property_status != 'disapproved' ) {
                 <?php } ?>
 
                 <?php
-                if( $paid_submission_type == 'per_listing' && $property_status != 'expired' ) {
-                    if ($payment_status != 'paid') {
 
-                        if( houzez_is_woocommerce() ) {
-                            echo '<a href="#" class="houzez-woocommerce-pay btn pay-btn" data-listid="'.intval($post_id).'">' . esc_html__('Pay Now', 'houzez') . '</a>';
-                        } else {
-                            echo '<a href="' . esc_url($payment_page_link) . '" class="btn pay-btn">' . esc_html__('Pay Now', 'houzez') . '</a>';
-                        }
-                    } else {
-                        if( houzez_get_listing_data('featured') != 1 && $property_status == 'publish' ) {
+                if( $is_user_can_manage ) {
+
+                    if ( in_array( $post->post_status, array( 'pending', 'disapproved' ) ) ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="approve" class="dropdown-item houzez-prop-action-js"><strong>' . esc_html__('Approve', 'houzez') . '</strong></a>';
+                    }
+
+                    if ( in_array( $post->post_status, array( 'pending', 'publish' ) ) ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="disapprove" class="dropdown-item houzez-prop-action-js"><strong>' . esc_html__('Disapproved', 'houzez') . '</strong></a>';
+                    }
+
+                    if ( in_array( $post->post_status, array( 'publish' ) ) && ! $fave_featured ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="set_featured" class="dropdown-item houzez-prop-action-js"><strong>' . esc_html__('Mark as Featured', 'houzez') . '</strong></a>';
+                    }
+
+                    if ( in_array( $post->post_status, array( 'publish' ) ) && $fave_featured ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="remove_featured" class="dropdown-item houzez-prop-action-js"><strong>' . esc_html__('Remove from Featured', 'houzez') . '</strong></a>';
+                    }
+
+                    if ( in_array( $post->post_status, array( 'publish' ) ) ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="expire" class="dropdown-item houzez-prop-action-js">' . esc_html__('Mark as Expired', 'houzez') . '</a>';
+                    }
+
+                    if ( in_array( $post->post_status, array( 'expired', 'houzez_sold', 'draft' ) ) ) { 
+                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" data-type="publish" class="dropdown-item houzez-prop-action-js">' . esc_html__('Publish', 'houzez') . '</a>';
+                    }
+
+                } else {
+
+                    if( $paid_submission_type == 'per_listing' && $property_status != 'expired' ) {
+                        if ($payment_status != 'paid') {
 
                             if( houzez_is_woocommerce() ) {
-                                echo '<a href="' . esc_url($payment_page_link_featured) . '" class="houzez-woocommerce-pay btn pay-btn" data-featured="1" data-listid="'.intval($post_id).'">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                echo '<a href="#" class="houzez-woocommerce-pay btn pay-btn" data-listid="'.intval($post_id).'">' . esc_html__('Pay Now', 'houzez') . '</a>';
                             } else {
-                                echo '<a href="' . esc_url($payment_page_link_featured) . '" class="btn pay-btn">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                echo '<a href="' . esc_url($payment_page_link) . '" class="btn pay-btn">' . esc_html__('Pay Now', 'houzez') . '</a>';
+                            }
+                        } else {
+                            if( houzez_get_listing_data('featured') != 1 && $property_status == 'publish' ) {
+
+                                if( houzez_is_woocommerce() ) {
+                                    echo '<a href="' . esc_url($payment_page_link_featured) . '" class="houzez-woocommerce-pay btn pay-btn" data-featured="1" data-listid="'.intval($post_id).'">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                } else {
+                                    echo '<a href="' . esc_url($payment_page_link_featured) . '" class="btn pay-btn">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                }
+                                
+                            }
+                        }
+                    }
+
+                    if( $property_status == 'expired' && ( $paid_submission_type == 'per_listing') ) {
+                        
+                        if( houzez_is_woocommerce() ) {
+                            echo '<a href="#" data-listid="'.intval($post_id).'" class="houzez-woocommerce-pay btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
+                        } else {
+
+                            $payment_page_link_expired = add_query_arg( array('prop-id' => $post_id, 'mode' => 'relist'), $payment_page );
+                            echo '<a href="' . esc_url($payment_page_link_expired) . '" class="btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
+                        }
+                        
+                    }
+
+                    if( $property_status == 'expired' && ( $paid_submission_type == 'free_paid_listing' || $paid_submission_type == 'no' ) ) {
+                        
+                        echo '<a href="#" data-property="'.$post->ID.'" class="relist-free btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
+                        
+                    }
+
+                    if( houzez_check_post_status( $post->ID ) ) {
+
+                        // Membership
+                        if ( $paid_submission_type == 'membership' && houzez_get_listing_data('featured') != 1 && $property_status == 'publish' ) {
+                            
+                            echo '<a href="#" data-proptype="membership" data-propid="'.intval( $post->ID ).'" class="make-prop-featured btn pay-btn">' . esc_html__('Set as Featured', 'houzez') . '</a>';
+                            
+                        }
+                        if ( $paid_submission_type == 'membership' && houzez_get_listing_data('featured') == 1 ) {
+                            
+                            echo '<a href="#" data-proptype="membership" data-propid="'.intval( $post->ID ).'" class="remove-prop-featured btn pay-btn">' . esc_html__('Remove From Featured', 'houzez') . '</a>';
+                            
+                        }
+                        if( $property_status == 'expired' && $paid_submission_type == 'membership' ) {
+                            
+                            echo '<a href="#" data-propid="'.intval( $post->ID ).'" class="resend-for-approval btn pay-btn">' . esc_html__('Reactivate Listing', 'houzez') . '</a>';
+                            
+                        }
+
+                        //Paid Featured
+                        if( $paid_submission_type == 'free_paid_listing' && $property_status == 'publish' ) {
+                            
+                            if( houzez_get_listing_data('featured') != 1 ) {
+
+                                if( houzez_is_woocommerce() ) {
+                                    echo '<a href="#" class="houzez-woocommerce-pay btn pay-btn" data-featured="1" data-listid="'.intval($post_id).'">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                } else {
+                                    echo '<a href="' . esc_url($payment_page_link_featured) . '" class="btn pay-btn">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
+                                }
                             }
                             
                         }
+
                     }
-                }
-
-                if( $property_status == 'expired' && ( $paid_submission_type == 'per_listing') ) {
-                    
-                    if( houzez_is_woocommerce() ) {
-                        echo '<a href="#" data-listid="'.intval($post_id).'" class="houzez-woocommerce-pay btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
-                    } else {
-
-                        $payment_page_link_expired = add_query_arg( array('prop-id' => $post_id, 'mode' => 'relist'), $payment_page );
-                        echo '<a href="' . esc_url($payment_page_link_expired) . '" class="btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
-                    }
-                    
-                }
-
-                if( $property_status == 'expired' && ( $paid_submission_type == 'free_paid_listing' || $paid_submission_type == 'no' ) ) {
-                    
-                    echo '<a href="#" data-property="'.$post->ID.'" class="relist-free btn pay-btn">'.esc_html__( 'Re-List', 'houzez' ).'</a>';
-                    
-                }
-
-                if( houzez_check_post_status( $post->ID ) ) {
-
-                    // Membership
-                    if ( $paid_submission_type == 'membership' && houzez_get_listing_data('featured') != 1 && $property_status == 'publish' ) {
-                        
-                        echo '<a href="#" data-proptype="membership" data-propid="'.intval( $post->ID ).'" class="make-prop-featured btn pay-btn">' . esc_html__('Set as Featured', 'houzez') . '</a>';
-                        
-                    }
-                    if ( $paid_submission_type == 'membership' && houzez_get_listing_data('featured') == 1 ) {
-                        
-                        echo '<a href="#" data-proptype="membership" data-propid="'.intval( $post->ID ).'" class="remove-prop-featured btn pay-btn">' . esc_html__('Remove From Featured', 'houzez') . '</a>';
-                        
-                    }
-                    if( $property_status == 'expired' && $paid_submission_type == 'membership' ) {
-                        
-                        echo '<a href="#" data-propid="'.intval( $post->ID ).'" class="resend-for-approval btn pay-btn">' . esc_html__('Reactivate Listing', 'houzez') . '</a>';
-                        
-                    }
-
-                    //Paid Featured
-                    if( $paid_submission_type == 'free_paid_listing' && $property_status == 'publish' ) {
-                        
-                        if( houzez_get_listing_data('featured') != 1 ) {
-
-                            if( houzez_is_woocommerce() ) {
-                                echo '<a href="#" class="houzez-woocommerce-pay btn pay-btn" data-featured="1" data-listid="'.intval($post_id).'">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
-                            } else {
-                                echo '<a href="' . esc_url($payment_page_link_featured) . '" class="btn pay-btn">' . esc_html__('Upgrade to Featured', 'houzez') . '</a>';
-                            }
-                        }
-                        
-                    }
-
                 }
                 ?>
 			</div>

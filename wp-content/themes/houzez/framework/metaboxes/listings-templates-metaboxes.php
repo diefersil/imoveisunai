@@ -16,6 +16,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
         $prop_features = array();
         $prop_neighborhood = array();
         $prop_label = array();
+        $prop_country = array();
 
         if( houzez_current_screen() == 'admin_page' ) {
             houzez_get_terms_array( 'property_feature', $prop_features );
@@ -24,7 +25,12 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
             houzez_get_terms_array( 'property_city', $prop_locations );
             houzez_get_terms_array( 'property_state', $prop_states );
             houzez_get_terms_array( 'property_label', $prop_label );
-            houzez_get_terms_array( 'property_area', $prop_neighborhood );
+            houzez_get_terms_array( 'property_country', $prop_country );
+
+            if( !in_array('property_area', (array)$page_filters) ) {
+                houzez_get_terms_array( 'property_area', $prop_neighborhood );
+            }
+
         }
         
         $meta_boxes[] = array(
@@ -50,6 +56,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'template/template-listing-grid-v2-fullwidth-3cols.php',
                     'template/template-listing-grid-v2-fullwidth-4cols.php',
                     'template/template-listing-grid-v4.php',
+                    'template/template-listing-list-v4.php',
                     'template/template-listing-grid-v5.php',
                     'template/template-listing-grid-v5-fullwidth-2cols.php',
                     'template/template-listing-grid-v5-fullwidth-3cols.php',
@@ -160,6 +167,25 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                 );
         }
 
+        $property_country_filter = array(
+            'id'   => 'field_id_country',
+            'type' => 'divider',
+            'class' => 'houzez_hidden',
+            'columns' => 6,
+        );
+        if( !in_array('property_country', (array)$page_filters) ) {
+            $property_country_filter = array(
+                    'name'      => esc_html__('Countries', 'houzez'),
+                    'id'        => $houzez_prefix . 'countries',
+                    'type'      => 'select',
+                    'options'   => $prop_country,
+                    'desc'      => '',
+                    'columns' => 6,
+                    'select_all_none' => true,
+                    'multiple' => true
+                );
+        }
+
         $property_state_filter = array(
             'id'   => 'field_id_state',
             'type' => 'divider',
@@ -243,6 +269,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'template/template-listing-grid-v2-fullwidth-3cols.php',
                     'template/template-listing-grid-v2-fullwidth-4cols.php',
                     'template/template-listing-grid-v4.php',
+                    'template/template-listing-list-v4.php',
                     'template/template-listing-grid-v5.php',
                     'template/template-listing-grid-v5-fullwidth-2cols.php',
                     'template/template-listing-grid-v5-fullwidth-3cols.php',
@@ -284,7 +311,9 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                         'd_price' => esc_html__('Price (High to Low)', 'houzez'),
                         'a_price' => esc_html__('Price (Low to High)', 'houzez'),
                         'featured_first' => esc_html__('Show Featured Listings on Top', 'houzez'),
+                        'featured_first_random' => esc_html__('Show Featured Listings on Top - Randomly', 'houzez'),
                         'featured' => esc_html__('Show Featured Listings', 'houzez'),
+                        'featured_random' => esc_html__('Show Featured Listings - Randomly', 'houzez'),
                         'random' => esc_html__('Random Listings', 'houzez')
                     ),
                     'std'       => array( 'd_date' ),
@@ -324,6 +353,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                 $property_type_filter,
                 $property_status_filter,
                 $property_label_filter,
+                $property_country_filter,
                 $property_state_filter,
                 $property_city_filter,
                 $property_feature_filter,
@@ -346,7 +376,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'options'         => $agencies_for_templates,
                     'multiple'        => true,
                     'select_all_none' => true,
-                    'columns'         => 12,
+                    'columns'         => 6,
                 ),
 
                 array(

@@ -1,6 +1,49 @@
 <?php 
-global $post, $ele_thumbnail_size, $image_size, $listing_agent_info; 
-$listing_agent_info = houzez20_property_contact_form();//houzez20_get_property_agent( $post->ID );
+global $post, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
+$listing_agent_info = houzez20_property_contact_form();
+
+$defaultButtons = array(
+    'enabled' => array(
+        'call' => 'Call',
+        'email' => 'Email',
+        'whatsapp' => 'WhatsApp',
+        // Add other buttons as needed
+    )
+);
+
+$listingButtonsComposer = houzez_option('listing_buttons_composer', $defaultButtons);
+
+// Ensure that 'enabled' index exists
+$buttonsComposer = isset($listingButtonsComposer['enabled']) ? $listingButtonsComposer['enabled'] : [];
+
+// Remove the 'placebo' element
+unset($buttonsComposer['placebo']);
+
+// Agent contact information
+$agent_mobile = $listing_agent_info['agent_mobile'] ?? '';
+$agent_whatsapp = $listing_agent_info['agent_whatsapp'] ?? '';
+$agent_telegram = $listing_agent_info['agent_telegram'] ?? '';
+$agent_lineapp = $listing_agent_info['agent_lineapp'] ?? '';
+$agent_email = $listing_agent_info['agent_email'] ?? '';
+
+$totalButtonsCount = 0;
+
+// Check each button and increment the count if the corresponding agent info is available
+foreach ($buttonsComposer as $key => $value) {
+    if (($key == 'call' && $agent_mobile != '') ||
+        ($key == 'email' && $agent_email != '') ||
+        ($key == 'whatsapp' && $agent_whatsapp != '') ||
+        ($key == 'telegram' && $agent_telegram != '') ||
+        ($key == 'lineapp' && $agent_lineapp != '')
+    ) {
+        $totalButtonsCount++;
+    }
+}
+
+// Limit the total buttons to a maximum of 4
+$totalButtonsCount = min($totalButtonsCount, 4);
+$totalButtonsClass = 'items-btns-count-' . $totalButtonsCount;
+
 
 if( houzez_is_fullwidth_2cols_custom_width() ) {
 	$image_size = 'houzez-item-image-4';
@@ -28,7 +71,8 @@ if( houzez_is_fullwidth_2cols_custom_width() ) {
 				<?php get_template_part('template-parts/listing/partials/item-address'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-features-v7'); ?>
 			</div><!-- item-body -->
-			<div class="item-footer clearfix">
+		
+			<div class="item-footer <?php echo esc_attr($totalButtonsClass); ?> clearfix">
 				<div class="item-buttons-wrap">
 					<?php get_template_part('template-parts/listing/partials/item-btns-cew'); ?>		
 				</div><!-- item-buttons-wrap --> 

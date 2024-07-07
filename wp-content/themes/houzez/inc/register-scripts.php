@@ -225,9 +225,15 @@ if( !function_exists('houzez_enqueue_scripts') ) {
 
                 wp_enqueue_script('bootstrap-datepicker', HOUZEZ_JS_DIR_URI. 'vendors/bootstrap-datepicker.min.js', array('jquery'), '1.9.0', true);
 
+
                 $agent_form_redirect = houzez_option('agent_form_redirect', '');
 
                 if( !empty($agent_form_redirect) ) {
+
+                    if (defined('ICL_SITEPRESS_VERSION')) {
+                        $agent_form_redirect = houzez_translate_object_id($agent_form_redirect, 'page');
+                    }
+                    
                     $agent_form_redirect = get_permalink($agent_form_redirect);
                 }
 
@@ -391,6 +397,8 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 $max_prop_images = houzez_option('max_prop_images', '50');
             }
 
+            $invoices_page = houzez_get_template_link_2('template/user_dashboard_invoices.php');
+
             wp_enqueue_script('bootbox-min', HOUZEZ_JS_DIR_URI . 'vendors/bootbox.min.js', array('jquery'), '4.4.0', true);
 
             wp_enqueue_script('houzez_property',  get_theme_file_uri('/js/houzez_property.js'), array('jquery', 'plupload', 'jquery-ui-sortable'), HOUZEZ_THEME_VERSION, true);
@@ -445,6 +453,7 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 'api_mapbox' => houzez_option('mapbox_api_key'),
                 'enable_title_limit' => houzez_option('enable_title_limit', 0),
                 'property_title_limit' => houzez_option('property_title_limit'),
+                'invoices_page_link' => $invoices_page,
             );
             wp_localize_script('houzez_property', 'houzezProperty', $prop_data);
 

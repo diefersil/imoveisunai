@@ -119,11 +119,17 @@ if( ! function_exists( 'houzez_indian_number_shorten' ) ) {
 if( !function_exists('houzez_listing_price') ) {
     function houzez_listing_price() {
 
-        $sale_price = get_post_meta( get_the_ID(), 'fave_property_price', true);
-        $second_price     = get_post_meta( get_the_ID(), 'fave_property_sec_price', true );
-        $price_postfix = get_post_meta( get_the_ID(), 'fave_property_price_postfix', true);
-        $price_prefix  = get_post_meta( get_the_ID(), 'fave_property_price_prefix', true );
+        $listing_id = get_the_ID();
+
+        $sale_price = get_post_meta( $listing_id, 'fave_property_price', true);
+        $second_price     = get_post_meta( $listing_id, 'fave_property_sec_price', true );
+        $price_postfix = get_post_meta( $listing_id, 'fave_property_price_postfix', true);
+        $price_prefix  = get_post_meta( $listing_id, 'fave_property_price_prefix', true );
         $price_separator = houzez_option('currency_separator');
+
+        if( houzez_is_price_placeholder($listing_id) ) {
+            return houzez_is_price_placeholder($listing_id, 'span'); 
+        }
 
         $output = '';
         $price_as_text = doubleval( $sale_price );
@@ -663,6 +669,10 @@ if( !function_exists('houzez_listing_price_by_id') ) {
         $price_postfix = get_post_meta( $propID, 'fave_property_price_postfix', true);
         $price_separator = houzez_option('currency_separator');
 
+        if( houzez_is_price_placeholder($propID) ) {
+            return houzez_is_price_placeholder($propID, 'span'); 
+        }
+
         $output = '';
         $price_as_text = doubleval( $sale_price );
         if( !$price_as_text ) {
@@ -702,6 +712,10 @@ if( !function_exists('houzez_listing_price_for_saved_searches') ) {
         $price_postfix  = get_post_meta( $listing_id, 'fave_property_price_postfix', true );
         $price_prefix   = get_post_meta( $listing_id, 'fave_property_price_prefix', true );
         $price_separator = houzez_option('currency_separator');
+
+        if( houzez_is_price_placeholder($listing_id) ) {
+            return houzez_is_price_placeholder($listing_id); 
+        }
 
         $price_as_text = doubleval( $sale_price );
         if( !$price_as_text ) {
@@ -760,6 +774,26 @@ if( !function_exists('houzez_listing_price_for_saved_searches') ) {
     }
 }
 
+if( ! function_exists('houzez_is_price_placeholder') ) {
+    function houzez_is_price_placeholder( $listing_id, $attr = 'li' ) {
+        $is_price_placeholder   = get_post_meta( $listing_id, 'fave_show_price_placeholder', true );
+        $price_placeholder   = get_post_meta( $listing_id, 'fave_property_price_placeholder', true );
+        $output = '';
+
+        if( $is_price_placeholder && ! empty( $price_placeholder ) ) {
+
+            if( is_singular( 'property' ) ) {
+                $output .= '<li class="item-price item-price-text price-single-listing-text">'.$price_placeholder. '</li>';
+                return $output;
+            }
+            $output .= '<'.$attr.' class="item-price item-price-text">'.$price_placeholder. '</'.$attr.'>';
+            return $output;
+
+        }
+        return false;
+    }
+}
+
 /*-----------------------------------------------------------------------------------*/
 // Listing price version 1
 /*-----------------------------------------------------------------------------------*/
@@ -776,6 +810,10 @@ if( !function_exists('houzez_listing_price_v1') ) {
         $price_postfix  = get_post_meta( $listing_id, 'fave_property_price_postfix', true );
         $price_prefix   = get_post_meta( $listing_id, 'fave_property_price_prefix', true );
         $price_separator = houzez_option('currency_separator');
+
+        if( houzez_is_price_placeholder($listing_id) ) {
+            return houzez_is_price_placeholder($listing_id); 
+        }
 
         $price_as_text = doubleval( $sale_price );
         if( !$price_as_text ) {
@@ -840,12 +878,17 @@ if( !function_exists('houzez_listing_price_v1') ) {
 /*-----------------------------------------------------------------------------------*/
 if( !function_exists('houzez_listing_price_v5') ) {
     function houzez_listing_price_v5() {
+        $listing_id = get_the_ID();
         $output = '';
-        $sale_price     = get_post_meta( get_the_ID(), 'fave_property_price', true );
-        $second_price     = get_post_meta( get_the_ID(), 'fave_property_sec_price', true );
-        $price_postfix  = get_post_meta( get_the_ID(), 'fave_property_price_postfix', true );
-        $price_prefix  = get_post_meta( get_the_ID(), 'fave_property_price_prefix', true );
+        $sale_price     = get_post_meta( $listing_id, 'fave_property_price', true );
+        $second_price     = get_post_meta( $listing_id, 'fave_property_sec_price', true );
+        $price_postfix  = get_post_meta( $listing_id, 'fave_property_price_postfix', true );
+        $price_prefix  = get_post_meta( $listing_id, 'fave_property_price_prefix', true );
         $price_separator = houzez_option('currency_separator');
+
+        if( houzez_is_price_placeholder($listing_id) ) {
+            return houzez_is_price_placeholder($listing_id, 'span'); 
+        }
 
         $price_as_text = doubleval( $sale_price );
         if( !$price_as_text ) {
@@ -928,6 +971,10 @@ if( !function_exists('houzez_listing_price_for_print') ) {
         $price_postfix  = get_post_meta( $propID, 'fave_property_price_postfix', true );
         $price_prefix  = get_post_meta( $propID, 'fave_property_price_prefix', true );
         $price_separator = houzez_option('currency_separator');
+
+        if( houzez_is_price_placeholder($propID) ) {
+            return houzez_is_price_placeholder($propID, 'span'); 
+        }
 
         $output = '';
         $price_as_text = doubleval( $sale_price );
@@ -1353,7 +1400,8 @@ if ( ! function_exists( 'houzez_currency_converter' ) ) {
 
                 if (Fcc_currency_exists($currency_converter) && setcookie('houzez_set_current_currency', $currency_converter, $current_currency_expiry, '/')) {
                     echo json_encode(array(
-                        'success' => true
+                        'success' => true,
+                        'msg' => __("Cookie set", 'houzez')
                     ));
                 } else {
                     echo json_encode(array(

@@ -34,17 +34,17 @@
     </button>
 </form>
 
-<?php if( houzez_option('facebook_login') != 'no' || houzez_option('google_login') != 'no' ) { ?>
+<?php if( houzez_option('facebook_login') == 'yes' || houzez_option('google_login') == 'yes' ) { ?>
 <div class="social-login-wrap">
 
-    <?php if( houzez_option('facebook_login') != 'no' ) { ?>
+    <?php if( houzez_option('facebook_login') == 'yes' ) { ?>
     <button type="button" class="hz-facebook-login btn btn-facebook-login btn-full-width">
         <?php get_template_part('template-parts/loader'); ?>
         <?php esc_html_e( 'Continue with Facebook', 'houzez' ); ?>
     </button>
     <?php } ?>
 
-    <?php if( houzez_option('google_login') != 'no' ) { ?>
+    <?php if( houzez_option('google_login') == 'yes' ) { ?>
     <button type="button" class="hz-google-login btn btn-google-plus-lined btn-full-width">
         <?php get_template_part('template-parts/loader'); ?>
         <img class="google-icon" src="<?php echo HOUZEZ_IMAGE; ?>Google__G__Logo.svg"/> <?php esc_html_e( 'Sign in with google', 'houzez' ); ?>

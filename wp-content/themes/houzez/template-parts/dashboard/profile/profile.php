@@ -1,5 +1,11 @@
 <?php
 $userID = get_current_user_id();
+
+$id_flag = false;
+if( isset( $_GET['edit_user'] ) && !empty( $_GET['edit_user'] ) ) {
+    $userID = intval($_GET['edit_user']);
+    $id_flag = true;
+}
 $user_agent_id = get_user_meta( $userID, 'fave_author_agent_id', true );
 $user_agency_id = get_user_meta( $userID, 'fave_author_agency_id', true );
 if(houzez_is_agency()){
@@ -45,11 +51,16 @@ if( !empty( $id_for_permalink ) ) {
                 <?php get_template_part('template-parts/dashboard/profile/social'); ?>
                 <?php wp_nonce_field( 'houzez_profile_ajax_nonce', 'houzez-security-profile' ); ?>
                 <input type="hidden" name="action" value="houzez_ajax_update_profile">
+                <?php if( $id_flag ) { ?>
+                <input type="hidden" id="user_id" name="user_id" value="<?php echo intval($userID); ?>">
+                <?php } ?>
             </form>
 
             <?php
 
             get_template_part('template-parts/dashboard/profile/role');
+
+            get_template_part('template-parts/dashboard/profile/package');
 
             get_template_part('template-parts/dashboard/profile/currency');
 

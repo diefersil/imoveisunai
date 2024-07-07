@@ -7,7 +7,7 @@ if( houzez_is_fullwidth_2cols_custom_width() ) {
 }
 ?>
 <div class="item-listing-wrap hz-item-gallery-js item-listing-wrap-v3 card" data-hz-id="hz-<?php esc_attr_e($post->ID); ?>" <?php houzez_property_gallery($image_size); ?>>
-	<div class="item-wrap item-wrap-v3 h-100">
+	<div class="item-wrap item-wrap-v3 item-wrap-no-frame h-100">
 		<?php get_template_part('template-parts/listing/partials/item-image'); ?>
 		<?php get_template_part('template-parts/listing/partials/item-title'); ?>
 		<?php get_template_part('template-parts/listing/partials/item-features-v3'); ?>

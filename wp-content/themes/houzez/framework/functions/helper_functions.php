@@ -57,18 +57,18 @@ if( ! function_exists('houzez_get_listing_link_target') ) {
     }
 }
 
-if( ! function_exists( 'houzez_get_elementor_library' ) ) {
-    function houzez_get_elementor_library( $type ) {
+if( ! function_exists( 'houzez_get_studio_library' ) ) {
+    function houzez_get_studio_library( $type ) {
         $choices = array();
 
         $args = array(
             'sort_column'    => 'post_title',
-            'post_type'      => 'elementor_library',
+            'post_type'      => 'fts_builder',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'meta_query'     => [
                 [
-                    'key'   => '_elementor_template_type',
+                    'key'   => 'fts_template_type',
                     'value' => $type,
                 ],
             ],
@@ -117,6 +117,8 @@ if( ! function_exists( 'houzez_get_main_wrap_class' ) ) {
         if( houzez_is_splash() ) { 
             $classes[] = 'splash-page-wrap'; 
         }
+
+        $classes[] = 'main-wrap-js';
 
         if ( is_singular() ) {
 
@@ -242,6 +244,80 @@ if ( ! function_exists( 'houzez_check_elementor_installed' ) ) {
 }
 
 /*-----------------------------------------------------------------------------------*/
+// Check if Elementor Pro is active.
+/*-----------------------------------------------------------------------------------*/
+function houzez_is_elementor_pro() {
+    if ( class_exists( '\ElementorPro\Plugin' ) ) {
+        return true;
+    }
+
+    return false;
+}
+
+if( ! function_exists('houzez_elementor_template_enqueue') ) {
+
+    function houzez_elementor_template_enqueue() {
+        $templates   = array();
+
+        if ( class_exists( '\Elementor\Plugin' ) ) {
+            $elementor = \Elementor\Plugin::instance();
+            $elementor->frontend->enqueue_styles();
+        }
+
+        if ( class_exists( '\ElementorPro\Plugin' ) ) {
+            $elementor = \ElementorPro\Plugin::instance();
+            $elementor->enqueue_styles();
+        }
+
+        if ( ! class_exists( 'Elementor\Core\Files\CSS\Post' ) ) {
+            return;
+        }
+
+        $header_location_exists = false;
+        $footer_location_exists = false;
+
+        if ( houzez_is_elementor_pro() && function_exists( 'elementor_location_exits' ) ) {
+            $header_location_exists = elementor_location_exits( 'header', true );
+            $footer_location_exists = elementor_location_exits( 'footer', true );
+        }
+
+        $header_type = houzez_option('houzez_header_type');
+        $footer_type = houzez_option('houzez_footer_type');
+        $before_header_block  = houzez_option('shopely_above_header_block');
+        $after_header_block  = houzez_option('shopely_after_header_block');
+
+        $before_footer_block  = houzez_option('shopely_before_footer_block');
+        $after_footer_block  = houzez_option('shopely_after_footer_block');
+
+        $shop_before_main_content_block  = houzez_option('shopely_shop_before_main_content_block');
+        $shop_after_main_content_block  = houzez_option('shopely_shop_after_main_content_block');
+
+        $before_shop_loop_block  = houzez_option('shopely_before_shop_loop_block');
+        $after_shop_loop_block  = houzez_option('shopely_after_shop_loop_block');
+
+        $before_single_product_block  = houzez_option('shopely_before_single_product_block');
+        $after_single_product_block  = houzez_option('shopely_after_single_product_block');
+
+
+        $header_id = favestudio_header_template_id();
+
+        if ( favestudio_header_template_id() ) {
+            $templates[] = $header_id;
+        }
+        if ( $header_type === '_custom' && ! $header_location_exists ) {
+            $templates[] = houzez_option('houzez_ele_header_template');
+        }
+
+
+        foreach ( $templates as $template ) {
+            $css_file = new Elementor\Core\Files\CSS\Post( $template );
+            $css_file->enqueue();
+        }
+    }
+    //add_action( 'wp_enqueue_scripts', 'houzez_elementor_template_enqueue', 500 );
+}
+
+/*-----------------------------------------------------------------------------------*/
 // Check if page build with elementor 
 /*-----------------------------------------------------------------------------------*/
 if(!function_exists('houzez_check_is_elementor')) {
@@ -282,9 +358,9 @@ if ( ! function_exists( 'shopely_elementor_is_preview_mode' ) ) {
     }
 }
 
-if ( ! function_exists( 'shopely_elementor_is_preview_page' ) ) {
+if ( ! function_exists( 'houzez_elementor_is_preview_page' ) ) {
     
-    function shopely_elementor_is_preview_page() {
+    function houzez_elementor_is_preview_page() {
         return isset( $_GET['preview_id'] );
     }
 }
@@ -947,18 +1023,6 @@ if(!function_exists('houzez_v1_4_meta_type')) {
     } 
 }
 
-if( !function_exists('houzez_is_admin') ) {
-    function houzez_is_admin() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-
-        if (in_array('administrator', (array)$current_user->roles)) {
-            return true;
-        }
-        return false;
-    }
-}
-
 if(!function_exists('houzez_v2_meta_type')) {
     function houzez_v2_meta_type() {
         $v2_meta_type = houzez_option('v2_meta_type');
@@ -1011,49 +1075,106 @@ if(!function_exists('houzez_get_ajax_search')) {
     }
 }
 
+
 if( !function_exists('houzez_hide_calculator')) {
     function houzez_hide_calculator() {
-        $term_status = wp_get_post_terms( get_the_ID(), 'property_status', array("fields" => "all"));
+        $post_id = get_the_ID();
+        $term_status = wp_get_post_terms( $post_id, 'property_status', array("fields" => "all"));
 
         if ( ! empty( $term_status ) && ! is_wp_error( $term_status ) ) {
-
             $cal_where = houzez_option('cal_where');
             if( empty($cal_where) ) {
                 $cal_where = array();
             }
-            
-            if( in_array( $term_status[0]->term_id, $cal_where ) ) {
+
+            // Translate cal_where term IDs if WPML is active
+            if (defined('ICL_SITEPRESS_VERSION')) {
+                foreach ($cal_where as $key => $term_id) {
+                    $cal_where[$key] = houzez_translate_object_id($term_id, 'property_status');
+                }
+            }
+
+            $translated_term_id = defined('ICL_SITEPRESS_VERSION') 
+                ? houzez_translate_object_id($term_status[0]->term_id, 'property_status')
+                : $term_status[0]->term_id;
+
+            if( in_array( $translated_term_id, $cal_where ) ) {
                 return false;
             }
         }
-       
+
         return true;
     }
 }
 
 if( !function_exists('houzez_hide_schedule_tour')) {
     function houzez_hide_schedule_tour() {
-        $term_status = wp_get_post_terms( get_the_ID(), 'property_status', array("fields" => "all"));
+        $post_id = get_the_ID();
+        $term_status = wp_get_post_terms( $post_id, 'property_status', array("fields" => "all"));
 
         if ( ! empty( $term_status ) && ! is_wp_error( $term_status ) ) {
-
             $schedule_tour_where = houzez_option('schedule_tour_where');
             if( empty($schedule_tour_where) ) {
                 $schedule_tour_where = array();
             }
-            
-            if( in_array( $term_status[0]->term_id, $schedule_tour_where ) ) {
+
+            // Translate schedule_tour_where term IDs if WPML is active
+            if (defined('ICL_SITEPRESS_VERSION')) {
+                foreach ($schedule_tour_where as $key => $term_id) {
+                    $schedule_tour_where[$key] = houzez_translate_object_id($term_id, 'property_status');
+                }
+            }
+
+            $translated_term_id = defined('ICL_SITEPRESS_VERSION') 
+                ? houzez_translate_object_id($term_status[0]->term_id, 'property_status') 
+                : $term_status[0]->term_id;
+
+            if( in_array( $translated_term_id, $schedule_tour_where ) ) {
                 return false;
             }
         }
-       
+
         return true;
     }
 }
 
+
 if(!function_exists('houzez_ajax_search')) {
     function houzez_ajax_search() {
         echo houzez_get_ajax_search();
+    }
+}
+
+if(!function_exists('houzez_is_search_result')) {
+    function houzez_is_search_result() {
+
+        if( is_page_template(array('template/template-search.php')) ) {
+            return true;
+
+        }
+        return false;
+    }
+}
+
+if(!function_exists('houzez_is_agents_template')) {
+    function houzez_is_agents_template() {
+
+        if( is_page_template(array('template/template-agents.php')) ) {
+            return true;
+
+        }
+        return false;
+    }
+}
+
+if(!function_exists('houzez_is_agencies_template')) {
+    function houzez_is_agencies_template() {
+
+        if( is_page_template(array('template/template-agencies.php')) ) {
+            return true;
+
+        }
+        return false;
     }
 }
 
@@ -1359,9 +1480,15 @@ if( !function_exists('houzez_dummy_search_style_3') ) {
     }
 }
 
+
 if(!function_exists('houzez_get_term_slug')) {
     function houzez_get_term_slug($term_id, $tax) {
         if(!empty($term_id)) {
+            // Check if WPML is active
+            if (defined('ICL_SITEPRESS_VERSION')) {
+                $term_id = houzez_translate_object_id($term_id, $tax);
+            }
+
             $term = get_term( $term_id, $tax );
 
             if( !is_wp_error($term) && !empty($term) ) {
@@ -1693,6 +1820,7 @@ if( !function_exists('houzez_is_listings_template') ) {
             'template/property-listings-map.php',
             'template/template-listing-list-v1.php',
             'template/template-listing-list-v2.php',
+            'template/template-listing-list-v4.php',
             'template/template-listing-list-v5.php',
             'template/template-listing-list-v1-fullwidth.php',
             'template/template-listing-list-v2-fullwidth.php',
@@ -1793,6 +1921,7 @@ if( !function_exists('houzez_hide_grid_switcher') ) {
             'template/template-listing-grid-v3-fullwidth-2cols.php',
             'template/template-listing-grid-v3-fullwidth-3cols.php',
             'template/template-listing-list-v7.php',
+            'template/template-listing-list-v4.php',
             'template/template-listing-list-v7-fullwidth.php',
             'template/template-listing-grid-v7.php',
             'template/template-listing-grid-v7-fullwidth-2cols.php',
@@ -1839,6 +1968,8 @@ if( !function_exists( 'houzez_browser_body_class' ) ) {
     function houzez_browser_body_class($classes) {
         global $post;
         
+        $classes[] = 'houzez-theme';
+
         $classes[] = 'houzez-footer-position';
 
         if(houzez_is_dashboard()) {
@@ -2021,60 +2152,6 @@ if(!function_exists('houzez_enqueue_maps_api')) {
     }
 }
 
-if( !function_exists('houzez_check_role') ) {
-    function houzez_check_role() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        //houzez_agent, subscriber, author, houzez_buyer, houzez_owner, houzez_seller, houzez_manager, houzez_agency
-        $use_houzez_roles = 1;
-
-        if( $use_houzez_roles != 0 ) {
-            if (in_array('houzez_buyer', (array)$current_user->roles) || in_array('subscriber', (array)$current_user->roles)) {
-                return false;
-            }
-            return true;
-        }
-        return true;
-    }
-}
-
-
-if( !function_exists('houzez_is_agency') ) {
-    function houzez_is_agency() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        
-        if (in_array('houzez_agency', (array)$current_user->roles)) {
-            return true;
-        }
-        return false;
-    }
-}
-
-if( !function_exists('houzez_is_owner') ) {
-    function houzez_is_owner() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        
-        if (in_array('houzez_owner', (array)$current_user->roles)) {
-            return true;
-        }
-        return false;
-    }
-}
-
-if( !function_exists('houzez_is_buyer') ) {
-    function houzez_is_buyer() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        
-        if (in_array('houzez_buyer', (array)$current_user->roles) || in_array('subscriber', (array)$current_user->roles)) {
-            return true;
-        }
-        return false;
-    }
-}
-
 if(!function_exists('houzez_area_unit_label')) {
     function houzez_area_unit_label() {
         $measurement_unit_adv_search = houzez_option('measurement_unit_adv_search');
@@ -2242,60 +2319,8 @@ if( !function_exists('houzez_show_agent_box') ) {
             if ( in_array('houzez_owner', (array)$current_user->roles) ||
                 in_array('houzez_agent', (array)$current_user->roles) ||
                 in_array('houzez_seller', (array)$current_user->roles) ||
-                in_array('houzez_manager', (array)$current_user->roles) ||
                 in_array('author', (array)$current_user->roles)
             ) {
-                return false;
-            }
-            return true;
-        }
-        return true;
-    }
-}
-
-if( !function_exists('houzez_is_agency') ) {
-    function houzez_is_agency() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        //houzez_agent, subscriber, author, houzez_buyer, houzez_owner
-        $use_houzez_roles = 1;
-
-        if( $use_houzez_roles != 0 ) {
-            if (in_array('houzez_agency', (array)$current_user->roles) ) {
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
-}
-
-if( !function_exists('houzez_is_agent') ) {
-    function houzez_is_agent() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        //houzez_agent, subscriber, author, houzez_buyer, houzez_owner
-        $use_houzez_roles = 1;
-
-        if( $use_houzez_roles != 0 ) {
-            if (in_array('houzez_agent', (array)$current_user->roles) ) {
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
-}
-
-if( !function_exists('houzez_not_buyer') ) {
-    function houzez_not_buyer() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        //houzez_agent, subscriber, author, houzez_buyer, houzez_owner
-        $use_houzez_roles = 1;
-
-        if( $use_houzez_roles != 0 ) {
-            if (in_array('houzez_buyer', (array)$current_user->roles) ) {
                 return false;
             }
             return true;
@@ -2668,6 +2693,20 @@ if (!function_exists('houzez_get_all_states')) {
         return $selectStateOptions;
     }
 }
+
+if( ! function_exists('houzez_delete_term_meta_data') ) {
+    function houzez_delete_term_meta_data($term, $tt_id, $taxonomy, $deleted_term) {
+        if ($taxonomy == 'property_city' || $taxonomy == 'property_state' || $taxonomy == 'property_area') {
+            // Construct the option name
+            $option_name = '_houzez_' . $taxonomy . '_' . $term;
+            
+            // Delete the option from wp_options table
+            delete_option($option_name);
+        }
+    }
+    add_action('delete_term', 'houzez_delete_term_meta_data', 10, 4);
+}
+
 
 
 if ( !function_exists( 'update_recent_colors' ) ) {
@@ -3605,7 +3644,7 @@ if( !function_exists( 'houzez_pagination' ) ){
                         if( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) {
                             $output .= '<li class="page-item">';
                                 $output .= '<a class="page-link" href="'.get_pagenum_link( $pages ).'" aria-label="Next">';
-                                    $output .= '<i class="houzez-icon arrow-button-right-1"></i>';
+                                    $output .= '<i class="houzez-icon icon-arrow-button-right-1"></i>';
                                 $output .= '</a>';
                             $output .= '</li>';
                         }
@@ -4277,6 +4316,12 @@ if( !function_exists('houzez_get_image_placeholder')){
 
         $placeholder_url = houzez_option( 'houzez_placeholder', false, 'url' );
 
+        if( is_singular('houzez_agent') ) {
+            $placeholder_url = houzez_option( 'houzez_agent_placeholder', false, 'url' );
+        } elseif(is_singular('houzez_agency')) {
+            $placeholder_url = houzez_option( 'houzez_agency_placeholder', false, 'url' );
+        }
+
         if ( ! empty( $placeholder_url ) ) {
             $placeholder_image_id = attachment_url_to_postid( $placeholder_url );
             if ( ! empty( $placeholder_image_id ) ) {
@@ -4638,8 +4683,7 @@ if(!function_exists('houzez_hirarchical_options')){
                     $parent_city = sanitize_title($term_meta['parent_city']);
 
                     if ( class_exists( 'sitepress' ) ) {
-                        $default_lang = apply_filters( 'wpml_default_language', NULL );
-                        $term_id_default = apply_filters( 'wpml_object_id', $term->term_id, 'property_area', true, $default_lang );
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_area');
                         $term_meta= get_option( "_houzez_property_area_$term_id_default");
                         $parent_city = sanitize_title($term_meta['parent_city']);
                         $parent_city = get_term_by( 'slug', $parent_city, 'property_city' )->slug;
@@ -4653,11 +4697,11 @@ if(!function_exists('houzez_hirarchical_options')){
                     
                 } elseif( $taxonomy_name == 'property_city' ) {
                     $term_meta= get_option( "_houzez_property_city_$term->term_id");
-                    $parent_state = sanitize_title($term_meta['parent_state']);
+                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
+                    $parent_state = sanitize_title($parent_state);
 
                     if ( class_exists( 'sitepress' ) ) {
-                        $default_lang = apply_filters( 'wpml_default_language', NULL );
-                        $term_id_default = apply_filters( 'wpml_object_id', $term->term_id, 'property_city', true, $default_lang );
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_city');
                         $term_meta= get_option( "_houzez_property_city_$term_id_default");
                         $parent_state = sanitize_title($term_meta['parent_state']);
                         $parent_state = get_term_by( 'slug', $parent_state, 'property_state' )->slug;
@@ -4675,8 +4719,7 @@ if(!function_exists('houzez_hirarchical_options')){
                     $parent_country = sanitize_title($term_meta['parent_country']);
 
                     if ( class_exists( 'sitepress' ) ) {
-                        $default_lang = apply_filters( 'wpml_default_language', NULL );
-                        $term_id_default = apply_filters( 'wpml_object_id', $term->term_id, 'property_state', true, $default_lang );
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_state');
                         $term_meta= get_option( "_houzez_property_state_$term_id_default");
                         $parent_country = sanitize_title($term_meta['parent_country']);
                         $parent_country = get_term_by( 'slug', $parent_country, 'property_country' )->slug;
@@ -5914,63 +5957,70 @@ if(!function_exists('houzez_get_search_taxonomies')){
                 } else {
                     $output.= '<option data-ref="'.esc_attr($category->slug).'" '.$data_attr.' '.$data_subtext.' value="' . esc_attr($category->slug) . '">' . esc_attr($category->name) . '</option>';
                 }
- 
-                foreach( $taxonomies as $subcategory ) {
-                    if($subcategory->parent == $category->term_id) {
- 
-                        $data_attr_child = '';
-                        if( $taxonomy_name == 'property_city' ) {
-                            $term_meta= get_option( "_houzez_property_city_$subcategory->term_id");
-                            $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                            $parent_state = sanitize_title($parent_state);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
- 
-                        } elseif( $taxonomy_name == 'property_area' ) {
-                            $term_meta= get_option( "_houzez_property_area_$subcategory->term_id");
-                            $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                            $parent_city = sanitize_title($parent_city);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
- 
-                        } elseif( $taxonomy_name == 'property_state' ) {
-                            $term_meta= get_option( "_houzez_property_state_$subcategory->term_id");
-                            $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                            $parent_country = sanitize_title($parent_country);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
-                        }
- 
-                        if ( !empty($searched_data) && in_array( $subcategory->slug, $searched_data ) ) {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '" selected="selected"> - '. esc_attr($subcategory->name) . '</option>';
-                        } else {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '"> - ' . esc_attr($subcategory->name) . '</option>';
-                        }
- 
-                        foreach( $taxonomies as $subsubcategory ) {
-                            if($subsubcategory->parent == $subcategory->term_id) {
- 
-                                $data_attr_child = '';
-                                if( $taxonomy_name == 'property_city' ) {
-                                    $term_meta= get_option( "_houzez_property_city_$subsubcategory->term_id");
-                                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                                    $parent_state = sanitize_title($parent_state);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
- 
-                                } elseif( $taxonomy_name == 'property_area' ) {
-                                    $term_meta= get_option( "_houzez_property_area_$subsubcategory->term_id");
-                                    $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                                    $parent_city = sanitize_title($parent_city);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
- 
-                                } elseif( $taxonomy_name == 'property_state' ) {
-                                    $term_meta= get_option( "_houzez_property_state_$subsubcategory->term_id");
-                                    $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                                    $parent_country = sanitize_title($parent_country);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
-                                }
- 
-                                if ( !empty($searched_data) && in_array( $subsubcategory->slug, $searched_data ) ) {
-                                    $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '" selected="selected"> - '. esc_attr($subsubcategory->name) . '</option>';
-                                } else {
-                                    $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '"> -- ' . esc_attr($subsubcategory->name) . '</option>';
+    
+                $children = get_term_children($category->term_id, $taxonomy_name);
+                if (!empty($children)) {
+                    foreach( $taxonomies as $subcategory ) {
+                        if($subcategory->parent == $category->term_id) {
+     
+                            $data_attr_child = '';
+                            if( $taxonomy_name == 'property_city' ) {
+                                $term_meta= get_option( "_houzez_property_city_$subcategory->term_id");
+                                $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
+                                $parent_state = sanitize_title($parent_state);
+                                $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
+     
+                            } elseif( $taxonomy_name == 'property_area' ) {
+                                $term_meta= get_option( "_houzez_property_area_$subcategory->term_id");
+                                $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
+                                $parent_city = sanitize_title($parent_city);
+                                $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
+     
+                            } elseif( $taxonomy_name == 'property_state' ) {
+                                $term_meta= get_option( "_houzez_property_state_$subcategory->term_id");
+                                $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
+                                $parent_country = sanitize_title($parent_country);
+                                $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
+                            }
+     
+                            if ( !empty($searched_data) && in_array( $subcategory->slug, $searched_data ) ) {
+                                $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '" selected="selected"> - '. esc_attr($subcategory->name) . '</option>';
+                            } else {
+                                $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '"> - ' . esc_attr($subcategory->name) . '</option>';
+                            }
+                            
+                            $subchildren = get_term_children($subcategory->term_id, $taxonomy_name);
+
+                            if( ! empty($subchildren) ) {
+                                foreach( $taxonomies as $subsubcategory ) {
+                                    if($subsubcategory->parent == $subcategory->term_id) {
+         
+                                        $data_attr_child = '';
+                                        if( $taxonomy_name == 'property_city' ) {
+                                            $term_meta= get_option( "_houzez_property_city_$subsubcategory->term_id");
+                                            $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
+                                            $parent_state = sanitize_title($parent_state);
+                                            $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
+         
+                                        } elseif( $taxonomy_name == 'property_area' ) {
+                                            $term_meta= get_option( "_houzez_property_area_$subsubcategory->term_id");
+                                            $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
+                                            $parent_city = sanitize_title($parent_city);
+                                            $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
+         
+                                        } elseif( $taxonomy_name == 'property_state' ) {
+                                            $term_meta= get_option( "_houzez_property_state_$subsubcategory->term_id");
+                                            $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
+                                            $parent_country = sanitize_title($parent_country);
+                                            $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
+                                        }
+         
+                                        if ( !empty($searched_data) && in_array( $subsubcategory->slug, $searched_data ) ) {
+                                            $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '" selected="selected"> - '. esc_attr($subsubcategory->name) . '</option>';
+                                        } else {
+                                            $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '"> -- ' . esc_attr($subsubcategory->name) . '</option>';
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -6283,7 +6333,8 @@ if(!function_exists('houzez_taxonomy_hirarchical_options_for_search')){
 
                 } elseif( $taxonomy_name == 'property_city' ) {
                     $term_meta= get_option( "_houzez_property_city_$term->term_id");
-                    $parent_state = sanitize_title($term_meta['parent_state']);
+                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
+                    $parent_state = sanitize_title($parent_state);
 
                     if ($target_term_name == $term->slug) {
                         echo '<option data-ref="' . urldecode($term->slug) . '" data-belong="'.urldecode($parent_state).'" value="' . urldecode($term->slug) . '" selected="selected">' . esc_attr($prefix) . esc_attr($term->name) . '</option>';
@@ -7079,6 +7130,24 @@ if( !function_exists('houzez_countries_list') ) {
     }
 }
 
+
+if( ! function_exists('houzez_get_referer_url') ) {
+    function houzez_get_referer_url() {
+        $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+        $parsedUrl = parse_url($referer);
+
+        $urlOnly = '';
+        if (!empty($parsedUrl)) {
+            $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : '';
+            $host   = $parsedUrl['host'] ?? '';
+            $path   = $parsedUrl['path'] ?? '';
+            $urlOnly = $scheme . $host . $path;
+        }
+
+        return $urlOnly;
+    }
+}
+
 /* --------------------------------------------------------------------------
  * Breadcrumb from http://dimox.net/wordpress-breadcrumbs-without-a-plugin/
  ---------------------------------------------------------------------------*/
@@ -7094,6 +7163,7 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
         );
 
         $text['home']     = esc_html__('Home', 'houzez'); // text for the 'Home' link
+        $text['backto_search']     = esc_html__('Back to Search', 'houzez'); // text for the 'Home' link
         $text['category'] = esc_html__('%s', 'houzez'); // text for a category page
         $text['tax']      = esc_html__('%s', 'houzez'); // text for a taxonomy page
         $text['search']   = esc_html__('Search Results for "%s" Query', 'houzez'); // text for a search results page
@@ -7121,7 +7191,7 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
 
         extract($defaults);
 
-        $link = '<a href="%1$s"><span>' . $link_in_before . '%2$s' . $link_in_after . '</span></a>';
+        $link = '<a href="%1$s">' . $link_in_before . '%2$s' . $link_in_after . '</a>';
 
         // form whole link option
         $link = $link_before . $link . $link_after;
@@ -7169,7 +7239,20 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
 
         } else {
 
-            echo '<ol class="breadcrumb">' .$home_before . sprintf($link, $home_link, $text['home']) . $home_after . $delimiter;
+            echo '<ol class="breadcrumb">'; 
+
+            $page_url = houzez_get_referer_url();
+
+            if( ! empty($page_url) ) {
+                $page_id = url_to_postid( $page_url );
+                $template_file = get_page_template_slug( $page_id );
+
+                if( $template_file == 'template/template-search.php' || $template_file == 'template/property-listings-map.php' ) {
+                    echo '<li class="breadcrumb-item breadcrumb-item-back-to-search"><a href="'.esc_url($_SERVER['HTTP_REFERER']).'">'.esc_attr($text['backto_search']).'</a></li>';
+                }
+            }
+
+            echo '<li class="breadcrumb-item breadcrumb-item-home"><i class="houzez-icon icon-house"></i><a href="'.esc_url($home_link).'">' . esc_html($text['home']) . '</a></li>';
 
             if (is_category() || is_tax())
             {
@@ -7281,7 +7364,7 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
                             if (is_wp_error($term_link)) {
                                 continue;
                             }
-                            echo '<li class="breadcrumb-item"><a href="' . esc_url($term_link) . '"> <span>' . esc_attr( $term->name ). '</span></a></li>';
+                            echo '<li class="breadcrumb-item"><a href="' . esc_url($term_link) . '"> ' . esc_attr( $term->name ). '</a></li>';
                         }
                     }
 
@@ -7292,7 +7375,7 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
                             if (is_wp_error($term_link)) {
                                 continue;
                             }
-                            echo '<li class="breadcrumb-item"><a href="' . esc_url($term_link) . '"> <span>' . esc_attr( $term->name ). '</span></a></li>';
+                            echo '<li class="breadcrumb-item"><a href="' . esc_url($term_link) . '"> ' . esc_attr( $term->name ). '</a></li>';
                         }
                     }
 
@@ -7838,5 +7921,107 @@ if( ! function_exists( 'houzez_stripe_3digits_currencies' ) ) {
             'TND'
         );
         return $currencies;
+    }
+}
+
+// Function to standardize Telegram URL to https://t.me/username format
+if( ! function_exists('houzezStandardizeTelegramURL') ) {
+    function houzezStandardizeTelegramURL($url) {
+        $parsedUrl = parse_url($url);
+        $path = $parsedUrl['path'] ?? '';
+
+        // Extracting the username part
+        $username = trim($path, '/');
+
+        // Handling the case where URL might be in the format 'https://username.t.me'
+        if (isset($parsedUrl['host']) && strpos($parsedUrl['host'], 't.me') !== false && $username === '') {
+            $username = str_replace(['t.me', 'telegram.me'], '', $parsedUrl['host']);
+            $username = trim($username, '/');
+        }
+
+        // Reconstruct the URL in the standard format
+        return 'https://t.me/' . $username;
+    }
+}
+
+add_action( 'template_redirect', 'houzez_redirect_disapproved_properties' );
+
+if( ! function_exists('houzez_redirect_disapproved_properties') ) {
+
+    function houzez_redirect_disapproved_properties() {
+        if ( is_singular( 'property' ) ) { // Check if it's a single 'property' post
+            global $post;
+
+            if ( $post->post_status == 'disapproved' ) { // Check if the status is 'disapproved'
+                global $wp_query;
+                $wp_query->set_404(); // Set the query to a 404 not found
+                status_header( 404 ); // Send a 404 status header
+                get_template_part( 404 ); // Load the 404.php template
+                exit;
+            }
+        }
+    }
+}
+
+
+if( ! function_exists('houzez_translate_object_id') ) {
+    /**
+     * Returns the translated object ID(post_type or term) or original if missing
+     *
+     * @param $object_id integer|string|array The ID/s of the objects to check and return
+     * @param $type the object type: post, page, {custom post type name}, nav_menu, nav_menu_item, category, tag etc.
+     * @return string or array of object ids
+     */
+    function houzez_translate_object_id( $object_id, $type ) {
+        $current_language= apply_filters( 'wpml_current_language', NULL );
+        // if array
+        if( is_array( $object_id ) ){
+            $translated_object_ids = array();
+            foreach ( $object_id as $id ) {
+                $translated_object_ids[] = apply_filters( 'wpml_object_id', $id, $type, true, $current_language );
+            }
+            return $translated_object_ids;
+        }
+        // if string
+        elseif( is_string( $object_id ) ) {
+            // check if we have a comma separated ID string
+            $is_comma_separated = strpos( $object_id,"," );
+     
+            if( $is_comma_separated !== FALSE ) {
+                // explode the comma to create an array of IDs
+                $object_id     = explode( ',', $object_id );
+     
+                $translated_object_ids = array();
+                foreach ( $object_id as $id ) {
+                    $translated_object_ids[] = apply_filters ( 'wpml_object_id', $id, $type, true, $current_language );
+                }
+     
+                // make sure the output is a comma separated string (the same way it came in!)
+                return implode ( ',', $translated_object_ids );
+            }
+            // if we don't find a comma in the string then this is a single ID
+            else {
+                return apply_filters( 'wpml_object_id', intval( $object_id ), $type, true, $current_language );
+            }
+        }
+        // if int
+        else {
+            return apply_filters( 'wpml_object_id', $object_id, $type, true, $current_language );
+        }
+    }
+}
+
+if( ! function_exists('houzez_ensure_iframe_closing_tag') ) {
+    function houzez_ensure_iframe_closing_tag($html) {
+        // Regular expression to match an iframe tag without a closing tag
+        $pattern = '/<iframe[^>]*>(?!<\/iframe>)/i';
+        
+        // Check if the iframe tag is not closed
+        if (preg_match($pattern, $html)) {
+            // Add the closing iframe tag
+            $html = preg_replace($pattern, '$0</iframe>', $html);
+        }
+        
+        return $html;
     }
 }

@@ -16,9 +16,7 @@ class Favethemes_Menu {
 	 */
 	private $fields = array(
 		'design',
-		'behavior',
 		'width',
-		'height',
 		'html_block',
 		'icon_type',
 		'icon_id',
@@ -38,7 +36,7 @@ class Favethemes_Menu {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->elementor_blocks = houzez_get_elementor_library('html_blocks');
+		$this->elementor_blocks = houzez_get_studio_library('tmp_megamenu');
 		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_fields' ), 10, 5 );
 		add_action( 'wp_update_nav_menu_item', array( $this, 'update_menu_fields' ), 10, 3 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
@@ -54,11 +52,9 @@ class Favethemes_Menu {
 	 * @param int       $menu_id 
 	 */
 	public function add_menu_fields( $item_id, $menu_item, $depth, $args, $menu_id ) {
-		$behavior    = get_post_meta( $item_id, '_menu_item_behavior', true );
 		$html_block  = get_post_meta( $item_id, '_menu_item_html_block', true );
 		$design      = get_post_meta( $item_id, '_menu_item_design', true );
 		$width       = get_post_meta( $item_id, '_menu_item_width', true );
-		$height      = get_post_meta( $item_id, '_menu_item_height', true );
 		$icon_type   = get_post_meta( $item_id, '_menu_item_icon_type', true );
 		$icon_id     = get_post_meta( $item_id, '_menu_item_icon_id', true );
 		$icon_width  = get_post_meta( $item_id, '_menu_item_icon_width', true );
@@ -77,9 +73,8 @@ class Favethemes_Menu {
 						<?php esc_html_e('Design', 'houzez'); ?><br>
 						<select id="edit-menu-item-design-<?php echo esc_attr( $item_id ); ?>" class="widefat" name="menu-item-design[<?php echo esc_attr( $item_id ); ?>]">
 							<option value="default" <?php selected( $design, 'default', true ); ?>><?php esc_html_e('Default', 'houzez'); ?></option>
-							<option value="custom-size" <?php selected( $design, 'custom-size', true ); ?>><?php esc_html_e('Custom Size', 'houzez'); ?></option>
-							<option value="container-width" <?php selected( $design, 'container-width', true ); ?>><?php esc_html_e('Container width', 'houzez'); ?></option>
 							<option value="full-width" <?php selected( $design, 'full-width', true ); ?>><?php esc_html_e('Full width', 'houzez'); ?></option>
+							<!-- <option value="custom-size" <?php selected( $design, 'custom-size', true ); ?>><?php esc_html_e('Custom Size', 'houzez'); ?></option> -->
 						</select>
 					</label>
 					<small class="field-instruction"><?php esc_html_e('Choose dropdown design.', 'houzez'); ?></small>
@@ -91,13 +86,7 @@ class Favethemes_Menu {
 						<input type="number" id="edit-menu-item-width-<?php echo esc_attr( $item_id ); ?>" class="widefat" min="0" name="menu-item-width[<?php echo esc_attr( $item_id ); ?>]" value="<?php echo esc_attr( $width ); ?>">
 					</label>
 				</p>
-				<p class="field-menu-item-height description description-thin">
-					<label for="edit-menu-item-height-<?php echo esc_attr( $item_id ); ?>">
-						<?php esc_html_e( 'Height (optional)', 'houzez' ); ?> (px)<br>
-						<input type="number" id="edit-menu-item-height-<?php echo esc_attr( $item_id ); ?>" class="widefat" min="0" name="menu-item-height[<?php echo esc_attr( $item_id ); ?>]" value="<?php echo esc_attr( $height ); ?>">
-					</label>
-				</p>
-
+				
 				<p class="field-menu-item-block description description-wide">
 					<label for="edit-menu-item-block-<?php echo esc_attr( $item_id ); ?>">
 						<?php esc_html_e('Elementor Block', 'houzez'); ?><br>
@@ -109,15 +98,6 @@ class Favethemes_Menu {
 						</select>
 					</label>
 					<small class="field-instruction"><?php esc_html_e('Choose elementor block for this menu.', 'houzez'); ?></small>
-				</p>
-				<p class="field-menu-item-hover description description-wide">
-					<label for="edit-menu-item-behavior-<?php echo esc_attr( $item_id ); ?>">
-						<?php esc_html_e( 'Reveal', 'houzez' ); ?><br>
-						<select id="edit-menu-item-behavior-<?php echo esc_attr( $item_id ); ?>" class="widefat" name="menu-item-behavior[<?php echo esc_attr( $item_id ); ?>]">
-							<option value="hover" <?php selected( $behavior, 'hover', true ); ?>><?php esc_html_e( 'On hover', 'houzez' ); ?></option>
-							<option value="click" <?php selected( $behavior, 'click', true ); ?>><?php esc_html_e( 'On click', 'houzez' ); ?></option>
-						</select>
-					</label>
 				</p>
 			</div>
 		</div>

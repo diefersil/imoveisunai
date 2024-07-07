@@ -1,5 +1,5 @@
 <?php
-$all_enquires = Houzez_Enquiry::get_enquires();
+global $all_enquires;
 
 $is_not_lead_detail = true;
 if(isset($_GET['tab']) && $_GET['tab'] == 'enquires') {
@@ -15,22 +15,12 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
 
 if(!empty($all_enquires['data']['results'])) {
 ?>
-<div class="d-flex justify-content-between mb-3">
-    <div><?php echo esc_attr($all_enquires['data']['total_records']); ?> <?php esc_html_e('Inquiries found', 'houzez'); ?></div> 
-    <div>
-        
-        <button id="enquiry_delete_multiple" class="btn btn-danger btn-slim ">
-            <i class="houzez-icon icon-remove-circle mr-1"></i> 
-            <?php esc_html_e('Delete', 'houzez'); ?>
-        </button>
-    </div>    
-</div>
 <table class="dashboard-table table-lined table-hover responsive-table">
     <thead>
         <tr>
             <th>
                 <label class="control control--checkbox">
-                    <input type="checkbox" id="enquiry_select_all" name="enquiry_multicheck">
+                    <input type="checkbox" class="enquiry_multi_delete" id="enquiry_select_all" name="enquiry_multicheck">
                     <span class="control__indicator"></span>
                 </label>
             </th>
@@ -154,28 +144,6 @@ if(!empty($all_enquires['data']['results'])) {
         } ?>
 
     </tbody>
-
-    <tfoot>
-        <tr>
-            <td colspan="<?php echo esc_attr($colspan); ?>">
-                <?php get_template_part('template-parts/dashboard/board/records-html'); ?>
-            </td>
-            <td class="text-right no-wrap">
-                <div class="crm-pagination">
-                    <?php
-                    echo paginate_links( array(
-                        'base' => add_query_arg( 'cpage', '%#%' ),
-                        'format' => '',
-                        'prev_text' => __('&laquo;'),
-                        'next_text' => __('&raquo;'),
-                        'total' => ceil($all_enquires['data']['total_records'] / $all_enquires['data']['items_per_page']),
-                        'current' => $all_enquires['data']['page']
-                    ));
-                    ?>
-                </div>
-            </td>
-        </tr>
-    </tfoot>
 </table><!-- dashboard-table -->
 <?php
 } else { ?>

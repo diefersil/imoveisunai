@@ -54,9 +54,6 @@ $show_hide_roles = houzez_option('show_hide_roles');
 	                    if( $show_hide_roles['seller'] != 1 ) {
 	                        echo '<option value="houzez_seller"> ' . houzez_option('seller_role') . '  </option>';
 	                    }
-	                    if( $show_hide_roles['manager'] != 1 ) {
-	                        echo '<option value="houzez_manager"> ' . houzez_option('manager_role') . ' </option>';
-	                    }
 	                    ?>
 	                </select>
 				</div><!-- col-md-3 col-sm-12 -->

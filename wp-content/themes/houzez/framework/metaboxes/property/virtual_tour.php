@@ -34,7 +34,7 @@ function houzez_virtual_tour_metabox_fields( $metabox_fields ) {
 		array(
             'id' => "{$houzez_prefix}virtual_tour",
             'name' => houzez_option('cls_virtual_tour', '360° Virtual Tour'),
-            'placeholder' => houzez_option('cl_virtual_plac', 'Enter virtual tour iframe/embeded code'),
+            'placeholder' => houzez_option('cl_virtual_plac', 'Enter virtual tour link OR iframe/embeded code'),
             'type' => 'textarea',
             'columns' => 12,
             'sanitize_callback' => 'none',

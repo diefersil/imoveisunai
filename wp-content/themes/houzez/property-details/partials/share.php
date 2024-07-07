@@ -15,7 +15,7 @@ echo '<a class="dropdown-item" href="https://www.facebook.com/sharer.php?u=' . u
 	<i class="houzez-icon icon-social-media-facebook mr-1"></i> '.esc_html__('Facebook', 'houzez').'
 </a>
 <a class="dropdown-item" href="https://twitter.com/intent/tweet?text=' . urlencode(get_the_title()) . '&url=' .  urlencode(get_permalink()) . '&via=' . urlencode($twitter_user ? $twitter_user : get_bloginfo('name')) .'" onclick="if(!document.getElementById(\'td_social_networks_buttons\')){window.open(this.href, \'mywin\',\'left=50,top=50,width=600,height=350,toolbar=0\'); return false;}">
-	<i class="houzez-icon icon-social-media-twitter mr-1"></i> '.esc_html__('Twitter', 'houzez').'
+	<i class="houzez-icon icon-x-logo-twitter-logo-2 mr-1"></i> '.esc_html__('Twitter', 'houzez').'
 </a>
 <a class="dropdown-item" href="https://pinterest.com/pin/create/button/?url='. urlencode( get_permalink() ) .'&amp;media=' . (!empty($image[0]) ? $image[0] : '') . '" onclick="window.open(this.href, \'mywin\',\'left=50,top=50,width=600,height=350,toolbar=0\'); return false;">
 	<i class="houzez-icon icon-social-pinterest mr-1"></i> '.esc_html__('Pinterest', 'houzez').'

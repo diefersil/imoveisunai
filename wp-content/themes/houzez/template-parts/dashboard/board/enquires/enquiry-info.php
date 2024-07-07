@@ -1,17 +1,19 @@
 <?php
 global $enquiry, $lead;
 $temp_array = array();
-$first_name = $last_name = '';
-if(isset($_GET['enquiry'])) {
+$first_name = $last_name = $display_name = '';
+if( isset($_GET['enquiry']) ) {
 	$dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
 
 	$meta = maybe_unserialize($enquiry->enquiry_meta);
 	$message = $enquiry->message;
 	$private_note = $enquiry->private_note;
 
-	$display_name = $lead->display_name;
-	$first_name = $lead->first_name;
-	$last_name = $lead->last_name;
+	if( ! empty($lead) ) {
+		$display_name = $lead->display_name;
+		$first_name = $lead->first_name;
+		$last_name = $lead->last_name;
+	}
 
 	if(empty($display_name)) {
 		$display_name = $first_name.' '.$last_name;

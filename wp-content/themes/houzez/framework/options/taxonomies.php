@@ -62,6 +62,7 @@ Redux::setSection( $houzez_opt_name, array(
 
                 'Listings Version 4' => array(
                     'grid-view-v4' => 'Grid View',
+                    'list-view-v4' => 'List View',
                 ),
 
                 'Listings Version 5' => array(
@@ -94,6 +95,7 @@ Redux::setSection( $houzez_opt_name, array(
                 'd_price' => esc_html__( 'Price (High to Low)', 'houzez' ),
                 'a_price' => esc_html__( 'Price (Low to High)', 'houzez' ),
                 'featured_first' => esc_html__( 'Show Featured Listings on Top', 'houzez' ),
+                'featured_first_random' => esc_html__( 'Show Featured Listings on Top - Randomly', 'houzez' ),
                 'random' => esc_html__( 'Random Listings', 'houzez' ),
             ),
             'default' => 'd_date'

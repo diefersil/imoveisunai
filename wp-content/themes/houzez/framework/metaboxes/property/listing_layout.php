@@ -44,7 +44,8 @@ function houzez_listing_layout_metabox_fields( $metabox_fields ) {
                 'v3' => esc_html__( 'Version 3', 'houzez' ),
                 'v4' => esc_html__( 'Version 4', 'houzez' ),
                 'v5' => esc_html__( 'Version 5', 'houzez' ),
-                'v6' => esc_html__( 'Version 6', 'houzez' )
+                'v6' => esc_html__( 'Version 6', 'houzez' ),
+                'v7' => esc_html__( 'Version 7', 'houzez' )
             ),
             'columns' => 12,
             'tab' => 'listing_layout'

@@ -38,12 +38,12 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
     if ( ! empty( $property_data ) && ( $property_data->post_type == 'property' ) ) {
         $prop_meta_data = get_post_custom( $property_data->ID );
 
-        if ( $property_data->post_author == $current_user->ID ) {
+        if ( $property_data->post_author == $current_user->ID || houzez_can_manage() || houzez_is_editor() ) {
         
         if ( !houzez_is_admin() && $property_data->post_status == 'draft' && $enable_paid_submission == 'membership' && $remaining_listings != -1 && $remaining_listings < 1 && is_user_logged_in() ) {
         if (!houzez_user_has_membership($userID)) {
             print '<div class="user_package_status">
-                    <h4>' . esc_html__("You don\'t have any package! You need to buy your package.", 'houzez') . '</h4>
+                    <h4>' . esc_html__("You don't have any package! You need to buy your package.", 'houzez') . '</h4>
                     <a class="btn btn-primary" href="' . $select_packages_link . '">' . esc_html__('Get Package', 'houzez') . '</a>
                     </div>';
         } else {
@@ -160,6 +160,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             
             <?php wp_nonce_field('submit_property', 'property_nonce'); ?>
             <input type="hidden" name="action" value="update_property"/>
+            <input type="hidden" name="property_author" value="<?php echo intval($property_data->post_author);?>"/>
             <input type="hidden" name="prop_id" value="<?php echo intval( $property_data->ID ); ?>"/>
 
             <?php if( ! houzez_is_admin() ) { ?>

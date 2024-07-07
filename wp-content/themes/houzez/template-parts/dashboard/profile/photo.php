@@ -1,6 +1,9 @@
 <?php
 global $houzez_local;
 $userID = get_current_user_id();
+if (isset($_GET['edit_user']) && is_numeric($_GET['edit_user'])) {
+    $userID = intval($_GET['edit_user']); // Sanitize the input
+}
 
 $user_custom_picture    =   get_the_author_meta( 'fave_author_custom_picture' , $userID );
 $author_picture_id      =   get_the_author_meta( 'fave_author_picture_id' , $userID );
@@ -13,6 +16,7 @@ if($user_custom_picture =='' ) {
 <div id="houzez_profile_photo" class="profile-image">
 <?php
 if( !empty( $author_picture_id ) ) {
+    echo '<a href="#" class="delete-profile-pic"><i class="houzez-icon icon-close"></i></a>';
     $author_picture_id = intval( $author_picture_id );
     if ( $author_picture_id ) {
         echo wp_get_attachment_image( $author_picture_id, 'large', "", array( "class" => "img-fluid" ) );

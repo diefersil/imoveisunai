@@ -49,16 +49,18 @@ if( is_page_template( 'template/user_dashboard_profile.php' ) ) {
 }
 
 $agency_agents = add_query_arg( 'agents', 'list', $dash_profile_link );
-$agency_agent_add = add_query_arg( 'agent', 'add_new', $dash_profile_link );
+$agency_agent_add = add_query_arg( 'agents', 'add_new', $dash_profile_link );
 
 $all = add_query_arg( 'prop_status', 'all', $dashboard_listings );
+$mine_link = add_query_arg( 'prop_status', 'mine', $dashboard_listings );
 $approved = add_query_arg( 'prop_status', 'approved', $dashboard_listings );
 $pending = add_query_arg( 'prop_status', 'pending', $dashboard_listings );
 $expired = add_query_arg( 'prop_status', 'expired', $dashboard_listings );
 $draft = add_query_arg( 'prop_status', 'draft', $dashboard_listings );
 $on_hold = add_query_arg( 'prop_status', 'on_hold', $dashboard_listings );
+$disapproved = add_query_arg( 'prop_status', 'disapproved', $dashboard_listings );
 
-$ac_approved = $ac_pending = $ac_expired = $ac_all = $ac_draft = $ac_on_hold = $ac_agents = $ac_agent_new = '';
+$ac_approved = $ac_disapproved = $ac_pending = $ac_expired = $ac_all = $ac_draft = $ac_mine = $ac_on_hold = $ac_agents = $ac_agent_new = '';
 
 if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'approved' ) {
     $ac_approved = $ac_props = 'class=active';
@@ -70,26 +72,41 @@ if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'approved' ) {
     $ac_expired = $ac_props = 'class=active';
 } elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'approved' ) {
     $ac_approved = $ac_props = 'class=active';
+} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'disapproved' ) {
+    $ac_disapproved = $ac_props = 'class=active';
 } elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'draft' ) {
     $ac_draft = $ac_props = 'class=active';
 } elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'on_hold' ) {
     $ac_on_hold = $ac_props = 'class=active';
 } elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'all' ) {
     $ac_all = $ac_props = 'class=active';
+} elseif( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
+    $ac_mine = $ac_props = 'class=active';
 }
 
 if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
     $ac_agents = 'active';
-} elseif( isset( $_GET['agent'] ) && $_GET['agent'] == 'add_new' ) {
+} elseif( isset( $_GET['agents'] ) && $_GET['agents'] == 'add_new' ) {
     $ac_agent_new = 'active';
 }
+
+$all_post_count = houzez_user_posts_count('any');
+$publish_post_count = houzez_user_posts_count('publish');
+$pending_post_count = houzez_user_posts_count('pending');
+$draft_post_count = houzez_user_posts_count('draft');
+$on_hold_post_count = houzez_user_posts_count('on_hold');
+$disapproved_post_count = houzez_user_posts_count('disapproved');
+$expired_post_count = houzez_user_posts_count('expired');
 ?>
 <nav class="navi-user-mobile main-nav navbar slideout-menu slideout-menu-right" id="navi-user">
 	<ul class="navbar-nav">
 		<?php
-		echo '<li class="nav-item">
-			<a href="'.esc_url( home_url( '/' ) ).'"><i class="houzez-icon icon-house mr-2"></i> '.houzez_option('dsh_home', 'Home').'</a>
-		</li>';
+
+		if( houzez_option('dsh_home_btn', 0) == 1 ) {
+			echo '<li class="nav-item">
+				<a href="'.esc_url( home_url( '/' ) ).'"><i class="houzez-icon icon-house mr-2"></i> '.houzez_option('dsh_home', 'Home').'</a>
+			</li>';
+		}
 		if( !empty( $dashboard_crm ) && houzez_check_role() ) {
 			echo '<li class="nav-item dropdown">';
 					echo '<a class="nav-link '.$ac_crm.'" href="'.esc_url($dashboard_crm).'">
@@ -129,48 +146,70 @@ if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
 		}
 
 		if( !empty( $dashboard_listings ) && houzez_check_role() ) {
-			echo '<li class="nav-item dropdown">
+			$properties_menu = '';
+			$properties_menu .= '<li class="nav-item dropdown">
 					<a class="nav-link '.esc_attr( $ac_props ).'" href="'.esc_url($dashboard_listings).'">
 						<i class="houzez-icon icon-building-cloudy mr-2"></i> '.houzez_option('dsh_props', 'Properties').'
 					</a>
 
 					<span class="nav-mobile-trigger dropdown-toggle" data-toggle="dropdown">
 		                <i class="houzez-icon arrow-down-1"></i>
-		            </span>
+		            </span>';
 
-					<ul class="dropdown-menu">
+					$properties_menu .= '<ul class="dropdown-menu">
 						<li class="nav-item">
 							<a '.esc_attr( $ac_all ).' href="'.esc_url($all).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_all', 'all').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_all', 'all').' ('.$all_post_count.')
 							</a>
-						</li>
-						<li class="nav-item">
+						</li>';
+
+						if( houzez_can_manage() || houzez_is_editor() ) {
+							$mine_post_count = houzez_user_posts_count('any', $mine = true);
+							$properties_menu .= '<li class="nav-item">
+									<a '.esc_attr( $ac_mine ).' href="'.esc_url($mine_link).'">
+										<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_mine', 'Mine').' ('.$mine_post_count.')
+									</a>
+								</li>';
+						}
+
+						$properties_menu .= '<li class="nav-item">
 							<a '.esc_attr( $ac_approved ).' href="'.esc_url($approved).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_published', 'published').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_published', 'published').' ('.$publish_post_count.')
 							</a>
-						</li>
-						<li class="nav-item">
+						</li>';
+
+						$properties_menu .= '<li class="nav-item">
 							<a '.esc_attr( $ac_pending ).' href="'.esc_url($pending).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_pending', 'pending').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_pending', 'pending').' ('.$pending_post_count.')
 							</a>
-						</li>
-						<li class="nav-item">
+						</li>';
+
+						$properties_menu .= '<li class="nav-item">
 							<a '.esc_attr( $ac_expired ).' href="'.esc_url($expired).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_expired', 'expired').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_expired', 'expired').' ('.$expired_post_count.')
 							</a>
-						</li>
-						<li class="nav-item">
+						</li>';
+
+						$properties_menu .= '<li class="nav-item">
 							<a '.esc_attr( $ac_draft ).' href="'.esc_url($draft).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_draft', 'draft').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_draft', 'draft').' ('.$draft_post_count.')
 							</a>
-						</li>
-						<li class="nav-item">
+						</li>';
+
+						$properties_menu .= '<li class="nav-item">
 							<a '.esc_attr( $ac_on_hold ).' href="'.esc_url($on_hold).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_hold', 'on_hold').'
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_hold', 'on_hold').' ('.$on_hold_post_count.')
 							</a>
-						</li>
-					</ul>
-				</li>';
+						</li>';
+						$properties_menu .= '<li class="nav-item">
+							<a '.esc_attr( $ac_disapproved ).' href="'.esc_url($disapproved).'">
+								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_disapproved', 'Disapproved').' ('.$disapproved_post_count.')
+							</a>
+						</li>';
+					$properties_menu .= '</ul>';
+				$properties_menu .= '</li>';
+
+				echo $properties_menu;
 	    }
 
 		if( !empty( $dashboard_add_listing ) && houzez_check_role() ) {
@@ -198,7 +237,7 @@ if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
 	    }
 
 
-		if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() ) {
+		if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() && ! houzez_is_admin() ) {
 			echo '<li class="nav-item">
 					<a '.esc_attr($ac_mem).' href="'.esc_attr($dashboard_membership).'">
 						<i class="houzez-icon icon-task-list-text-1 mr-2"></i> '.houzez_option('dsh_membership', 'Membership').'

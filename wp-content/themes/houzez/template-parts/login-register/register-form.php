@@ -86,9 +86,6 @@ $show_hide_roles = houzez_option('show_hide_roles');
         if( isset($show_hide_roles['seller']) && $show_hide_roles['seller'] != 1 ) {
             echo '<option value="houzez_seller"> ' . houzez_option('seller_role') . '  </option>';
         }
-        if( isset($show_hide_roles['manager']) && $show_hide_roles['manager'] != 1 ) {
-            echo '<option value="houzez_manager"> ' . houzez_option('manager_role') . ' </option>';
-        }
         ?>
     </select>
 </div><!-- form-group -->
@@ -105,16 +102,6 @@ $show_hide_roles = houzez_option('show_hide_roles');
     </label>
 </div><!-- form-tools -->
 
-<?php if(houzez_option('agent_forms_terms')) { ?>
-<div class="form-tools">
-    <label class="control control--checkbox">
-        <input name="privacy_policy" type="checkbox"> <?php echo houzez_option('agent_forms_terms_text'); ?>
-        <span class="control__indicator"></span>
-    </label>
-</div><!-- form-tools -->
-<?php } ?>
-
-
 <?php get_template_part('template-parts/google', 'reCaptcha'); ?>
 
 <?php wp_nonce_field( 'houzez_register_nonce', 'houzez_register_security' ); ?>
@@ -125,17 +112,17 @@ $show_hide_roles = houzez_option('show_hide_roles');
 </button>
 </form>
 
-<?php if( houzez_option('facebook_login') != 'no' || houzez_option('google_login') != 'no' ) { ?>
+<?php if( houzez_option('facebook_login') == 'yes' || houzez_option('google_login') == 'yes' ) { ?>
 <div class="social-login-wrap">
 
-    <?php if( houzez_option('facebook_login') != 'no' ) { ?>
+    <?php if( houzez_option('facebook_login') == 'yes' ) { ?>
     <button type="button" class="hz-facebook-login btn btn-facebook-login btn-full-width">
         <?php get_template_part('template-parts/loader'); ?>
         <?php esc_html_e( 'Continue with Facebook', 'houzez' ); ?>
     </button>
     <?php } ?>
 
-    <?php if( houzez_option('google_login') != 'no' ) { ?>
+    <?php if( houzez_option('google_login') == 'yes' ) { ?>
     <button type="button" class="hz-google-login btn btn-google-plus-lined btn-full-width">
         <?php get_template_part('template-parts/loader'); ?>
         <img class="google-icon" src="<?php echo HOUZEZ_IMAGE; ?>Google__G__Logo.svg"/> <?php esc_html_e( 'Sign in with google', 'houzez' ); ?>

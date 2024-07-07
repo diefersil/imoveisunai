@@ -24,6 +24,8 @@ if(!taxonomy_exists('property_area')) {
 
 unset($layout['placebo']);
 
+$layout = array_slice($layout, 0, houzez_search_builder_first_row());
+
 if(houzez_is_radius_search() != 1) {
 	unset($layout['geolocation']);
 }
@@ -86,8 +88,8 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 							echo '</div>';
 							
 						}
-						if($i == houzez_search_builder_first_row())
-							break;
+						/*if($i == houzez_search_builder_first_row())
+							break;*/
 					}
 				}
 				?>

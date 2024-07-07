@@ -19,6 +19,7 @@ if(!class_exists('houzez_data_source')) {
                         'property_ids' => '',
                         'posts_limit' => '',
                         'sort_by' => '',
+                        'post_status' => '',
                         'offset' => '',
                         'min_price' => '',
                         'max_price' => '',
@@ -111,6 +112,11 @@ if(!class_exists('houzez_data_source')) {
                     'value'   => $properties_by_agents,
                     'compare' => 'IN',
                 );
+                $meta_query[] = array(
+                    'key'     => 'fave_agent_display_option',
+                    'value'   => 'agent_info',
+                    'compare' => '=',
+                );
             }
 
             if ( !empty($properties_by_agencies) && count( $properties_by_agencies ) >= 1 ) {
@@ -118,6 +124,12 @@ if(!class_exists('houzez_data_source')) {
                     'key'     => 'fave_property_agency',
                     'value'   => $properties_by_agencies,
                     'compare' => 'IN',
+                );
+
+                $meta_query[] = array(
+                    'key'     => 'fave_agent_display_option',
+                    'value'   => 'agency_info',
+                    'compare' => '=',
                 );
             }
 
@@ -214,6 +226,9 @@ if(!class_exists('houzez_data_source')) {
             } else if ( $sort_by == 'featured_first' ) {
                 $wp_query_args['orderby'] = 'meta_value date';
                 $wp_query_args['meta_key'] = 'fave_featured';
+            } else if ( $sort_by == 'featured_first_random' ) {
+                $wp_query_args['meta_key'] = 'fave_featured';
+                $wp_query_args['orderby'] = 'meta_value DESC rand'; 
             }
 
             if (!empty($featured_prop)) {
@@ -227,7 +242,13 @@ if(!class_exists('houzez_data_source')) {
                 }
             }
 
-            $wp_query_args['post_status'] = 'publish';
+            if( $post_status == 'publish' ) {
+                $wp_query_args['post_status'] = 'publish';
+            } else if( $post_status == 'houzez_sold' ) {
+                $wp_query_args['post_status'] = 'houzez_sold';
+            } else {
+                $wp_query_args['post_status'] = array('publish', 'houzez_sold');
+            }
 
             if (empty($posts_limit)) {
                 $posts_limit = get_option('posts_per_page');

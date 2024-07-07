@@ -162,7 +162,8 @@ else if( $enable_paid_submission == 'membership' ) {
         $token_recursive = wp_kses($_GET['token'], $allowed_html);
         $paymentMethod = 'Paypal';
         $time = time();
-        $date = date('Y-m-d H:i:s',$time);
+        //$date = date('Y-m-d H:i:s',$time);
+        $date = date_i18n( get_option('date_format').' '.get_option('time_format') );
 
         // get transfer data
         $save_data = get_user_meta($userID, 'houzez_paypal_package', true);
@@ -220,7 +221,7 @@ else if( $enable_paid_submission == 'membership' ) {
             if($json_resp['state']=='Active' && $json_resp['payer']['status'] == 'verified' ) {
 
                 $profileID = $json_resp['id'];
-                $payer_id = $json_resp['payer_id'];
+                $payer_id = $json_resp['payer_id'] ?? '';
 
                 houzez_save_user_packages_record($userID, $pack_id);
                 if( houzez_check_user_existing_package_status( $current_user->ID, $pack_id ) ) {

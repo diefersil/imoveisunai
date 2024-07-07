@@ -5,7 +5,8 @@ $size = 'houzez-top-v7';
 
 $listing_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
 $i = 0; $j = 0;
-$total_images = count($listing_images);
+$total_images = get_post_meta($post->ID, 'fave_property_images', false);
+$total_images = count($total_images);
 $property_gallery_popup_type = houzez_get_popup_gallery_type();
 
 $css_class = 'houzez-trigger-popup-slider-js';
@@ -33,8 +34,7 @@ $layout = $layout['enabled'];
 					if(!empty($listing_images)) {
 						foreach( $listing_images as $image ) { $i++; 
 						
-							if($i == 1) {
-							?>
+							if($i == 1) { ?>
 							<div class="property-banner-inner-left">
 								<div class="property-banner-item">
 									<a href="#" data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" class="<?php echo esc_attr($css_class); ?> img-wrap-1" <?php echo $dataModal; ?>>
@@ -50,7 +50,7 @@ $layout = $layout['enabled'];
 								<div class="property-banner-item">
 									<a href="#" data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" <?php echo $dataModal; ?> class="<?php echo esc_attr($css_class); ?> swipebox img-wrap-<?php echo esc_attr($i); ?>">
 										<?php if($total_images > 5 && $i == 5) { ?>
-										<div class="img-wrap-3-text"><?php echo $total_images-5; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
+										<div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun mr-1"></i> <?php echo $total_images-5; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
 										<?php } ?>
 
 										<img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">

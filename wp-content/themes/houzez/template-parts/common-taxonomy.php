@@ -53,6 +53,14 @@ if($listing_view == 'list-view-v1') {
     $view_class = 'grid-view';
     $have_switcher = false;
 
+} elseif($listing_view == 'list-view-v4') {
+    $wrap_class = 'listing-list-v4';
+    $item_layout = 'list-v4';
+    $view_class = 'list-view listing-view-v4';
+    $have_switcher = false;
+    $card_deck = '';
+    $taxonomy_layout = 'no-sidebar';
+
 } elseif($listing_view == 'list-view-v5') {
     $wrap_class = 'listing-v5';
     $item_layout = 'v5';
@@ -107,6 +115,7 @@ if( $taxonomy_layout == 'no-sidebar' ) {
 $taxonomy_content_position = houzez_option('taxonomy_content_position', 'above');
 
 $sort_args = array('post_status' => 'publish');
+$sort_args = apply_filters( 'houzez_sold_status_filter', $sort_args );
 $sort_args = houzez_prop_sort($sort_args);
 global $wp_query;
 $args = array_merge( $wp_query->query_vars, $sort_args );

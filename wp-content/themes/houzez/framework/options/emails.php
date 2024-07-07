@@ -344,7 +344,7 @@ Redux::setSection( $houzez_opt_name, array(
             'notice' => false,
             'style'  => 'info',
             'title'  => wp_kses(__( '<span class="font24">New Registered User</span>', 'houzez' ), $allowed_html_array),
-            'desc'   => esc_html__( '%user_login_register as username, %user_pass_register as user password, %user_email_register as new user email, %user_phone_register as phone number, %email_verification_link as email verification', 'houzez' )
+            'desc'   => esc_html__( '%user_login_register as username, %user_pass_register as user password, %user_email_register as new user email, %user_phone_register as phone number', 'houzez' )
         ),
 
         array(
@@ -371,6 +371,17 @@ Thank you!', 'houzez'),
                 'teeny' => false,
                 'textarea_rows' => 10
             )
+        ),
+
+        array(
+            'id'       => 'nru_admin_email',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Admin Email?', 'houzez' ),
+            'desc'     => '',
+            'subtitle' => esc_html__('Enable/Disable admin email notification for new registered user', 'houzez'),
+            'default'  => 1,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
         ),
 
         array(

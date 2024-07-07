@@ -54,9 +54,9 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__( 'Header Layout', 'houzez' ),
             'subtitle' => '',
             'required' => array('header_style', '=', '1'),
-            'options'	=> array(
-                'container'	=> esc_html__( 'Boxed', 'houzez' ),
-                'container-fluid'	=> esc_html__( 'Full Width', 'houzez' )
+            'options'   => array(
+                'container' => esc_html__( 'Boxed', 'houzez' ),
+                'container-fluid'   => esc_html__( 'Full Width', 'houzez' )
             ),
             'desc'     => esc_html__( 'Select the header layout', 'houzez' ),
             'default'  => 'container'// 1 = on | 0 = off
@@ -89,9 +89,9 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__( 'Navigation Align', 'houzez' ),
             'subtitle' => '',
             'required' => array('header_style', '=', '1' ),
-            'options'	=> array(
-                'nav-left'	=> esc_html__( 'Left Align', 'houzez' ),
-                'nav-right'	=> esc_html__( 'Right Align', 'houzez' )
+            'options'   => array(
+                'nav-left'  => esc_html__( 'Left Align', 'houzez' ),
+                'nav-right' => esc_html__( 'Right Align', 'houzez' )
             ),
             'desc'     => esc_html__( 'Select the navigation align', 'houzez' ),
             'default'  => 'nav-right'// 1 = on | 0 = off
@@ -203,9 +203,9 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__( 'Navigation Align', 'houzez' ),
             'desc' => esc_html__( 'Select the navigation align', 'houzez' ),
             'required' => array('header_style', '=', '4' ),
-            'options'	=> array(
-                'nav-left'	=> esc_html__( 'Left Align', 'houzez' ),
-                'nav-right'	=> esc_html__( 'Right Align', 'houzez' )
+            'options'   => array(
+                'nav-left'  => esc_html__( 'Left Align', 'houzez' ),
+                'nav-right' => esc_html__( 'Right Align', 'houzez' )
             ),
             'default'  => 'nav-left'// 1 = on | 0 = off
         ),
@@ -261,8 +261,8 @@ Redux::setSection( $houzez_opt_name, array(
             'url'      => true,
             'title'    => esc_html__( 'Upload image', 'houzez' ),
             'subtitle' => esc_html__('Recommended size 85 x 85', 'houzez'),
-            'default'	=> array(
-                'url'	=> get_template_directory_uri() . '/img/call-image.png'
+            'default'   => array(
+                'url'   => get_template_directory_uri() . '/img/call-image.png'
             ),
         ),
         array(
@@ -314,7 +314,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_contact_info', '=', '1'),
             'title'    => esc_html__( 'Phone Number', 'houzez' ),
             'subtitle' => '',
-            'default'	=> '1 800 987 6543',
+            'default'   => '1 800 987 6543',
             'desc'     => esc_html__( 'Enter the phone number', 'houzez' ),
         ),
         array(
@@ -323,7 +323,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_contact_info', '=', '1'),
             'title'    => esc_html__( 'Email Address', 'houzez' ),
             'subtitle' => '',
-            'default'	=> 'info@houzez.com',
+            'default'   => 'info@houzez.com',
             'desc'     => esc_html__( 'Enter the email address', 'houzez' ),
         ),
         array(
@@ -359,7 +359,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_address_info', '=', '1'),
             'title'    => esc_html__( 'Line 1', 'houzez' ),
             'subtitle' => '',
-            'default'	=> 'Oceanview Hall',
+            'default'   => 'Oceanview Hall',
             'desc'     => esc_html__( 'Enter the address line 1', 'houzez' ),
         ),
         array(
@@ -368,7 +368,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_address_info', '=', '1'),
             'title'    => esc_html__( 'Line 2', 'houzez' ),
             'subtitle' => '',
-            'default'	=> 'Miami, FL 33141',
+            'default'   => 'Miami, FL 33141',
             'desc'     => esc_html__( 'Enter the address line 2', 'houzez' ),
         ),
         array(
@@ -406,7 +406,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_timing_info', '=', '1'),
             'title'    => esc_html__( 'Opening Hours', 'houzez' ),
             'subtitle' => '',
-            'default'	=> '9 am to 6 pm',
+            'default'   => '9 am to 6 pm',
             'desc'     => esc_html__( 'Enter the opening hours', 'houzez' ),
 
         ),
@@ -416,7 +416,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('hd2_timing_info', '=', '1'),
             'title'    => esc_html__( 'Opening Days', 'houzez' ),
             'subtitle' => '',
-            'default'	=> 'Monday to Friday',
+            'default'   => 'Monday to Friday',
             'desc'     => esc_html__( 'Enter the opening days', 'houzez' ),
         ),
         array(
@@ -455,8 +455,8 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'hs-twitter',
             'type'     => 'text',
             'required' => array( 'social-header', '=', '1' ),
-            'title'    => esc_html__( 'Twitter', 'houzez' ),
-            'desc' => esc_html__( 'Enter the Twitter profile URL', 'houzez' ),
+            'title'    => esc_html__( 'X', 'houzez' ),
+            'desc' => esc_html__( 'Enter the X profile URL', 'houzez' ),
             'default'  => false,
         ),
         array(

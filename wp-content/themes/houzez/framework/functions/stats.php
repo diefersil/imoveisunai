@@ -46,6 +46,8 @@ if(!function_exists('houzez_realtor_stats')) {
 		    )
 		);
 
+		$args = apply_filters( 'houzez_sold_status_filter', $args );
+
 		$meta_query = array();
 
         if(is_singular('houzez_agency')) {

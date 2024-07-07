@@ -1,5 +1,5 @@
 <div class="item-listing-wrap item-listing-wrap-v3">
-	<div class="item-wrap item-wrap-v3">
+	<div class="item-wrap item-wrap-v3 item-wrap-no-frame">
 		<?php get_template_part('template-parts/listing/partials/item-image'); ?>
 		<?php get_template_part('template-parts/listing/partials/item-title'); ?>
 		<?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>

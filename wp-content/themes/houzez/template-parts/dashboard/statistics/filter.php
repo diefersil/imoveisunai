@@ -7,25 +7,63 @@ global $listing_id;
         <option value=""><?php esc_html_e('Select', 'houzez'); ?></option>
 
         <?php
-        $args = array(
-        	'post_type' => 'property',
-        	'posts_per_page' => apply_filters('fave_stats_listing_num', -1),
-        	'author' => get_current_user_id(),
-        	'post_status' => 'publish',
-        );
 
-        $the_query = new WP_Query($args);
+        // Calculate the total number of posts
+        $total_posts = wp_count_posts('property')->publish;
+        $batch_size = 500; // Adjust batch size as needed
+        $iterations = ceil($total_posts / $batch_size);
+        $userID     = get_current_user_id();
 
-        if( $the_query->have_posts()):
+        for ($i = 1; $i <= $iterations; $i++) {
+            $args = array(
+                'post_type' => 'property',
+                'posts_per_page' => $batch_size,
+                'paged' => $i,
+                'post_status' => 'publish',
+            );
 
-        	while($the_query->have_posts()): $the_query->the_post();
+            if( houzez_is_admin() || houzez_is_editor() ) {
+                if( isset( $_GET['user'] ) && $_GET['user'] != '' ) {
+                    $args['author'] = intval($_GET['user']);
 
-        		echo '<option '.selected($listing_id, get_the_ID(), false).' value="'.intval(get_the_ID()).'">'.get_the_title().'</option>';
+                } else if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
+                    $args['author'] = $userID;
+                }
+            } else if( houzez_is_agency() ) {
 
-        	endwhile;
+                $agents = houzez_get_agency_agents($userID);
+                
+                if( isset( $_GET['user'] ) && $_GET['user'] != '' ) {
+                    $args['author'] = intval($_GET['user']);
 
-        endif;
-        wp_reset_postdata();
+                } else if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
+                    $args['author'] = $userID;
+
+                } else if( $agents ) {
+                    if (!in_array($userID, $agents)) {
+                        $agents[] = $userID;
+                    }
+                    $args['author__in'] = $agents;
+                } else {
+                    $args['author'] = $userID;
+                }
+
+            } else {
+                $args['author'] = $userID;
+            }
+            
+            $the_query = new WP_Query($args);
+
+            if ($the_query->have_posts()) {
+                while ($the_query->have_posts()) {
+                    $the_query->the_post();
+                    echo '<option ' . selected($listing_id, get_the_ID(), false) . ' value="' . intval(get_the_ID()) . '">' . get_the_title() . '</option>';
+                }
+            }
+            wp_reset_postdata(); // Reset post data after each batch
+        }
+
         ?>
+
     </select><!-- selectpicker -->
 </div><!-- form-group -->

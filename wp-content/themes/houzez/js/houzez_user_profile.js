@@ -11,7 +11,13 @@ jQuery(document).ready(function($) {
         var verify_file_type = houzezUserProfile.verify_file_type;
         var houzez_site_url = houzezUserProfile.houzez_site_url;
         var gdpr_agree_text = houzezUserProfile.gdpr_agree_text;
+        var delete_confirmation = houzezProperty.delete_confirmation;
         var processing_text = houzez_vars.processing_text;
+        var are_you_sure_text = houzezProperty.are_you_sure_text;
+        var delete_btn_text = houzezProperty.delete_btn_text;
+        var cancel_btn_text = houzezProperty.cancel_btn_text;
+        var confirm_btn_text = houzezProperty.confirm_btn_text;
+        var formUserID = $('#user_id').val();
 
 
         /*-------------------------------------------------------------------
@@ -248,6 +254,7 @@ jQuery(document).ready(function($) {
                     'action'      : 'houzez_ajax_password_reset',
                     'newpass'     : newpass,
                     'confirmpass' : confirmpass,
+                    'user_id'     : formUserID,
                     'houzez-security-pass' : securitypassword,
                 },
                 beforeSend: function( ) {
@@ -271,73 +278,157 @@ jQuery(document).ready(function($) {
 
         });
 
-        $('#houzez_delete_account').click(function(e){
-            e.preventDefault();
+        $( '#houzez_delete_account' ).on( 'click', function (e){
+                e.preventDefault();
 
-            //var confirm = window.confirm("Are you sure!, you want to delete a account.");
-            var confirm = window.confirm(houzezProperty.delete_confirmation);
+                var $this = $( this );
+                var propID = $this.data('id');
+                var propNonce = $this.data('nonce');
 
-            if ( confirm == true ) {
-
-                $.ajax({
-                    type: 'post',
-                    url: ajaxURL,
-                    dataType: 'json',
-                    data: {
-                        'action': 'houzez_delete_account'
+                bootbox.confirm({
+                message: "<strong>"+delete_confirmation+"</strong>",
+                buttons: {
+                    confirm: {
+                        label: delete_btn_text,
+                        className: 'btn btn-primary'
                     },
-                    beforeSend: function () {
-                        profile_processing_modal(processing_text);
-                    },
-                    success: function( response ) {
-                        if( response.success ) {
-                            window.location.href = houzez_site_url;
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        var err = eval("(" + xhr.responseText + ")");
-                        console.log(err.Message);
+                    cancel: {
+                        label: cancel_btn_text,
+                        className: 'btn btn-grey-outlined'
                     }
-                });
+                },
+                callback: function (result) {
+                    if(result==true) {
+                        profile_processing_modal( processing_text );
 
-            }
+                        $.ajax({
+                            type: 'post',
+                            url: ajaxURL,
+                            dataType: 'json',
+                            data: {
+                                'action': 'houzez_delete_account',
+                                'user_id': formUserID
+                            },
+                            success: function( response ) {
+                                if( response.success ) {
+                                    window.location.href = houzez_site_url;
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                var err = eval("(" + xhr.responseText + ")");
+                                console.log(err.Message);
+                            }
+                        }); // $.ajax
+                    } // result
+                } // Callback
+            });
 
+            return false;
+            
         });
 
-        $('.houzez_delete_agency_agent').click(function(e){
-            e.preventDefault();
-            
-            var confirm = window.confirm(houzezProperty.delete_confirmation);
-            var agent_id = $(this).attr('data-agentid');
-            var agent_delete_security = $('#agent_delete_security').val();
+        var delete_profile_pic = function() {
+            $( '.delete-profile-pic' ).on( 'click', function (e){
+                    e.preventDefault();
 
-            if ( confirm == true ) {
-
-                $.ajax({
-                    type: 'post',
-                    url: ajaxURL,
-                    dataType: 'json',
-                    data: {
-                        'action': 'houzez_delete_agency_agent',
-                        'agent_delete_security': agent_delete_security,
-                        'agent_id': agent_id
-                    },
-                    beforeSend: function () {
-                        profile_processing_modal(processing_text);
-                    },
-                    success: function( response ) {
-                        if( response.success ) {
-                            window.location.reload();
+                    var $this = $( this );
+                    var picID = $("#profile-pic-id").val();
+                    bootbox.confirm({
+                    message: "<strong>"+delete_confirmation+"</strong>",
+                    buttons: {
+                        confirm: {
+                            label: delete_btn_text,
+                            className: 'btn btn-primary'
+                        },
+                        cancel: {
+                            label: cancel_btn_text,
+                            className: 'btn btn-grey-outlined'
                         }
                     },
-                    error: function(xhr, status, error) {
-                        var err = eval("(" + xhr.responseText + ")");
-                        console.log(err.Message);
-                    }
+                    callback: function (result) {
+                        if(result==true) {
+                            profile_processing_modal( processing_text );
+
+                            $.ajax({
+                                type: 'post',
+                                url: ajaxURL,
+                                dataType: 'json',
+                                data: {
+                                    'action': 'houzez_delete_profile_pic',
+                                    'picture_id': picID,
+                                    'user_id': formUserID
+                                },
+                                success: function( response ) {
+                                    if( response.success ) {
+                                        window.location.reload();
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    var err = eval("(" + xhr.responseText + ")");
+                                    console.log(err.Message);
+                                }
+                            }); // $.ajax
+                        } // result
+                    } // Callback
                 });
 
-            }
+                return false;
+                
+            });
+        }
+        delete_profile_pic();
 
+
+        $( '.houzez_delete_agency_agent' ).on( 'click', function (e){
+                e.preventDefault();
+
+                var agent_id = $(this).attr('data-agentid');
+                var agent_delete_security = $('#agent_delete_security').val();
+
+                bootbox.confirm({
+                message: "<strong>"+delete_confirmation+"</strong>",
+                buttons: {
+                    confirm: {
+                        label: delete_btn_text,
+                        className: 'btn btn-primary'
+                    },
+                    cancel: {
+                        label: cancel_btn_text,
+                        className: 'btn btn-grey-outlined'
+                    }
+                },
+                callback: function (result) {
+                    if(result==true) {
+                        profile_processing_modal( processing_text );
+
+                        $.ajax({
+                            type: 'post',
+                            url: ajaxURL,
+                            dataType: 'json',
+                            data: {
+                                'action': 'houzez_delete_agency_agent',
+                                'agent_delete_security': agent_delete_security,
+                                'agent_id': agent_id
+                            },
+                            beforeSend: function () {
+                                profile_processing_modal(processing_text);
+                            },
+                            success: function( response ) {
+                                if( response.success ) {
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                var err = eval("(" + xhr.responseText + ")");
+                                console.log(err.Message);
+                            }
+                        }); // $.ajax
+                    } // result
+                } // Callback
+            });
+
+            return false;
+            
         });
 
 
@@ -363,6 +454,42 @@ jQuery(document).ready(function($) {
                 },
                 success: function( response ) {
                     if( response.success ) {
+                        window.location.reload(true);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err.Message);
+                }
+            });
+        });
+
+        $( '#houzez_user_package' ).on( 'change', function(e) {
+            e.preventDefault();
+
+            var permission_val = $( this ).val();
+            var nonce    = $('#houzez-agency-package-security').val();
+            var _wp_http_referer = $( 'input[name="_wp_http_referer"]' ).val();
+
+            $.ajax({
+                type: 'post',
+                url: ajaxURL,
+                dataType: 'json',
+                data: {
+                    'action': 'houzez_user_package_permission',
+                    'agency_allow_package': permission_val,
+                    'houzez-role-security-pass' : nonce,
+                    '_wp_http_referer' : _wp_http_referer
+                },
+                beforeSend: function () {
+                    profile_processing_modal(processing_text);
+                },
+                success: function( response ) {
+                    if( response.success ) {
+                        window.location.reload(true);
+                    } else {
+                        profile_processing_modal_close();
+                        alert(response.reason);
                         window.location.reload(true);
                     }
                 },
@@ -420,10 +547,10 @@ jQuery(document).ready(function($) {
             browse_button: 'select_user_profile_photo',
             file_data_name: 'houzez_file_data_name',
             multi_selection : false,
-            url: ajaxURL + "?action=houzez_user_picture_upload&verify_nonce=" + houzez_upload_nonce + "&user_id=" + user_id,
+            url: ajaxURL + "?action=houzez_user_picture_upload&verify_nonce=" + houzez_upload_nonce + "&user_id=" + formUserID,
             filters: {
                 mime_types : [
-                    { title : verify_file_type, extensions : "jpg,jpeg,gif,png" }
+                    { title : verify_file_type, extensions : "jpg,jpeg,gif,png,webp" }
                 ],
                 max_file_size: '12000kb',
                 prevent_duplicates: true
@@ -454,11 +581,12 @@ jQuery(document).ready(function($) {
 
             if ( response.success ) {
 
-                var houzez_profile_thumb = '<img class="img-fluid" src="' + response.url + '" alt="" />' +
+                var houzez_profile_thumb = '<a href="#" class="delete-profile-pic"><i class="houzez-icon icon-close"></i></a><img class="img-fluid" src="' + response.url + '" alt="" />' +
                     '<input type="hidden" class="profile-pic-id" id="profile-pic-id" name="profile-pic-id" value="' + response.attachment_id + '"/>';
 
                 document.getElementById( "imageholder-" + file.id ).innerHTML = houzez_profile_thumb;
 
+                delete_profile_pic();
             } else {
                 console.log ( response );
             }

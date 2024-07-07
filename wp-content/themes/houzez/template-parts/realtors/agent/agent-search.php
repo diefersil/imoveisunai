@@ -3,10 +3,11 @@ global $houzez_local;
 
 $city = $category = $agent_name = '';
 $default_category = array();
-$category = isset($_GET['category']) ? $_GET['category'] : $default_category;
+$category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : $default_category;
+$agent_name = isset ( $_GET['agent_name'] ) ? sanitize_text_field($_GET['agent_name']) : '';
 
 $default_city = array();
-$city = isset($_GET['city']) ? $_GET['city'] : $default_city;
+$city = isset($_GET['city']) ? sanitize_text_field($_GET['city']) : $default_city;
 
 $purl = houzez_get_template_link('template/template-agents.php');
 ?>
@@ -19,7 +20,7 @@ $purl = houzez_get_template_link('template/template-agents.php');
 					<div class="flex-search flex-grow-1">
 						<div class="form-group">
 							<div class="search-icon">
-								<input type="text" name="agent_name" class="form-control" placeholder="<?php echo $houzez_local['search_agent_name']?>" value="<?php echo isset ( $_GET['agent_name'] ) ? $_GET['agent_name'] : ''; ?>">
+								<input type="text" name="agent_name" class="form-control" placeholder="<?php echo $houzez_local['search_agent_name']?>" value="<?php echo esc_attr($agent_name); ?>">
 							</div><!-- search-icon -->
 						</div><!-- form-group -->
 					</div><!-- flex-search -->

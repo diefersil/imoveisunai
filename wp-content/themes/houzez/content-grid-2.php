@@ -6,7 +6,7 @@
  *
  * @package WordPress
  * @subpackage Houzez
- * @since Houzez 1.0
+ * @since Houzez 1.0 
  */
 global $houzez_local, $ele_settings;
 $blog_date = houzez_option('blog_date');

@@ -4,17 +4,26 @@
  */
 class houzez_nav_walker extends Walker_Nav_Menu {
 
-	function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output )
-	{
+
+    function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output )
+    {
         if ( $depth == "" ) {
             $depth = 0;
         }
-		$id_field = $this->db_fields['id'];
-		if ( is_object( $args[0] ) ) {
-			$args[0]->has_children = ! empty( $children_elements[$element->$id_field] );
-		}
-		return parent::display_element( $element, $children_elements, $max_depth, $depth, $args, $output );
-	}
+        $id_field = $this->db_fields['id'];
+        $id       = $element->$id_field;
+        if ( is_object( $args[0] ) ) {
+            $args[0]->has_children = ! empty( $children_elements[$element->$id_field] );
+        }
+
+        // Remove children from mega menu items.
+        if ( get_post_meta( $id, '_menu_item_html_block', true ) ) {
+            $this->unset_children( $element, $children_elements );
+        }
+
+        return parent::display_element( $element, $children_elements, $max_depth, $depth, $args, $output );
+    }
+
     /**
      * Start the element output.
      *
@@ -25,35 +34,105 @@ class houzez_nav_walker extends Walker_Nav_Menu {
      * @return void
      */
     function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-        $classes     = empty ( $item->classes ) ? array () : (array) $item->classes;
-
-        $class_names = join(
-            ' '
-        ,   apply_filters(
-                'nav_menu_css_class'
-            ,   array_filter( $classes ), $item
-            )
-        );
+        if ( isset( $args->item_spacing ) && 'discard' === $args->item_spacing ) {
+            $t = '';
+            $n = '';
+        } else {
+            $t = "\t";
+            $n = "\n";
+        }
+        $indent = ( $depth ) ? str_repeat( $t, $depth ) : '';
+        
+        $is_top_level   = $depth == 0;
+        $html_block     = get_post_meta( $item->ID, '_menu_item_html_block', true );
+        $design         = get_post_meta( $item->ID, '_menu_item_design', true );
+        $width          = get_post_meta( $item->ID, '_menu_item_width', true );
+        $icon_type      = get_post_meta( $item->ID, '_menu_item_icon_type', true );
+        $icon_id        = get_post_meta( $item->ID, '_menu_item_icon_id', true );
+        $icon_width     = get_post_meta( $item->ID, '_menu_item_icon_width', true );
+        $icon_height    = get_post_meta( $item->ID, '_menu_item_icon_height', true );
+        $icon_html      = get_post_meta( $item->ID, '_menu_item_icon_html', true );
+        $is_mega_menu   = ! empty( $html_block );
 
         $dropdown_anchor_calss = '';
-        $dropdown_li_class = '';
-        if($args->has_children) {
-        	$dropdown_li_class = "dropdown";
-        	$dropdown_anchor_calss = "dropdown-toggle";
+        $classes   = empty ( $item->classes ) ? array() : (array) $item->classes;
+        $classes[] = 'nav-item menu-item-' . $item->ID;
+
+        // Set Active Class.
+        if ( in_array( 'current-menu-ancestor', $classes, true ) || in_array( 'current-menu-item', $classes, true ) || in_array( 'current-menu-parent', $classes, true ) ) {
+            $classes[] = '';
         }
 
-        ! empty ( $class_names )
-            and $class_names = ' class="nav-item '. esc_attr( $class_names.' '.$dropdown_li_class ) . '"';
+        if( $is_top_level ) {
+            $classes[] = 'menu-item-design-' . $design;
 
-        $output .= "<li id='menu-item-$item->ID' $class_names>";
+            if( $is_mega_menu ) {
+                $classes[] = 'menu-item-has-megamenu megamenu-item';
+            }
+        }
+
+        if ( $is_mega_menu || $args->has_children ) {
+            $classes[] = 'dropdown';
+
+            if( $is_mega_menu  ) {
+                $classes[] = '';
+            }
+            /*if ( 'click' === $behavior ) {
+                $classes[] = 'nav-dropdown-toggle';
+            }*/
+
+            $dropdown_anchor_calss = "dropdown-toggle";
+        }
+
+        /**
+         * Filters the arguments for a single nav menu item.
+         *
+         * @since 4.4.0
+         *
+         * @param stdClass $args  An object of wp_nav_menu() arguments.
+         * @param WP_Post  $item  Menu item data object.
+         * @param int      $depth Depth of menu item. Used for padding.
+         */
+        $args = apply_filters( 'nav_menu_item_args', $args, $item, $depth );
+
+        /**
+         * Filters the CSS classes applied to a menu item's list item element.
+         *
+         * @since 3.0.0
+         * @since 4.1.0 The `$depth` parameter was added.
+         *
+         * @param string[] $classes Array of the CSS classes that are applied to the menu item's `<li>` element.
+         * @param WP_Post  $item    The current menu item.
+         * @param stdClass $args    An object of wp_nav_menu() arguments.
+         * @param int      $depth   Depth of menu item. Used for padding.
+         */
+        $class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args, $depth ) );
+        $class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
+
+        /**
+         * Filters the ID applied to a menu item's list item element.
+         *
+         * @since 3.0.1
+         * @since 4.1.0 The `$depth` parameter was added.
+         *
+         * @param string   $menu_id The ID that is applied to the menu item's `<li>` element.
+         * @param WP_Post  $item    The current menu item.
+         * @param stdClass $args    An object of wp_nav_menu() arguments.
+         * @param int      $depth   Depth of menu item. Used for padding.
+         */
+        $id = apply_filters( 'nav_menu_item_id', 'menu-item-' . $item->ID, $item, $args, $depth );
+        $id = strlen( $id ) ? ' id="' . esc_attr( $id ) . '"' : '';
+
+
+        $output .= $indent . '<li' . $id . $class_names . '>';
 
         $attributes  = '';
 
         if($depth > 0 ) {
-        	$attributes .=  ' class="dropdown-item '.$dropdown_anchor_calss.'"';
+            $attributes .=  ' class="dropdown-item '.$dropdown_anchor_calss.'"';
         } else {
-	        $attributes .=  ' class="nav-link '.$dropdown_anchor_calss.'"';
-	    }
+            $attributes .=  ' class="nav-link '.$dropdown_anchor_calss.'"';
+        }
 
         if( wp_is_mobile() ) {
             $attributes .= $args->has_children ? ' data-toggle="dropdown" ' : '';
@@ -83,6 +162,31 @@ class houzez_nav_walker extends Walker_Nav_Menu {
             . $description
             . $args->after;
 
+        if ( $is_top_level && $is_mega_menu ) {
+            $dropdown_classes = array( 'dropdown-menu megamenu' );
+            $dropdown_classes = implode( ' ', $dropdown_classes );
+
+            $item_output .= '<div class="' . esc_attr( $dropdown_classes ) . '">';
+            $item_output .= houzez_get_elementor_template( $html_block );
+            $item_output .= '</div>';
+        }
+
+        $css = "";
+        if ( $design == 'custom-size' && ! empty( $width ) ) {
+            $css .= '#menu-item-' . $item->ID . ' > .dropdown-menu {';
+            $css .= 'width: ' . $width . 'px;';
+            if ( ! empty( $height ) ) {
+                $css .= 'min-height: ' . $height . 'px;';
+            }
+            $css .= '}';
+        }
+
+        if ( $css != '' ) {
+            $item_output .= '<style>';
+            $item_output .= $css;
+            $item_output .= '</style>';
+        }
+
         // Since $output is called by reference we don't need to return anything.
         $output .= apply_filters(
             'walker_nav_menu_start_el'
@@ -95,13 +199,17 @@ class houzez_nav_walker extends Walker_Nav_Menu {
 
     function start_lvl( &$output, $depth=0, $args = array() ) {
 
+        $classes = array('dropdown-menu');
 
         // depth dependent classes
         $indent = ( $depth > 0  ? str_repeat( "\t", $depth ) : '' ); // code indent
         $display_depth = ( $depth + 1); // because it counts the first submenu as 0
-        $classes = array(
-            'dropdown-menu'
-            );
+
+    
+        if( $display_depth > 1 ) {
+            $classes[] = 'submenu';
+        }
+
         $class_names = implode( ' ', $classes );
 
         // build html

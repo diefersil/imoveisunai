@@ -19,7 +19,7 @@ global $wp_version;
 */
 define( 'HOUZEZ_THEME_NAME', 'Houzez' );
 define( 'HOUZEZ_THEME_SLUG', 'houzez' );
-define( 'HOUZEZ_THEME_VERSION', '2.8.6.1' );
+define( 'HOUZEZ_THEME_VERSION', '3.2.4' );
 define( 'HOUZEZ_FRAMEWORK', get_template_directory() . '/framework/' );
 define( 'HOUZEZ_WIDGETS', get_template_directory() . '/inc/widgets/' );
 define( 'HOUZEZ_INC', get_template_directory() . '/inc/' );
@@ -97,11 +97,6 @@ if ( ! function_exists( 'houzez_setup' ) ) {
 		//remove gallery style css
 		add_filter( 'use_default_gallery_style', '__return_false' );
 
-		// Support for elementor header and footer
-		if ( class_exists( 'Header_Footer_Elementor' ) ) {
-			add_theme_support( 'header-footer-elementor' );
-		}
-
 		update_option( 'redux-framework_extendify_plugin_notice', 'hide' );
 	
 		/*
@@ -131,37 +126,47 @@ require_once( HOUZEZ_FRAMEWORK . 'classes/houzez-lazy-load.php');
 require_once( HOUZEZ_FRAMEWORK . 'admin/class-admin.php');
 
 
+
+
 /**
  *	---------------------------------------------------------------------
  *	Mobile Detect Filter 
  *	---------------------------------------------------------------------
  */
-if( !function_exists('houzez_mobile_filter')) {
-	function houzez_mobile_filter() {
+if (!function_exists('houzez_mobile_filter')) {
+    function houzez_mobile_filter() {
+        // Assuming HOUZEZ_FRAMEWORK points to the 'vendor' directory where Composer's autoload.php is located.
+        require_once(HOUZEZ_FRAMEWORK . 'mobile-detect/vendor/autoload.php');
 
-		if( ! class_exists( 'Houzez_Mobile_Detect' ) ) {
-			require_once( HOUZEZ_FRAMEWORK . 'Mobile_Detect.php');
+        // Directly use the class with its namespace.
+        $MobileDetect = new \Detection\MobileDetect();
 
-			$Houzez_Mobile_Detect = new Houzez_Mobile_Detect;
-
-			if( $Houzez_Mobile_Detect->isMobile() && !$Houzez_Mobile_Detect->isTablet() ) {
-			    add_filter( 'wp_is_mobile', '__return_true' );
-
-			} else {
-			    add_filter( 'wp_is_mobile', '__return_false' );
-			}
-
-		}
-	}
-	houzez_mobile_filter();
+        if ($MobileDetect->isMobile() && !$MobileDetect->isTablet()) {
+            add_filter('wp_is_mobile', '__return_true');
+        } else { 
+            add_filter('wp_is_mobile', '__return_false');
+        }
+    }
+    //houzez_mobile_filter();
 }
 
+
+
+/**
+ *	---------------------------------------------------------------------
+ *	Hooks
+ *	---------------------------------------------------------------------
+ */
+require_once( HOUZEZ_FRAMEWORK . 'template-hooks.php' );
 
 /**
  *	---------------------------------------------------------------------
  *	Functions
  *	---------------------------------------------------------------------
  */
+require_once( HOUZEZ_FRAMEWORK . 'functions/template-functions.php' );
+//require_once( HOUZEZ_FRAMEWORK . 'functions/header-functions.php' );
+//require_once( HOUZEZ_FRAMEWORK . 'functions/footer-functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/price_functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/helper_functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/search_functions.php' );
@@ -294,8 +299,8 @@ if ( class_exists( 'ReduxFramework' ) ) {
 	require_once( get_template_directory() . '/inc/styling-options.php' );
 }
 
-if ( defined( 'ELEMENTOR_VERSION' ) ) {
-	//require get_template_directory() . '/inc/blocks/blocks.php';
+if ( houzez_check_elementor_installed() ) {
+	require get_template_directory() . '/inc/blocks/blocks.php';
 }
 
 /**
@@ -434,6 +439,15 @@ if( !function_exists('houzez_widgets_init') ) {
 			'name' => esc_html__('Agent Sidebar', 'houzez'),
 			'id' => 'agent-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in agents template and angent detail page.', 'houzez'),
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'after_widget' => '</div>',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'after_title' => '</h3></div>',
+		));
+		register_sidebar(array(
+			'name' => esc_html__('Mobile Menu', 'houzez'),
+			'id' => 'hz-mobile-menu',
+			'description' => esc_html__('Widgets in this area will be shown in the mobile menu', 'houzez'),
 			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
 			'after_widget' => '</div>',
 			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
@@ -666,5 +680,6 @@ if( ! function_exists( 'houzez_is_mobile_filter' ) ) {
 		}
 		return $is_mobile ;
 	}
-	add_filter( 'wp_is_mobile', 'houzez_is_mobile_filter' );
+	//add_filter( 'wp_is_mobile', 'houzez_is_mobile_filter' );
 }
+

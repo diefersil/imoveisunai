@@ -1,6 +1,9 @@
 <?php
-global $current_user, $houzez_local;
+global $houzez_local;
 $userID = get_current_user_id();
+if (isset($_GET['edit_user']) && is_numeric($_GET['edit_user'])) {
+    $userID = intval($_GET['edit_user']); // Sanitize the input
+}
 
 $facebook               =   get_the_author_meta( 'fave_author_facebook' , $userID );
 $twitter                =   get_the_author_meta( 'fave_author_twitter' , $userID );
@@ -9,9 +12,10 @@ $pinterest              =   get_the_author_meta( 'fave_author_pinterest' , $user
 $instagram              =   get_the_author_meta( 'fave_author_instagram' , $userID );
 $googleplus             =   get_the_author_meta( 'fave_author_googleplus' , $userID );
 $youtube                =   get_the_author_meta( 'fave_author_youtube' , $userID );
-$tiktok                =   get_the_author_meta( 'fave_author_tiktok' , $userID );
-$telegram                =   get_the_author_meta( 'fave_author_telegram' , $userID );
+$tiktok                 =   get_the_author_meta( 'fave_author_tiktok' , $userID );
 $vimeo                  =   get_the_author_meta( 'fave_author_vimeo' , $userID );
+$zillow_url             =   get_the_author_meta( 'fave_author_zillow' , $userID );
+$realtor_com_url        =   get_the_author_meta( 'fave_author_realtor_com' , $userID );
 $user_skype             =   get_the_author_meta( 'fave_author_skype' , $userID );
 $website_url            =   get_the_author_meta( 'user_url' , $userID );
 ?>
@@ -32,8 +36,8 @@ $website_url            =   get_the_author_meta( 'user_url' , $userID );
 
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
-                        <label><?php esc_html_e( 'Twitter', 'houzez' ); ?></label>
-                        <input class="form-control" name="twitter" value="<?php echo esc_url( $twitter );?>" placeholder="<?php esc_html_e( 'Enter the Twitter URL', 'houzez' ); ?>" type="text">
+                        <label><?php esc_html_e( 'X', 'houzez' ); ?></label>
+                        <input class="form-control" name="twitter" value="<?php echo esc_url( $twitter );?>" placeholder="<?php esc_html_e( 'Enter the X URL', 'houzez' ); ?>" type="text">
                     </div>
                 </div>
 
@@ -53,8 +57,8 @@ $website_url            =   get_the_author_meta( 'user_url' , $userID );
 
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
-                        <label><?php esc_html_e( 'Google Plus', 'houzez' ); ?></label>
-                        <input class="form-control" name="googleplus" value="<?php echo esc_url( $googleplus );?>" placeholder="<?php esc_html_e( 'Enter the Google Plus URL', 'houzez' ); ?>" type="text">
+                        <label><?php esc_html_e( 'Google', 'houzez' ); ?></label>
+                        <input class="form-control" name="googleplus" value="<?php echo esc_url( $googleplus );?>" placeholder="<?php esc_html_e( 'Enter the Google URL', 'houzez' ); ?>" type="text">
                     </div>
                 </div>
 
@@ -69,13 +73,6 @@ $website_url            =   get_the_author_meta( 'user_url' , $userID );
                     <div class="form-group">
                         <label><?php esc_html_e( 'TikTok', 'houzez' ); ?></label>
                         <input class="form-control" name="tiktok" value="<?php echo esc_url( $tiktok );?>" placeholder="<?php esc_html_e( 'Enter the TikTok URL', 'houzez' ); ?>" type="text">
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-sm-12">
-                    <div class="form-group">
-                        <label><?php esc_html_e( 'Telegram', 'houzez' ); ?></label>
-                        <input class="form-control" name="telegram" value="<?php echo esc_url( $telegram );?>" placeholder="<?php esc_html_e( 'Enter the telegram URL', 'houzez' ); ?>" type="text">
                     </div>
                 </div>
 
@@ -104,6 +101,20 @@ $website_url            =   get_the_author_meta( 'user_url' , $userID );
                     <div class="form-group">
                         <label><?php esc_html_e( 'Website', 'houzez' ); ?></label>
                         <input class="form-control" name="website" value="<?php echo esc_url($website_url); ?>" placeholder="<?php esc_html_e( 'Enter your website URL', 'houzez' ); ?>" type="text">
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label><?php esc_html_e( 'Zillow', 'houzez' ); ?></label>
+                        <input class="form-control" name="zillow" value="<?php echo esc_url($zillow_url); ?>" placeholder="<?php esc_html_e( 'Enter your zillow URL', 'houzez' ); ?>" type="text">
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label><?php esc_html_e( 'Realtor.com', 'houzez' ); ?></label>
+                        <input class="form-control" name="realtor_com" value="<?php echo esc_url($realtor_com_url); ?>" placeholder="<?php esc_html_e( 'Enter your realtor.com URL', 'houzez' ); ?>" type="text">
                     </div>
                 </div>
 

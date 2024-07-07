@@ -47,6 +47,12 @@ if(empty($default_multi_currency)) {
 			</div><!-- col-md-6 col-sm-12 -->
 			<?php } ?>
 
+			<?php if( $hide_prop_fields['sale_rent_price'] != 1 && isset( $hide_prop_fields['price_placeholder'] ) && $hide_prop_fields['price_placeholder'] != 1 ) { ?>
+			<div id="price-plac-js" class="col-md-6 col-sm-12">
+				<?php get_template_part('template-parts/dashboard/submit/form-fields/price-placeholder'); ?>
+			</div><!-- col-md-6 col-sm-12 -->
+			<?php } ?>
+
 			<?php if( $hide_prop_fields['second_price'] != 1 ) { ?>
 			<div class="col-md-6 col-sm-12">
 				<?php get_template_part('template-parts/dashboard/submit/form-fields/second-price'); ?>

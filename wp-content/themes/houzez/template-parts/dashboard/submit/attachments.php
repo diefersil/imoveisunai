@@ -24,16 +24,15 @@
                     if( !empty($property_attachs[0])) {
                         foreach ($property_attachs as $prop_attach_id) {
 
-                            $fullimage_url  = wp_get_attachment_image_src( $prop_attach_id, 'full' );
+                            $fullimage_url  = wp_get_attachment_url( $prop_attach_id );
                             $attachment_title = get_the_title($prop_attach_id);
-
                             
                             echo '<tr class="attach-thumb">
 								<td class="table-full-width table-cell-title">
 									<span>'.esc_attr($attachment_title).'</span>
 								</td>
 								<td>
-									<a href="'.$fullimage_url[0].'" target="_blank" class="btn btn-light-grey-outlined"><i class="houzez-icon icon-download-bottom"></i></a>
+									<a href="'.$fullimage_url.'" target="_blank" class="btn btn-light-grey-outlined"><i class="houzez-icon icon-download-bottom"></i></a>
 								</td>
 								<td>
 									<button data-attach-id="' . intval($property_data->ID) . '"  data-attachment-id="' . intval($prop_attach_id) . '" class="attachment-delete btn btn-light-grey-outlined"><i class="houzez-icon icon-close"></i></button>

@@ -41,6 +41,7 @@ jQuery(document).ready( function($) {
         var plan_image_text = houzezProperty.plan_image_text;
         var plan_description_text = houzezProperty.plan_description_text;
         var plan_upload_text = houzezProperty.plan_upload_text;
+        var invoices_page_link = houzezProperty.invoices_page_link;
 
         var mu_title_text = houzezProperty.mu_title_text;
         var mu_type_text = houzezProperty.mu_type_text;
@@ -88,6 +89,100 @@ jQuery(document).ready( function($) {
 
         var fave_processing_modal_close = function ( ) {
             jQuery('#fave_modal').modal('hide');
+        }
+
+        // Function to toggle visibility
+        function togglePricePlaceholder() {
+            if ($('#show_price_placeholder').is(':checked')) {
+                $('#price-plac-js').show();
+            } else {
+                $('#price-plac-js').hide();
+            }
+        }
+
+        // Event listener for checkbox changes
+        $('#show_price_placeholder').change(togglePricePlaceholder);
+
+        // Initial check on page load
+        togglePricePlaceholder();
+
+        /*--------------------------------------------------------------------------
+         *  Invoice Filter
+         * -------------------------------------------------------------------------*/
+        $('#invoice_status, #invoice_type').on('change', function() {
+            houzez_invoices_update_url();
+        });
+
+        $('#startDate, #endDate').on( 'change', function() {
+            houzez_invoices_update_url();
+        });
+
+        var houzez_invoices_update_url = function() {
+            var inv_status = $('#invoice_status').val(),
+                inv_type   = $('#invoice_type').val(),
+                startDate  = $('#startDate').val(),
+                endDate    = $('#endDate').val();
+
+            // Construct the query string
+            var queryStringParts = [];
+
+            if(inv_status) {
+                queryStringParts.push('invoice_status=' + encodeURIComponent(inv_status));
+            }
+
+            if(inv_type) {
+                queryStringParts.push('invoice_type=' + encodeURIComponent(inv_type));
+            }
+
+            if(startDate) {
+                queryStringParts.push('startDate=' + encodeURIComponent(startDate));
+            }
+
+            if(endDate) {
+                queryStringParts.push('endDate=' + encodeURIComponent(endDate));
+            }
+
+            var queryString = queryStringParts.join('&');
+
+            // Construct new URL without the page part
+            var newUrl = invoices_page_link;
+            
+            if (queryString) {
+                newUrl += '?' + queryString;
+            }
+
+            // Append the query string to the current URL and reload the page
+            window.location.href = newUrl;
+        }
+
+
+        var houzez_invoices_filter = function() {
+            var inv_status = $('#invoice_status').val(),
+                inv_type   = $('#invoice_type').val(),
+                startDate  = $('#startDate').val(),
+                endDate  = $('#endDate').val();
+
+            $.ajax({
+                url: ajaxurl,
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    'action': 'houzez_invoices_ajax_search',
+                    'invoice_status': inv_status,
+                    'invoice_type'  : inv_type,
+                    'startDate'     : startDate,
+                    'endDate'       : endDate
+                },
+                success: function(res) { 
+                    if(res.success) {
+                        $('#invoices_content').empty().append( res.result );
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err.Message);
+                }
+            });
         }
 
         /*--------------------------------------------------------------------------
@@ -144,7 +239,84 @@ jQuery(document).ready( function($) {
             
         });
 
+
+        $('#property-author-js').on('change', function() { 
+            var user_id = $(this).val();
+            $('input[name="property_author"]').val(user_id);
+        });
+
+        $('#property-author-mobile-js').on('change', function() { 
+            var user_id = $(this).val();
+            $('input[name="property_author"]').val(user_id);
+        });
+
         /*--------------------------------------------------------------------------
+         *  Property actions
+         * -------------------------------------------------------------------------*/
+        $('.houzez-prop-action-js').on('click', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var prop_id = $this.attr('data-propid');
+            var type = $this.attr('data-type');
+
+            bootbox.confirm({
+                message: "<strong>"+are_you_sure_text+"</strong>",
+                buttons: {
+                    confirm: {
+                        label: confirm_btn_text,
+                        className: 'btn btn-primary'
+                    },
+                    cancel: {
+                        label: cancel_btn_text,
+                        className: 'btn btn-grey-outlined'
+                    }
+                },
+                callback: function (result) {
+                    if(result==true) {
+                        fave_processing_modal( processing_text );
+                        houzez_property_actions(prop_id, $this, type);
+                        $this.unbind("click");
+                    }
+                }
+            });
+            
+        });
+
+        var houzez_property_actions = function( prop_id, currentDiv, type ) {
+
+            var $messages = $('#dash-prop-msg');
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_url,
+                dataType: 'JSON',
+                data: {
+                    'action' : 'houzez_property_actions',
+                    'propid' : prop_id,
+                    'type': type
+                },
+                success: function ( res ) {
+
+                    if( res.success ) {
+                        window.location.reload();
+                    } else {
+                        houzez_processing_modal_close();
+                        $('html, body').animate({
+                            scrollTop: $(".dashboard-content-inner-wrap").offset().top
+                        }, 'slow');
+                        $messages.empty().append('<div class="alert alert-danger alert-dismissible fade show" role="alert">'+houzezProperty.featured_listings_none+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+                    }
+
+                },
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err.Message);
+                }
+
+            });//end ajax
+        }
+
+         /*--------------------------------------------------------------------------
          *   Make Property Featured - only for membership
          * -------------------------------------------------------------------------*/
         $('.make-prop-featured').on('click', function (e) {
@@ -2039,10 +2211,17 @@ jQuery(document).ready( function($) {
                     tooltips: {
                         callbacks: {
                             labelColor: function(tooltipItem, chart) {
-                                return {
-                                    borderColor: 'rgb(255, 99, 132, 1)',
-                                    backgroundColor: 'rgb(255, 99, 132, 1)'
-                                };
+                                if (tooltipItem.datasetIndex === 0) { // For 'views_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        backgroundColor: 'rgba(255, 99, 132, 1)'
+                                    };
+                                } else if (tooltipItem.datasetIndex === 1) { // For 'unique_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        backgroundColor: 'rgba(54, 162, 235, 1)'
+                                    };
+                                }
                             },
                             labelTextColor: function(tooltipItem, chart) {
                                 return '#fff';
@@ -2120,16 +2299,24 @@ jQuery(document).ready( function($) {
                     tooltips: {
                         callbacks: {
                             labelColor: function(tooltipItem, chart) {
-                                return {
-                                    borderColor: 'rgb(255, 99, 132, 1)',
-                                    backgroundColor: 'rgb(255, 99, 132, 1)'
-                                };
+                                if (tooltipItem.datasetIndex === 0) { // For 'views_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        backgroundColor: 'rgba(255, 99, 132, 1)'
+                                    };
+                                } else if (tooltipItem.datasetIndex === 1) { // For 'unique_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        backgroundColor: 'rgba(54, 162, 235, 1)'
+                                    };
+                                }
                             },
                             labelTextColor: function(tooltipItem, chart) {
                                 return '#fff';
                             }
                         }
                     }
+
                 }
             });
         }
@@ -2201,10 +2388,17 @@ jQuery(document).ready( function($) {
                     tooltips: {
                         callbacks: {
                             labelColor: function(tooltipItem, chart) {
-                                return {
-                                    borderColor: 'rgb(255, 99, 132, 1)',
-                                    backgroundColor: 'rgb(255, 99, 132, 1)'
-                                };
+                                if (tooltipItem.datasetIndex === 0) { // For 'views_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        backgroundColor: 'rgba(255, 99, 132, 1)'
+                                    };
+                                } else if (tooltipItem.datasetIndex === 1) { // For 'unique_7d' dataset
+                                    return {
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        backgroundColor: 'rgba(54, 162, 235, 1)'
+                                    };
+                                }
                             },
                             labelTextColor: function(tooltipItem, chart) {
                                 return '#fff';
@@ -2248,8 +2442,6 @@ jQuery(document).ready( function($) {
                 }
             });
         }
-
-
     }
 
 });

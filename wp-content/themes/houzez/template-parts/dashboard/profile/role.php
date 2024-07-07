@@ -1,9 +1,15 @@
 <?php
-$user_data         = get_userdata( get_current_user_id() );
+$userID = get_current_user_id();
+$edit_flag = false;
+if (isset($_GET['edit_user']) && is_numeric($_GET['edit_user'])) {
+    $userID = intval($_GET['edit_user']); // Sanitize the input
+    $edit_flag = true;
+} 
+$user_data         = get_userdata($userID);
 $role              = $user_data->roles[0];
 $show_hide_roles = houzez_option('show_hide_roles');
 
-if( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() ) { ?>
+if( ( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() && ! houzez_is_manager() && ! $edit_flag ) ) { ?>
 <div class="dashboard-content-block">
     <div class="row">
         <div class="col-md-3 col-sm-12">
@@ -31,9 +37,6 @@ if( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() ) { ?>
                         }
                         if( $show_hide_roles['seller'] != 1 ) {
                             echo '<option value="houzez_seller" ' . selected('houzez_seller', $role) . '> ' . houzez_option('seller_role') . '  </option>';
-                        }
-                        if( $show_hide_roles['manager'] != 1 ) {
-                            echo '<option value="houzez_manager" ' . selected('houzez_manager', $role) . '> ' . houzez_option('manager_role') . ' </option>';
                         }
                         ?>
                     </select>

@@ -69,7 +69,7 @@ Redux::setSection( $houzez_opt_name, array(
             'title'		=> esc_html__( 'Currency Symbol', 'houzez' ),
             'read-only'	=> false,
             'default'	=> '$',
-            'required'  => array('multi_currency', '=', '0'),
+            //'required'  => array('multi_currency', '=', '0'),
             'desc'	=> esc_html__( 'Enter the currency sign. (For Example: $)', 'houzez' ),
         ),
         array(

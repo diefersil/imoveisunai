@@ -31,6 +31,43 @@ Redux::setSection( $houzez_opt_name, array(
             ), 
         ),
         array(
+            'id'       => 'des_item_v1',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Description Item Grid v1', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable or disable Description for listing grid v1', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+        ),
+        array(
+            'id'       => 'des_item_v2',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Description Item Grid v2', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable or disable Description for listing grid v2', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+        ),
+        array(
+            'id'       => 'des_item_v4',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Description Item Grid v4', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable or disable Description for listing grid v4', 'houzez' ),
+            'default'  => 1,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+        ),
+        /*array(
+            'id'       => 'des_item_list_v4',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Description Item List v4', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable or disable Description for listing list view v4', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+        ),*/
+        
+        array(
             'id'       => 'disable_compare',
             'type'     => 'switch',
             'title'    => esc_html__( 'Compare Buttom', 'houzez' ),
@@ -162,6 +199,26 @@ Redux::setSection( $houzez_opt_name, array(
             'options' => array(
                 'enabled'  => $listing_composer,
                 'disabled' => $listing_composer_disabled
+            ),
+        ),
+
+        array(
+            'id'      => 'listing_buttons_composer',
+            'type'    => 'sorter',
+            'title'   => 'Listing v4 & v7 Buttons',
+            'subtitle'    => esc_html__( 'Maximum 4 options allowed. For listings list v4 only top 3 options will show.', 'houzez' ),
+            'desc'    => esc_html__( 'Drag and drop layout manager, to quickly organize.
+', 'houzez' ),
+            'options' => array(
+                'enabled'  => array(
+                    'call' => esc_html__('Call', 'houzez'),
+                    'email' => esc_html__('Email', 'houzez'),
+                    'whatsapp' => esc_html__('WhatsApp', 'houzez'),
+                ),
+                'disabled' => array(
+                    'lineapp' => esc_html__('LINE', 'houzez'),
+                    'telegram' => esc_html__('Telegram', 'houzez'),
+                )
             ),
         ),
 
@@ -416,6 +473,15 @@ Redux::setSection( $houzez_opt_name, array(
                 'taxonomy' => array( 'property_status' ),
                 'hide_empty' => false,
             )
-        ), 
+        ),
+        array(
+            'id'       => 'show_sold_listings',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Show sold listing in front-end?', 'houzez' ),
+            'subtitle' => esc_html__( 'This option is to show/hide sold listings for all listings templates.', 'houzez' ),
+            'default'  => 1,
+            'on'       => esc_html__( 'Yes', 'houzez' ),
+            'off'      => esc_html__( 'No', 'houzez' ),
+        ),
     )
 ));

@@ -38,12 +38,9 @@ $args = array(
 );
 
 /* Keyword Based Search */
-if( isset ( $_GET['agency_name'] ) ) {
-    $keyword = trim( $_GET['agency_name'] );
-    $keyword = sanitize_text_field($keyword);
-    if ( ! empty( $keyword ) ) {
-        $args['s'] = $keyword;
-    }
+$keyword = isset($_GET['agency_name']) ? sanitize_text_field(trim($_GET['agency_name'])) : '';
+if (!empty($keyword)) {
+    $args['s'] = $keyword;
 }
 
 query_posts( $args );

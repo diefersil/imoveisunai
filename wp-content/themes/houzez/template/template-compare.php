@@ -7,13 +7,11 @@ global $houzez_local;
 
 $page_content_position = houzez_get_listing_data('listing_page_content_area');
 
-$prop_ids = explode(',', $_COOKIE['houzez_compare_listings']);
-if( empty( $prop_ids[0] ) ) {
-    $prop_ids = isset( $_GET['ids'] ) ? $_GET['ids'] : '';
-    $prop_ids = explode(',', $prop_ids);
-}
+$prop_ids = isset( $_GET['ids'] ) ? $_GET['ids'] : '';
 
-$basic_info = $prop_address = $prop_status = $prop_type = $listing_title = $listing_price = $prop_city = $prop_state = $prop_zipcode = $prop_additional_features = $prop_country = $prop_beds = $prop_baths = $property_id = $prop_size = $prop_garage = $prop_garage_size = $prop_year = '';
+$basic_info = $prop_address = $prop_status = $prop_type = $listing_title = $listing_price = $prop_city = $prop_state = $prop_zipcode = $prop_additional_features = $prop_country = $prop_beds = $prop_baths = $property_id = $prop_size = $prop_garage = $prop_garage_size = $prop_year = $bedrooms_label = $bath_label = $garage_label = '';
+
+    $all_featurs = array();
 ?>
 
 <section class="listing-wrap">
@@ -43,6 +41,8 @@ $basic_info = $prop_address = $prop_status = $prop_type = $listing_title = $list
 
 
                 if( !empty($prop_ids) ) {
+                    $prop_ids = explode(',', $prop_ids);
+                    
                     $args = array(
                         'post_type' => 'property',
                         'post__in' => $prop_ids,

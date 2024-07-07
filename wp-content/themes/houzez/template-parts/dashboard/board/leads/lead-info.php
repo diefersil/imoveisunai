@@ -1,7 +1,10 @@
 <?php
 $lead = $first_name = $last_name = '';
 if(isset($_GET['lead-id'])) {
-	$lead = Houzez_Leads::get_lead($_GET['lead-id']);
+
+	$lead_id = isset($_GET['lead-id']) ? intval($_GET['lead-id']) : 0;
+	
+	$lead = Houzez_Leads::get_lead($lead_id);
 
 	$prefix = $lead->prefix;
 	$display_name = $lead->display_name;

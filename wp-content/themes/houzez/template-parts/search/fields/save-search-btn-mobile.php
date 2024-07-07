@@ -19,7 +19,7 @@ if( houzez_option('enable_disable_save_search', 0) ) {
         <input type="hidden" name="search_geolocation" value="<?php echo isset($_GET['search_location']) ? esc_attr($_GET['search_location']) : ''; ?>">
         <input type="hidden" name="houzez_save_search_ajax" value="<?php echo wp_create_nonce('houzez-save-search-nounce')?>">
 
-        <button class="btn save_search_click btn-secondary btn-full-width mt-2" type="button">
+        <button class="btn save-search-btn save_search_click btn-secondary btn-full-width mt-2" type="button">
             <?php get_template_part('template-parts/loader'); ?>
             <i class="houzez-icon icon-alarm-bell mr-1"></i> <?php echo houzez_option('srh_btn_save_search', 'Save Search'); ?>
         </button>

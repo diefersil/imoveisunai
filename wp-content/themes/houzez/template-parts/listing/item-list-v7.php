@@ -1,6 +1,25 @@
 <?php 
-global $post, $ele_thumbnail_size, $image_size, $listing_agent_info; 
+global $post, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
 $listing_agent_info = houzez20_property_contact_form();
+
+$defaultButtons = array(
+    'enabled' => array(
+        'call' => 'Call',
+        'email' => 'Email',
+        'whatsapp' => 'WhatsApp',
+        'telegram' => 'Telegram',
+        // Add other buttons as needed
+    )
+);
+
+$listingButtonsComposer = houzez_option('listing_buttons_composer', $defaultButtons);
+
+// Ensure that 'enabled' index exists
+$buttonsComposer = isset($listingButtonsComposer['enabled']) ? $listingButtonsComposer['enabled'] : [];
+
+// Remove the 'placebo' element
+unset($buttonsComposer['placebo']);
+
 
 if( houzez_is_fullwidth_2cols_custom_width() ) {
 	$image_size = 'houzez-item-image-4';

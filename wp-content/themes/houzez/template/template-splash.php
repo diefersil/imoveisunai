@@ -117,7 +117,7 @@ if( $background_type == 'image' ) {
 
                 <?php if( houzez_option('sp-twitter') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-twitter" href="<?php echo esc_url(houzez_option('sp-twitter')); ?>"><i class="houzez-icon icon-social-media-twitter mr-2"></i></a>
+                        <a target="_blank" class="btn-twitter" href="<?php echo esc_url(houzez_option('sp-twitter')); ?>"><i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i></a>
                     </span>
                 <?php } ?>
 

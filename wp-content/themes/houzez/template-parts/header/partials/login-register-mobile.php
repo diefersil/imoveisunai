@@ -1,7 +1,9 @@
 <?php
 $create_lisiting_enable = houzez_option('create_lisiting_enable');
 $header_create_listing_template = houzez_get_template_link_2('template/user_dashboard_submit.php');
+$favorite_template = houzez_get_template_link_2('template/user_dashboard_favorites.php');
 $create_listing_button_required_login = houzez_option('create_listing_button');
+$add_to_favorite = houzez_option('add_to_favorite', 0);
 
 $create_listing_title = houzez_option('dsh_create_listing', 'Create a Listing');
 
@@ -35,6 +37,12 @@ if( $custom_create_lisiting_btn && !empty($custom_create_lisiting_link) ) {
 			<a href="#" data-toggle="modal" data-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle mr-1"></i> <?php echo esc_html__('Register', 'houzez'); ?></a>
 		</li>
 		<?php } ?>
+
+		<?php if( ! $add_to_favorite ) { ?>
+			<li class="favorite-link">
+				<a class="favorite-btn" href="<?php echo esc_url($favorite_template); ?>"><i class="houzez-icon icon-love-it mr-1"></i> <?php echo houzez_option('dsh_favorite', 'Favorites'); ?>  <span class="btn-bubble frvt-count">0</span></a>
+			</li>
+			<?php } ?>
 		
 	</ul><!-- .main-nav -->
 	<?php endif; ?>

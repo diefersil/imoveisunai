@@ -49,7 +49,12 @@ $yelp_data = houzez_option( 'houzez_yelp_term' );
 $yelp_dist_unit = houzez_option( 'houzez_yelp_dist_unit' );
 $prop_location = get_post_meta( get_the_ID(), 'fave_property_location', true );
 $prop_location = explode( ',', $prop_location );
-$prop_location = $prop_location[0].','.$prop_location[1];
+
+$l1 = isset($prop_location[0]) ? $prop_location[0] : '';
+$l2 = isset($prop_location[1]) ? $prop_location[1] : '';
+
+// Concatenate $l1 and $l2 with a comma only if both are not empty
+$prop_location = $l1 . ($l1 !== '' && $l2 !== '' ? ',' : '') . $l2;
 
 
 $dist_unit = 1.1515;

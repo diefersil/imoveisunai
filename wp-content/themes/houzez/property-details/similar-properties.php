@@ -137,6 +137,9 @@ if( $show_similer ) {
     } else if ( $sort_by == 'featured_first' ) {
         $properties_args['orderby'] = 'meta_value date';
         $properties_args['meta_key'] = 'fave_featured';
+    } else if ( $sort_by == 'featured_first_random' ) {
+        $properties_args['orderby'] = 'meta_value DESC rand';
+        $properties_args['meta_key'] = 'fave_featured';
     } else if ( $sort_by == 'random' ) {
         $properties_args['orderby'] = 'rand date';
     }

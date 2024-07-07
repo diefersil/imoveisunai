@@ -5,8 +5,159 @@
  * Date: 1 July 2020
  * Time: 11:47 AM
  */
-get_header(); ?>
+global $houzez_local;
+$houzez_local = houzez_get_localization();
+/**
+ * @package Houzez
+ * @since Houzez 1.0
+ */
+if( isset($_GET['fid']) && !empty( $_GET['fid'] ) ) { 
 	
+	$fb_info = get_option('houzez_user_facebook_info_'.$_GET['fid']);	
+	$fid = isset($fb_info['id']) ? $fb_info['id'] : '';
+	$picture_url = isset($fb_info['picture_url']) ? $fb_info['picture_url'] : '';
+	$first_name = isset($fb_info['first_name']) ? $fb_info['first_name'] : '';
+	$last_name = isset($fb_info['last_name']) ? $fb_info['last_name'] : '';
+	$username = $first_name.'_'.$last_name;
+
+	if( $fid != $_GET['fid'] ) {
+		wp_die('Invalid social id');
+	}
+?>
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="profile" href="https://gmpg.org/xfn/11" />
+    <meta name="format-detection" content="telephone=no">
+	<?php wp_head(); ?>
+</head>
+
+<body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
+<div class="hz-fb-main-wrap">
+    <div class="hz-fb-wrap">
+        <div class="hz-fb-avatar-wrap">
+            <img src="<?php echo esc_url($picture_url); ?>" alt="<?php echo esc_attr($username); ?>">
+        </div><!-- .hz-fb-avatar-wrap -->
+        
+        <div class="main-step-wrap">
+	        <div class="hz-fb-header-wrap">
+	            <div class="hz-fb-welcome-message">
+	                <i class="houzez-icon icon-social-media-facebook"></i> <?php esc_html_e('Hi', 'houzez'); ?> <?php echo esc_html( $first_name ).' '.esc_html( $last_name ); ?>
+	            </div>
+	            <p><?php esc_html_e('You\'re now signed in with your Facebook account but you are still one step away of getting into our website.', 'houzez'); ?></p>
+	        </div><!-- .hz-fb-header-wrap -->
+	        <div class="hz-fb-footer-wrap">
+	            <div class="hz-fb-footer-columns">
+	                <div class="hz-fb-footer-title">
+	                    <strong><?php esc_html_e('Already have an account?', 'houzez'); ?></strong>
+	                </div>
+	                <div>
+	                    <p><?php esc_html_e('Link your existing account on your website to you Facebook ID.', 'houzez'); ?></p>
+	                </div>
+	                <button class="btn-link-account btn btn-primary"><?php esc_html_e('Link my account', 'houzez'); ?></button>
+	            </div><!-- .hz-fb-footer-columns -->
+	            <div class="hz-fb-footer-columns">
+	                <div class="hz-fb-footer-title">
+	                    <strong><?php esc_html_e('New to our website?', 'houzez'); ?></strong>
+	                </div>
+	                <div>
+	                    <p><?php esc_html_e('Create a new account and it will be associated with your Facebook ID.', 'houzez'); ?></p>
+	                </div>
+	                <button class="btn-create-account btn btn-primary"><?php esc_html_e('Create a new account', 'houzez'); ?></button>
+	            </div><!-- .hz-fb-footer-columns -->
+	        </div><!-- .hz-fb-footer-wrap -->
+	    </div>
+
+        <!--************* Link Account Form *************-->
+        <div class="link-account-wrap">
+	        <div class="hz-fb-header-wrap">
+	            <div class="hz-fb-welcome-message">
+	                <?php esc_html_e( 'Already have an account?', 'houzez' ); ?>
+	            </div>
+	            <p><?php esc_html_e( 'Please enter your username and password of your existing account on our website. Once verified, it will linked to your Facebook ID.', 'houzez' ); ?></p>
+	        </div><!-- .hz-fb-header-wrap -->
+
+	        <div class="hz-fb-form-wrap">
+	        	<div id="hz-link-messages" class="hz-social-messages"></div>
+	            <form action="#" method="post">
+	            	<?php wp_nonce_field( 'link_account_nonce', 'link_account_security' ); ?>
+				    <input type="hidden" name="action" value="houzez_link_account">
+				    <input type="hidden" name="lid" value="<?php echo esc_attr($fid);?>">
+				    <input type="hidden" name="redirect_to" value="<?php echo esc_url(houzez_after_login_redirect()); ?>">
+		            <div class="login-form-wrap">
+		                <div class="form-group">
+		                    <div class="form-group-field username-field">
+		                        <input type="text" name="lusername" class="form-control" placeholder="<?php esc_html_e( 'Username', 'houzez' ); ?>" required>
+		                    </div><!-- input-group -->
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <div class="form-group-field password-field">
+		                        <input type="password" name="lpassword" class="form-control" placeholder="<?php esc_html_e( 'Password', 'houzez' ); ?>" required>
+		                    </div><!-- input-group -->
+		                </div><!-- form-group -->
+		            </div><!-- login-form-wrap -->
+		            <div class="form-tools">
+		                <a class="hz-fb-cancel" href="#"><?php esc_html_e( 'Cancel', 'houzez' ); ?></a>
+		                <button id="houzez-link-account" type="submit" class="btn btn-primary">
+						    <?php get_template_part('template-parts/loader'); ?>
+						    <?php esc_html_e('Continue','houzez');?>
+						</button>    
+		            </div><!-- form-tools -->
+		        </form>
+	        </div><!-- .hz-fb-form-wrap -->
+	    </div>
+
+        <!--************* Create Account Form *************-->
+        <div class="new-account-wrap">
+	        <div class="hz-fb-header-wrap">
+	            <div class="hz-fb-welcome-message">
+	                <?php esc_html_e( 'New to our website?', 'houzez' ); ?>
+	            </div>
+	            <p><?php echo esc_html__( 'Please fill in your information in the form below. Once completed, you will be able to automatically sign into our website through your Facebook ID.', 'houzez' )?></p>
+	        </div><!-- .hz-fb-header-wrap -->
+
+	        <div class="hz-fb-form-wrap">
+	        	<div id="hz-create-messages" class="hz-social-messages"></div>
+	            <form action="#" method="post">
+	            	<input type="hidden" name="action" value="houzez_social_create_account">
+				    <input type="hidden" name="id" value="<?php echo esc_attr($fid);?>">
+				    <input type="hidden" name="term_condition" value="on">
+				    <?php wp_nonce_field( 'houzez_social_register_nonce', 'houzez_social_register_security' ); ?>
+				    <input type="hidden" name="redirect_to" value="<?php echo esc_url(houzez_after_login_redirect()); ?>">
+		            <div class="login-form-wrap">
+		                <div class="form-group">
+		                    <div class="form-group-field username-field">
+		                        <input type="text" name="username" value="<?php echo esc_attr($username);?>" class="form-control" placeholder="<?php esc_html_e( 'Username', 'houzez' ); ?>" required>
+		                    </div><!-- input-group -->
+		                </div><!-- form-group -->
+		                <div class="form-group">
+		                    <div class="form-group-field password-field">
+		                        <input type="email" name="useremail" class="form-control" placeholder="<?php esc_html_e( 'Email', 'houzez' ); ?>" required>
+		                    </div><!-- input-group -->
+		                </div><!-- form-group -->
+		            </div><!-- login-form-wrap -->
+		            <div class="form-tools">
+		                <a class="hz-fb-cancel" href="#"><?php esc_html_e( 'Cancel', 'houzez' ); ?></a>
+		                <button id="houzez-create-account-btn" type="submit" class="btn btn-primary">
+						    <?php get_template_part('template-parts/loader'); ?>
+						    <?php esc_html_e('Continue','houzez');?>
+						</button>   
+		            </div><!-- form-tools -->
+		        </form>
+	        </div><!-- .hz-fb-form-wrap -->
+	    </div>
+
+    </div><!-- .hz-fb-wrap -->
+    <a href="<?php echo home_url('/');?>" class="hz-fb-help-link"><i class="houzez-icon icon-arrow-left-1"></i> <?php echo esc_html__('Back to', 'houzez').' '.get_bloginfo('name'); ?></a> 
+</div><!-- .hz-fb-wrap -->
+<?php wp_footer(); ?>
+</body>
+<?php } else { ?>
+
+<?php get_header(); ?>
 <section class="blog-wrap">
     <div class="container">
     	<div class="page-title-wrap login-page-title">
@@ -48,6 +199,7 @@ get_header(); ?>
 		               </div>
 		           <?php } else { ?>
 
+		             
 		               <div class="login-form-page-wrap">
 			                <div class="login-register-tabs">
 			                    <ul class="nav nav-tabs">
@@ -73,7 +225,8 @@ get_header(); ?>
 			               		<?php } ?>
 			               </div><!-- tab-content -->
 		               </div>
-           			<?php } ?>
+           			<?php 
+           		}?>
                <?php 
            		} else { 
            			echo '<div class="login-form-page-text">'; 
@@ -85,5 +238,5 @@ get_header(); ?>
        </div><!-- row -->
    </div><!-- container -->
 </section>
-
 <?php get_footer(); ?>
+<?php } ?>

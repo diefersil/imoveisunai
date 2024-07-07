@@ -10,7 +10,8 @@ $token = '';
 define('DEBUG',0);
 
 $time = time();
-$date = date('Y-m-d H:i:s',$time);
+//$date = date('Y-m-d H:i:s',$time);
+$date = date_i18n( get_option('date_format').' '.get_option('time_format') );
 
 $payload       = file_get_contents( 'php://input' );
 $payload_array = explode( '&', $payload );
@@ -110,12 +111,16 @@ if (strcmp ($res, "VERIFIED") == 0) {
             houzez_save_user_packages_record($user_id, $pack_id);
             houzez_update_membership_package($user_id, $pack_id);
 
+            // Retrieve user data
+            $user_data = get_userdata($user_id);
+            $user_email = $user_data->user_email;  // This is the user's email address
+
 
             $args  =array(
                 'recurring_package_name' => get_the_title($pack_id),
                 'merchant'               => 'Paypal'
             );
-            houzez_email_type( $receiver_email, 'recurring_payment', $args );
+            houzez_email_type( $user_email, 'recurring_payment', $args );
          
         } else {
            

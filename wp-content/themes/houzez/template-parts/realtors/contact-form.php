@@ -5,6 +5,7 @@ $terms_page_id = houzez_option('terms_condition');
 $thumb_url_array = wp_get_attachment_image_src( $thumb_id, 'thumbnail', true );
 $image_url = $thumb_url_array[0];
 $name = '';
+$gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
 
 $hide_form_fields = houzez_option('hide_agency_agent_contact_form_fields');
 
@@ -33,7 +34,7 @@ if ( is_singular( 'houzez_agent' ) ) {
     global $current_author, $current_author_meta;
     $target_email = $current_author->user_email;
     $name = $current_author->display_name;
-    $image_url = $current_author_meta['fave_author_custom_picture'][0];
+    $image_url = $current_author_meta['fave_author_custom_picture'][0] ?? '';
     $agent_id  = get_the_author_meta( 'ID' );
     $agent_type  = 'author_info';
     $source_link = get_author_posts_url( get_the_author_meta( 'ID' ));
@@ -135,9 +136,14 @@ if ( is_singular( 'houzez_agent' ) ) {
                             <?php } ?>
 
                             <div class="form-group">
-                                <label class="control control--checkbox m-0 hz-terms-of-use">
-                                    <input type="checkbox" name="privacy_policy"><?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+                                <label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+                                    <?php if( ! $gdpr_checkbox ) { ?>
+                                    <input type="checkbox" name="privacy_policy">
                                     <span class="control__indicator"></span>
+                                    <?php } ?>
+                                    <div class="gdpr-text-wrap">
+                                        <?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+                                    </div>
                                 </label>
                             </div><!-- form-group -->
 

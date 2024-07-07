@@ -51,7 +51,11 @@ if( isset($_GET['tab']) && $_GET['tab'] == 'active' ) {
         </div><!-- d-flex -->
     </div><!-- dashboard-header-wrap -->
 </header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap">
+<section class="dashboard-content-wrap deals-main-wrap">
+
+    <div class="dashboard-content-inner-wrap">
+        <?php get_template_part('template-parts/dashboard/statistics/statistic-deals'); ?>
+    </div>
     
     <div class="deals-table-wrap">
 
@@ -100,24 +104,20 @@ if( isset($_GET['tab']) && $_GET['tab'] == 'active' ) {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="7">
+                        <td colspan="5">
                             <?php get_template_part('template-parts/dashboard/board/records-html'); ?>
                         </td>
                         
                         <td colspan="2" class="text-right no-wrap">
-                            <div class="crm-pagination">
+                            <div class="leads-pagination-wrap">
                                 <?php
-                                echo paginate_links( array(
-                                    'base' => add_query_arg( 'cpage', '%#%' ),
-                                    'format' => '',
-                                    'prev_text' => __('&laquo;'),
-                                    'next_text' => __('&raquo;'),
-                                    'total' => ceil($deals['data']['total_records'] / $deals['data']['items_per_page']),
-                                    'current' => $deals['data']['page']
-                                ));
+                                $total_pages = ceil($deals['data']['total_records'] / $deals['data']['items_per_page']);
+                                $current_page = $deals['data']['page'];
+                                houzez_crm_pagination($total_pages, $current_page);
                                 ?>
-                            </div>
+                            </div> <!-- leads-pagination-wrap -->
                         </td>
+
                     </tr>
                 </tfoot>
             </table><!-- dashboard-table -->

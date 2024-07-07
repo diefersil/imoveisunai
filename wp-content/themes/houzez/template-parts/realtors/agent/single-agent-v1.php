@@ -103,7 +103,10 @@ if(isset($_GET['tab']) || $paged > 0) {
 
 $the_query = Houzez_Query::loop_agent_properties();
 $agent_total_listings = Houzez_Query::agent_properties_count();
-$agent_listing_ids = Houzez_Query::get_agent_properties_ids_by_agent_id(get_the_ID());
+
+if( houzez_option('agent_stats', 0) != 0 ) {
+ $agent_listing_ids = Houzez_Query::get_agent_properties_ids_by_agent_id(get_the_ID());
+}
 
 $active_reviews_tab = '';
 $active_reviews_content = '';

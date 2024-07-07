@@ -12,7 +12,27 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => __('Page Layout', 'houzez'),
             'subtitle' => '',
             'options'  => array(
-                
+                'left-sidebar' => array(
+                    'alt'   => '',
+                    'img'   => HOUZEZ_IMAGE. '2cl.png'
+                ),
+                'right-sidebar' => array(
+                    'alt'   => '',
+                    'img'  => HOUZEZ_IMAGE. '2cr.png'
+                )
+            ),
+            'default' => 'right-sidebar'
+        ),
+        array(
+            'id'       => 'blog_single_layout',
+            'type'     => 'image_select',
+            'title'    => __('Single Post Layout', 'houzez'),
+            'subtitle' => '',
+            'options'  => array(
+                'no-sidebar' => array(
+                    'alt'   => '',
+                    'img'   => ReduxFramework::$_url.'assets/img/1c.png'
+                ),
                 'left-sidebar' => array(
                     'alt'   => '',
                     'img'   => HOUZEZ_IMAGE. '2cl.png'

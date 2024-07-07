@@ -16,6 +16,7 @@ if( !class_exists('Fave_Insights')) {
 $show_statistics = true;
 $author_id = 0;
 $user_id = get_current_user_id();
+
 $insights = new Fave_Insights();
 
 $listing_id = isset($_GET['listing_id']) ? $_GET['listing_id'] : '';
@@ -26,11 +27,6 @@ if(!empty($listing_id)) {
 } else {
     $insights_stats = $insights->fave_user_stats($user_id);
 }
-
-if( $author_id != 0 && ( $author_id != $user_id ) ) {
-    $show_statistics = false;
-}
-
 ?>
 
 <header class="header-main-wrap dashboard-header-main-wrap">

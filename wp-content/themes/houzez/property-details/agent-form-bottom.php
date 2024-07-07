@@ -6,6 +6,7 @@ if(empty($return_array)) {
 }
 $hide_form_fields = houzez_option('hide_prop_contact_form_fields');
 $terms_page_id = houzez_option('terms_condition');
+$gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
 $terms_page_id = apply_filters( 'wpml_object_id', $terms_page_id, 'page', true );
 
 $agent_display = houzez_get_listing_data('agent_display_option');
@@ -138,9 +139,13 @@ if($agent_display != 'none') {
 					<?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
 					<div class="col-sm-12 col-xs-12">
 						<div class="form-group">
-							<label class="control control--checkbox m-0 hz-terms-of-use">
-								<input type="checkbox" name="privacy_policy"><?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
+							<label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+								<?php if( ! $gdpr_checkbox ) { ?>
+								<input type="checkbox" name="privacy_policy">
 								<span class="control__indicator"></span>
+								<?php } ?>
+								<div class="gdpr-text-wrap">
+								<?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a></div>
 							</label>
 						</div><!-- form-group -->
 					</div>

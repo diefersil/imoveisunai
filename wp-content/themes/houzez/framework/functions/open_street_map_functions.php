@@ -84,6 +84,8 @@ if( !function_exists( 'houzez_get_osm_properties' ) ) {
             'post_status' => 'publish'
         );
 
+        $wp_query_args = apply_filters( 'houzez_sold_status_filter', $wp_query_args );
+
         if(houzez_is_listings_template()) {
 
             $wp_query_args = apply_filters( 'houzez20_property_filter', $wp_query_args );
@@ -102,7 +104,6 @@ if( !function_exists( 'houzez_get_osm_properties' ) ) {
             $wp_query_args['posts_per_page'] = $properties_limit;
 
             $wp_query_args['paged'] = $paged;
-            $wp_query_args['post_status'] = array( 'publish', 'houzez_sold' );
 
             $wp_query_args = houzez_prop_sort ( $wp_query_args );
             

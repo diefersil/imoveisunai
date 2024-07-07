@@ -17,7 +17,7 @@
 		<?php if( houzez_option('hs-twitter') != '' ){ ?>
 		 <li class="list-inline-item">
 			<a target="_blank" class="btn-square btn-twitter" href="<?php echo esc_url(houzez_option('hs-twitter')); ?>">
-				<i class="houzez-icon icon-social-media-twitter"></i>
+				<i class="houzez-icon icon-x-logo-twitter-logo-2"></i>
 			</a>
 		</li>
 		<?php } ?>

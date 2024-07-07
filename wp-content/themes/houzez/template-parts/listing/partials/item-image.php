@@ -6,7 +6,6 @@ $thumbnail_size = !empty($ele_thumbnail_size) ? $ele_thumbnail_size : $image_siz
 	<div class="listing-thumb">
 		<a <?php houzez_listing_link_target(); ?> href="<?php echo esc_url(get_permalink()); ?>" class="listing-featured-thumb hover-effect">
 			<?php
-		    
 		    if( has_post_thumbnail( $post->ID ) && get_the_post_thumbnail($post->ID) != '' ) {
 		        the_post_thumbnail( $thumbnail_size, array('class' => 'img-fluid') );
 		    }else{

@@ -65,5 +65,8 @@
             }
             ?>
         </select><!-- selectpicker -->
+
+        <?php get_template_part( 'template-parts/dashboard/submit/partials/author-mobile'); ?>
+        
     </div><!-- form-group -->
 </div><!-- dashboard-mobile-edit-menu-wrap -->

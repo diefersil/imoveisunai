@@ -22,6 +22,11 @@ if ( houzez_site_width() == '1210px' ) {
 				<?php get_template_part('template-parts/listing/partials/item-title'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-price'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-address'); ?>
+				<?php 
+				if( houzez_option('des_item_v4', 0) ) {?>
+					<div class="item-short-description"><?php echo houzez_get_excerpt(30); ?></div>
+				<?php
+				}?>
 				<?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-btn'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-author'); ?>

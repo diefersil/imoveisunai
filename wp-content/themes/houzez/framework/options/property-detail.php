@@ -881,6 +881,15 @@ Redux::setSection( $houzez_opt_name, array(
     'subsection' => true,
     'fields' => array(
         array(
+            'id'          => 'schedule_num_days',
+            'type'        => 'text',
+            'title'       => esc_html__( 'Number of Days', 'houzez' ),
+            'subtitle'    => esc_html__( 'Enter number of available days for user to schedule tour. Default 14', 'houzez' ),
+            'desc'        => '',
+            'default'  => '14',
+            'validate' => 'numeric'
+        ),
+        array(
             'id'       => 'schedule_time_slots',
             'type'     => 'textarea',
             'title'    => esc_html__( 'Time Slots', 'houzez' ),
@@ -900,7 +909,6 @@ Redux::setSection( $houzez_opt_name, array(
                 'hide_empty' => false,
             )
         ),
-
         array(
             'id'          => 'schedule_tour_redirect',
             'type'        => 'text',
@@ -1106,6 +1114,7 @@ Redux::setSection( $houzez_opt_name, array(
                 'd_price' => esc_html__( 'Price (High to Low)', 'houzez' ),
                 'a_price' => esc_html__( 'Price (Low to High)', 'houzez' ),
                 'featured_first' => esc_html__( 'Show Featured Listings on Top', 'houzez' ),
+                'featured_first_random' => esc_html__( 'Show Featured Listings on Top - Randomly', 'houzez' ),
                 'random' => esc_html__( 'Random', 'houzez' ),
             ),
             'default' => 'd_date'

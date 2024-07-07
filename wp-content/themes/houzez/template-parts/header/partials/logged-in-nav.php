@@ -143,7 +143,7 @@ $user_custom_picture = houzez_get_profile_pic($userID);
 
 
 
-            if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() ) {
+            if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() && ! houzez_is_admin() ) {
                 echo '<li class="side-menu-item">
                         <a '.esc_attr($ac_mem).' href="'.esc_attr($dashboard_membership).'">
                             <i class="houzez-icon icon-task-list-text-1 mr-2"></i> '.houzez_option('dsh_membership', 'Membership').'

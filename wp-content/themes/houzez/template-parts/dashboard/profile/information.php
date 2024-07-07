@@ -1,6 +1,15 @@
 <?php
-global $current_user, $houzez_local;
+global $houzez_local;
+$current_user = wp_get_current_user();
 $userID = get_current_user_id();
+$is_agency_agent = false;
+
+if (isset($_GET['edit_user']) && is_numeric($_GET['edit_user'])) {
+    $userID = intval($_GET['edit_user']); // Sanitize the input
+    $current_user = get_userdata($userID);
+    $is_agency_agent = true;
+} 
+
 $username               =   get_the_author_meta( 'user_login' , $userID );
 $user_title             =   get_the_author_meta( 'fave_author_title' , $userID );
 $first_name             =   get_the_author_meta( 'first_name' , $userID );
@@ -8,6 +17,8 @@ $last_name              =   get_the_author_meta( 'last_name' , $userID );
 $user_email             =   get_the_author_meta( 'user_email' , $userID );
 $user_mobile            =   get_the_author_meta( 'fave_author_mobile' , $userID );
 $user_whatsapp          =   get_the_author_meta( 'fave_author_whatsapp' , $userID );
+$telegram               =   get_the_author_meta( 'fave_author_telegram' , $userID );
+$line_id                =   get_the_author_meta( 'fave_author_line_id' , $userID );
 $user_phone             =   get_the_author_meta( 'fave_author_phone' , $userID );
 $description            =   get_the_author_meta( 'description' , $userID );
 $userlangs              =   get_the_author_meta( 'fave_author_language' , $userID );
@@ -51,7 +62,7 @@ if( houzez_is_agency() ) {
                     </div>
                 </div>
 
-                <?php if( !houzez_is_agency() ): ?>
+                <?php if( !houzez_is_agency() || $is_agency_agent ): ?>
                 <div class="col-sm-6 col-xs-12">
                     <div class="form-group">
                         <label for="firstname"><?php esc_html_e('First Name','houzez');?></label>
@@ -129,6 +140,18 @@ if( houzez_is_agency() ) {
                         <input type="text" name="whatsapp" class="form-control" value="<?php echo esc_attr( $user_whatsapp );?>" placeholder="<?php esc_html_e('Enter your whatsapp number with country code','houzez');?>">
                     </div>
                 </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label><?php esc_html_e( 'Telegram', 'houzez' ); ?></label>
+                        <input class="form-control" name="telegram" value="<?php echo esc_attr( $telegram );?>" placeholder="<?php esc_html_e( 'Enter the telegram username', 'houzez' ); ?>" type="text">
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label><?php esc_html_e( 'LINE ID', 'houzez' ); ?></label>
+                        <input class="form-control" name="line_id" value="<?php echo esc_attr( $line_id );?>" placeholder="<?php esc_html_e( 'Enter the LINE ID', 'houzez' ); ?>" type="text">
+                    </div>
+                </div>
                 <div class="col-sm-6 col-xs-12">
                     <div class="form-group">
                         <label for="tax_number"><?php esc_html_e('Tax Number','houzez');?></label>
@@ -155,7 +178,7 @@ if( houzez_is_agency() ) {
                     </div>
                 </div>
 
-                <?php if( !houzez_is_agency() ): ?>
+                <?php if( !houzez_is_agency() || $is_agency_agent ): ?>
                 <div class="col-sm-6 col-xs-12">
                     <div class="form-group">
                         <label for="user_company"><?php esc_html_e('Company Name','houzez');?></label>

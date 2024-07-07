@@ -1,5 +1,5 @@
 <?php
-get_header();
+get_header(); 
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');

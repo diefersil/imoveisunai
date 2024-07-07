@@ -1,11 +1,24 @@
 <?php
-global $houzez_local, $dashboard_invoices, $current_user;
-wp_get_current_user();
-$userID         = $current_user->ID;
-$user_login     = $current_user->user_login;
-$user_email     = $current_user->user_email;
-$first_name     = $current_user->first_name;
-$last_name     = $current_user->last_name;
+global $houzez_local, $dashboard_invoices;
+
+$invoice_id = isset( $_GET['invoice_id'] ) ? $_GET['invoice_id'] : '';
+
+// Get user ID from the invoice post meta or similar
+//$user_id_from_invoice = get_post_field('post_author', $invoice_id);
+$user_id_from_invoice = get_post_meta($invoice_id, 'HOUZEZ_invoice_buyer', true);
+
+// Get user info by user ID
+$user_info = get_userdata($user_id_from_invoice);
+
+// Check if user exists
+if ($user_info) {
+    $userID = $user_info->ID;
+    $user_login = $user_info->user_login;
+    $user_email = $user_info->user_email;
+    $first_name = $user_info->first_name;
+    $last_name = $user_info->last_name;
+} 
+
 $user_address = get_user_meta( $userID, 'fave_author_address', true);
 if( !empty($first_name) && !empty($last_name) ) {
     $fullname = $first_name.' '.$last_name;

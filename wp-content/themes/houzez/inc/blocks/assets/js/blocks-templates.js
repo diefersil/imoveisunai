@@ -131,7 +131,12 @@
 			});
 
 			$('#houzez-library-modal #elementor-template-library-filter-text').on('keyup', function () {
-				var search = $(this).val().toLowerCase();
+				
+				var searchValue = $(this).val();
+				console.log(searchValue); 
+
+				//var search = $(this).val().toLowerCase();
+				var search = String($(this).val()).toLowerCase(); // Convert to string explicitly
 
 				/*var search = search.replace(/\s/g, '-');
 				alert(search);*/
@@ -157,7 +162,7 @@
 
 				$('#houzez-library-modal').find('.elementor-template-library-template-block').each(function () {
 					var $this = $(this);
-					var slug = $this.data('slug').toLowerCase();
+					var slug = String($this.data('slug')).toLowerCase();
 
 					if ( slug.indexOf(val) > -1 || val == 'all') {
 						$this.show();

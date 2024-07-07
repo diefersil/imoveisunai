@@ -1,5 +1,5 @@
 <?php 
-global $houzez_local, $post; 
+global $houzez_local, $post, $buttonsComposer; 
 $key = '';
 $userID      =   get_current_user_id();
 $fav_option = 'houzez_favorites-'.$userID;

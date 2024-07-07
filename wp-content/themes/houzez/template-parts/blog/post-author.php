@@ -48,7 +48,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $twitter ) ) { ?>
                 <span>
                     <a class="btn-twitter" target="_blank" href="<?php echo esc_url( $twitter ); ?>">
-                        <i class="houzez-icon icon-social-media-twitter mr-2"></i>
+                        <i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i>
                     </a>
                 </span>
                 <?php } ?>

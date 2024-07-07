@@ -963,7 +963,7 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'search_result_page',
             'type'     => 'select',
-            'title'    => __('Search Reslt Page', 'houzez'),
+            'title'    => __('Search Result Page', 'houzez'),
             'desc' => __('Create this page using "Search Results" template', 'houzez'),
             'options'  => array(
                 'normal_page' => 'Normal Page',
@@ -1015,6 +1015,7 @@ Redux::setSection( $houzez_opt_name, array(
 
                 'Listings Version 4' => array(
                     'grid-view-v4' => 'Grid View',
+                    'list-view-v4' => 'List View',
                 ),
 
                 'Listings Version 5' => array(
@@ -1048,6 +1049,7 @@ Redux::setSection( $houzez_opt_name, array(
                 'd_price' => esc_html__( 'Price (High to Low)', 'houzez' ),
                 'a_price' => esc_html__( 'Price (Low to High)', 'houzez' ),
                 'featured_first' => esc_html__( 'Show Featured Listings on Top', 'houzez' ),
+                'featured_first_random' => esc_html__( 'Show Featured Listings on Top - Randomly', 'houzez' ),
             ),
             'default' => ''
         ),

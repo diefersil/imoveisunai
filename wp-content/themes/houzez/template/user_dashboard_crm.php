@@ -19,6 +19,9 @@ if( (isset($_GET['hpage']) && $_GET['hpage'] == 'lead-detail') && ( isset($_GET[
 } elseif( isset($_GET['hpage']) && $_GET['hpage'] == 'leads' ) { 
     get_template_part('template-parts/dashboard/board/leads/main'); 
 
+} elseif( isset($_GET['hpage']) && $_GET['hpage'] == 'import-leads' ) { 
+    get_template_part('template-parts/dashboard/board/leads/import'); 
+
 } elseif( isset($_GET['hpage']) && $_GET['hpage'] == 'deals' ) {
 	get_template_part('template-parts/dashboard/board/deals/main'); 
 

@@ -18,7 +18,8 @@ $submission_currency = houzez_option('currency_paid_submission');
 $thankyou_page_link = houzez_get_template_link('template/template-thankyou.php');
 $paymentMethod = 'Stripe';
 $time = time();
-$date = date('Y-m-d H:i:s',$time);
+//$date = date('Y-m-d H:i:s',$time);
+$date = date_i18n( get_option('date_format').' '.get_option('time_format') );
 $api_error = '';
 
 $stripe_secret_key = houzez_option('stripe_secret_key');
@@ -349,8 +350,14 @@ if( isset( $_GET['session_id'] ) && ! empty( $_GET['session_id'] ) && isset($_GE
           $user_id         = $stripeSessionInfo->metadata->user_id;
           $pack_id   = $stripeSessionInfo->metadata->package_id;
           $payment_status     = $stripeSessionInfo->payment_status; 
-          $stripeCustomerInfo = $stripe->customers->retrieve($stripeSessionInfo->customer);
-          $stripe_customer_id = $stripeCustomerInfo->id;
+
+          $stripe_customer_id = '';
+          
+          if($stripeSessionInfo->customer != "") {
+              $stripeCustomerInfo = $stripe->customers->retrieve($stripeSessionInfo->customer);
+
+              $stripe_customer_id = $stripeCustomerInfo->id;
+          }
 
           if ( $payment_status == 'paid' ) {
               houzez_save_user_packages_record($user_id, $pack_id);

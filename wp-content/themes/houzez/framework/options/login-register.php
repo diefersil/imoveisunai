@@ -249,7 +249,6 @@ Redux::setSection( $houzez_opt_name, array(
                 'owner' => esc_html__('Owner', 'houzez'),
                 'buyer' => esc_html__('Buyer', 'houzez'),
                 'seller' => esc_html__('Seller', 'houzez'),
-                'manager' => esc_html__('Manager', 'houzez')
             ),
             'default' => array(
                 'agent' => '0',
@@ -257,7 +256,6 @@ Redux::setSection( $houzez_opt_name, array(
                 'owner' => '0',
                 'buyer' => '0',
                 'seller' => '0',
-                'manager' => '0'
             )
         ),
         array(
@@ -299,14 +297,6 @@ Redux::setSection( $houzez_opt_name, array(
             'subtitle' => esc_html__( 'Change the default name of the seller role', 'houzez' ),
             'desc'     => esc_html__( 'Enter a name for the seller role (Default: Seller)', 'houzez' ),
             'default'  => esc_html__( 'Seller', 'houzez' ),
-        ),
-        array(
-            'id'       => 'manager_role',
-            'type'     => 'text',
-            'title'    => esc_html__( 'Manager Role', 'houzez' ),
-            'subtitle' => esc_html__( 'Change the default name of the manager role', 'houzez' ),
-            'desc'     => esc_html__( 'Enter a name for the manager role (Default: Manager)', 'houzez' ),
-            'default'  => esc_html__( 'Manager', 'houzez' ),
         ),
     )
 ) );

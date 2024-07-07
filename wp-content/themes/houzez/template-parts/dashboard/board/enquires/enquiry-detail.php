@@ -2,7 +2,9 @@
 global $enquiry, $matched_query, $lead;
 $enquiry = Houzez_Enquiry::get_enquiry($_GET['enquiry']);
 $matched_query = matched_listings($enquiry->enquiry_meta);
-$belong_to = isset($_GET['enquiry']) ? $_GET['enquiry'] : '';
+$belong_to = isset($_GET['enquiry']) ? intval($_GET['enquiry']) : 0;
+
+//print_r($enquiry->enquiry_meta);
 
 $lead = Houzez_Leads::get_lead($enquiry->lead_id);
 

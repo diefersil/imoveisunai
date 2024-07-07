@@ -40,7 +40,7 @@
 	<?php if( houzez_option('fs-twitter') != '' ){ ?>
 	<span>
 		<a class="btn-twitter" target="_blank" href="<?php echo esc_url(houzez_option('fs-twitter')); ?>">
-			<i class="houzez-icon icon-social-media-twitter <?php echo esc_attr($icons_class); ?>"></i> <?php echo $text_twitter; ?>
+			<i class="houzez-icon icon-x-logo-twitter-logo-2 <?php echo esc_attr($icons_class); ?>"></i> <?php echo $text_twitter; ?>
 		</a>
 	</span>
 	<?php } ?>

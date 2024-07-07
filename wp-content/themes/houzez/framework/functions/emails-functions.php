@@ -16,6 +16,15 @@ if (!function_exists('houzez_email_type')) {
         $value_message = apply_filters('wpml_translate_single_string', $value_message, 'admin_texts_houzez_options', '[houzez_options]houzez_email_' . $value_message );
         $value_subject = apply_filters('wpml_translate_single_string', $value_subject, 'admin_texts_houzez_options', '[houzez_options]houzez_email_subject_' . $value_subject );
 
+        $notificationArgs = array(
+            'title'   => $value_subject,
+            'message' => $value_message,
+            'type'    => $email_type,
+            'to'      => $email,
+        );
+        $notificationArgs = array_merge($notificationArgs, $args);
+
+        do_action('houzez_send_notification', $notificationArgs);
 
         houzez_emails_filter_replace( $email, $value_message, $value_subject, $args);
     }
@@ -29,6 +38,16 @@ if (!function_exists('houzez_email_with_reply')) {
 
         $value_message = apply_filters('wpml_translate_single_string', $value_message, 'admin_texts_houzez_options', 'houzez_email_' . $value_message );
         $value_subject = apply_filters('wpml_translate_single_string', $value_subject, 'admin_texts_houzez_options', 'houzez_email_subject_' . $value_subject );
+
+        $notificationArgs = array(
+            'title'   => $value_subject,
+            'message' => $value_message,
+            'type'    => $email_type,
+            'to'      => $email,
+        );
+        $notificationArgs = array_merge($notificationArgs, $args);
+        
+        do_action('houzez_send_notification', $notificationArgs);
 
         return houzez_emails_maker( $email, $value_message, $value_subject, $args, $sender_name, $sender_email, $cc_email, $bcc_email);
     }
@@ -160,7 +179,7 @@ if( !function_exists('houzez_send_emails_with_reply') ):
         }
 
         $email_content .= '<div style="background-color: #F6F6F6; padding: 30px;">
-                            <div style="margin: 0 auto; width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
+                            <div style="margin: 0 auto; max-width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
                                 <div style="font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;font-size:100%;line-height:1.6em;display:block;max-width:600px;margin:0 auto;padding:0">
                                 '.$message.'
                                 </div>
@@ -170,7 +189,7 @@ if( !function_exists('houzez_send_emails_with_reply') ):
         if( $enable_email_footer != 0 ) {
             $email_content .= '<div style="padding-top: 30px; text-align:center; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -279,7 +298,7 @@ if( !function_exists('houzez_send_emails') ):
         }
 
         $email_content .= '<div style="background-color: #F6F6F6; padding: 30px;">
-                            <div style="margin: 0 auto; width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
+                            <div style="margin: 0 auto; max-width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
                                 <div style="font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;font-size:100%;line-height:1.6em;display:block;max-width:600px;margin:0 auto;padding:0">
                                 '.$message.'
                                 </div>
@@ -289,7 +308,7 @@ if( !function_exists('houzez_send_emails') ):
         if( $enable_email_footer != 0 ) {
             $email_content .= '<div style="padding-top: 30px; text-align:center; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -652,7 +671,7 @@ if( !function_exists('houzez_send_messages_emails') ):
         }
 
         $email_content .= '<div style="background-color: #F6F6F6; padding: 30px;">
-                            <div style="margin: 0 auto; width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
+                            <div style="margin: 0 auto; max-width: 620px; background-color: #fff;border:1px solid #eee; padding:30px;">
                                 <div style="font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;font-size:100%;line-height:1.6em;display:block;max-width:600px;margin:0 auto;padding:0">
                                 '.$message.'
                                 </div>
@@ -662,7 +681,7 @@ if( !function_exists('houzez_send_messages_emails') ):
         if( $enable_email_footer != 0 ) {
             $email_content .= '<div style="padding-top: text-align:center; 30px; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -760,7 +779,7 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
             wp_die();
         }
 
-        if( houzez_option('gdpr_and_terms_checkbox', 1) ) {
+        if( houzez_option('gdpr_and_terms_checkbox', 1) && ! houzez_option('gdpr_hide_checkbox', 1) ) {
             $privacy_policy = $_POST['privacy_policy'];
             if ( empty($privacy_policy) ) {
                 echo json_encode(array(
@@ -805,6 +824,15 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
             } elseif( ( houzez_option('webhook_agent_contact') == 1 ) && ( $agent_type == "agent_info" || $agent_type == "author_info" ) ) {
                 houzez_webhook_post( $_POST, 'houzez_agent_profile_contact_from' );
             }
+
+            $notificationArgs = array(
+                'title'   => $email_subject,
+                'message' => $sender_msg,
+                'type'    => 'contact_realtor',
+                'to'      => $target_email,
+            );
+            
+            do_action('houzez_send_notification', $notificationArgs);
 
             $activity_args = array(
                 'type' => 'lead_agent',
@@ -983,6 +1011,15 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
             }
 
             do_action('houzez_after_contact_form_submission');
+
+            $notificationArgs = array(
+                "title" => $email_subject,
+                "message" => $email_body,
+                "type" => "contact_form",
+                "to" => $email_to,
+            );
+            
+            do_action('houzez_send_notification', $notificationArgs);
 
             $activity_args = array(
                 'type' => 'lead_contact',
@@ -1191,6 +1228,16 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
 
             do_action('houzez_after_estimation_form_submission');
 
+            $notificationArgs = array(
+                "title" => $email_subject,
+                "message" => $email_body,
+                "type" => "inquiry",
+                "inquiry_type" => $enquiry_type,
+                "to" => $email_to,
+            );
+
+            do_action('houzez_send_notification', $notificationArgs);
+
             $activity_args = array(
                 'type' => 'lead_contact',
                 'name' => $sender_name,
@@ -1222,7 +1269,6 @@ add_action( 'wp_ajax_houzez_property_agent_contact', 'houzez_property_agent_cont
 if( !function_exists('houzez_property_agent_contact') ) {
     function houzez_property_agent_contact() {
 
-        $agent_forms_terms = houzez_option('agent_forms_terms');
         $hide_form_fields = houzez_option('hide_prop_contact_form_fields');
         
         $nonce = $_POST['property_agent_contact_security'];
@@ -1293,7 +1339,7 @@ if( !function_exists('houzez_property_agent_contact') ) {
         }
 
         
-        if( houzez_option('gdpr_and_terms_checkbox', 1) ) {
+        if( houzez_option('gdpr_and_terms_checkbox', 1) && ! houzez_option('gdpr_hide_checkbox', 1) ) {
             $privacy_policy = isset( $_POST['privacy_policy'] ) ? $_POST['privacy_policy'] : "";
             if ( empty($privacy_policy) ) {
                 echo json_encode(array(
@@ -1370,8 +1416,6 @@ add_action( 'wp_ajax_houzez_schedule_send_message', 'houzez_schedule_send_messag
 
 if( !function_exists('houzez_schedule_send_message') ) {
     function houzez_schedule_send_message() {
-
-        $agent_forms_terms = houzez_option('agent_forms_terms');
 
         $nonce = $_POST['schedule_contact_form_ajax'];
         if (!wp_verify_nonce( $nonce, 'schedule-contact-form-nonce') ) {
@@ -1458,7 +1502,7 @@ if( !function_exists('houzez_schedule_send_message') ) {
         }
 
         
-        if( houzez_option('gdpr_and_terms_checkbox', 1) ) {
+        if( houzez_option('gdpr_and_terms_checkbox', 1) && ! houzez_option('gdpr_hide_checkbox', 1) ) {
             $privacy_policy = $_POST['privacy_policy'];
             if ( empty($privacy_policy) ) {
                 echo json_encode(array(

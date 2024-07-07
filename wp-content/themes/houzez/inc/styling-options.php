@@ -112,6 +112,8 @@ if(!function_exists('houzez_custom_styling')) {
         }
 
         .btn,
+        .houzez-search-button,
+        .houzez-submit-button,
         .form-control,
         .bootstrap-select .text,
         .sort-by-title,
@@ -344,7 +346,8 @@ if(!function_exists('houzez_custom_styling')) {
       .property-lightbox-v2-sections-navigation .slick-prev, 
       .property-lightbox-v2-sections-navigation .slick-next,
       .property-lightbox-v2-sections-navigation .slick-slide.current-section,
-      .property-lightbox-v2-sections-navigation .nav-link.active {
+      .property-lightbox-v2-sections-navigation .nav-link.active,
+      .agent-detail-page-v2 .listing-tabs .nav-link.active {
         color: {$primary_color}; 
       }
       

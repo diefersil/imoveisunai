@@ -473,11 +473,11 @@ jQuery( function($) {
             } //end houzezAddMarkers
 
 
-            if ( houzez_map_properties.length > 0 ) {
+            if ( houzez_map_properties.length > 0 ) { 
 
                 houzezAddMarkers(houzez_map_properties, houzezMap);
 
-            } else {
+            } else { 
 
                 var defaultLocation = new google.maps.LatLng(default_lat,default_long);
                 var mapOptions = {
@@ -596,9 +596,18 @@ jQuery( function($) {
                         } else { 
                             clearClusterer();
                             reloadMarkers();
+
+                            houzezMap.setCenter(new google.maps.LatLng(default_lat, default_long));
+                            houzezMap.setZoom(7);
+
+                            houzez_map_zoomin(houzezMap);
+                            houzez_map_zoomout(houzezMap);
+
                             $('#houzez-properties-map').append('<div class="map-notfound">'+not_found+'</div>');
                             ajax_container.empty().html('<div class="search-no-results-found">'+not_found+'</div>');
                             total_results.empty().html(data.total_results);
+
+
                         }
                         return false;
                     },

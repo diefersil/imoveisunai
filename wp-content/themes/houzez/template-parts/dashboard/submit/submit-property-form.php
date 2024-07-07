@@ -5,16 +5,19 @@
  * Date: 06/10/15
  * Time: 4:12 PM
  */
-
-global $current_user;
-
-wp_get_current_user();
-$userID = $current_user->ID;
+$userID = get_current_user_id();
+$packageUserId = $userID;
 $user_show_roles = houzez_option('user_show_roles');
 $show_hide_roles = houzez_option('show_hide_roles');
 $enable_paid_submission = houzez_option('enable_paid_submission');
-$remaining_listings = houzez_get_remaining_listings( $userID );
 $select_packages_link = houzez_get_template_link('template/template-packages.php'); 
+
+$agent_agency_id = houzez_get_agent_agency_id( $userID );
+if( $agent_agency_id ) {
+    $packageUserId = $agent_agency_id;
+}
+
+$remaining_listings = houzez_get_remaining_listings( $packageUserId );
 
 $cancel_link = houzez_dashboard_listings();
 if( !is_user_logged_in() ) {
@@ -67,6 +70,12 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+            </div>
+
+            <div class="dashboard-mobile-edit-menu-wrap">
+                <div class="form-group">
+                    <?php get_template_part( 'template-parts/dashboard/submit/partials/author-mobile'); ?>
+                </div>
             </div>
 
             <?php
@@ -133,7 +142,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             }
             endif;
 
-            if( houzez_is_admin() ) {
+            if( houzez_is_admin() || houzez_is_editor() ) {
                 get_template_part('template-parts/dashboard/submit/settings');
             }
 
@@ -150,6 +159,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             <?php wp_nonce_field('submit_property', 'property_nonce'); ?>
 
             <input type="hidden" name="action" value="add_property"/>
+            <input type="hidden" name="property_author" value="<?php echo intval($userID);?>"/>
             <?php if( ! houzez_is_admin() ) { ?>
             <input type="hidden" name="prop_featured" value="0"/>
             <?php } ?>

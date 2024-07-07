@@ -62,6 +62,22 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                     'columns'   => 6
                 ),
                 array(
+                    'name'      => esc_html__('Service Areas', 'houzez'),
+                    'id'        => $houzez_prefix . 'agency_service_area',
+                    'placeholder'      => esc_html__('Enter your service area', 'houzez'),
+                    'type'      => 'text',
+                    'desc'      => '',
+                    'columns'   => 6
+                ),
+                array(
+                    'name'      => esc_html__('Specialties', 'houzez'),
+                    'id'        => $houzez_prefix . 'agency_specialties',
+                    'placeholder'      => esc_html__('Enter your speciaties', 'houzez'),
+                    'type'      => 'text',
+                    'desc'      => '',
+                    'columns'   => 6
+                ),
+                array(
                     'name'      => esc_html__('Mobile Number', 'houzez'),
                     'id'        => $houzez_prefix . 'agency_mobile',
                     'type'      => 'text',
@@ -73,6 +89,22 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                     'id' => "{$houzez_prefix}agency_whatsapp",
                     'name' => esc_html__("WhatsApp", 'houzez'),
                     'placeholder'      => esc_html__('Enter the WhatsApp number with country code', 'houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agency_line_id",
+                    'name' => esc_html__("LINE ID", 'houzez'),
+                    'placeholder'      => esc_html__('Enter the line id', 'houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agency_telegram",
+                    'name' => esc_html__("Telegram Username", 'houzez'),
+                    'placeholder'      => esc_html__('Enter your telegram username','houzez'),
                     'type' => 'text',
                     'std' => "",
                     'columns'   => 6
@@ -142,10 +174,10 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                 ),
                 array(
                     'id' => "{$houzez_prefix}agency_twitter",
-                    'name' => "Twitter URL",
+                    'name' => "X URL",
                     'type' => 'text',
                     'std' => "",
-                    'placeholder'      => esc_html__('Enter your Twitter profile URL','houzez'),
+                    'placeholder'      => esc_html__('Enter your X profile URL','houzez'),
                     'columns'   => 6
                 ),
                 array(
@@ -158,10 +190,10 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                 ),
                 array(
                     'id' => "{$houzez_prefix}agency_googleplus",
-                    'name' => "Google Plus URL",
+                    'name' => "Google URL",
                     'type' => 'text',
                     'std' => "",
-                    'placeholder'      => esc_html__('Enter your Google Plus profile URL','houzez'),
+                    'placeholder'      => esc_html__('Enter your Google profile URL','houzez'),
                     'columns'   => 6
                 ),
                 array(
@@ -176,14 +208,6 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                     'id' => "{$houzez_prefix}agency_tiktok",
                     'name' => "Tiktok URL",
                     'placeholder'      => esc_html__('Enter your Tiktok profile URL','houzez'),
-                    'type' => 'text',
-                    'std' => "",
-                    'columns'   => 6
-                ),
-                array(
-                    'id' => "{$houzez_prefix}agency_telegram",
-                    'name' => "Telegram URL",
-                    'placeholder'      => esc_html__('Enter your telegram profile URL','houzez'),
                     'type' => 'text',
                     'std' => "",
                     'columns'   => 6
@@ -210,6 +234,22 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                     'type' => 'text',
                     'std' => "",
                     'placeholder'      => esc_html__('Enter your Vimeo profile URL','houzez'),
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agency_zillow",
+                    'name' => "Zillow URL",
+                    'type' => 'text',
+                    'std' => "",
+                    'placeholder'      => esc_html__('Enter your zillow profile URL','houzez'),
+                    'columns'   => 6
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agency_realtor_com",
+                    'name' => "Realtor.com URL",
+                    'type' => 'text',
+                    'std' => "",
+                    'placeholder'      => esc_html__('Enter your realtor.com profile URL','houzez'),
                     'columns'   => 6
                 ),
 

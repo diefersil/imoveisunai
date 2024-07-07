@@ -22,6 +22,10 @@ if( houzez_is_fullwidth_2cols_custom_width() ) {
 				<?php get_template_part('template-parts/listing/partials/item-title'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-price'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-address'); ?>
+				<?php 
+				if( houzez_option('des_item_v2', 0) ) {
+					get_template_part('template-parts/listing/partials/item-description'); 
+				}?>
 				<?php get_template_part('template-parts/listing/partials/item-features-v2'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-author'); ?>
 				<?php get_template_part('template-parts/listing/partials/item-date'); ?>

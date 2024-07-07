@@ -1,6 +1,7 @@
 <?php
 global $deal_data;
 
+$first_name = $last_name = $display_name = $lead_mobile = $lead_email = '';
 $action_due_date = $deal_data->action_due_date; 
 $action_due_date = str_replace('00:00:00', '', $action_due_date);
 if($action_due_date == '0000-00-00 ') {
@@ -21,12 +22,16 @@ $agent_name = get_the_title($agent_id);
 
 $lead = Houzez_Leads::get_lead($deal_data->lead_id);
 
-$display_name = $lead->display_name;
-$lead_mobile = $lead->mobile;
-$lead_email = $lead->email;
-if(empty($display_name)) {
-	$display_name = $lead->first_name.' '.$lead->last_name;
+if( ! empty($lead) ) {
+	$display_name = $lead->display_name;
+	$lead_mobile = $lead->mobile;
+	$lead_email = $lead->email;
+
+	if(empty($display_name)) {
+		$display_name = $lead->first_name.' '.$lead->last_name;
+	}
 }
+
 ?>
 <tr data-id="<?php echo intval($deal_data->deal_id); ?>">
 	<th class="table-nowrap" data-label="<?php esc_html_e('Title', 'houzez'); ?>">

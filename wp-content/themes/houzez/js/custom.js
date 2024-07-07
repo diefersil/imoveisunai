@@ -164,6 +164,20 @@
 
     });
 
+    function HouzezDebounce(func, delay) {
+        let debounceTimer;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    function parseBool(str) {
+        if( str == 'true' ) { return true; } else { return false; }
+    }
+
     /* ------------------------------------------------------------------------ */
     /*  force video background to play on safari 11
     /* ------------------------------------------------------------------------ */
@@ -172,6 +186,89 @@
             $('#video-background').data('vide').getVideoObject().play();
         }
     });
+
+    function adjustMegaMenu(megaMenuSelector, containerSelector, fullwidthClass, customWidthClass, customWidthPx) {
+        jQuery(megaMenuSelector).each(function() {
+            var windowWidth = jQuery(window).width();
+            var isRTL = jQuery('html').attr('dir') === 'rtl'; // Check if the page is RTL
+
+            if (jQuery(this).closest(fullwidthClass).length > 0) {
+                // Full viewport width
+                jQuery(this).css('width', '100vw');
+                var position = jQuery(this).offset().left * -1;
+                //jQuery(this).css(isRTL ? 'right' : 'left', position + 'px');
+
+                if (isRTL) {
+                    jQuery(this).css('right', position * -1 + 'px');
+                } else {
+                    jQuery(this).css('left', position + 'px');
+                }
+
+            } else if (jQuery(this).closest(customWidthClass).length > 0) {
+                // Set custom width
+                jQuery(this).css('width', customWidthPx + 'px');
+
+                var menuItem = jQuery(this).closest('.nav-item');
+                var menuItemOffset = menuItem.offset().left;
+                var position = menuItemOffset - jQuery(this).parent().offset().left;
+
+                // Check if the dropdown goes outside the window
+                if (menuItemOffset + customWidthPx > windowWidth) {
+                    // Open towards the left (or right in RTL) side of the menu item
+                    position -= (customWidthPx - menuItem.width());
+                }
+
+                if (isRTL) {
+                    jQuery(this).css('right', position * -1 + 'px');
+                } else {
+                    jQuery(this).css('left', position + 'px');
+                }
+
+            } else {
+                // Width of the nearest container
+                var containerWidth = jQuery(this).closest(containerSelector).width();
+                jQuery(this).css('width', containerWidth);
+                // Positioning relative to container
+                var containerOffset = jQuery(this).closest(containerSelector).offset().left;
+                var megamenuOffset = jQuery(this).closest('.nav-item').offset().left;
+                var position = containerOffset - megamenuOffset;
+                //jQuery(this).css(isRTL ? 'right' : 'left', position + 'px');
+
+                if (isRTL) {
+                    jQuery(this).css('right', position * -1 + 'px');
+                } else {
+                    jQuery(this).css('left', position + 'px');
+                }
+            }
+        });
+    }
+
+    function setMenuFullWidthEle() {
+        if ($('#houzez_toggle').length > 0) {
+            var isRTL = $('html').attr('dir') === 'rtl'; // Check if the page is RTL
+
+            var leftDistance;
+            leftDistance = $('#houzez_toggle').offset().left;
+            //alert(leftDistance);
+            $('.houzez-nav-mobile-menu-fullwidth .main-mobile-nav').css('left', 'calc(50vw - ' + leftDistance + 'px)');
+
+            console.log('Distance from the left:', leftDistance);
+        }
+    }
+
+    // Call the function with specific class names
+    $(window).on('load', function () {
+        adjustMegaMenu('.houzez-elementor-menu .dropdown-menu.megamenu', '.e-con-inner', '.menu-item-design-full-width', '.menu-item-design-custom-size', 200);
+        setTimeout(setMenuFullWidthEle, 500); // Delay of 1000 milliseconds (1 second)
+
+    });
+
+    // Re-adjust the megamenu on window resize
+    $(window).resize(function() {
+        adjustMegaMenu('.houzez-elementor-menu .dropdown-menu.megamenu', '.e-con-inner', '.menu-item-design-full-width', '.menu-item-design-custom-size', 200);
+        setMenuFullWidthEle();
+    });
+
 
     /* ------------------------------------------------------------------------ */
     /*  lazy load
@@ -253,14 +350,14 @@
     /*  Schedule tour v2
     /* ------------------------------------------------------------------------ */
     
-    $('.tour-day-form-slide-arrow.next').click(function (e) {
+    /*$('.tour-day-form-slide-arrow.next').click(function (e) {
         $('.property-schedule-tour-day-form-slide').addClass("end");    
         $('.property-schedule-tour-day-form-slide').removeClass("start");    
     });
     $('.tour-day-form-slide-arrow.prev').click(function (e) {
         $('.property-schedule-tour-day-form-slide').addClass("start");    
         $('.property-schedule-tour-day-form-slide').removeClass("end");    
-    });
+    });*/
 
     /*-------------------------------------------------------------------
     * Properties ajax tabs
@@ -1221,6 +1318,12 @@
         houzez_register( currnt );
     });
 
+    $('#houzez-create-account-btn').on('click', function(e){
+        e.preventDefault();
+        var currnt = $(this);
+        houzez_social_create_account( currnt );
+    });
+
     var houzez_login = function( currnt ) {
         var $form = currnt.parents('form');
         var $messages = $('#hz-login-messages');
@@ -1258,8 +1361,9 @@
                 }
             },
             error: function(xhr, status, error) {
-                var err = eval("(" + xhr.responseText + ")");
-                console.log(err.Message);
+                console.log("Error Status: " + status);
+                console.log("Error Thrown: " + error);
+                console.log("Response Text: " + xhr.responseText);
             }
         })
 
@@ -1304,12 +1408,126 @@
                 }
             },
             error: function(xhr, status, error) {
+                console.log("Error Status: " + status);
+                console.log("Error Thrown: " + error);
+                console.log("Response Text: " + xhr.responseText);
+            }
+        });
+    }
+
+    var houzez_social_create_account = function ( currnt ) {
+
+        var $form = currnt.parents('form');
+        var $messages = $('#hz-create-messages');
+
+        $.ajax({
+            type: 'post',
+            url: ajaxurl,
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function( ) {
+                currnt.find('.houzez-loader-js').addClass('loader-show');
+            },
+            complete: function(){
+                currnt.find('.houzez-loader-js').removeClass('loader-show');
+            },
+            success: function( response ) {
+                if( response.success ) {
+                    $messages.empty().append('<div class="alert alert-success" role="alert"><i class="houzez-icon icon-check-circle-1 mr-1"></i>'+ response.msg +'</div>');
+                    
+                    window.location.replace( response.redirect_to );
+
+                } else {
+                    $messages.empty().append('<div class="alert alert-danger" role="alert"><i class="houzez-icon icon-check-circle-1 mr-1"></i>'+ response.msg +'</div>');
+                }
+
+                currnt.find('.houzez-loader-js').removeClass('loader-show');
+            
+            },
+            error: function(xhr, status, error) {
                 var err = eval("(" + xhr.responseText + ")");
                 console.log(err.Message);
             }
         });
     }
 
+    $('#houzez-link-account').on('click', function(e){
+        e.preventDefault();
+        var currnt = $(this);
+        houzez_link_account( currnt );
+    });
+
+    var houzez_link_account = function ( currnt ) {
+
+        var $form = currnt.parents('form');
+        var $messages = $('#hz-link-messages');
+
+        $.ajax({
+            type: 'post',
+            url: ajaxurl,
+            dataType: 'json',
+            data: $form.serialize(),
+            beforeSend: function( ) {
+                currnt.find('.houzez-loader-js').addClass('loader-show');
+            },
+            complete: function(){
+                currnt.find('.houzez-loader-js').removeClass('loader-show');
+            },
+            success: function( response ) {
+                if( response.success ) {
+                    $messages.empty().append('<div class="alert alert-success" role="alert"><i class="houzez-icon icon-check-circle-1 mr-1"></i>'+ response.msg +'</div>');
+                    
+                    window.location.replace( response.redirect_to );
+
+                } else {
+                    $messages.empty().append('<div class="alert alert-danger" role="alert"><i class="houzez-icon icon-check-circle-1 mr-1"></i>'+ response.msg +'</div>');
+                }
+
+                currnt.find('.houzez-loader-js').removeClass('loader-show');
+                if(houzez_reCaptcha == 1) {
+                    $form.find('.g-recaptcha-response').remove();
+                    if( g_recaptha_version == 'v3' ) {
+                        houzezReCaptchaLoad();
+                    } else {
+                        houzezReCaptchaReset();
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                var err = eval("(" + xhr.responseText + ")");
+                console.log(err.Message);
+            }
+        });
+    }
+
+    function houzez_social_login_panel() {
+        var $mainStepWrap = $('.main-step-wrap');
+        var $newAccountWrap = $('.new-account-wrap');
+        var $linkAccountWrap = $('.link-account-wrap');
+
+        function toggleVisibility(hide1, hide2, show) {
+            hide1.hide();
+            hide2.hide();
+            show.show();
+        }
+
+        $(document).on('click', '.btn-link-account', function(event) {
+            event.preventDefault();
+            toggleVisibility($mainStepWrap, $newAccountWrap, $linkAccountWrap);
+        });
+
+        $(document).on('click', '.btn-create-account', function(event) {
+            event.preventDefault();
+            toggleVisibility($mainStepWrap, $linkAccountWrap, $newAccountWrap);
+        });
+
+        $(document).on('click', '.hz-fb-cancel', function(event) {
+            event.preventDefault();
+            toggleVisibility($linkAccountWrap, $newAccountWrap, $mainStepWrap);
+        });
+    }
+
+    houzez_social_login_panel();
 
     $( '#houzez_forgetpass').on('click', function(){
         var user_login = $('#user_login_forgot').val(),
@@ -2033,47 +2251,6 @@
         });
     });
 
-
-    /*--------------------------------------------------------------------------
-     *  Invoice Filter
-     * -------------------------------------------------------------------------*/
-    $('#invoice_status, #invoice_type').change(function() {
-        houzez_invoices_filter();
-    });
-
-    $('#startDate, #endDate').focusout(function() {
-        houzez_invoices_filter();
-    })
-
-    var houzez_invoices_filter = function() {
-        var inv_status = $('#invoice_status').val(),
-            inv_type   = $('#invoice_type').val(),
-            startDate  = $('#startDate').val(),
-            endDate  = $('#endDate').val();
-
-        $.ajax({
-            url: ajaxurl,
-            dataType: 'json',
-            type: 'POST',
-            data: {
-                'action': 'houzez_invoices_ajax_search',
-                'invoice_status': inv_status,
-                'invoice_type'  : inv_type,
-                'startDate'     : startDate,
-                'endDate'       : endDate
-            },
-            success: function(res) { 
-                if(res.success) {
-                    $('#invoices_content').empty().append( res.result );
-                }
-            },
-            error: function(xhr, status, error) {
-                var err = eval("(" + xhr.responseText + ")");
-                console.log(err.Message);
-            }
-        });
-    }
-
     /*--------------------------------------------------------------------------
      *  AutoComplete Search
      * -------------------------------------------------------------------------*/
@@ -2084,7 +2261,7 @@
             var auto_complete_container = $('.auto-complete');
             var lastLenght = 0;
 
-            $('.houzez-keyword-autocomplete').keyup(function() {
+            $( 'body' ).on('keyup', '.houzez-keyword-autocomplete', HouzezDebounce(function() {
 
                 var $this = $( this );
                 var $dataType = $this.data('type');
@@ -2142,7 +2319,7 @@
                     }
                 }
 
-            });
+            }, 400)); // 500 milliseconds as the delay
             auto_complete_container.on( 'click', 'li', function (){
                 $('.houzez-keyword-autocomplete').val( $( this ).data( 'text' ) );
                 auto_complete_container.fadeOut();
@@ -2222,8 +2399,8 @@
                     $form.find('input[name="name"], input[name="phone"], input[name="email"]').val('');
                     $form.find('textarea').val('');
                     $result.empty().append('<div class="alert alert-success alert-dismissible fade show" role="alert">'+response.msg+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-                    
-                    if( response.redirect_to != '' ) {
+
+                    if( typeof response.redirect_to !=='undefined' && response.redirect_to != '' ) {
                         setTimeout(function(){
                             window.location.replace(response.redirect_to);
                         }, 500);
@@ -2254,6 +2431,15 @@
 
         $('#houzez-auto-complete-banner').css('top', autocomplete_search_position);
     }
+
+    /* ------------------------------------------------------------------------ */
+    /*  Elementor Mobile menu trigger
+    /* ------------------------------------------------------------------------ */
+
+    $('.houzez-nav-menu-main-mobile-wrap .houzez-menu-toggle').click(function (e) {
+        $('.houzez-nav-menu-main-mobile-wrap .navbar-nav, .houzez-nav-menu-main-mobile-wrap .houzez-menu-toggle').toggleClass('houzez-nav-menu-active');
+    });
+
 
     $(window).on('load', function(){
         setAutoCompleteResultPosition();
@@ -3213,7 +3399,7 @@
     /*  mobile menu
     /* ------------------------------------------------------------------------ */
     // disable touch
-    if($('.nav-mobile').length > 0 ) {
+    if($('.nav-mobile-js').length > 0 ) {
 
         var smm_transform = 256;
         if ( houzez_rtl ) {
@@ -3230,7 +3416,7 @@
         slideout_left.disableTouch();
     }
 
-    if($('#main-wrap').length > 0 ) {
+    if($('.main-wrap-js').length > 0 ) {
         var smd_transform = 256;
         if ( houzez_rtl ) {
             smd_transform = -256;
@@ -3255,33 +3441,6 @@
         slideout_right.toggle();
         $('.slideout-menu-right').toggleClass('open');
     });
-
-    /* ---------------------------------------------------- */
-    /*  Fixed mobile header 
-     /* ---------------------------------------------------- */
-     /*var fixed = document.querySelector('.fixed-header');
-
-    slideout_left.on('translate', function(translated) {
-      fixed.style.transform = 'translateX(' + translated + 'px)';
-    });
-
-    slideout_left.on('beforeopen', function () {
-      fixed.style.transition = 'transform 300ms ease';
-      fixed.style.transform = 'translateX(256px)';
-    });
-
-    slideout_left.on('beforeclose', function () {
-      fixed.style.transition = 'transform 300ms ease';
-      fixed.style.transform = 'translateX(0px)';
-    });
-
-    slideout_left.on('open', function () {
-      fixed.style.transition = '';
-    });
-
-    slideout_left.on('close', function () {
-      fixed.style.transition = '';
-    });*/
 
 
      /* ---------------------------------------------------- */
@@ -3434,7 +3593,7 @@
             speed:500,
             adaptiveHeight: true,
             auto:false,
-            loop:true,
+            loop:false,
             prevHtml: '<button type="button" class="slick-prev slick-arrow"></button>',
             nextHtml: '<button type="button" class="slick-next slick-arrow"></button>',
             onSliderLoad: function() {
@@ -3584,6 +3743,74 @@
             ]
         });
     }
+
+    /* ------------------------------------------------------------------------ */
+    /*  Schedule your dates
+    /* ------------------------------------------------------------------------ */
+    var schedule_tour_day = $('.property-schedule-tour-day-form-slide-v2');
+    if( schedule_tour_day.length > 0 ) {
+        schedule_tour_day.slick({
+            rtl: houzez_rtl,
+            lazyLoad: 'ondemand',
+            infinite: false,
+            speed: 300,
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            arrows: true,
+            adaptiveHeight: false,
+            dots: false,
+            prevArrow: $('.tour-day-form-slide-arrow.sche-tabs-prev-js'),
+            nextArrow: $('.tour-day-form-slide-arrow.sche-tabs-next-js'),
+            responsive: [{
+                    breakpoint: 992,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3
+                    }
+                },
+                {
+                    breakpoint: 769,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3
+                    }
+                }
+            ]
+        });
+    }
+
+    var schedule_tour_day2 = $('.property-schedule-tour-day-form-slide-v2-bottom');
+    if( schedule_tour_day2.length > 0 ) {
+        schedule_tour_day2.slick({
+            rtl: houzez_rtl,
+            lazyLoad: 'ondemand',
+            infinite: false,
+            speed: 300,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            arrows: true,
+            adaptiveHeight: false,
+            dots: false,
+            prevArrow: $('.tour-day-form-slide-arrow.sche-prev-js'),
+            nextArrow: $('.tour-day-form-slide-arrow.sche-next-js'),
+            responsive: [{
+                    breakpoint: 992,
+                    settings: {
+                        slidesToShow: 4,
+                        slidesToScroll: 4
+                    }
+                },
+                {
+                    breakpoint: 769,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3
+                    }
+                }
+            ]
+        });
+    }
+    
     
     /* ------------------------------------------------------------------------ */
     /*  featured property widget
@@ -4045,6 +4272,33 @@
 
     } );
 
+    /*---------------------------------------------------------------------------
+    * Render compare data on page load
+    * -------------------------------------------------------------------------*/
+    houzez_render_compare_properties_data();
+    function houzez_render_compare_properties_data() {
+        let compare_listings = JSON.parse(localStorage.getItem('houzez_compare_listings'));
+
+        // Check if 'compare_listings' is not null and not empty before processing
+        if (compare_listings && compare_listings.length > 0) {
+            let properties_array = '';
+            compare_listings.forEach(function(item) {
+                let img = item.image; // Image URL from the local storage array
+                let listingId = item.id; // Listing ID from the local storage array
+                
+                properties_array += '<div class="compare-item remove-' + listingId + '">' +
+                    '<a href="#" class="remove-compare remove-icon" data-listing_id="' + listingId + '">' +
+                    '<i class="houzez-icon icon-remove-circle"></i></a>' +
+                    '<img class="img-fluid" src="' + img + '" width="200" height="150" alt="Thumb">' +
+                    '</div>';
+            });
+
+            jQuery('.compare-wrap').html(properties_array);
+        }
+    }
+
+
+
 })(jQuery);
 
 /* ------------------------------------------------------------------------ */
@@ -4108,8 +4362,8 @@ function houzez_grid_image_gallery() {
                 var images = jQuery(this).data('images');
 
                 var html = '<div class="listing-gallery-wrap '+gallery_behaviour+'"><div class="houzez-listing-carousel">';
-                images.forEach(function(img_url, index){
-                    html += '<div class="item"><a target="'+ link_target +'" href="'+ href +'"><img src="'+img_url.image+'" alt="'+img_url.alt+'" class="img-fluid"></a></div>';
+                images.forEach(function(image, index){
+                    html += '<div class="item"><a target="'+ link_target +'" href="'+ href +'"><img src="'+image.image+'" alt="'+image.alt+'" width="'+image.width+'" height="'+image.height+'" class="img-fluid"></a></div>';
                 });
                 html += '</div></div>';
                 jQuery(this).find('.listing-image-wrap .listing-thumb').append(html);
@@ -4369,129 +4623,113 @@ function houzez_check_favourites( userID ) {
     }
 }
 
-
 function add_to_compare(compare_url, compare_add_icon, compare_remove_icon, add_compare_text, remove_compare_text, compare_limit, listings_compare, limit_item_compare) {
-    jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + houzezGetCookie('houzez_compare_listings'));
+    var storedData = localStorage.getItem('houzez_compare_listings');
+    var listings_compare = storedData ? JSON.parse(storedData) : [];
 
-    var listings_compare = houzezGetCookie('houzez_compare_listings');
+    jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + listings_compare.map(item => item.id).join(','));
 
     if (listings_compare.length > 0) {
         jQuery('.compare-property-label').fadeIn(1000);
     }
 
-    if(listings_compare && listings_compare.length){
-        listings_compare = listings_compare.split(',');
-        if(listings_compare.length){
-            for(var i = 0 ; i < listings_compare.length; i++) {
-                jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i]+'"] i').removeClass('icon-add-circle').addClass('icon-subtract-circle');
-                jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i]+'"]').attr('title', remove_compare_text);
-                jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i]+'"]').tooltip('hide').attr('data-original-title', remove_compare_text);
-            }
-            jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
+    if(listings_compare.length){
+        for(var i = 0 ; i < listings_compare.length; i++) {
+            jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i].id+'"] i').removeClass('icon-add-circle').addClass('icon-subtract-circle');
+            jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i].id+'"]').attr('title', remove_compare_text);
+            jQuery( '.houzez_compare[data-listing_id="'+listings_compare[i].id+'"]').tooltip('hide').attr('data-original-title', remove_compare_text);
         }
-
-    }else{
-        listings_compare = [];
+        jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
     }
     
-
-    jQuery( '.houzez_compare' ).on('click', function(e) {
+    jQuery('.houzez_compare').on('click', function(e) {
         e.preventDefault();
 
-        var listings_compare = houzezGetCookie('houzez_compare_listings');
+        var storedData = localStorage.getItem('houzez_compare_listings');
+        var listings_compare = storedData ? JSON.parse(storedData) : [];
 
-        if(listings_compare && listings_compare.length) {
-            listings_compare = listings_compare.split(',');
-        } else {
-            listings_compare = [];
-        }
-
-        var listing_id = jQuery( this ).data( 'listing_id' );
-        var index = listings_compare.indexOf( listing_id.toString() );
+        var listing_id = jQuery(this).data('listing_id');
+        var index = listings_compare.findIndex(item => item.id === listing_id.toString());
         var image_div = jQuery(this).parents('.item-wrap');
         var thumb_url = image_div.find('img').attr('src');
 
-        if( index == -1 ){
+        if(index == -1){
             if(listings_compare.length >= limit_item_compare){
                 alert(compare_limit);
-            }else{ 
-
+            }else{
                 jQuery('.compare-wrap').append('<div class="compare-item remove-'+listing_id+'"><a href="" class="remove-compare remove-icon" data-listing_id="'+listing_id+'"><i class="houzez-icon icon-remove-circle"></i></a><img class="img-fluid" src="'+thumb_url+'" width="200" height="150" alt="Thumb"></div>');
 
-                listings_compare.push(listing_id.toString());
-                houzezSetCookie('houzez_compare_listings', listings_compare.join(','), 30);
+                listings_compare.push({id: listing_id.toString(), image: thumb_url});
+                localStorage.setItem('houzez_compare_listings', JSON.stringify(listings_compare));
                 jQuery(this).attr('title', remove_compare_text);
                 jQuery(this).find('i').removeClass('icon-add-circle').addClass('icon-subtract-circle');
                 jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
-                jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + houzezGetCookie('houzez_compare_listings'));
+                jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + listings_compare.map(item => item.id).join(','));
                 jQuery('.compare-property-label').fadeIn(1000);
                 jQuery(this).toggleClass('active');
-                jQuery('.compare-property-active').addClass('compare-property-active-push-toleft' );
+                jQuery('.compare-property-active').addClass('compare-property-active-push-toleft');
                 jQuery('#compare-property-panel').addClass('compare-property-panel-open');
                 jQuery(this).tooltip('dispose').tooltip('show');
                 remove_from_compare(listings_compare, compare_add_icon, compare_remove_icon, add_compare_text, remove_compare_text);
             }
-        }else{
-
+        } else {
             jQuery('div.remove-'+listing_id).remove();
             jQuery(this).attr('title', add_compare_text);
             jQuery(this).find('i').removeClass('icon-subtract-circle').addClass('icon-add-circle');
             listings_compare.splice(index, 1);
-            houzezSetCookie('houzez_compare_listings', listings_compare.join(','), 30);
+            localStorage.setItem('houzez_compare_listings', JSON.stringify(listings_compare));
             jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
-            jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + houzezGetCookie('houzez_compare_listings'));
+            jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + listings_compare.map(item => item.id).join(','));
             jQuery(this).tooltip('dispose').tooltip('show');
 
             if (listings_compare.length > 0) {
                 jQuery('.compare-property-label').fadeIn(1000);
                 jQuery(this).toggleClass('active');
-                jQuery('.compare-property-active').addClass('compare-property-active-push-toleft' );
+                jQuery('.compare-property-active').addClass('compare-property-active-push-toleft');
                 jQuery('#compare-property-panel').addClass('compare-property-panel-open');
             } else {
                 jQuery('.compare-property-label').fadeOut(1000);
             }
         }
         return false;
-        
     });
 }
-
 
 function remove_from_compare(listings_compare, compare_add_icon, compare_remove_icon, add_compare_text, remove_compare_text) {
-    jQuery('.remove-compare').on('click', function(e){
+    // Moved the event binding outside of this function to prevent multiple bindings
+    // This should be called once, outside and independently from this function
+    jQuery('.remove-compare').off('click').on('click', function(e) {
         e.preventDefault();
+        var compare_url = houzez_vars.compare_url; // Ensure houzez_vars is globally available
+        var storedData = localStorage.getItem('houzez_compare_listings');
+        listings_compare = storedData ? JSON.parse(storedData) : [];
+
+        var listing_id = jQuery(this).data('listing_id');
+        var index = listings_compare.findIndex(item => item.id === listing_id.toString());
         
-        if(typeof listings_compare == 'object') {
-    
-            listings_compare = listings_compare.toString();
-        }
+        if (index !== -1) { // Only proceed if the item was found
+            listings_compare.splice(index, 1);
+            localStorage.setItem('houzez_compare_listings', JSON.stringify(listings_compare));
+            
+            jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
 
-        if(listings_compare && listings_compare.length){
-            listings_compare = listings_compare.split(',');
-            if(listings_compare.length){
-                
-                jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
+            // Update UI elements if they exist
+            var compareElement = jQuery('.compare-' + listing_id);
+            if (compareElement.length) {
+                compareElement.attr('title', add_compare_text);
+                compareElement.tooltip('hide').attr('data-original-title', add_compare_text);
+                compareElement.find('i').removeClass('icon-subtract-circle').addClass('icon-add-circle');
             }
-        }else{
-            listings_compare = [];
+            
+            jQuery(this).parents('.compare-item').remove();
+
+            // Update the compare URL
+            jQuery('a.compare-btn').attr('href', compare_url + '?ids=' + listings_compare.map(item => item.id).join(','));
         }
-
-        if (listings_compare.length == 1) { 
-            jQuery('.compare-property-label').fadeOut(1000);
-        }
-
-        var listing_id = jQuery( this ).data( 'listing_id' );
-        var index = listings_compare.indexOf( listing_id.toString() );
-        listings_compare.splice(index, 1);
-        houzezSetCookie('houzez_compare_listings', listings_compare.join(','), 30);
-        jQuery('.compare-property-label').find('.compare-count').html(listings_compare.length);
-
-        jQuery('.compare-'+listing_id).attr('title', add_compare_text);
-        jQuery('.compare-'+listing_id).tooltip('hide').attr('data-original-title', add_compare_text);
-        jQuery('.compare-'+listing_id).find('i').removeClass('icon-subtract-circle').addClass('icon-add-circle');
-        jQuery(this).parents('.compare-item').remove();
     });
 }
+
+
 
 /* ------------------------------------------------------------------------ */
 /*  mobile popup js
@@ -4512,3 +4750,4 @@ function houzez_grid_call_to_action() {
 
     });
 }
+

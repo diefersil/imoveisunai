@@ -10,7 +10,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: ../archive.php:29 ../archive.php:32 ../archive.php:35
 #: ../framework/functions/helper_functions.php:6876
@@ -71,8 +71,8 @@ msgstr "רישומים"
 #: ../author.php:305 ../framework/options/property-detail.php:235
 #: ../framework/options/property-detail.php:391
 #: ../framework/options/translation-old.php:770
-#: ../framework/options/translation.php:770
-#: ../single-houzez_agency-old.php:304 ../single-houzez_agent-old.php:244
+#: ../framework/options/translation.php:770 ../single-houzez_agency-old.php:304
+#: ../single-houzez_agent-old.php:244
 #: ../template-parts/realtors/agency/single-agency-v1.php:306
 #: ../template-parts/realtors/agency/single-agency-v2.php:249
 #: ../template-parts/realtors/agent/single-agent-v1.php:243
@@ -159,8 +159,8 @@ msgstr "מחליף מטבעות"
 msgid "Post Types"
 msgstr "סוגי פוסטים"
 
-#: ../framework/admin/class-admin.php:99
-#: ../framework/admin/class-admin.php:100 ../framework/admin/tabs.php:8
+#: ../framework/admin/class-admin.php:99 ../framework/admin/class-admin.php:100
+#: ../framework/admin/tabs.php:8
 msgid "Taxonomies"
 msgstr "טקסונומיות"
 
@@ -3863,6 +3863,7 @@ msgstr "הזן את ההתמחויות שלך"
 #: ../template-parts/dashboard/board/leads/new-lead-panel.php:86
 #: ../template-parts/dashboard/board/leads/new-lead-panel.php:90
 #: ../template-parts/dashboard/profile/information.php:169
+#: ../framework/options/agencies.php:39
 msgid "Address"
 msgstr "כתובת"
 
@@ -4060,8 +4061,7 @@ msgid "Contact Information"
 msgstr "פרטי התקשרות"
 
 #: ../framework/functions/property_functions.php:2994
-#: ../framework/options/404.php:21
-#: ../framework/options/property-detail.php:225
+#: ../framework/options/404.php:21 ../framework/options/property-detail.php:225
 #: ../framework/options/property-detail.php:290
 #: ../framework/options/translation-old.php:648
 #: ../framework/options/translation-old.php:1389
@@ -4521,8 +4521,8 @@ msgid ""
 "All messages related to the agent from the contact form on property details "
 "page, will be sent on this email address. "
 msgstr ""
-"כל ההודעות הקשורות לסוכן מטופס יצירת הקשר בדף פרטי הנכס, יישלחו לכתובת דוא"
-"\"ל זו. "
+"כל ההודעות הקשורות לסוכן מטופס יצירת הקשר בדף פרטי הנכס, יישלחו לכתובת "
+"דוא\"ל זו. "
 
 #: ../framework/metaboxes/agent-metaboxes.php:101
 msgid "Hide agent to show on front-end"
@@ -4688,8 +4688,7 @@ msgstr "קבל בירושה בצבע ברירת המחדל"
 #: ../framework/metaboxes/status-meta.php:12
 #: ../framework/metaboxes/status-meta.php:59
 #: ../framework/metaboxes/type-meta.php:12
-#: ../framework/metaboxes/type-meta.php:62
-#: ../framework/options/insights.php:20
+#: ../framework/metaboxes/type-meta.php:62 ../framework/options/insights.php:20
 msgid "Custom"
 msgstr "המותאם אישית"
 
@@ -6221,8 +6220,7 @@ msgstr ""
 msgid "Multi Selection"
 msgstr "מבחר רב"
 
-#: ../framework/options/add-new-property.php:77
-#: ../framework/vc_extend.php:2673
+#: ../framework/options/add-new-property.php:77 ../framework/vc_extend.php:2673
 msgid "Property Types"
 msgstr "סוגי נכסים"
 
@@ -6249,8 +6247,7 @@ msgstr "מצב הנכס"
 msgid "Allow multiple selection of property status"
 msgstr "אפשר בחירה מרובה של סטטוס נכס"
 
-#: ../framework/options/add-new-property.php:99
-#: ../framework/vc_extend.php:2697
+#: ../framework/options/add-new-property.php:99 ../framework/vc_extend.php:2697
 msgid "Property Labels"
 msgstr "תוויות נכסים"
 
@@ -7348,10 +7345,6 @@ msgstr "מספר הסוכנויות להצגה בתבנית הדף של כל ה�
 msgid "Enter the number of agencies"
 msgstr "הזן את מספר הסוכנויות"
 
-#: ../framework/options/agencies.php:39
-msgid "Address"
-msgstr "כתובת"
-
 #: ../framework/options/agencies.php:57 ../framework/options/agents.php:62
 msgid "Office Phone"
 msgstr "טלפון במשרד"
@@ -7687,8 +7680,8 @@ msgid ""
 "Enter the contact form shortcode for the agent form above image, sidebar and "
 "property gallery lightbox."
 msgstr ""
-"הזן את קוד הקיצור של טופס יצירת הקשר עבור טופס הסוכן מעל התמונה, סרגל הצד ו-"
-"lightbox של גלריית הנכסים."
+"הזן את קוד הקיצור של טופס יצירת הקשר עבור טופס הסוכן מעל התמונה, סרגל הצד "
+"ו-lightbox של גלריית הנכסים."
 
 #: ../framework/options/contact-forms.php:57
 msgid "Agent Contact Form Bottom"
@@ -7927,8 +7920,8 @@ msgid ""
 "Enable/Disable HTML emails, if enable then system will allow you to add html "
 "in email templates"
 msgstr ""
-"הפעל / השבת הודעות דוא\"ל HTML, אם לאפשר ואז המערכת תאפשר לך להוסיף HTML בדוא"
-"\"ל תבניות"
+"הפעל / השבת הודעות דוא\"ל HTML, אם לאפשר ואז המערכת תאפשר לך להוסיף HTML "
+"בדוא\"ל תבניות"
 
 #: ../framework/options/emails.php:25
 msgid "<span class=\"font24\">Email Header</span>"
@@ -8197,8 +8190,8 @@ msgid ""
 "according to you plan."
 msgstr ""
 "היי, שם\n"
-"ברוכים הבאים אל website_url ותודה על רכישת תוכנית איתנו. אנו נרגשים שבחרת ב-"
-"% website_name. % website_name הוא מקום נהדר לפרסם ולחקור נכסים\n"
+"ברוכים הבאים אל website_url ותודה על רכישת תוכנית איתנו. אנו נרגשים שבחרת "
+"ב-% website_name. % website_name הוא מקום נהדר לפרסם ולחקור נכסים\n"
 "\n"
 "אתה מתכנן ב% website_url מופעל! כעת תוכל לרשום את הנכסים שלך בהתאם לתוכניתך."
 
@@ -8560,8 +8553,8 @@ msgid ""
 "you can use %listing_title as listing title, %listing_url as listing link "
 "and %listing_id as listing id"
 msgstr ""
-"אתה יכול להשתמש ב-%listing_title ככותרת הרישום, %listing_url כקישור רישום ו-"
-"%listing_id כמזהה רישום"
+"אתה יכול להשתמש ב-%listing_title ככותרת הרישום, %listing_url כקישור רישום "
+"ו-%listing_id כמזהה רישום"
 
 #: ../framework/options/emails.php:832
 msgid "Subject for Submission"
@@ -8671,8 +8664,8 @@ msgid ""
 "Can use %expired_listing_url as expired listing url and "
 "%expired_listing_name as expired listing name"
 msgstr ""
-"ניתן להשתמש ב-%expired_listing_url ככתובת אתר של פרסום פג תוקף ו-"
-"%expired_listing_name בתור שם פרסום שפג תוקפו"
+"ניתן להשתמש ב-%expired_listing_url ככתובת אתר של פרסום פג תוקף "
+"ו-%expired_listing_name בתור שם פרסום שפג תוקפו"
 
 #: ../framework/options/emails.php:937
 msgid "Subject for Free Listing Expired"
@@ -10342,11 +10335,11 @@ msgstr "מפתח API של Mapbox"
 
 #: ../framework/options/map.php:34
 msgid ""
-"Please enter the Mapbox API key, you can get from <a target=\"_blank\" href="
-"\"https://account.mapbox.com/\">here</a>."
+"Please enter the Mapbox API key, you can get from <a target=\"_blank\" "
+"href=\"https://account.mapbox.com/\">here</a>."
 msgstr ""
-"נא להזין את מפתח ה-API של Mapbox, אתה יכול לקבל <a target=\"_blank\" href="
-"\"https://account.mapbox.com/\">מכאן</a> ."
+"נא להזין את מפתח ה-API של Mapbox, אתה יכול לקבל <a target=\"_blank\" "
+"href=\"https://account.mapbox.com/\">מכאן</a> ."
 
 #: ../framework/options/map.php:40
 msgid "Map Type"
@@ -10496,8 +10489,7 @@ msgstr "סגנון מפת Google"
 msgid "Use https://snazzymaps.com/ to create styles"
 msgstr "השתמש ב- https://snazzymaps.com/ כדי ליצור סגנונות"
 
-#: ../framework/options/membership.php:4
-#: ../framework/options/membership.php:19
+#: ../framework/options/membership.php:4 ../framework/options/membership.php:19
 #: ../framework/options/translation-old.php:2704
 #: ../framework/options/translation-old.php:2705
 #: ../framework/options/translation.php:2704
@@ -11523,12 +11515,12 @@ msgstr "הפעל או השבת את Yelp בדף פרטי הנכס."
 
 #: ../framework/options/property-detail.php:783
 msgid ""
-"Please note that Yelp is not working for all countries. See here <a target="
-"\"_blank\" href=\"https://www.yelp.com/factsheet\">https://www.yelp.com/"
-"factsheet</a> the list of countries where Yelp is available."
+"Please note that Yelp is not working for all countries. See here <a "
+"target=\"_blank\" href=\"https://www.yelp.com/factsheet\">https://www.yelp."
+"com/factsheet</a> the list of countries where Yelp is available."
 msgstr ""
-"שים לב ש- Yelp אינו פועל עבור כל הארצות. ראה כאן <a target=\"_blank\" href="
-"\"https://www.yelp.com/factsheet\"> https://www.yelp.com/factsheet </a> "
+"שים לב ש- Yelp אינו פועל עבור כל הארצות. ראה כאן <a target=\"_blank\" "
+"href=\"https://www.yelp.com/factsheet\"> https://www.yelp.com/factsheet </a> "
 "רשימת הארצות שבהן Yelp זמינה."
 
 #: ../framework/options/property-detail.php:791
@@ -11716,8 +11708,7 @@ msgstr "נכס עיר"
 msgid "Property Area"
 msgstr "בריכה במקום האירוח"
 
-#: ../framework/options/property-detail.php:1069
-#: ../framework/vc_extend.php:127
+#: ../framework/options/property-detail.php:1069 ../framework/vc_extend.php:127
 msgid "Random"
 msgstr "אקראי"
 
@@ -12709,13 +12700,13 @@ msgstr "המדריך"
 
 #: ../framework/options/topbar.php:129
 msgid ""
-"Please find full list of available currencies at <a target=\"_blank\" href="
-"\"https://openexchangerates.org/currencies\">https://openexchangerates.org/"
-"currencies</a><br/>Add api key under Houzez -> Currency Converter API"
+"Please find full list of available currencies at <a target=\"_blank\" "
+"href=\"https://openexchangerates.org/currencies\">https://openexchangerates."
+"org/currencies</a><br/>Add api key under Houzez -> Currency Converter API"
 msgstr ""
-"אנא מצא רשימה מלאה של מטבעות זמינים בכתובת <a target=\"_blank\" href="
-"\"https://openexchangerates.org/currencies\">https://openexchangerates.org/"
-"currencies</a><br/> הוסף מפתח API תחת Houzez -> API של ממיר מטבעות"
+"אנא מצא רשימה מלאה של מטבעות זמינים בכתובת <a target=\"_blank\" "
+"href=\"https://openexchangerates.org/currencies\">https://openexchangerates."
+"org/currencies</a><br/> הוסף מפתח API תחת Houzez -> API של ממיר מטבעות"
 
 #: ../framework/options/topbar.php:134
 msgid "Base Currency"
@@ -15010,8 +15001,7 @@ msgstr "תוֹבָנָה"
 #: ../framework/vc_extend.php:494 ../framework/vc_extend.php:668
 #: ../framework/vc_extend.php:835 ../framework/vc_extend.php:1009
 #: ../framework/vc_extend.php:1183 ../framework/vc_extend.php:1365
-#: ../framework/widgets/latest-posts.php:145
-#: ../inc/blocks/class-library.php:69
+#: ../framework/widgets/latest-posts.php:145 ../inc/blocks/class-library.php:69
 #: ../template-parts/listing/listing-tabs.php:33
 #: ../template-parts/realtors/agency/listing-tabs.php:37
 #: ../template-parts/realtors/agent/listing-tabs.php:44
@@ -15218,8 +15208,7 @@ msgstr "כותרת הסעיף"
 #: ../framework/widgets/advanced-search.php:89
 #: ../framework/widgets/agency-search.php:84
 #: ../framework/widgets/agents-search.php:89
-#: ../framework/widgets/code-banner.php:91
-#: ../framework/widgets/contact.php:131
+#: ../framework/widgets/code-banner.php:91 ../framework/widgets/contact.php:131
 #: ../framework/widgets/featured-properties.php:156
 #: ../framework/widgets/houzez-instagram.php:136
 #: ../framework/widgets/houzez-login-widget.php:122
@@ -16718,8 +16707,8 @@ msgstr "תוקף הרישום הזה פג"
 
 #: ../property-details/partials/login_required.php:33
 msgid ""
-"To view this listing please <a class=\"hhh_login\" href=\"#\" data-toggle="
-"\"modal\" data-target=\"#login-register-form\">sign in</a>."
+"To view this listing please <a class=\"hhh_login\" href=\"#\" data-"
+"toggle=\"modal\" data-target=\"#login-register-form\">sign in</a>."
 msgstr ""
 "כדי לצפות ברישום זה, <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal\" "
 "data-target=\"#login-register-form\">היכנס</a> ."
@@ -16731,8 +16720,8 @@ msgstr "כדי לצפות ברישום זה, היכנס."
 #: ../property-details/partials/login_required.php:41
 #: ../template-parts/reviews/form.php:47
 msgid ""
-"Don’t you have an account? <a class=\"hhh_regis\" href=\"#\" data-toggle="
-"\"modal\" data-target=\"#login-register-form\">Register</a>"
+"Don’t you have an account? <a class=\"hhh_regis\" href=\"#\" data-"
+"toggle=\"modal\" data-target=\"#login-register-form\">Register</a>"
 msgstr ""
 "אין לך חשבון? <a class=\"hhh_regis\" href=\"#\" data-toggle=\"modal\" data-"
 "target=\"#login-register-form\">הירשם</a>"
@@ -17859,8 +17848,8 @@ msgid ""
 "Please enter your username or email address. You will receive a link to "
 "create a new password via email."
 msgstr ""
-"הזן את שם המשתמש או את כתובת הדוא\"ל שלך. תקבל קישור ליצירת סיסמה חדשה בדוא"
-"\"ל."
+"הזן את שם המשתמש או את כתובת הדוא\"ל שלך. תקבל קישור ליצירת סיסמה חדשה "
+"בדוא\"ל."
 
 #: ../template-parts/login-register/modal-reset-password-form.php:15
 msgid "Enter your username or email"
@@ -17976,8 +17965,8 @@ msgid ""
 "By clicking \"Complete Membership\" you agree to our <a target=\"_blank\"  "
 "href=\"%s\">Terms & Conditions</a>"
 msgstr ""
-"על ידי לחיצה על \"חברות מלאה\" אתה מסכים <a target=\"_blank\"  href=\"%s"
-"\">לתנאי השימוש</a> שלנו"
+"על ידי לחיצה על \"חברות מלאה\" אתה מסכים <a target=\"_blank\"  "
+"href=\"%s\">לתנאי השימוש</a> שלנו"
 
 #: ../template-parts/membership/payment-method.php:149
 msgid ""
@@ -17991,11 +17980,11 @@ msgstr "תשלום הושלם"
 #: ../template-parts/membership/per-listing/payment-method.php:91
 #, php-format
 msgid ""
-"By clicking \"Complete Payment\" you agree to our <a target=\"_blank\"  href="
-"\"%s\">Terms & Conditions</a>"
+"By clicking \"Complete Payment\" you agree to our <a target=\"_blank\"  "
+"href=\"%s\">Terms & Conditions</a>"
 msgstr ""
-"בלחיצה על &quot;השלם תשלום&quot; אתה מסכים <a target=\"_blank\"  href=\"%s"
-"\">לתנאים וההגבלות</a> שלנו"
+"בלחיצה על &quot;השלם תשלום&quot; אתה מסכים <a target=\"_blank\"  "
+"href=\"%s\">לתנאים וההגבלות</a> שלנו"
 
 #: ../template-parts/membership/per-listing/price.php:22
 msgid "Pay Listing"
@@ -18092,8 +18081,8 @@ msgid ""
 "Review this listing <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal\" "
 "data-target=\"#login-register-form\">sign in</a>."
 msgstr ""
-"תנו ביקורת על רישום זה <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal"
-"\" data-target=\"#login-register-form\">היכנס</a>."
+"תנו ביקורת על רישום זה <a class=\"hhh_login\" href=\"#\" data-"
+"toggle=\"modal\" data-target=\"#login-register-form\">היכנס</a>."
 
 #: ../template-parts/reviews/form.php:43
 msgid "To review this listing please sign in."
@@ -19176,10 +19165,10 @@ msgstr "מבצע!"
 #~ "openexchangerates.org/currencies</a><br/>wp-currencies plugin is required "
 #~ "- https://wordpress.org/plugins/wp-currencies/"
 #~ msgstr ""
-#~ "עיין ברשימה המלאה של המטבעות הזמינים בכתובת <a target=\"_blank\" href="
-#~ "\"https://openexchangerates.org/currencies\"> https://openexchangerates."
-#~ "org/currencies </a> <br/> פלאגין wp-currency נדרש - https://wordpress.org/"
-#~ "plugins/wp-currencies/"
+#~ "עיין ברשימה המלאה של המטבעות הזמינים בכתובת <a target=\"_blank\" "
+#~ "href=\"https://openexchangerates.org/currencies\"> https://"
+#~ "openexchangerates.org/currencies </a> <br/> פלאגין wp-currency נדרש - "
+#~ "https://wordpress.org/plugins/wp-currencies/"
 
 #~ msgid "Enable/Disable login register in header menu"
 #~ msgstr "הפעל / בטל הרשמה הרשמה בתפריט כותרת"
@@ -20130,9 +20119,9 @@ msgstr "מבצע!"
 #~ msgstr "הצג / הסתר חצי שדות חיפוש מתקדמים במפה"
 
 #~ msgid ""
-#~ "<strong>Normal Page:</strong> Create page using \"Advanced Search Result"
-#~ "\" template.<br/><strong>Half Map:</strong> Create page using \"Property "
-#~ "Listings Half Map\" template."
+#~ "<strong>Normal Page:</strong> Create page using \"Advanced Search "
+#~ "Result\" template.<br/><strong>Half Map:</strong> Create page using "
+#~ "\"Property Listings Half Map\" template."
 #~ msgstr ""
 #~ "<strong> דף רגיל: </ strong> צור דף באמצעות תבנית \"תוצאת חיפוש מתקדם\". "
 #~ "<br/> <strong> חצי מפה: </ strong> צור דף באמצעות תבנית \"רישומי נכס חצי "

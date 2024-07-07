@@ -1,5 +1,6 @@
 <?php
-$belong_to = isset($_GET['lead-id']) ? $_GET['lead-id'] : '';
+// Sanitize and validate the 'lead-id' input
+$belong_to = isset($_GET['lead-id']) ? intval($_GET['lead-id']) : 0; // Using intval() to convert to integer and ensure it's safe
 $notes = Houzez_CRM_Notes::get_notes($belong_to, 'lead');
 ?>
 <div class="form-group">

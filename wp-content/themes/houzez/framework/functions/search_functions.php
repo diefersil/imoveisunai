@@ -133,8 +133,10 @@ if( !function_exists('houzez20_half_map_listings') ) {
             'post_type' => 'property',
             'posts_per_page' => $number_of_prop,
             'paged' => $paged,
-            'post_status' => array( 'publish', 'houzez_sold' )
+            'post_status' => 'publish'
         );
+
+        $search_qry = apply_filters( 'houzez_sold_status_filter', $search_qry );
 
         $item_layout = $_GET['item_layout'] ?? 'v1';
 
@@ -217,6 +219,10 @@ if( !function_exists('houzez20_half_map_listings') ) {
             $search_qry['meta_key'] = 'fave_featured';
             $search_qry['meta_value'] = '1';
             $search_qry['orderby'] = 'meta_value date';
+        } else if ( $sort_by == 'featured_random' ) {
+            $search_qry['meta_key'] = 'fave_featured';
+            $search_qry['meta_value'] = '1';
+            $search_qry['orderby'] = 'meta_value DESC rand';
         } else if ( $sort_by == 'a_date' ) {
             $search_qry['orderby'] = 'date';
             $search_qry['order'] = 'ASC';
@@ -226,6 +232,9 @@ if( !function_exists('houzez20_half_map_listings') ) {
         } else if ( $sort_by == 'featured_first' ) {
             $search_qry['orderby'] = 'meta_value date';
             $search_qry['meta_key'] = 'fave_featured';
+        } else if ( $sort_by == 'featured_first_random' ) {
+            $search_qry['meta_key'] = 'fave_featured';
+            $search_qry['orderby'] = 'meta_value DESC rand'; 
         } else if ( $sort_by == 'featured_top' ) {
             $search_qry['orderby'] = 'meta_value date';
             $search_qry['meta_key'] = 'fave_featured';
@@ -425,7 +434,8 @@ if(!function_exists('houzez20_properties_search')) {
             );
         }
         /*echo '<pre>';
-        print_r($search_qry);*/
+        print_r($search_qry);
+        echo '</pre>';*/
         return $search_qry;
 
 	}
@@ -483,11 +493,13 @@ if(!function_exists('houzez_search_bedrooms')) {
     function houzez_search_bedrooms($meta_query) {
         $beds_baths_search = houzez_option('beds_baths_search', 'equal');
         $search_criteria = '=';
+        $type = 'NUMERIC';
         if( $beds_baths_search == 'greater' ) {
             $search_criteria = '>=';
 
         } else if( $beds_baths_search == 'like' ) {
             $search_criteria = 'LIKE';
+            $type = 'CHAR';
         }
 
         if (isset($_GET['bedrooms']) && $_GET['bedrooms'] != "" && $_GET['bedrooms'] != 'any') {
@@ -495,7 +507,7 @@ if(!function_exists('houzez_search_bedrooms')) {
             $meta_query[] = array(
                 'key' => 'fave_property_bedrooms',
                 'value' => $bedrooms,
-                'type' => 'CHAR',
+                'type' => $type,
                 'compare' => $search_criteria,
             );
         }
@@ -509,10 +521,12 @@ if(!function_exists('houzez_search_rooms')) {
     function houzez_search_rooms($meta_query) {
         $beds_baths_search = houzez_option('beds_baths_search', 'equal');
         $search_criteria = '=';
+        $type = 'NUMERIC';
         if( $beds_baths_search == 'greater') {
             $search_criteria = '>=';
         } else if( $beds_baths_search == 'like' ) {
             $search_criteria = 'LIKE';
+            $type = 'CHAR';
         }
 
         if (isset($_GET['rooms']) && $_GET['rooms'] != "" && $_GET['rooms'] != 'any') {
@@ -520,7 +534,7 @@ if(!function_exists('houzez_search_rooms')) {
             $meta_query[] = array(
                 'key' => 'fave_property_rooms',
                 'value' => $rooms,
-                'type' => 'CHAR',
+                'type' => $type,
                 'compare' => $search_criteria,
             );
         }
@@ -571,11 +585,13 @@ if(!function_exists('houzez_search_bathrooms')) {
 	function houzez_search_bathrooms($meta_query) {
 		$beds_baths_search = houzez_option('beds_baths_search');
 		$search_criteria = '=';
+        $type = 'NUMERIC';
         if( $beds_baths_search == 'greater') {
             $search_criteria = '>=';
             
         } else if( $beds_baths_search == 'like' ) {
             $search_criteria = 'LIKE';
+            $type = 'CHAR';
         }
         
 		if (isset($_GET['bathrooms']) && $_GET['bathrooms'] != "" && $_GET['bathrooms'] != 'any') {
@@ -583,7 +599,7 @@ if(!function_exists('houzez_search_bathrooms')) {
             $meta_query[] = array(
                 'key' => 'fave_property_bathrooms',
                 'value' => $bathrooms,
-                'type' => 'CHAR',
+                'type' => $type,
                 'compare' => $search_criteria,
             );
         }
@@ -617,14 +633,27 @@ if(!function_exists('houzez_search_custom_fields')) {
         if(class_exists('Houzez_Fields_Builder')) {
             $fields_array = Houzez_Fields_Builder::get_form_fields();
             if(!empty($fields_array)):
+
+                $builtInFields = Houzez_Fields_Builder::builtInFields();
                 foreach ( $fields_array as $value ):
                     $field_title = $value->label;
                     $field_name = $value->field_id;
                     $is_search = $value->is_search;
                     $field_type = $value->type;
 
-                    if($is_search == 'yes') {
+                    if($is_search == 'yes' && ! in_array($field_name, $builtInFields) ) {
                         if(isset($_GET[$field_name]) && !empty($_GET[$field_name]) ) {
+
+                            // Check if the input is an array
+                            if (is_array($_GET[$field_name])) {
+                                $value = array_map(function($item) {
+                                    // Sanitize each item in the array
+                                    return sanitize_text_field($item);
+                                }, $_GET[$field_name]);
+                            } else {
+                                // If it's not an array, sanitize the string directly
+                                $value = sanitize_text_field($_GET[$field_name]);
+                            }
 
                             $compare = 'LIKE';
                             if( $field_type == 'checkbox_list' || $field_type == 'multiselect' ) {
@@ -633,7 +662,7 @@ if(!function_exists('houzez_search_custom_fields')) {
 
                             $meta_query[] = array(
                                 'key' => 'fave_'.$field_name,
-                                'value' => $_GET[$field_name],
+                                'value' => $value,
                                 'type' => 'CHAR',
                                 'compare' => $compare,
                             );
@@ -910,25 +939,26 @@ if(!function_exists('houzez_search_area')) {
 }
 
 if(!function_exists('houzez_search_features')) {
-	function houzez_search_features($query_arg) {
+    function houzez_search_features($query_arg) {
 
-		if (isset($_GET['feature']) && !empty($_GET['feature'][0])) {
+        if (isset($_GET['feature']) && !empty($_GET['feature'][0])) {
             if (is_array($_GET['feature'])) {
                 $features = $_GET['feature'];
 
-                $query_arg[] = array(
-                    'taxonomy' => 'property_feature',
-                    'field' => 'slug',
-                    'terms' => $features
-                );
-
+                // Iterate over each feature and add it to the $query_arg array
+                foreach ($features as $feature) {
+                    $query_arg[] = array(
+                        'taxonomy' => 'property_feature',
+                        'field' => 'slug',
+                        'terms' => $feature,
+                    );
+                }
             }
         }
-
         return $query_arg;
-	}
+    }
 
-	add_filter('houzez_taxonomy_search_filter', 'houzez_search_features');
+    add_filter('houzez_taxonomy_search_filter', 'houzez_search_features');
 }
 
 if(!function_exists('houzez_search_label')) {

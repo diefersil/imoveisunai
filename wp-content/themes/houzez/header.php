@@ -18,21 +18,37 @@ $houzez_local = houzez_get_localization();
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<?php get_template_part('template-parts/header/nav-mobile'); ?>
-
 <?php if(houzez_is_dashboard()) { ?>
 
-	<main id="main-wrap" class="main-wrap dashboard-main-wrap">
+	<?php get_template_part('template-parts/header/nav-mobile'); ?>
+
+	<main id="main-wrap" class="main-wrap main-wrap-js dashboard-main-wrap">
+
 	<?php get_template_part('template-parts/header/header-mobile'); ?>
 
 <?php } else { ?>
 
+	<?php 
+	if( houzez_option('houzez_header_type') != "_custom" ) {
+		get_template_part('template-parts/header/nav-mobile'); 
+	}?>
+
 	<main id="main-wrap" <?php houzez_main_wrap_class('main-wrap'); ?>>
 
 	<?php 
+	do_action( 'houzez_before_header' );
+
 	if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) {
-		get_template_part('template-parts/header/main'); 
-	}?>
+		
+		if( function_exists('fts_header_enabled') && fts_header_enabled() ) {
+			do_action( 'houzez_header_studio' );
+		} else { 
+			do_action( 'houzez_header' );
+		}
+	}
+
+	do_action( 'houzez_after_header' );
+	?>
 
 	<?php 
 	// Header Search Start 
@@ -93,4 +109,4 @@ $houzez_local = houzez_get_localization();
 	} // Header search End
 
 	get_template_part('template-parts/banners/main');
-} ?>
+}?>

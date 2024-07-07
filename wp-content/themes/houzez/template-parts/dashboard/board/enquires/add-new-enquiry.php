@@ -14,7 +14,10 @@
 						<?php
 						$contacts = Houzez_Leads::get_all_leads();
 						foreach ($contacts as $contact) {
-							echo '<option value="'.esc_attr($contact->lead_id).'">'.esc_attr($contact->display_name).'</option>';
+
+							if( $contact->lead_id != '' ) {
+								echo '<option value="'.esc_attr($contact->lead_id).'">'.esc_attr($contact->display_name).'</option>';
+							}
 						}
 						?>
 					</select>
@@ -77,7 +80,7 @@
                         // All Option
                         echo '<option value="">'.esc_html__('Select', 'houzez').'</option>';
 
-                        $prop_type = get_terms (
+                        $prop_status = get_terms (
                             array(
                                 "property_status"
                             ),
@@ -88,7 +91,7 @@
                                 'parent' => 0
                             )
                         );
-                        hcrm_get_taxonomy('property_status', $prop_type);
+                        hcrm_get_taxonomy('property_status', $prop_status);
                         ?>
 					</select><!-- selectpicker -->
 				</div>
@@ -102,7 +105,7 @@
                         // All Option
                         echo '<option value="">'.esc_html__('Select', 'houzez').'</option>';
 
-                        $prop_type = get_terms (
+                        $prop_label = get_terms (
                             array(
                                 "property_label"
                             ),
@@ -113,7 +116,7 @@
                                 'parent' => 0
                             )
                         );
-                        hcrm_get_taxonomy('property_label', $prop_type);
+                        hcrm_get_taxonomy('property_label', $prop_label);
                         ?>
 					</select><!-- selectpicker -->
 				</div>

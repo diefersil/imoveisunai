@@ -6,7 +6,7 @@ if( houzez_is_fullwidth_2cols_custom_width() ) {
 	$image_size = 'houzez-item-image-6';
 }
 ?>
-<div ,jhkhkhk class="item-listing-wrap hz-item-gallery-js item-listing-wrap-v6 card" data-hz-id="hz-<?php esc_attr_e($post->ID); ?>" <?php houzez_property_gallery($image_size); ?>>
+<div class="item-listing-wrap hz-item-gallery-js item-listing-wrap-v6 card" data-hz-id="hz-<?php esc_attr_e($post->ID); ?>" <?php houzez_property_gallery($image_size); ?>>
 	<div class="item-wrap item-wrap-v6 h-100">
 		<div class="d-flex align-items-center h-100">
 			<div class="item-header">

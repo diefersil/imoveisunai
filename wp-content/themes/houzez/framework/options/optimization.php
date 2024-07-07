@@ -42,7 +42,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'        => 'minify_css',
             'type'      => 'switch',
             'title'     => esc_html__( 'Minify CSS', 'houzez' ),
-            'subtitle'  => esc_html__( 'By default the theme loads a style.css that is not minified. If you wish you can enable this setting to instead load a single style-min.css file with the code minified. If you are using a child theme you will have to change the @import from pointing to style.css to point to style-min.css', 'houzez' ),
+            'subtitle'  => esc_html__( 'By default the theme loads a style.css that is not minified. If you wish you can enable this setting to instead load a single style-min.css file with the code minified. If you are using a child theme you will have to change the @import from pointing to style.css to point to style.min.css', 'houzez' ),
             "default"   => 0,
             'on'        => esc_html__( 'On', 'houzez' ),
             'off'       => esc_html__( 'Off', 'houzez' ),

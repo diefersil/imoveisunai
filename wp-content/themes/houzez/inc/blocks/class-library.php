@@ -17,7 +17,7 @@ class Houzez_Library
 	public function inline_styles()
 	{
 ?>
-		<style>.houzez-library-modal-btn {margin-left: 5px;background: #35AAE1;vertical-align: top;font-size: 0 !important;}.houzez-library-modal-btn:before {content: '';width: 16px;height: 16px;background-image: url('<?php echo get_template_directory_uri() . '/img/favicon.png';?>');background-position: center;background-size: contain;background-repeat: no-repeat;}#houzez-library-modal .houzez-elementor-template-library-template-name {text-align: right;flex: 1 0 0%;}</style>
+		<style>.houzez-library-modal-btn {margin-left: 5px;background: #35AAE1;vertical-align: top;font-size: 0 !important;}.houzez-library-modal-btn:before {content: '';width: 16px;height: 16px;background-image: url('<?php echo get_template_directory_uri() . '/img/studio-icon.png';?>');background-position: center;background-size: contain;background-repeat: no-repeat;}#houzez-library-modal .houzez-elementor-template-library-template-name {text-align: right;flex: 1 0 0%;}</style>
 	<?php
 	}
 

@@ -94,7 +94,17 @@ if ($media_tabs): foreach ($media_tabs as $key=>$value) {
     case '360_virtual_tour': 
     	?>
 		<div class="tab-pane houzez-360-virtual-tour <?php echo esc_attr($virtual_active); ?>" id="pills-360tour" role="tabpanel" aria-labelledby="pills-360tour-tab">
-			<?php echo houzez_get_listing_data('virtual_tour'); ?>
+			<?php 
+			$virtual_tour = houzez_get_listing_data('virtual_tour');
+			// Check if the content contains either <iframe> or <embed> tags
+			if (strpos($virtual_tour, '<iframe') !== false || strpos($virtual_tour, '<embed') !== false) {
+				$virtual_tour = houzez_ensure_iframe_closing_tag($virtual_tour);
+			    echo $virtual_tour;
+			} else { 
+			    $virtual_tour = '<iframe width="853" height="480" src="'.$virtual_tour.'" frameborder="0" allowfullscreen="allowfullscreen"></iframe>';
+			    echo $virtual_tour;
+			}
+			?>
 		</div>
 		<?php
     	break;

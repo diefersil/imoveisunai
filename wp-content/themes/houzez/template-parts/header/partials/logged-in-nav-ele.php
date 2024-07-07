@@ -63,9 +63,11 @@ $user_custom_picture = houzez_get_profile_pic($userID);
         </a>
         <ul class="logged-in-nav dropdown-menu <?php echo esc_attr($ele_show_dropdown); ?>">
             <?php
-            echo '<li class="side-menu-item">
-                <a href="'.esc_url( home_url( '/' ) ).'"><i class="houzez-icon icon-house mr-2"></i> '.houzez_option('dsh_home', 'Home').'</a>
-            </li>';
+            if( houzez_option('dsh_home_btn', 0) == 1 ) {
+                echo '<li class="side-menu-item">
+                    <a href="'.esc_url( home_url( '/' ) ).'"><i class="houzez-icon icon-house mr-2"></i> '.houzez_option('dsh_home', 'Home').'</a>
+                </li>';
+            }
             if( !empty( $dashboard_crm ) && houzez_check_role() ) {
                 echo '<li class="side-menu-item">';
                         echo '<a '.$ac_crm.' href="'.esc_url($dashboard_crm).'">';
@@ -117,7 +119,7 @@ $user_custom_picture = houzez_get_profile_pic($userID);
 
 
 
-            if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() ) {
+            if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() && ! houzez_is_admin() ) {
                 echo '<li class="side-menu-item">
                         <a '.esc_attr($ac_mem).' href="'.esc_attr($dashboard_membership).'">
                             <i class="houzez-icon icon-task-list-text-1 mr-2"></i> '.houzez_option('dsh_membership', 'Membership').'

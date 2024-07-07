@@ -1,4 +1,7 @@
 <div class="menu-edit-property-wrap">
+    
+    <?php get_template_part( 'template-parts/dashboard/submit/partials/author'); ?>
+
     <div class="menu-title">
         <?php esc_html_e('Menu', 'houzez'); ?> 
     </div><!-- menu-title -->

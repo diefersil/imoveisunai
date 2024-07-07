@@ -240,6 +240,8 @@ if(!class_exists('Houzez_Query')) {
                 ),
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             return new WP_Query( $args );
         }
 
@@ -270,6 +272,9 @@ if(!class_exists('Houzez_Query')) {
                     ),
                 ),
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $property_query = new WP_Query($args);
 
             return $property_query->posts;
@@ -302,6 +307,9 @@ if(!class_exists('Houzez_Query')) {
                     )
                 ),
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $property_query = new WP_Query($args);
 
             return $property_query->posts;
@@ -335,6 +343,8 @@ if(!class_exists('Houzez_Query')) {
                     ),
                 ),
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $qry = new WP_Query( $args );
 
@@ -385,6 +395,8 @@ if(!class_exists('Houzez_Query')) {
                 )
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $qry = new WP_Query( $args );
 
             if( $qry->have_posts() ):
@@ -420,6 +432,8 @@ if(!class_exists('Houzez_Query')) {
                 'post_status' => 'publish',
                 'author' => $author_id,
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $qry = new WP_Query( $args );
 
@@ -481,6 +495,8 @@ if(!class_exists('Houzez_Query')) {
                     ),
                 )
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $count = count($tax_query);
             if($count > 0 ) {
@@ -581,6 +597,8 @@ if(!class_exists('Houzez_Query')) {
                 'fields'         => 'ids',
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $agents_array = array();
             $agency_agents_ids = Houzez_Query::loop_agency_agents_ids($agency_id);
 
@@ -654,6 +672,8 @@ if(!class_exists('Houzez_Query')) {
                 'post_status' => 'publish'
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $count = count($tax_query);
             if($count > 0 ) {
                 $args['tax_query'] = $tax_query;
@@ -682,6 +702,7 @@ if(!class_exists('Houzez_Query')) {
                 'post_status' => 'publish'
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $posts = get_posts($args);
             return count($posts);
@@ -721,6 +742,8 @@ if(!class_exists('Houzez_Query')) {
                 )
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $posts = get_posts($args);
             return count($posts);
         }
@@ -757,6 +780,8 @@ if(!class_exists('Houzez_Query')) {
                 )
             );
 
+            $agency_listing_args = apply_filters( 'houzez_sold_status_filter', $agency_listing_args );
+
             $agency_qry = new WP_Query( $agency_listing_args );
             return $agency_qry->found_posts;
         }
@@ -780,6 +805,8 @@ if(!class_exists('Houzez_Query')) {
                 'post_status' => 'publish',
                 'author' => $author_id
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $qry = new WP_Query( $args );
             return $qry->post_count;
@@ -815,6 +842,8 @@ if(!class_exists('Houzez_Query')) {
                 )
             );
 
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+
             $qry = new WP_Query( $args );
             return $qry->found_posts;
         }
@@ -846,6 +875,9 @@ if(!class_exists('Houzez_Query')) {
                     ),
                 ),
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
+            
             $property_query = new WP_Query($args);
 
             return $property_query->found_posts;
@@ -898,6 +930,8 @@ if(!class_exists('Houzez_Query')) {
                     )
                 )
             );
+
+            $args = apply_filters( 'houzez_sold_status_filter', $args );
 
             $count = count($tax_query);
             if($count > 0 ) {

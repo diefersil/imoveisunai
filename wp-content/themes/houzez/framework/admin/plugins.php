@@ -13,7 +13,7 @@ $plugins_array = array(
 		'source'   		=> 'https://default.houzez.co/plugins/houzez-theme-functionality.zip', // The plugin source
 		'path'   		=> 'houzez-theme-functionality/houzez-theme-functionality.php', // Plugin main file path
 		'required' 		=> true,
-		'version' 		=> '2.8.4', 
+		'version' 		=> '3.2.3', 
 		'author' 		=> 'FaveThemes',
 		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
 		'description' 	=> 'Theme core plugin to add all the functionality for Houzez theme', 
@@ -26,20 +26,31 @@ $plugins_array = array(
 		'source'   		=> 'https://default.houzez.co/plugins/houzez-login-register.zip', // The plugin source
 		'path'   		=> 'houzez-login-register/houzez-login-register.php', // Plugin main file path
 		'required' 		=> true,
-		'version' 		=> '2.8.2', 
+		'version' 		=> '3.2.1', 
 		'author' 		=> 'FaveThemes',
 		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
 		'description' 	=> 'Theme core plugin to login & register functionality', 
 		'thumbnail' 	=> HOUZEZ_IMAGE . 'houzez-icon.jpg',
 	),
-
+	array(
+		'name'     		=> 'Houzez Studio', // The plugin name
+		'slug'     		=> 'houzez-studio', // The plugin slug (typically the folder name)
+		'source'   		=> 'https://default.houzez.co/plugins/houzez-studio.zip', // The plugin source
+		'path'   		=> 'houzez-studio/houzez-studio.php', // Plugin main file path
+		'required' 		=> true,
+		'version' 		=> '1.0.2', 
+		'author' 		=> 'FaveThemes',
+		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
+		'description' 	=> 'Theme core plugin to login & register functionality', 
+		'thumbnail' 	=> HOUZEZ_IMAGE . 'houzez-icon.jpg',
+	),
 	array(
 		'name'     		=> 'Houzez CRM', // The plugin name
 		'slug'     		=> 'houzez-crm', // The plugin slug (typically the folder name)
 		'source'   		=> 'https://default.houzez.co/plugins/houzez-crm.zip', // The plugin source
 		'path'   		=> 'houzez-crm/houzez-crm.php', // Plugin main file path
 		'required' 		=> false,
-		'version' 		=> '1.3.6', 
+		'version' 		=> '1.4.3', 
 		'author' 		=> 'FaveThemes',
 		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
 		'description' 	=> 'Theme core plugin to add the CRM functionality', 
@@ -52,25 +63,12 @@ $plugins_array = array(
 		'source'   		=> 'https://default.houzez.co/plugins/favethemes-insights.zip', // The plugin source
 		'path'   		=> 'favethemes-insights/favethemes-insights.php', // Plugin main file path
 		'required' 		=> false,
-		'version' 		=> '1.2.5', 
+		'version' 		=> '1.2.9', 
 		'author' 		=> 'FaveThemes',
 		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
 		'description' 	=> 'Theme core plugin to add the insight data chart', 
 		'thumbnail' 	=> HOUZEZ_IMAGE . 'houzez-icon.jpg',
 	),
-	array(
-		'name'     		=> 'Houzez MLS Sync by Realtyna', // The plugin name
-		'slug'     		=> 'realtyna-mls-sync', // The plugin slug (typically the folder name)
-		'source'   		=> 'https://default.houzez.co/plugins/realtyna-mls-sync.zip', // The plugin source
-		'path'   		=> 'realtyna-mls-sync/realtyna-mls-sync.php', // Plugin main file path
-		'required' 		=> false,
-		'version' 		=> '1.0.18', 
-		'author' 		=> 'FaveThemes',
-		'author_url' 	=> 'https://themeforest.net/user/favethemes/portfolio',
-		'description' 	=> 'Sync MLS listings with houzez themes', 
-		'thumbnail' 	=> HOUZEZ_IMAGE . 'houzez-icon.jpg',
-	),
-
 	array(
 		'name'     		=> 'Redux Framework', // The plugin name
 		'slug'     		=> 'redux-framework', // The plugin slug (typically the folder name)

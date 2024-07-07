@@ -8,7 +8,7 @@ if( houzez_is_fullwidth_2cols_custom_width() ) {
 }
 ?>
 <div class="item-listing-wrap hz-item-gallery-js item-listing-wrap-v5 card" data-hz-id="hz-<?php esc_attr_e($post->ID); ?>" <?php houzez_property_gallery($image_size); ?>>
-	<div class="item-wrap item-wrap-v5 h-100">
+	<div class="item-wrap item-wrap-v5 item-wrap-no-frame h-100">
 		<div class="d-flex align-items-center h-100">
 			<div class="item-header">
 				<?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>

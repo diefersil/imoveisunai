@@ -4,12 +4,13 @@ $agent_display = houzez_get_listing_data('agent_display_option');
 if ($agent_display != 'none') { 
 
 $agent_array = houzez20_property_contact_form();
-$agent_array = $agent_array['agent_info'][0];
+$agent_array = $agent_array['agent_info'][0] ?? '';
 
 $agent_name = isset($agent_array['agent_name']) ? $agent_array['agent_name'] : '';
 $agent_mobile_call = isset($agent_array['agent_mobile_call']) ? $agent_array['agent_mobile_call'] : '';
 $agent_whatsapp_call = isset($agent_array['agent_whatsapp_call']) ? $agent_array['agent_whatsapp_call'] : '';
 $agent_number_call = isset($agent_array['agent_mobile_call']) ? $agent_array['agent_mobile_call'] : '';
+$agent_picture = $agent_array['picture'] ?? '';
 if( empty($agent_number_call) ) {
 	$agent_number_call = isset($agent_array['agent_phone_call']) ? $agent_array['agent_phone_call'] : '';
 }
@@ -20,7 +21,7 @@ if( empty($agent_number_call) ) {
 		<div class="agent-details flex-grow-1">
 			<div class="d-flex align-items-center">
 				<div class="agent-image">
-					<img class="rounded" src="<?php echo esc_url($agent_array['picture']); ?>" width="50" height="50" alt="<?php echo esc_attr($agent_name); ?>">
+					<img class="rounded" src="<?php echo esc_url($agent_picture); ?>" width="50" height="50" alt="<?php echo esc_attr($agent_name); ?>">
 				</div>
 				<ul class="agent-information list-unstyled">
 					<li class="agent-name">

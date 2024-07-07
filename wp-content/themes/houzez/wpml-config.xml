@@ -23,10 +23,13 @@
 		<taxonomy translate="1">agent_city</taxonomy>
 	</taxonomies>
 	<custom-fields>
+		<custom-field action="translate">fave_currency</custom-field>
 		<custom-field action="translate">fave_property_price</custom-field>
 		<custom-field action="translate">fave_property_sec_price</custom-field>
 		<custom-field action="translate">fave_property_price_prefix</custom-field>
 		<custom-field action="translate">fave_property_price_postfix</custom-field>
+		<custom-field action="translate">fave_show_price_placeholder</custom-field>
+		<custom-field action="translate">fave_property_price_placeholder</custom-field>
 		<custom-field action="translate">fave_property_size</custom-field>
 		<custom-field action="translate">fave_property_size_prefix</custom-field>
 		<custom-field action="translate">fave_property_land</custom-field>
@@ -63,7 +66,7 @@
 		<custom-field action="translate">fave_epc_current_rating</custom-field>
 		<custom-field action="translate">fave_epc_potential_rating</custom-field>
 		<custom-field action="copy">fave_single_top_area</custom-field>
-		<custom-field action="copy">fave_single_content_area</custom-field>
+		<custom-field action="copy">fave_single_top_area</custom-field>
 		<custom-field action="translate">fave_booking_shortcode</custom-field>
 		<custom-field action="translate">additional_features</custom-field>
     	<custom-field action="translate">floor_plans</custom-field>
@@ -140,6 +143,8 @@
 	    <custom-field action="translate">fave_agency_pinterest</custom-field>
 	    <custom-field action="translate">fave_agency_instagram</custom-field>
 	    <custom-field action="copy">fave_agency_location</custom-field>
+	    <custom-field action="translate">fave_agency_service_area</custom-field>
+		<custom-field action="translate">fave_agency_specialties</custom-field>
 	    <custom-field action="copy">fave_agency_map_address</custom-field>
 	    <custom-field action="translate">fave_agency_language</custom-field>
 	    <custom-field action="translate">fave_agency_tax_no</custom-field>
@@ -491,9 +496,30 @@
 				<field type="Overview: Label Plural" editor_type="LINE">label_plural</field>
 			</fields-in-item>
 		</widget>
+		<widget name="houzez_elementor_inquiry_form">
+	      <conditions>
+	        <condition key="widgetType">houzez_elementor_inquiry_form</condition>
+	      </conditions>
+	      <fields>
+	        <field type="Form Name" editor_type="LINE">form_name</field>
+	        <field type="Inquiry Form: GDPR Label" editor_type="LINE">gdpr_label</field>
+	        <field type="Inquiry Form: GDPR Validation Message" editor_type="LINE">gdpr_validate</field>
+	        <field type="Inquiry Form: GDPR Agreement Text" editor_type="AREA">gdpr_text</field>
+	        <field type="Inquiry Form: Redirect Link" editor_type="LINK">redirect_to</field>
+	        <field type="Inquiry Form: Submit Button" editor_type="LINK">button_text</field>
+	        <field type="Inquiry Form: Email Subject" editor_type="LINK">email_subject</field>
+	      </fields>
+	      <fields-in-item items_of="form_fields">
+	        <field type="Inquiry Form: Field Label" editor_type="LINE">field_label</field>
+	        <field type="Inquiry Form: Field Placeholder" editor_type="LINE">placeholder</field>
+	        <field type="Inquiry Form: Field Validation Message" editor_type="LINE">validation_message</field>
+	        <field type="Inquiry Form: Field Options" editor_type="AREA">field_options</field>
+	      </fields-in-item>
+	    </widget>
 	</elementor-widgets>
 	<admin-texts>
 		<key name="houzez_options">
+			<key name="login_register_type" />
 			<key name="cl_property" />
 			<key name="terms_condition" />
 			<key name="cl_properties" />
@@ -556,6 +582,7 @@
 			<key name="srh_mobile_title" />
 			<key name="srh_btn_more" />
 			<key name="srh_clear" />
+			<key name="srh_garage" />
 			<key name="srh_apply" />
 			<key name="glc_bedroom" />
 			<key name="glc_bedrooms" />
@@ -626,6 +653,9 @@
 			<key name="spl_con_buyer" />
 			<key name="spl_con_tennant" />
 			<key name="spl_con_agent" />
+			<key name="spl_con_tour_type" />
+			<key name="spl_con_in_person" />
+			<key name="spl_con_video_chat" />
 			<key name="spl_con_other" />
 			<key name="spl_con_view_listings" />
 			<key name="spl_con_date" />
@@ -651,6 +681,9 @@
 			<key name="spc_pmi" />
 			<key name="spc_total_amt" />
 			<key name="spc_down_payment" />
+			<key name="spc_loan_amount" />
+			<key name="spc_monthly_mortgage_payment" />
+			<key name="spc_hoa" />
 			<key name="spc_ir" />
 			<key name="spc_load_term" />
 			<key name="spc_monthly" />

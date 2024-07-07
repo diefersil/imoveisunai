@@ -49,6 +49,14 @@ if($listing_view == 'list-view-v1') {
     $view_class = 'grid-view';
     $have_switcher = false;
 
+} elseif($listing_view == 'list-view-v4') {
+    $wrap_class = 'listing-list-v4';
+    $item_layout = 'list-v4';
+    $view_class = 'list-view listing-view-v4';
+    $have_switcher = false;
+    $card_deck = '';
+    $search_result_layout = 'no-sidebar';
+
 } elseif($listing_view == 'list-view-v5') {
     $wrap_class = 'listing-v5';
     $item_layout = 'v5';
@@ -114,11 +122,12 @@ $search_qry = array(
     'post_type' => 'property',
     'posts_per_page' => $number_of_prop,
     'paged' => $paged,
-    'post_status' => array( 'publish', 'houzez_sold' )
+    'post_status' => 'publish'
 
 );
 
 $search_qry = apply_filters( 'houzez20_search_filters', $search_qry );
+$search_qry = apply_filters( 'houzez_sold_status_filter', $search_qry );
 $search_qry = houzez_prop_sort ( $search_qry );
 $search_query = new WP_Query( $search_qry );
 
@@ -128,7 +137,6 @@ $record_found_text = esc_html__('Result Found', 'houzez');
 if( $total_records > 1 ) {
     $record_found_text = esc_html__('Results Found', 'houzez');
 }
-
 ?>
 <section class="listing-wrap <?php echo esc_attr($wrap_class); ?>">
     <div class="container">
