@@ -16,14 +16,22 @@ Template: houzez
 -------------------------------------- */
 
 
+/*-----------------------------------Home---------------------------------------*/
+
+
+/*Prime Slide*/
+
+.bdt-prime-slider-social-icon{
+  display: none !important;
+}
+
+
+
 
 /*-----------------------------------Header Search-------------------------------*/
 .advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
     background-color: #2c356d;
 }
-
-
-
 
 /*Admin Area*/
 a[href="https://imoveisunai.com.br/favorite-properties/"],
