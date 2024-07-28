@@ -16,6 +16,15 @@ Template: houzez
 -------------------------------------- */
 
 
+/*Header*/
+
+.logo img {
+  top: -3px;
+  width: auto !important;
+  height: auto !important;
+}
+
+
 /*-----------------------------------Home---------------------------------------*/
 
 
