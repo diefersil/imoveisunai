@@ -20,7 +20,7 @@ Template: houzez
 
 .navbar .logo img {
   top: -3px;
-  max-width: 190px !important;
+  width: 190px !important;
   height: auto !important;
 }
 
