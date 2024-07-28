@@ -18,7 +18,7 @@ Template: houzez
 
 /*Header*/
 
-.logo img {
+.navbar .logo img {
   top: -3px;
   width: auto !important;
   height: auto !important;
