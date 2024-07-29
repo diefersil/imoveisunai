@@ -20,12 +20,9 @@ Template: houzez
 
 /*Header*/
 
-.navbar .logo img {
-  top: -3px;
-  width: 190px !important;
-  height: auto !important;
+.grid-view .item-wrap.item-wrap-no-frame .hover-effect {
+  display: none !important;
 }
-
 
 /*-----------------------------------Home---------------------------------------*/
 
