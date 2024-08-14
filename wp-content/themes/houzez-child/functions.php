@@ -10,7 +10,7 @@ function hide(){?>
         document.querySelector("input[name='specialties']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='service_areas']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='usermobile']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='userskype']").parentNode.parentNode.style.display='none' 
+        document.querySelector("input[name='title']").parentNode.parentNode.style.display='none' 
         document.querySelector("input[name='youtube']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='vimeo']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
