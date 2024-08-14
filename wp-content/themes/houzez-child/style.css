@@ -39,8 +39,6 @@ Template: houzez
 }
 
 
-
-
 /*-----------------------------------Header Search-------------------------------*/
 .advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
     background-color: #2c356d;
@@ -71,3 +69,10 @@ a[href="https://imoveisunai.com.br/board/"],
 /*.grid-view .item-wrap.item-wrap-no-frame .hover-effect {
   display: none !important;
 }*/
+
+
+/*Footer*/
+
+.footer .item-price{
+  display: none !important;
+}
