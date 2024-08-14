@@ -6,5 +6,9 @@ function hide(){?>
         document.querySelector("input[name='linkedin']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='googleplus']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='tiktok']").parentNode.parentNode.style.display='none' 
+        document.querySelector("input[name='twitter']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='pinterest']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='skype']").parentNode.parentNode.style.display='none' 
     </script>
 <? }
