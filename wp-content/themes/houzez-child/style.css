@@ -15,15 +15,34 @@ Template: houzez
 /* Your CSS code goes here
 -------------------------------------- */
 
+@import url("../houzez/style.css");
+
+
+/*Header*/
+
+.logo img {
+  width: 180px !important;
+  height: auto !important;
+}
+
+/*-----------------------------------Home---------------------------------------*/
+
+
+/*Prime Slide*/
+
+.bdt-prime-slider-social-icon{
+  display: none !important;
+}
+
+.bdt-scroll-down-wrapper{
+  display: none !important;
+}
 
 
 /*-----------------------------------Header Search-------------------------------*/
 .advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
     background-color: #2c356d;
 }
-
-
-
 
 /*Admin Area*/
 a[href="https://imoveisunai.com.br/favorite-properties/"],
@@ -42,4 +61,18 @@ a[href="https://imoveisunai.com.br/board/"],
 /*Add Featured*/
 .page-id-16053 #settings{
 	display:none;
+}
+
+
+
+
+/*.grid-view .item-wrap.item-wrap-no-frame .hover-effect {
+  display: none !important;
+}*/
+
+
+/*Footer*/
+
+footer .item-price{
+  display: none !important;
 }
