@@ -9,6 +9,10 @@ function hide(){?>
         document.querySelector("input[name='twitter']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='pinterest']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='skype']").parentNode.parentNode.style.display='none' 
+        document.querySelector("input[name='userskype']").parentNode.parentNode.style.display='none' 
+        document.querySelector("input[name='youtube']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='vimeo']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
+        document.querySelector("input[name='realtor_com']").parentNode.parentNode.style.display='none' 
     </script>
 <? }
