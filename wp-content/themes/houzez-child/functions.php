@@ -13,21 +13,22 @@ function hide(){
             document.querySelector("input[name='title']").parentNode.parentNode.style.display='none'
             document.querySelector('[name=display_name]').parentNode.parentNode.style.display='none'
 
-        document.querySelector("input[name='facebook']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='linkedin']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='googleplus']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='tiktok']").parentNode.parentNode.style.display='none' 
-        document.querySelector("input[name='twitter']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='pinterest']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='userskype']").parentNode.parentNode.style.display='none' 
-        document.querySelector("input[name='youtube']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='vimeo']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
-        document.querySelector("input[name='realtor_com']").parentNode.parentNode.style.display='none'
-        
-        document.querySelector('[name=houzez_user_package]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none' 
-
-
-    </script>
-<? }
+            document.querySelector("input[name='facebook']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='linkedin']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='googleplus']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='tiktok']").parentNode.parentNode.style.display='none' 
+            document.querySelector("input[name='twitter']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='pinterest']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='userskype']").parentNode.parentNode.style.display='none' 
+            document.querySelector("input[name='youtube']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='vimeo']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
+            document.querySelector("input[name='realtor_com']").parentNode.parentNode.style.display='none'
+            
+            document.querySelector('[name=houzez-agency-package-security]').parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none'
+            
+            document.querySelectorAll('h2')[4].parentNode.parentNode.parentNode.style.display='none'
+        </script>
+    <?php }
+}
