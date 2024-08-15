@@ -56,6 +56,7 @@ a[href="https://imoveisunai.com.br/board/"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=mine"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=draft"],
 .delete-property,
+.clone-property,
 .put-on-hold
 {
   display:none !important;
