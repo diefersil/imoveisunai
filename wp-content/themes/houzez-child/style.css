@@ -44,7 +44,24 @@ Template: houzez
     background-color: #2c356d;
 }
 
-/*Admin Area*/
+/*Add Featured*/
+.page-id-16053 #settings{
+	display:none;
+}
+
+/*.grid-view .item-wrap.item-wrap-no-frame .hover-effect {
+  display: none !important;
+}*/
+
+
+/*--------------------------------------------------------Footer------------------------------------------*/
+
+footer .item-price{
+  display: none !important;
+}
+
+
+/*------------------------------------Admin Area------------------------------------*/
 a[href="https://imoveisunai.com.br/favorite-properties/"],
 a[href="https://imoveisunai.com.br/invoices/"],
 a[href="https://imoveisunai.com.br/insights/"],
@@ -53,26 +70,13 @@ a[href="https://imoveisunai.com.br/my-properties/?prop_status=disapproved"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=on_hold"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=approved#"],
 a[href="https://imoveisunai.com.br/board/"],
-.put-on-hold
+a[href="https://imoveisunai.com.br/my-properties/?prop_status=mine"],
+a[href="https://imoveisunai.com.br/my-properties/?prop_status=draft"],
+a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
+.delete-property,
+.clone-property,
+.property-author-wrap
+/*.put-on-hold*/
 {
   display:none !important;
-}
-
-/*Add Featured*/
-.page-id-16053 #settings{
-	display:none;
-}
-
-
-
-
-/*.grid-view .item-wrap.item-wrap-no-frame .hover-effect {
-  display: none !important;
-}*/
-
-
-/*Footer*/
-
-footer .item-price{
-  display: none !important;
 }
