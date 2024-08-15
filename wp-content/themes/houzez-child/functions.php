@@ -3,7 +3,6 @@ add_action('wp_footer','hide');
 function hide(){
     if(is_page('my-profile')){?>
         <script type="text/javascript">
-
             document.querySelector("input[name='telegram']").parentNode.parentNode.style.display='none'
             document.querySelector("input[name='line_id']").parentNode.parentNode.style.display='none'
             document.querySelector("input[name='fax_number']").parentNode.parentNode.style.display='none'
