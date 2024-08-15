@@ -26,7 +26,7 @@ function hide(){?>
         document.querySelector("input[name='zillow']").parentNode.parentNode.style.display='none'
         document.querySelector("input[name='realtor_com']").parentNode.parentNode.style.display='none'
         
-       //document.querySelector('[name=houzez_user_package]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none' 
+       document.querySelector('[name=houzez-agency-package-security]').parentNode.parentNode.parentNode.style.display='none'
 
 
     </script>
