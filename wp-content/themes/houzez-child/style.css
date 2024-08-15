@@ -54,6 +54,7 @@ a[href="https://imoveisunai.com.br/my-properties/?prop_status=on_hold"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=approved#"],
 a[href="https://imoveisunai.com.br/board/"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=mine"],
+.delete-property,
 .put-on-hold
 {
   display:none !important;
