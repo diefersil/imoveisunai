@@ -74,7 +74,8 @@ a[href="https://imoveisunai.com.br/my-properties/?prop_status=mine"],
 a[href="https://imoveisunai.com.br/my-properties/?prop_status=draft"],
 a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
 .delete-property,
-.clone-property
+.clone-property,
+.property-author-wrap
 /*.put-on-hold*/
 {
   display:none !important;
