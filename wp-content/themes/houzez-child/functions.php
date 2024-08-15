@@ -27,6 +27,8 @@ function hide(){
             document.querySelector("input[name='realtor_com']").parentNode.parentNode.style.display='none'
             
             document.querySelector('[name=houzez-agency-package-security]').parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none'
+            
+            document.querySelectorAll('h2')[4].parentNode.parentNode.parentNode.style.display='none'
         </script>
     <?php }
 }
