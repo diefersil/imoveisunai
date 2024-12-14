@@ -2,6 +2,9 @@
 // Block direct access to the main plugin file.
 defined( 'ABSPATH' ) || die( 'Access Denied!' );
 
+$pluginURL = plugin_dir_url( REALTYNA_MLS_SYNC_PLUGIN_FILE );
+$benchmarkerURL = $pluginURL . 'realtyna/Addons/Benchmarker/';
+
 $nextButtonDisabledClass = 'disabled';
 $mlsData = $_REALTYNA['mlsData'];
 $idxData = $_REALTYNA['idxData'];
@@ -74,7 +77,7 @@ if ( !empty( $latestSync ) ){
                         echo '<span class="dashicons dashicons-update"></span> ' . __( 'MLS Sync is in progress... ' , REALTYNA_MLS_SYNC_SLUG );
 
                     }
-					
+
                     if ( !empty( $availableListings ) ){
 
                         echo '<br><span class="dashicons dashicons-info"></span> ' . __( 'Available Listings: ' , REALTYNA_MLS_SYNC_SLUG ) . $availableListings;
@@ -120,7 +123,7 @@ if ( !empty( $latestSync ) ){
             ?>
 			<p id="payment_details" class="realtyna_error_bg realtyna_error_text" style="text-align:center; margin:10px;padding:10px; font-weight:bold;">
                 <?php
-                    if ( $_REALTYNA['payment'] == 'cancel' ){
+                    if ( isset($_REALTYNA['payment']) && $_REALTYNA['payment'] == 'cancel' ){
 
                         echo __( "The payment has NOT been processed.<br>You can proceed with payemnt again or contact us: sync@realtyna.net" , REALTYNA_MLS_SYNC_SLUG);
 
@@ -148,6 +151,15 @@ if ( !empty( $latestSync ) ){
             <?php
             endif;
             ?>
+
+            <div style="padding-top:10px; padding-bottom:10px;font-weight:bold;">
+
+                <p> 
+                    <i class=" dashicons dashicons-info"></i> <i><a href="<?php echo $benchmarkerURL;?>" target="_blank"><?php _e("Click here to run a Benchmark Test to check your host" , REALTYNA_MLS_SYNC_SLUG);?></a></i>
+                </p>
+
+            </div>
+
 
 		</div>
 

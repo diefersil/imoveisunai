@@ -53,6 +53,10 @@ class Multiscroll extends Widget_Base {
 		return 'https://youtu.be/uzBHDw_mdRE';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section(
@@ -131,16 +135,16 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'left_background',
 			[
-				'label'   => esc_html__('Left Background', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Left Background', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::CHOOSE,
 				'default' => 'color',
 				'options' => [
 					'color' => [
-						'title' => esc_html__('Color', 'bdthemes-element-pack'),
+						'title' => esc_html__('Color', 'bdthemes-prime-slider'),
 						'icon'  => 'eicon-paint-brush',
 					],
 					'image' => [
-						'title' => esc_html__('Image', 'bdthemes-element-pack'),
+						'title' => esc_html__('Image', 'bdthemes-prime-slider'),
 						'icon'  => 'eicon-image',
 					],
 				],
@@ -150,7 +154,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'left_background_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'condition' => [
 					'left_background' => 'color'
@@ -164,7 +168,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'left_background_image',
 			[
-				'label'   => esc_html__('Image', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Image', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::MEDIA,
 				'dynamic' => ['active' => true],
 				'default' => [
@@ -179,16 +183,16 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'right_background',
 			[
-				'label'   => esc_html__('Right Background', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Right Background', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::CHOOSE,
 				'default' => 'color',
 				'options' => [
 					'color' => [
-						'title' => esc_html__('Color', 'bdthemes-element-pack'),
+						'title' => esc_html__('Color', 'bdthemes-prime-slider'),
 						'icon'  => 'eicon-paint-brush',
 					],
 					'image' => [
-						'title' => esc_html__('Image', 'bdthemes-element-pack'),
+						'title' => esc_html__('Image', 'bdthemes-prime-slider'),
 						'icon'  => 'eicon-image',
 					],
 				],
@@ -198,7 +202,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'right_background_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'condition' => [
 					'right_background' => 'color'
@@ -212,7 +216,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'right_background_image',
 			[
-				'label'   => esc_html__('Image', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Image', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::MEDIA,
 				'dynamic' => ['active' => true],
 				'default' => [
@@ -227,7 +231,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'custom_style_popover',
 			[
-				'label'        => esc_html__('Custom Style', 'bdthemes-element-pack') . BDTPS_CORE_NC,
+				'label'        => esc_html__('Custom Style', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
 				'type'         => Controls_Manager::POPOVER_TOGGLE,
 				'render_type'  => 'ui',
 				'return_value' => 'yes',
@@ -239,7 +243,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'repeater_title_color',
 			[
-				'label'     => __('Title Color', 'bdthemes-element-pack'),
+				'label'     => __('Title Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-mltiscroll-slider {{CURRENT_ITEM}}.ms-section .bdt-mltiscroll-slider-content .bdt-mltiscroll-slider-title' => 'color: {{VALUE}}; -webkit-text-stroke-color: {{VALUE}};',
@@ -250,7 +254,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'repeater_sub_title_color',
 			[
-				'label'     => __('Sub Title Color', 'bdthemes-element-pack'),
+				'label'     => __('Sub Title Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-mltiscroll-slider {{CURRENT_ITEM}}.ms-section .bdt-mltiscroll-slider-content .bdt-mltiscroll-slider-subtitle' => 'color: {{VALUE}};',
@@ -261,7 +265,7 @@ class Multiscroll extends Widget_Base {
 		$repeater->add_control(
 			'repeater_description_color',
 			[
-				'label'     => __('Text Color', 'bdthemes-element-pack'),
+				'label'     => __('Text Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-mltiscroll-slider {{CURRENT_ITEM}}.ms-section .bdt-mltiscroll-slider-content .bdt-mltiscroll-slider-description' => 'color: {{VALUE}};',
@@ -326,7 +330,8 @@ class Multiscroll extends Widget_Base {
 						'icon'  => 'eicon-h-align-right',
 					],
 				],
-				'toggle' => false
+				'toggle' => false,
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -345,6 +350,7 @@ class Multiscroll extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .bdt-mltiscroll-slider .bdt-mltiscroll-slider-content' => 'max-width: {{SIZE}}{{UNIT}};'
 				],
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -430,7 +436,28 @@ class Multiscroll extends Widget_Base {
 				],
 				'condition' => [
 					'show_button' => 'yes'
-				]
+				],
+				'classes'    => BDTPS_CORE_IS_PC
+			]
+		);
+		
+		$this->add_responsive_control(
+			'button_vertical_offset',
+			[
+				'label' => esc_html__('Button Vertical Offset', 'bdthemes-prime-slider'),
+				'type'  => Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => -300,
+						'max' => 300,
+					],
+				],
+				'default' => [
+					'size' => 0,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .bdt-mltiscroll-slider-button' => 'transform: translateY({{SIZE}}{{UNIT}});',
+				],
 			]
 		);
 
@@ -492,7 +519,8 @@ class Multiscroll extends Widget_Base {
 				],
 				'condition' => [
 					'navigation' => 'yes'
-				]
+				],
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -1182,6 +1210,10 @@ class Multiscroll extends Widget_Base {
 	public function rendar_item_content($content) {
 		$settings = $this->get_settings_for_display();
 
+		if ($content['title'] && ! empty($content['title_link']['url'])) {
+			$this->add_link_attributes('title-link', $content['title_link'], true);
+		}
+
 		?>
 		<div class="bdt-mltiscroll-slider-content bdt-position-center">
 			<div class="bdt-position-relative">
@@ -1192,15 +1224,15 @@ class Multiscroll extends Widget_Base {
 				<?php endif; ?>
 
 				<?php if ($content['title'] && ('yes' == $settings['show_title'])) : ?>
-					<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-mltiscroll-slider-title">
+					<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-mltiscroll-slider-title">
 						<?php if ('' !== $content['title_link']['url']) : ?>
-							<a href="<?php echo esc_url($content['title_link']['url']); ?>">
+							<a <?php $this->print_render_attribute_string('title-link'); ?>>
 							<?php endif; ?>
 							<?php echo wp_kses_post($content['title']); ?>
 							<?php if ('' !== $content['title_link']['url']) : ?>
 							</a>
 						<?php endif; ?>
-					</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+					</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 				<?php endif; ?>
 
 				<?php if ($content['description'] && ('yes' == $settings['show_description'])) : ?>
@@ -1214,11 +1246,39 @@ class Multiscroll extends Widget_Base {
 
 		<?php
 	}
+	public function render_button($slide) {
+		$settings = $this->get_settings_for_display();
+
+		if ('' == $settings['show_button']) {
+			return;
+		}
+
+		if ($slide['slide_button']) {
+			$this->add_link_attributes('button_link', $slide['button_link'], true);
+		}
+		
+
+		$this->add_render_attribute('button-position', 'class', 'bdt-mltiscroll-slider-button bdt-btn-position-' . $settings['button_position']);
+
+		?>
+		<?php if ($slide['slide_button'] && ('yes' == $settings['show_button']) && (! empty($slide['button_link']['url']))) : ?>
+			<div <?php $this->print_render_attribute_string('button-position'); ?>>
+				<?php if ('' !== $slide['button_link']['url']) : ?>
+					<a <?php $this->print_render_attribute_string('button_link') ?>>
+					<?php endif; ?>
+					<?php echo esc_html($slide['slide_button']); ?>
+					<?php if ('' !== $slide['button_link']['url']) : ?>
+					</a>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
+		<?php
+	}
 
 	public function render_content_center() {
 		$settings = $this->get_settings_for_display();
 
-		$this->add_render_attribute('button-position', 'class', 'bdt-mltiscroll-slider-button bdt-btn-position-' . $settings['button_position']);
+		
 
 		?>
 		<div class="bdt-content-center">
@@ -1241,7 +1301,7 @@ class Multiscroll extends Widget_Base {
 
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($left_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($left_bg); ?>">
 						<div class="intro">
 							<?php $this->rendar_item_content($slide); ?>
 							<?php if ($slide['slide_image']['url']) : ?>
@@ -1249,17 +1309,7 @@ class Multiscroll extends Widget_Base {
 							<?php endif; ?>
 						</div>
 						<?php if ($settings['button_position'] == 'left') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 					</div>
 
@@ -1287,7 +1337,7 @@ class Multiscroll extends Widget_Base {
 
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($right_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($right_bg); ?>">
 						<div class="intro">
 							<?php $this->rendar_item_content($slide); ?>
 							<?php if ($slide['slide_image']['url']) : ?>
@@ -1296,17 +1346,7 @@ class Multiscroll extends Widget_Base {
 						</div>
 
 						<?php if ($settings['button_position'] == 'right') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 
 					</div>
@@ -1324,7 +1364,7 @@ class Multiscroll extends Widget_Base {
 	public function render_content_text_left() {
 		$settings = $this->get_settings_for_display();
 
-		$this->add_render_attribute('button-position', 'class', 'bdt-mltiscroll-slider-button bdt-btn-position-' . $settings['button_position']);
+		
 
 		?>
 		<div class="bdt-content-text-left">
@@ -1347,22 +1387,12 @@ class Multiscroll extends Widget_Base {
 					}
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($left_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($left_bg); ?>">
 						<div class="intro">
 							<?php $this->rendar_item_content($slide); ?>
 						</div>
 						<?php if ($settings['button_position'] == 'left') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 					</div>
 
@@ -1389,23 +1419,13 @@ class Multiscroll extends Widget_Base {
 					}
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($right_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($right_bg); ?>">
 
 						<?php if ($slide['slide_image']['url']) : ?>
 							<?php $this->rendar_item_image($slide); ?>
 						<?php endif; ?>
 						<?php if ($settings['button_position'] == 'right') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 					</div>
 
@@ -1419,7 +1439,7 @@ class Multiscroll extends Widget_Base {
 	public function render_content_text_right() {
 		$settings = $this->get_settings_for_display();
 
-		$this->add_render_attribute('button-position', 'class', 'bdt-mltiscroll-slider-button bdt-btn-position-' . $settings['button_position']);
+		
 
 		?>
 		<div class="bdt-content-text-right">
@@ -1441,22 +1461,12 @@ class Multiscroll extends Widget_Base {
 					}
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($left_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_left'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($left_bg); ?>">
 						<?php if ($slide['slide_image']['url']) : ?>
 							<?php $this->rendar_item_image($slide); ?>
 						<?php endif; ?>
 						<?php if ($settings['button_position'] == 'left') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 					</div>
 
@@ -1483,22 +1493,12 @@ class Multiscroll extends Widget_Base {
 					}
 					?>
 
-					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo $slide['title']; ?>" style="<?php echo esc_attr($right_bg); ?>">
+					<div <?php $this->print_render_attribute_string('ms_section_right'); ?> data-label="<?php echo esc_html($slide['title']); ?>" style="<?php echo esc_attr($right_bg); ?>">
 						<div class="intro">
 							<?php $this->rendar_item_content($slide); ?>
 						</div>
 						<?php if ($settings['button_position'] == 'right') : ?>
-							<?php if ($slide['slide_button'] && ('yes' == $settings['show_button'])) : ?>
-								<div <?php $this->print_render_attribute_string('button-position'); ?>>
-									<?php if ('' !== $slide['button_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['button_link']['url']); ?>">
-										<?php endif; ?>
-										<?php echo wp_kses_post($slide['slide_button']); ?>
-										<?php if ('' !== $slide['button_link']['url']) : ?>
-										</a>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<?php $this->render_button($slide); ?>
 						<?php endif; ?>
 					</div>
 

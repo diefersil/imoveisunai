@@ -1,10 +1,10 @@
-=== Loco Translate ===
+	=== Loco Translate ===
 Contributors: timwhitlock
-Tags: translation, translators, localization, localisation, l10n, i18n, Gettext, PO, MO, productivity, multilingual, internationalization
+Tags: translation, language, multilingual, l10n, i18n
 Requires at least: 5.2
 Requires PHP: 5.6.20
-Tested up to: 6.3.1
-Stable tag: 2.6.6
+Tested up to: 6.7
+Stable tag: 2.6.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,58 @@ We don't collect your data or snoop on you. See the [plugin privacy notice](http
 
 
 == Changelog ==
+
+= 2.6.14 =
+* Critical fix: A relative path passed to `load_textdomain` no longer throws exception.
+
+= 2.6.13 =
+* Fix for direct calls to load_textdomain with custom paths
+* This resolves a regression in 2.6.12
+
+= 2.6.12 =
+* Major fix to custom load_textdomain loader. Works when original file is absent
+* Fixed bug in template comparison when JSON files need to be merged
+* CSS fixes including reinstating of unsaved "star" icon
+* Domain listener fixed for JIT loading
+* Bumped WordPress compatibility to 6.7
+
+= 2.6.11 =
+* Removed accidental console trace
+* Bumped WordPress compatibility to 6.6.0
+* Added lang_dir_for_domain fix to handle system file absence
+
+= 2.6.10 =
+* Added loco_api_provider_{id} filter
+* JSON compiler observes configured .js aliases
+* Fixed a missing security check - thanks Nosa Shandy
+* Added .blade.php tokenizer hack
+* Bumped WordPress compatibility to 6.5.4
+
+= 2.6.9 =
+* Rolled back load helper changes
+* Moved debug messages to action hooks
+* String debugger improvements
+
+= 2.6.8 =
+* Added string debugger
+* Added Zip download button instead of MO
+* Added debug messages about premature domain loading
+* Added warning when system translations not installed
+* Compiler avoids writing empty JSON translation files
+* UI promotes PO copy over msginit/xgettext routes
+* Populating msginit fields when copying a PO
+* Bumped WordPress compatibility to 6.5.3
+
+= 2.6.7 =
+* WordPress 6.5.0 compatible
+* Support for performant translation files in PHP format
+* Added block.json and theme.json extraction
+* Added theme pattern files to php string extractor
+* Fixed a bug where unused plural forms were counted as untranslated
+* Replaced CSS .notice with .panel to mitigate nag-blocker problems
+* Removed bundle debug screen (deprecated since 2.6.5)
+* Workaround for absent "source" references in JED files
+* Extension polyfills now restricted to Loco admin screens.
 
 = 2.6.6 =
 * Replaced open_basedir check with error capturing
@@ -499,7 +551,7 @@ We don't collect your data or snoop on you. See the [plugin privacy notice](http
 
 == Upgrade Notice ==
 
-= 2.6.6 =
+= 2.6.14 =
 * Various improvements and bug fixes
 
 

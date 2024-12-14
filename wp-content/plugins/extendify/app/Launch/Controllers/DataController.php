@@ -5,11 +5,9 @@
 
 namespace Extendify\Launch\Controllers;
 
-use Extendify\Http;
+defined('ABSPATH') || die('No direct access.');
 
-if (!defined('ABSPATH')) {
-    die('No direct access.');
-}
+use Extendify\Http;
 
 /**
  * The controller for handling general data
@@ -19,29 +17,19 @@ class DataController
     /**
      * Get Goals information.
      *
-     * @return \WP_REST_Response
-     */
-    public static function getGoals()
-    {
-        $response = Http::get('/goals');
-        return new \WP_REST_Response(
-            $response,
-            wp_remote_retrieve_response_code($response)
-        );
-    }
-
-    /**
-     * Get Goals information.
+     * @param \WP_REST_Request $request - The wp rest request.
      *
      * @return \WP_REST_Response
      */
-    public static function getSuggestedPlugins()
+    public static function getGoals($request)
     {
-        $response = Http::get('/suggested-plugins');
-        return new \WP_REST_Response(
-            $response,
-            wp_remote_retrieve_response_code($response)
-        );
+        $response = Http::get('/goals?site_type=' . $request->get_param('site_type'));
+
+        if (is_wp_error($response)) {
+            return new \WP_REST_Response([], 500);
+        }
+
+        return new \WP_REST_Response($response);
     }
 
     /**

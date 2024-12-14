@@ -29,31 +29,6 @@ class Core extends \Realtyna\Sync\Core\Theme
     static public $url = 'https://wpresidence.net/';
 
     /**
-     * Get Theme Name
-     * 
-     * @author Chris A <chris.a@realtyna.net>
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return self::$name;
-    }
-
-    /**
-     * Get Theme URL
-     * 
-     * @author Chris A <chris.a@realtyna.net>
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        return self::$url;
-    }
-
-
-    /**
      * Get new object of Agency
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -90,29 +65,6 @@ class Core extends \Realtyna\Sync\Core\Theme
     }
 
     /**
-     * Get Mapper Object
-     *
-     * @author Chris A <chris.a@realtyna.net>
-     * 
-     * @param string|null default Null
-     * @param string|null default Null
-     * @param array|null default Null
-     * @param array|null default Null
-     * 
-     * @return Mapper
-     */
-    public function mapper( $token = null , $provider = null , $addationMapping = null , $propertyImportOptions = null )
-    {
-
-        if ( Mapper::class ){
-
-            return new Mapper( $token , $provider , $addationMapping , $propertyImportOptions );
-
-        }
-
-    }
-
-    /**
      * Get Property Object
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -134,6 +86,53 @@ class Core extends \Realtyna\Sync\Core\Theme
 
     }
 
+    /**
+     * Purge Listings cron job
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return void
+     */
+    public function purgeListings()
+    {
+		
+        if ( Property::class ){
+
+            $wpresidenceProperty = new Property();
+			 
+			if ( \method_exists(  $wpresidenceProperty , 'purgeListings' ) ){
+				
+				$wpresidenceProperty->purgeListings();
+			 
+			}
+
+        }
+
+    }
+
+    /**
+     * Purge Attachments cron job
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return void
+     */
+    public function purgeAttachments()
+    {
+		
+        if ( Property::class ){
+
+            $wpresidenceProperty = new Property();
+			 
+			if ( \method_exists(  $wpresidenceProperty , 'purgeAttachments' ) ){
+				
+				$wpresidenceProperty->purgeAttachments();
+			 
+			}
+
+        }
+
+    }
 
     /**
      * Remove Imported Properties
@@ -184,7 +183,7 @@ class Core extends \Realtyna\Sync\Core\Theme
      * 
      * @return bool
      */
-    public function update_properties_agency( $agency )
+    public function updatePropertiesAgency( $agency )
     {
 
         return $this->updatePropertiesMeta( "fave_property_agency" , $agency );
@@ -200,7 +199,7 @@ class Core extends \Realtyna\Sync\Core\Theme
      * 
      * @return bool
      */
-    public function update_properties_agents( $agent )
+    public function updatePropertiesAgents( $agent )
     {
 
         return $this->updatePropertiesMeta( "fave_agents" , $agent );

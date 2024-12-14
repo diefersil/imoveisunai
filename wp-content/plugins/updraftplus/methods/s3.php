@@ -134,7 +134,7 @@ class UpdraftPlus_BackupModule_s3 extends UpdraftPlus_BackupModule {
 		if (is_string($secret)) $secret = trim($secret);
 
 		// Ignore the 'nossl' setting if the endpoint is DigitalOcean Spaces (https://developers.digitalocean.com/documentation/v2/)
-		if (is_string($endpoint) && preg_match('^/[\.^]digitaloceanspaces\.com$/', $endpoint)) {
+		if (is_string($endpoint) && preg_match('/\.digitaloceanspaces\.com$/i', $endpoint)) {
 			$nossl = apply_filters('updraftplus_gets3_nossl', false, $endpoint, $nossl);
 		}
 		
@@ -913,9 +913,9 @@ Check your permissions and credentials.','updraftplus'), 'error');
 	protected function get_pre_configuration_template_engine($key, $whoweare_short, $whoweare_long, $console_descrip, $console_url, $opening_html = '') {
 		$classes = $this->get_css_classes(false);
 		?>
-		<tr class="<?php echo $classes . ' ' . $whoweare_short . '_pre_config_container';?>">
+		<tr class="<?php echo esc_attr($classes . ' ' . $whoweare_short . '_pre_config_container');?>">
 			<td colspan="2">
-				<?php echo $opening_html.'<br>'; ?>
+				<?php echo wp_kses_post($opening_html).'<br>'; ?>
 				<?php
 
 					global $updraftplus_admin;
@@ -1077,7 +1077,7 @@ Check your permissions and credentials.','updraftplus'), 'error');
 		$properties = array(
 			'storage_image_url' => UPDRAFTPLUS_URL .'/images/aws_logo.png',
 			'console_url' => wp_kses(sprintf(__('Get your access key and secret key from your <a href="%s">%s console</a>, then pick a (globally unique - all %s users) bucket name (letters and numbers) (and optionally a path) to use for storage.', 'updraftplus'), 'https://aws.amazon.com/console/', 'AWS', $updraftplus->backup_methods[$this->get_id()]).' '.__('This bucket will be created for you if it does not already exist.', 'updraftplus'), $this->allowed_html_for_content_sanitisation()),
-			'xmlwriter_existence_label' => !apply_filters('updraftplus_s3_xmlwriter_exists', 'UpdraftPlus_S3_Compat' != $this->indicate_s3_class() || !class_exists('XMLWriter')) ? wp_kses($updraftplus_admin->show_double_warning('<strong>'.__('Warning', 'updraftplus').':</strong> '.sprintf(__("Your web server's PHP installation does not include a required module (%s).", 'updraftplus'), 'XMLWriter').' '.__("Please contact your web hosting provider's support and ask for them to enable it.", 'updraftplus'), $this->get_id(), false), $this->allowed_html_for_content_sanitisation()) : '',
+			'xmlwriter_existence_label' => !apply_filters('updraftplus_s3_xmlwriter_exists', 'UpdraftPlus_S3_Compat' != $this->indicate_s3_class() || class_exists('XMLWriter')) ? wp_kses($updraftplus_admin->show_double_warning('<strong>'.__('Warning', 'updraftplus').':</strong> '.sprintf(__("Your web server's PHP installation does not include a required module (%s).", 'updraftplus'), 'XMLWriter').' '.__("Please contact your web hosting provider's support and ask for them to enable it.", 'updraftplus'), $this->get_id(), false), $this->allowed_html_for_content_sanitisation()) : '',
 			'simplexmlelement_existence_label' => !apply_filters('updraftplus_s3_simplexmlelement_exists', class_exists('SimpleXMLElement')) ? wp_kses($updraftplus_admin->show_double_warning('<strong>'.__('Warning', 'updraftplus').':</strong> '.sprintf(__("Your web server's PHP installation does not include a required module (%s).", 'updraftplus'), 'SimpleXMLElement').' '.__("Please contact your web hosting provider's support.", 'updraftplus').' '.sprintf(__("UpdraftPlus's %s module <strong>requires</strong> %s.", 'updraftplus'), $updraftplus->backup_methods[$this->get_id()], 'SimpleXMLElement').' '.__('Please do not file any support requests; there is no alternative.', 'updraftplus'), $this->get_id(), false), $this->allowed_html_for_content_sanitisation()) : '',
 			'curl_existence_label' => wp_kses($updraftplus_admin->curl_check($updraftplus->backup_methods[$this->get_id()], true, $this->get_id().' hide-in-udc', false), $this->allowed_html_for_content_sanitisation()),
 			'ssl_certificates_errors_link_text' => wp_kses('<a href="'.apply_filters("updraftplus_com_link", "https://updraftplus.com/faqs/i-get-ssl-certificate-errors-when-backing-up-andor-restoring/").'" target="_blank">'.__('If you see errors about SSL certificates, then please go here for help.', 'updraftplus').'</a>', $this->allowed_html_for_content_sanitisation()),
@@ -1174,7 +1174,7 @@ Check your permissions and credentials.','updraftplus'), 'error');
 		$ssl_ca = false;
 		$nossl = $this->got_with['nossl'];
 		// Ignore the 'nossl' setting if the endpoint is DigitalOcean Spaces (https://developers.digitalocean.com/documentation/v2/)
-		if (!empty($config['endpoint']) && preg_match('/[\.^]digitaloceanspaces\.com$/', $config['endpoint'])) {
+		if (!empty($config['endpoint']) && preg_match('/\.digitaloceanspaces\.com$/i', $config['endpoint'])) {
 			$nossl = apply_filters('updraftplus_gets3_nossl', false, $config['endpoint'], $this->got_with['nossl']);
 		}
 
@@ -1377,7 +1377,7 @@ Check your permissions and credentials.','updraftplus'), 'error');
 		$useservercerts = isset($posted_settings['useservercerts']) ? absint($posted_settings['useservercerts']) : 0;
 		$disableverify = isset($posted_settings['disableverify']) ? absint($posted_settings['disableverify']) : 0;
 		$nossl = isset($posted_settings['nossl']) ? absint($posted_settings['nossl']) : 0;
-		$endpoint = isset($posted_settings['endpoint']) ? $posted_settings['endpoint'] : '';
+		$endpoint = isset($posted_settings['endpoint']) ? trim($posted_settings['endpoint']) : '';
 		$sse = empty($posted_settings['server_side_encryption']) ? false : true;
 
 		if (preg_match("#^/*([^/]+)/(.*)$#", $path, $bmatches)) {

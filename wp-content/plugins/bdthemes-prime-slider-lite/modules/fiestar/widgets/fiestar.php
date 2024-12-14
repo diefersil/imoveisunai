@@ -69,7 +69,11 @@ class Fiestar extends Widget_Base {
         return 'https://youtu.be/8neRnv80lMU';
     }
 
-    protected function register_controls() {
+    protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	protected function register_controls() {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
         $this->start_controls_section(
             'section_content_layout',
@@ -94,6 +98,7 @@ class Fiestar extends Widget_Base {
                     5 => '5',
                     6 => '6',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -151,6 +156,7 @@ class Fiestar extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .bdt-fiestar-slider' => 'padding: {{SIZE}}{{UNIT}} 0;',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -201,13 +207,14 @@ class Fiestar extends Widget_Base {
         $this->add_control(
             'title_tags',
             [
-                'label'     => __('Title HTML Tag', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
+                'label'     => esc_html__('Title HTML Tag', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
                 'type'      => Controls_Manager::SELECT,
                 'options'   => prime_slider_title_tags(),
                 'default'   => 'h3',
                 'condition' => [
                     'show_title' => 'yes',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -224,16 +231,17 @@ class Fiestar extends Widget_Base {
         $this->add_control(
             'wrapper_link',
             [
-                'label'   => esc_html__('Item Wrapper Link', 'bdthemes-prime-slider') . BDTPS_CORE_NC . BDTPS_CORE_PC,
+                'label'   => esc_html__('Item Wrapper Link', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
                 'type'    => Controls_Manager::SWITCHER,
-                'separator' => 'before'
+                'separator' => 'before',
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
         $this->add_control(
 			'show_navigation_arrows',
 			[
-				'label'   => esc_html__('Show Arrows', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+				'label'   => esc_html__('Show Arrows', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'separator' => 'before'
@@ -434,7 +442,7 @@ class Fiestar extends Widget_Base {
             Group_Control_Text_Stroke::get_type(),
             [
                 'name' => 'title_text_stroke',
-                'label' => __('Text Stroke', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'label' => __('Text Stroke', 'bdthemes-prime-slider'),
                 'selector' => '{{WRAPPER}} .bdt-fiestar-slider .bdt-title a',
             ]
         );
@@ -626,34 +634,34 @@ class Fiestar extends Widget_Base {
         $this->add_control(
 			'nav_arrows_icon',
 			[
-				'label'   => esc_html__( 'Arrows Icon', 'bdthemes-element-pack' ) . BDTPS_CORE_NC,
+				'label'   => esc_html__( 'Arrows Icon', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SELECT,
 				'default' => '8',
 				'options' => [
-					'0' => esc_html__('Default', 'bdthemes-element-pack'),
-					'1' => esc_html__('Style 1', 'bdthemes-element-pack'),
-					'2' => esc_html__('Style 2', 'bdthemes-element-pack'),
-					'3' => esc_html__('Style 3', 'bdthemes-element-pack'),
-					'4' => esc_html__('Style 4', 'bdthemes-element-pack'),
-					'5' => esc_html__('Style 5', 'bdthemes-element-pack'),
-					'6' => esc_html__('Style 6', 'bdthemes-element-pack'),
-					'7' => esc_html__('Style 7', 'bdthemes-element-pack'),
-					'8' => esc_html__('Style 8', 'bdthemes-element-pack'),
-					'9' => esc_html__('Style 9', 'bdthemes-element-pack'),
-					'10' => esc_html__('Style 10', 'bdthemes-element-pack'),
-					'11' => esc_html__('Style 11', 'bdthemes-element-pack'),
-					'12' => esc_html__('Style 12', 'bdthemes-element-pack'),
-					'13' => esc_html__('Style 13', 'bdthemes-element-pack'),
-					'14' => esc_html__('Style 14', 'bdthemes-element-pack'),
-					'15' => esc_html__('Style 15', 'bdthemes-element-pack'),
-					'16' => esc_html__('Style 16', 'bdthemes-element-pack'),
-					'17' => esc_html__('Style 17', 'bdthemes-element-pack'),
-					'18' => esc_html__('Style 18', 'bdthemes-element-pack'),
-					'circle-1' => esc_html__('Style 19', 'bdthemes-element-pack'),
-					'circle-2' => esc_html__('Style 20', 'bdthemes-element-pack'),
-					'circle-3' => esc_html__('Style 21', 'bdthemes-element-pack'),
-					'circle-4' => esc_html__('Style 22', 'bdthemes-element-pack'),
-					'square-1' => esc_html__('Style 23', 'bdthemes-element-pack'),
+					'0' => esc_html__('Default', 'bdthemes-prime-slider'),
+					'1' => esc_html__('Style 1', 'bdthemes-prime-slider'),
+					'2' => esc_html__('Style 2', 'bdthemes-prime-slider'),
+					'3' => esc_html__('Style 3', 'bdthemes-prime-slider'),
+					'4' => esc_html__('Style 4', 'bdthemes-prime-slider'),
+					'5' => esc_html__('Style 5', 'bdthemes-prime-slider'),
+					'6' => esc_html__('Style 6', 'bdthemes-prime-slider'),
+					'7' => esc_html__('Style 7', 'bdthemes-prime-slider'),
+					'8' => esc_html__('Style 8', 'bdthemes-prime-slider'),
+					'9' => esc_html__('Style 9', 'bdthemes-prime-slider'),
+					'10' => esc_html__('Style 10', 'bdthemes-prime-slider'),
+					'11' => esc_html__('Style 11', 'bdthemes-prime-slider'),
+					'12' => esc_html__('Style 12', 'bdthemes-prime-slider'),
+					'13' => esc_html__('Style 13', 'bdthemes-prime-slider'),
+					'14' => esc_html__('Style 14', 'bdthemes-prime-slider'),
+					'15' => esc_html__('Style 15', 'bdthemes-prime-slider'),
+					'16' => esc_html__('Style 16', 'bdthemes-prime-slider'),
+					'17' => esc_html__('Style 17', 'bdthemes-prime-slider'),
+					'18' => esc_html__('Style 18', 'bdthemes-prime-slider'),
+					'circle-1' => esc_html__('Style 19', 'bdthemes-prime-slider'),
+					'circle-2' => esc_html__('Style 20', 'bdthemes-prime-slider'),
+					'circle-3' => esc_html__('Style 21', 'bdthemes-prime-slider'),
+					'circle-4' => esc_html__('Style 22', 'bdthemes-prime-slider'),
+					'square-1' => esc_html__('Style 23', 'bdthemes-prime-slider'),
 				],
 			]
 		);
@@ -728,6 +736,7 @@ class Fiestar extends Widget_Base {
                     '{{WRAPPER}} .bdt-fiestar-slider .bdt-navigation-wrap .bdt-navigation-next' => 'right: {{SIZE}}%;',
                     '{{WRAPPER}} .bdt-fiestar-slider .bdt-navigation-wrap .bdt-navigation-prev' => 'left: {{SIZE}}%;',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -830,7 +839,7 @@ class Fiestar extends Widget_Base {
         $image_src = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), $size);
 
         if (!$image_src) {
-            printf('<img src="%1$s" alt="%2$s" class="bdt-img swiper-lazy">', $placeholder_image_src, esc_html(get_the_title()));
+            printf('<img src="%1$s" alt="%2$s" class="bdt-img swiper-lazy">', esc_url($placeholder_image_src), esc_html(get_the_title()));
         } else {
             print(wp_get_attachment_image(
                 get_post_thumbnail_id(),
@@ -847,29 +856,34 @@ class Fiestar extends Widget_Base {
     public function render_title() {
         $settings = $this->get_settings_for_display();
 
-        if (!$this->get_settings('show_title')) {
+        if ( ! $this->get_settings_for_display('show_title') ) {
             return;
         }
 
-        $this->add_render_attribute('slider-title', 'class', 'bdt-title', true);
-        $this->add_render_attribute('slider-title', 'data-reveal', 'reveal-active', true);
-        $titleClass = $this->get_render_attribute_string('slider-title');
-        echo
-        '<' . esc_html($settings['title_tags']) . ' ' . $titleClass . ' >
-                    <a href="' . esc_url(get_permalink()) . '" title="' . esc_attr(get_the_title()) . '">
-                        ' . esc_html(get_the_title())  . '
-                    </a>
-                </' . esc_html($settings['title_tags']) . '>';
+        printf(
+            '<%1$s class="bdt-title" data-reveal="reveal-active">
+                <a href="%2$s" title="%3$s">
+                    %4$s
+                </a>
+            </%1$s>',
+            esc_attr(Utils::get_valid_html_tag($settings['title_tags'])),
+            esc_url(get_permalink()),
+            esc_html(get_the_title()),
+            esc_html(get_the_title())
+        );
+        
     }
 
     public function render_category() {
         if (!$this->get_settings('show_category')) {
             return;
         }
+        
+        $post_id = get_the_ID();
 
         ?>
         <div class="bdt-category" data-reveal="reveal-active">
-            <?php echo get_the_category_list(' '); ?>
+        <?php echo $this->ps_get_taxonomy_list( $post_id, $this->ps_taxonomy_switcher() ); ?>
         </div>
         <?php
     }
@@ -974,7 +988,7 @@ class Fiestar extends Widget_Base {
         $this->add_render_attribute('slider-item', 'class', 'bdt-item swiper-slide', true);
 
         ?>
-        <div <?php echo $this->get_render_attribute_string('slider-item'); ?>>
+        <div <?php $this->print_render_attribute_string('slider-item'); ?>>
             <div class="bdt-img-wrap">
                 <?php $this->render_image($post_id, $image_size); ?>
             </div>

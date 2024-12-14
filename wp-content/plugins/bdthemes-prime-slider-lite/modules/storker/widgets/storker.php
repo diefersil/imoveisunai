@@ -70,7 +70,11 @@ class Storker extends Widget_Base {
         return 'https://youtu.be/Lsg15pGppb0';
     }
 
-    protected function register_controls() {
+    protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	protected function register_controls() {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
         $this->start_controls_section(
             'section_content_layout',
@@ -115,6 +119,7 @@ class Storker extends Widget_Base {
                 'selectors'   => [
                     '{{WRAPPER}} .bdt-prime-slider-storker .bdt-storker-content' => 'max-width: {{SIZE}}{{UNIT}};',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -148,9 +153,6 @@ class Storker extends Widget_Base {
          */
         $this->register_primary_thumbnail_controls();
 
-        //Global background settings Controls
-        $this->register_background_settings('.bdt-prime-slider-storker .bdt-image-wrap .bdt-storker-img');
-
         $this->end_controls_section();
 
         //New Query Builder Settings
@@ -177,7 +179,7 @@ class Storker extends Widget_Base {
         $this->start_controls_section(
             'section_additional_settings',
             [
-                'label' => esc_html__('Additional Settings', 'bdthemes-prime-slider'),
+                'label' => esc_html__('Additional Options', 'bdthemes-prime-slider'),
             ]
         );
 
@@ -250,7 +252,7 @@ class Storker extends Widget_Base {
         $this->add_control(
 			'rewind',
 			[
-				'label'   => __( 'Rewind', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC,
+				'label'   => __( 'Rewind', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'condition' => [
@@ -262,7 +264,7 @@ class Storker extends Widget_Base {
 		$this->add_control(
 			'mousewheel',
 			[
-				'label'   => __( 'Mousewheel', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC,
+				'label'   => __( 'Mousewheel', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SWITCHER,
 			]
 		);
@@ -278,7 +280,7 @@ class Storker extends Widget_Base {
 		$this->add_control(
 			'swiper_effect',
 			[
-				'label'   => esc_html__( 'Swiper Effect', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC,
+				'label'   => esc_html__( 'Swiper Effect', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'fade',
 				'options' => [
@@ -293,6 +295,7 @@ class Storker extends Widget_Base {
 					'gl'    => esc_html__( 'GL', 'bdthemes-prime-slider' ),
 					'creative' => esc_html__( 'Creative', 'bdthemes-prime-slider' ),
 				],
+                'classes' => BDTPS_CORE_IS_PC
 			]
 		);
 		//gl_shader control
@@ -381,7 +384,7 @@ class Storker extends Widget_Base {
                 'exclude'        => ['image'],
                 'fields_options' => [
                     'background' => [
-                        'label'   => esc_html__('Overlay', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                        'label'   => esc_html__('Overlay', 'bdthemes-prime-slider'),
                         'default' => 'classic',
                     ],
                     'color' => [
@@ -490,7 +493,7 @@ class Storker extends Widget_Base {
             Group_Control_Text_Stroke::get_type(),
             [
                 'name' => 'title_text_stroke',
-                'label' => __('Text Stroke', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'label' => __('Text Stroke', 'bdthemes-prime-slider'),
                 'selector' => '{{WRAPPER}} .bdt-prime-slider-storker .bdt-title',
             ]
         );
@@ -973,7 +976,8 @@ class Storker extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .bdt-storker-thumbs' => 'height: {{SIZE}}%;',
                 ],
-                'render_type' => 'template'
+                'render_type' => 'template',
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -1449,6 +1453,7 @@ class Storker extends Widget_Base {
             [
                 'label'     => __('Advanced Size', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
                 'type'      => Controls_Manager::SWITCHER,
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -1684,14 +1689,14 @@ class Storker extends Widget_Base {
 		// $slicer = $settings['swiper_effect'] == 'slicer' ? ' swiper-slicer-image' : '';
 
         if (!$image_src) {
-            printf('<img src="%1$s" alt="%2$s" class="bdt-storker-img %3$s">', $placeholder_image_src, esc_html(get_the_title()), $gl . $shutters);
+            printf('<img src="%1$s" alt="%2$s" class="bdt-storker-img %3$s">', esc_url($placeholder_image_src), esc_html(get_the_title()), esc_attr($gl.$shutters));
         } else {
             print(wp_get_attachment_image(
                 get_post_thumbnail_id(),
                 $size,
                 false,
                 [
-                    'class' => 'bdt-storker-img' . $gl . $shutters,
+                    'class' => 'bdt-storker-img' . esc_attr($gl.$shutters),
                     'alt' => esc_html(get_the_title())
                 ]
             ));
@@ -1710,7 +1715,7 @@ class Storker extends Widget_Base {
             if (has_excerpt()) {
                 the_excerpt();
             } else {
-                echo prime_slider_custom_excerpt($excerpt_length, $strip_shortcode);
+                echo wp_kses_post(prime_slider_custom_excerpt($excerpt_length, $strip_shortcode));
             }
             ?>
         </div>
@@ -1722,9 +1727,11 @@ class Storker extends Widget_Base {
             return;
         }
 
+        $post_id = get_the_ID();
+
         ?>
         <div class="bdt-storker-category" data-reveal="reveal-active" data-swiper-parallax-y="-120" data-swiper-parallax-duration="400">
-            <?php echo get_the_category_list(' '); ?>
+        <?php echo $this->ps_get_taxonomy_list( $post_id, $this->ps_taxonomy_switcher() ); ?>
         </div>
         <?php
     }
@@ -1840,8 +1847,7 @@ class Storker extends Widget_Base {
             ]
         );
 
-        $swiper_class = Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-		$this->add_render_attribute('swiper', 'class', 'swiper-storker ' . $swiper_class);
+		$this->add_render_attribute('swiper', 'class', 'swiper-storker swiper');
 
         ?>
         <div <?php $this->print_render_attribute_string('prime-slider'); ?>>
@@ -1912,7 +1918,7 @@ class Storker extends Widget_Base {
                     <div data-swiper-parallax-y="-65" data-swiper-parallax-duration="650">
                         <div class="bdt-storker-meta" data-reveal="reveal-active">
                             <?php $this->render_author(); ?>
-                            <span class="bdt-ps-separator"><?php echo $settings['meta_separator']; ?></span>
+                            <span class="bdt-ps-separator"><?php echo esc_html($settings['meta_separator']); ?></span>
                             <?php $this->render_date(); ?>
                         </div>
                     </div>
@@ -1933,8 +1939,7 @@ class Storker extends Widget_Base {
             return;
         }
 
-        $swiper_class = Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-        $this->add_render_attribute('swiper-thumbs', 'class', 'bdt-storker-thumbs reveal-muted ' . $swiper_class);
+        $this->add_render_attribute('swiper-thumbs', 'class', 'bdt-storker-thumbs reveal-muted swiper');
 
         ?>
         

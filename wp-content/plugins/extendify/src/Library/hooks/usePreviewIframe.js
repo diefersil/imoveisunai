@@ -86,6 +86,7 @@ export const usePreviewIframe = ({
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
 		for (const el of coverBlocks) {
+			if (!frame.contentDocument?.defaultView) return;
 			// Get the computed height in px and use it for your calculation
 			const computedHeight = parseFloat(
 				frame.contentDocument.defaultView.getComputedStyle(el).height,
@@ -135,7 +136,7 @@ export const usePreviewIframe = ({
 			m.disconnect();
 
 			await updateCoverBlocks(iFrame, container);
-			if (window.extLibraryData.themeSlug !== 'extendable') {
+			if (window.extSharedData.themeSlug !== 'extendable') {
 				await addMissingThemeVars(iFrame, container);
 			}
 			// Reconnect observer after making changes

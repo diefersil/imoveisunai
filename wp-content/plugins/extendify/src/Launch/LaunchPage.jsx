@@ -1,15 +1,17 @@
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
+import { safeParseJson } from '@shared/lib/parsing';
 import { SWRConfig, useSWRConfig } from 'swr';
+import { updateOption } from '@launch/api/WPApi';
+import { RestartLaunchModal } from '@launch/components/RestartLaunchModal';
 import { RetryNotice } from '@launch/components/RetryNotice';
+import { useTelemetry } from '@launch/hooks/useTelemetry';
 import { CreatingSite } from '@launch/pages/CreatingSite';
+import { NeedsTheme } from '@launch/pages/NeedsTheme';
 import { useGlobalStore } from '@launch/state/Global';
 import { usePagesStore } from '@launch/state/Pages';
-import { updateOption } from './api/WPApi';
-import { useTelemetry } from './hooks/useTelemetry';
-import { NeedsTheme } from './pages/NeedsTheme';
-import { useUserSelectionStore } from './state/UserSelections';
+import { useUserSelectionStore } from '@launch/state/user-selections';
 
 export const LaunchPage = () => {
 	const { updateSettings } = useDispatch('core/block-editor');
@@ -39,12 +41,17 @@ export const LaunchPage = () => {
 		}
 		if (generating) return <CreatingSite />;
 		if (!CurrentPage) return null;
-		return <CurrentPage />;
+		return (
+			<>
+				<RestartLaunchModal setPage={setPage} />
+				<CurrentPage />
+			</>
+		);
 	};
 
 	useEffect(() => {
 		// Add editor styles to use for live previews
-		updateSettings(window.extOnbData.editorStyles);
+		updateSettings(safeParseJson(window.extOnbData.editorStyles));
 	}, [updateSettings]);
 
 	useEffect(() => {
@@ -67,9 +74,16 @@ export const LaunchPage = () => {
 	}, []);
 
 	useEffect(() => {
-		if (fetcher) {
-			const data = typeof fetchData === 'function' ? fetchData() : fetchData;
-			mutate(data, () => fetcher(data));
+		const fetchers = [].concat(fetcher);
+		const fetchDatas = [].concat(fetchData);
+		if (fetchers.length) {
+			fetchers.forEach((fetcher, i) => {
+				const data =
+					typeof fetchDatas?.[i] === 'function'
+						? fetchDatas[i]()
+						: fetchDatas?.[i];
+				mutate(data, (last) => last || fetcher(data), { revalidate: false });
+			});
 		}
 	}, [fetcher, mutate, fetchData]);
 
@@ -102,10 +116,10 @@ export const LaunchPage = () => {
 			}}>
 			<div
 				style={{ zIndex: 99999 + 1 }} // 1 more than the library
-				className="h-screen w-screen fixed inset-0 overflow-y-auto md:overflow-hidden bg-white">
+				className="fixed inset-0 h-screen w-screen overflow-y-auto bg-white md:overflow-hidden">
 				{page()}
 			</div>
-			{retrying && <RetryNotice />}
+			<RetryNotice show={retrying} />
 		</SWRConfig>
 	);
 };

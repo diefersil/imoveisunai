@@ -9,7 +9,7 @@ namespace Realtyna\Sync\Core;
  * 
  * @version 1.0
  */
-class ThemeFactory extends Theme
+class ThemeFactory
 {
     
     /**

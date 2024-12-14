@@ -102,7 +102,7 @@ $agencyPostType = $_REALTYNA['agency_post_type'] ?? '';
             </select>
         </p>
         <p class="realtyna_warning_text">
-            <b><?php _e("Note: changes of this option, whould be applied on new properties only." , REALTYNA_MLS_SYNC_SLUG );?></b>
+            <b><?php _e("Note: changes of this option, would be applied on new properties only." , REALTYNA_MLS_SYNC_SLUG );?></b>
         </p>
         <hr>
 

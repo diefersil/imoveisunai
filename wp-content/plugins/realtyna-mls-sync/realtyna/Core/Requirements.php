@@ -3,10 +3,10 @@ namespace Realtyna\Sync\Core;
 
 /**
  * Core Requirements
- * 
+ *
  * @abstract
  * @author Chris A <chris.a@realtyna.net>
- * 
+ *
  * @version 1.0
  */
 class Requirements
@@ -17,7 +17,7 @@ class Requirements
 
     /**
      * Class Constructor
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
      */
     public function __construct(){
@@ -109,7 +109,7 @@ class Requirements
      * Create New Requiremnt as an array item
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $slug
      * @param array $params
      * @param boolean $updateIfExists
@@ -124,9 +124,9 @@ class Requirements
                 return false;
 
             }
-            
+
 			$params['result'] = false;
-			
+
             return $this->requirements[ $slug ] =  $params ;
 
         }
@@ -152,7 +152,7 @@ class Requirements
      * Delete a Requirement item By Slug
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $slug
      * @return boolean
      */
@@ -174,7 +174,7 @@ class Requirements
      * Read a Requirement item by Slug
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $slug
      * @param array|null $index
      * @return bool|string|array
@@ -195,7 +195,7 @@ class Requirements
      * Check Requirement existance by Slug
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $slug
      * @param array|null $index
      * @return bool
@@ -212,11 +212,11 @@ class Requirements
 
     /**
      * Validate Params array for requirement item
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
      *
      * @param array $params
-     * 
+     *
      * @return void
      */
     private function validateParams( $params ){
@@ -225,9 +225,9 @@ class Requirements
 
         if ( is_array( $params ) && !empty( $params ) ) {
 
-            if (isset( $params['required_value'] ) && 
-                isset( $params['current_value'] ) && 
-                !empty( $params['label'] ) && 
+            if (isset( $params['required_value'] ) &&
+                isset( $params['current_value'] ) &&
+                !empty( $params['label'] ) &&
                 !empty( $params['operator'] ) &&
                 !empty( $params['callback'] )  ){
 
@@ -253,7 +253,7 @@ class Requirements
      * Get Requirements as array
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return array
      */
     public function getRequirements(){
@@ -266,14 +266,14 @@ class Requirements
      * Requirement value validator
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $requirementSlug
-     * 
+     *
      * @return bool
      */
     public function requirementValidator( $requirementSlug ){
 
-        $requirement = $this->requirements[ $requirementSlug ] ?? '';		
+        $requirement = $this->requirements[ $requirementSlug ] ?? '';
 
         if ( $this->validateParams( $requirement ) ){
 
@@ -283,7 +283,7 @@ class Requirements
 
             }
 
-            if ( $requirement['operator'] == '!=' ){				
+            if ( $requirement['operator'] == '!=' ){
 
                 return $requirement['current_value'] != $requirement['required_value'];
 
@@ -294,7 +294,8 @@ class Requirements
                 if ( $requirementSlug == 'max_execution_time' ){
 					return ( $requirement['current_value'] == 0 || $requirement['current_value'] == -1 || $requirement['current_value'] >= $requirement['required_value'] );
 				}else
-					return $requirement['current_value'] >= $requirement['required_value'];
+
+                    return $requirement['current_value'] >= $requirement['required_value'];
 
             }
 
@@ -314,41 +315,41 @@ class Requirements
      * Requirement Int value validator
      *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @param string $requirementSlug
-     * 
+     *
      * @return bool
      */
     public function requirementIntValidator( $requirementSlug ){
 
-        $requirement = $this->requirements[ $requirementSlug ] ?? '';		
+        $requirement = $this->requirements[ $requirementSlug ] ?? '';
 
         if ( $this->validateParams( $requirement ) ){
 
             if ( $requirement['operator'] == '==' ){
 
-                return $requirement['current_value'] == $requirement['required_value'];
+                return $this->convertToBytes($requirement['current_value']) == $this->convertToBytes($requirement['required_value']);
 
             }
 
-            if ( $requirement['operator'] == '!=' ){				
+            if ( $requirement['operator'] == '!=' ){
 
-                return $requirement['current_value'] != $requirement['required_value'];
+                return $this->convertToBytes($requirement['current_value']) != $this->convertToBytes($requirement['required_value']);
 
             }
 
             if ( $requirement['operator'] == '>=' ){
 
                 if ( $requirementSlug == 'memory_limit' ){
-					return ( intval( $requirement['current_value'] ) == 0 || intval( $requirement['current_value'] ) == -1 ||  intval( $requirement['current_value'] ) >= intval( $requirement['required_value'] ) );
+					return ( $this->convertToBytes($requirement['current_value']) == 0 || $this->convertToBytes( $requirement['current_value'] ) == -1 || $this->convertToBytes( $requirement['current_value'] ) >=$this->convertToBytes( $requirement['required_value'] ) );
 				}else
-					return intval( $requirement['current_value'] ) >= intval( $requirement['required_value'] );
+                    return $this->convertToBytes($requirement['current_value'] ) >= $this->convertToBytes( $requirement['required_value'] );
 
             }
 
             if ( $requirement['operator'] == '<=' ){
 
-                return intval( $requirement['current_value'] ) <= intval( $requirement['required_value'] );
+                return $this->convertToBytes( $requirement['current_value'] ) <= $this->convertToBytes( $requirement['required_value'] );
 
             }
 
@@ -358,10 +359,41 @@ class Requirements
 
     }
 
+    /**
+     * Converts a size value to bytes.
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param string $size The size value to convert. Example: '2G', '500M', '10K'.
+     *
+     * @return int The size value converted to bytes.
+     */
+    public function convertToBytes($size)
+    {
+        $unit = strtoupper(substr($size, -1));
+        $value = (int) substr($size, 0, -1);
+
+        switch ($unit) {
+            case 'G':
+                $value *= 1024 * 1024 * 1024;
+                break;
+            case 'M':
+                $value *= 1024 * 1024;
+                break;
+            case 'K':
+                $value *= 1024;
+                break;
+            default:
+                break;
+        }
+
+        return $value;
+    }
+
 
     /**
      * Check All Requirments
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
      *
      * @return bool
@@ -369,12 +401,12 @@ class Requirements
     public function check(){
 
         $invalidRequirement = 0;
-        
+
         foreach ( $this->requirements as $requirementKey => $requirementValue ){
 
             $callback = $requirementValue['callback'];
             $requirementValue['result'] = \call_user_func( array( $callback[0] , $callback[1] ) , $requirementKey );
-            
+
             $this->requirements [$requirementKey ] [ 'result' ] = $requirementValue['result'];
 
             if ( ! $requirementValue['result'] ){
@@ -392,9 +424,9 @@ class Requirements
 
     /**
      * Get PHP Version
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return float
      */
     public static function getPhpVersion(){
@@ -404,9 +436,9 @@ class Requirements
     }
     /**
      * Get WordPress Version
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return float Wordpress Version or zero
      */
     public static function getWpVersion(){
@@ -416,16 +448,16 @@ class Requirements
             return floatval( get_bloginfo( 'version' ) );
 
         }
-        
+
         return 0;
 
     }
 
     /**
      * Get MySQL Version
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return float MySQL version or zero
      */
     public static function getMysqlVersion(){
@@ -452,9 +484,9 @@ class Requirements
 
     /**
      * Get Max Execution time of PHP Scripts
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return int as seconds
      */
     public static function getMaxExecutionTime(){
@@ -465,9 +497,9 @@ class Requirements
 
     /**
      * Get Memory Limit For PHP Scripts
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return int
      */
     public static function getMemoryLimit(){
@@ -477,10 +509,10 @@ class Requirements
     }
 
     /**
-     * Get Post Max Size For PHP 
-     * 
+     * Get Post Max Size For PHP
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return int
      */
     public static function getPostMaxSize(){
@@ -491,9 +523,9 @@ class Requirements
 
     /**
      * Get Max File Size for upload
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return int
      */
     public static function getUploadMaxFilesize(){
@@ -504,9 +536,9 @@ class Requirements
 
     /**
      * Get Permalinks Structure
-     * 
+     *
      * @author Chris A <chris.a@realtyna.net>
-     * 
+     *
      * @return string
      */
     public static function getPermalinksStructure(){

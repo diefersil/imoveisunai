@@ -63,171 +63,12 @@ class Tango extends Widget_Base {
 		return 'https://youtu.be/OdXH9cSgdz4';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
-		$this->start_controls_section(
-			'section_content_layout',
-			[
-				'label' => esc_html__('Layout', 'bdthemes-prime-slider'),
-			]
-		);
-
-		$this->add_responsive_control(
-			'columns',
-			[
-				'label'          => __( 'Columns', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
-				'type'           => Controls_Manager::SELECT,
-				'default'        => 3,
-				'tablet_default' => 3,
-				'mobile_default' => 1,
-				'options'        => [
-					1 => '1',
-					2 => '2',
-					3 => '3',
-					4 => '4',
-					5 => '5',
-					6 => '6',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'item_gap',
-			[
-				'label'   => __('Item Gap', 'ultimate-post-kit'),
-				'type'    => Controls_Manager::SLIDER,
-				'default' => [
-					'size' => 0,
-				],
-				'tablet_default' => [
-					'size' => 0,
-				],
-				'mobile_default' => [
-					'size' => 0,
-				],
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-					],
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'slider_min_height',
-			[
-				'label' => esc_html__('Height', 'bdthemes-prime-slider'),
-				'type'  => Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 50,
-						'max' => 1024,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .bdt-prime-slider-tango .bdt-item' => 'height: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'slider_bottom_spacing',
-			[
-				'label' => esc_html__('Slider Bottom Spacing', 'bdthemes-prime-slider'),
-				'type'  => Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 50,
-						'max' => 200,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .bdt-prime-slider-tango' => 'padding-bottom: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		/**
-		* Show Title Controls
-		*/
-		$this->register_show_title_controls();
-
-		$this->add_control(
-			'show_sub_title',
-			[
-				'label'   => esc_html__('Show Label', 'bdthemes-prime-slider'),
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => 'yes',
-			]
-		);
-
-		/**
-		* Show Navigation Controls
-		*/
-		$this->register_show_navigation_controls();
-
-		$this->add_control(
-			'navigation_center_arrows',
-			[
-				'label'   => esc_html__('Center Arrows', 'bdthemes-prime-slider'),
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => 'yes',
-				'condition' => [
-					'show_navigation_arrows' => 'yes'
-				]
-			]
-		);
-
-		/**
-		* Show Pagination Controls
-		*/
-		$this->register_show_pagination_controls();
-
-		$this->add_control(
-			'hide_on_mobile',
-			[
-				'label'   => esc_html__('Pagination Hide on Mobile', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => 'yes',
-				'condition' => [
-					'show_navigation_dots' => 'yes'
-				],
-				'prefix_class' => 'bdt-pagination-hide-',
-			]
-		);
-
-		$this->add_responsive_control(
-            'content_alignment',
-            [
-                'label'   => esc_html__( 'Alignment', 'bdthemes-prime-slider' ),
-                'type'    => Controls_Manager::CHOOSE,
-                'options' => [
-                    'left' => [
-                        'title' => esc_html__( 'Left', 'bdthemes-prime-slider' ),
-                        'icon'  => 'eicon-text-align-left',
-                    ],
-                    'center' => [
-                        'title' => esc_html__( 'Center', 'bdthemes-prime-slider' ),
-                        'icon'  => 'eicon-text-align-center',
-                    ],
-                    'right' => [
-                        'title' => esc_html__( 'Right', 'bdthemes-prime-slider' ),
-                        'icon'  => 'eicon-text-align-right',
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider-tango .bdt-content-wrap' => 'text-align: {{VALUE}};',
-                ],
-            ]
-		);
-
-		/**
-		* Thumbnail Size Controls
-		*/
-		$this->register_thumbnail_size_controls();
-		
-		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'section_content_sliders',
@@ -296,6 +137,193 @@ class Tango extends Widget_Base {
 		);
 
 		$this->end_controls_section();
+		
+		$this->start_controls_section(
+			'section_content_layout',
+			[
+				'label' => esc_html__('Additional Options', 'bdthemes-prime-slider'),
+			]
+		);
+
+		$this->add_responsive_control(
+			'columns',
+			[
+				'label'          => __( 'Columns', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
+				'type'           => Controls_Manager::SELECT,
+				'default'        => 3,
+				'tablet_default' => 3,
+				'mobile_default' => 1,
+				'options'        => [
+					1 => '1',
+					2 => '2',
+					3 => '3',
+					4 => '4',
+					5 => '5',
+					6 => '6',
+				],
+				'classes'   => BDTPS_CORE_IS_PC
+			]
+		);
+
+		$this->add_responsive_control(
+			'item_gap',
+			[
+				'label'   => __('Item Gap', 'bdthemes-prime-slider'),
+				'type'    => Controls_Manager::SLIDER,
+				'default' => [
+					'size' => 40,
+				],
+				'tablet_default' => [
+					'size' => 30,
+				],
+				'mobile_default' => [
+					'size' => 0,
+				],
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 100,
+					],
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'slider_min_height',
+			[
+				'label' => esc_html__('Height', 'bdthemes-prime-slider'),
+				'type'  => Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 50,
+						'max' => 1024,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .bdt-prime-slider-tango .bdt-item' => 'height: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'slider_bottom_spacing',
+			[
+				'label' => esc_html__('Slider Bottom Spacing', 'bdthemes-prime-slider'),
+				'type'  => Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 10,
+						'max' => 200,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .bdt-prime-slider-tango' => 'margin-bottom: {{SIZE}}{{UNIT}};', 
+					'{{WRAPPER}} .bdt-prime-slider-tango .swiper-pagination' => 'transform: translateX(-50%) translateY({{SIZE}}{{UNIT}});',
+				],
+			]
+		);
+
+		/**
+		* Show Title Controls
+		*/
+		$this->register_show_title_controls();
+
+		$this->add_control(
+			'show_sub_title',
+			[
+				'label'   => esc_html__('Show Label', 'bdthemes-prime-slider'),
+				'type'    => Controls_Manager::SWITCHER,
+				'default' => 'yes',
+			]
+		);
+
+		/**
+		* Show Navigation Controls
+		*/
+		$this->register_show_navigation_controls();
+
+		$this->add_control(
+			'navigation_center_arrows',
+			[
+				'label'   => esc_html__('Center Arrows', 'bdthemes-prime-slider'),
+				'type'    => Controls_Manager::SWITCHER,
+				'default' => 'yes',
+				'condition' => [
+					'show_navigation_arrows' => 'yes'
+				]
+			]
+		);
+
+		/**
+		* Show Pagination Controls
+		*/
+		$this->register_show_pagination_controls();
+
+		$this->add_control(
+			'hide_on_mobile',
+			[
+				'label'   => esc_html__('Pagination Hide on Mobile', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
+				'type'    => Controls_Manager::SWITCHER,
+				'default' => 'yes',
+				'condition' => [
+					'show_navigation_dots' => 'yes'
+				],
+				'prefix_class' => 'bdt-pagination-hide-',
+				'classes'   => BDTPS_CORE_IS_PC
+			]
+		);
+
+		$this->add_responsive_control(
+            'content_alignment',
+            [
+                'label'   => esc_html__( 'Alignment', 'bdthemes-prime-slider' ),
+                'type'    => Controls_Manager::CHOOSE,
+                'options' => [
+                    'left' => [
+                        'title' => esc_html__( 'Left', 'bdthemes-prime-slider' ),
+                        'icon'  => 'eicon-text-align-left',
+                    ],
+                    'center' => [
+                        'title' => esc_html__( 'Center', 'bdthemes-prime-slider' ),
+                        'icon'  => 'eicon-text-align-center',
+                    ],
+                    'right' => [
+                        'title' => esc_html__( 'Right', 'bdthemes-prime-slider' ),
+                        'icon'  => 'eicon-text-align-right',
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-tango .bdt-content-wrap' => 'text-align: {{VALUE}};',
+                ],
+            ]
+		);
+
+		$this->add_control(
+			'item_up_down',
+			[
+				'label'   => esc_html__('Item Up Down', 'bdthemes-prime-slider') . BDTPS_CORE_NC . BDTPS_CORE_PC,
+				'type'    => Controls_Manager::SWITCHER,
+				'prefix_class' => 'bdt-item-up-down-',
+				'render_type'  => 'template',
+				'classes'   => BDTPS_CORE_IS_PC
+			]
+		);
+
+		$this->add_control(
+			'item_wrapper_link',
+			[
+				'label'   => esc_html__('Item Wrapper Link', 'bdthemes-prime-slider') . BDTPS_CORE_NC . BDTPS_CORE_PC,
+				'type'    => Controls_Manager::SWITCHER,
+				'classes' => BDTPS_CORE_IS_PC
+			]
+		);
+
+		/**
+		* Thumbnail Size Controls
+		*/
+		$this->register_thumbnail_size_controls();
+
+		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'section_carousel_settings',
@@ -316,6 +344,7 @@ class Tango extends Widget_Base {
 				],
 				'prefix_class' => 'bdt-carousel-style-',
 				'render_type'  => 'template',
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -525,13 +554,13 @@ class Tango extends Widget_Base {
 			Group_Control_Background::get_type(),
 			[
 				'name' => 'image_overlay',
-				'label' => esc_html__('Background', 'pixel-gallery'),
+				'label' => esc_html__('Background', 'bdthemes-prime-slider'),
 				'types' => ['classic', 'gradient'],
 				'exclude' => ['image'],
 				'selector' => '{{WRAPPER}} .bdt-prime-slider-tango .bdt-image-wrap::before',
 				'fields_options' => [
 					'background' => [
-						'label' => esc_html__('Overlay Color', 'pixel-gallery'),
+						'label' => esc_html__('Overlay Color', 'bdthemes-prime-slider'),
 						'default' => 'gradient',
 					],
 					'color' => [
@@ -560,7 +589,7 @@ class Tango extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%' ],
 				'selectors'  => [
-					'{{WRAPPER}} .bdt-prime-slider-tango .bdt-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; clip-path: inset(10% 10% 10% 10% round {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}});',
+					'{{WRAPPER}} .bdt-prime-slider-tango .bdt-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; clip-path: inset(10% 0 10% 0 round {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}});',
 				],
 			]
 		);
@@ -827,7 +856,7 @@ class Tango extends Widget_Base {
 		$this->add_responsive_control(
 			'arrows_acx_position',
 			[
-				'label'   => __( 'Spacing', 'bdthemes-element-pack' ),
+				'label'   => __( 'Spacing', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
@@ -1041,8 +1070,7 @@ class Tango extends Widget_Base {
 
 		$this->add_render_attribute( 'prime-slider', 'class', 'bdt-prime-slider' );
 
-		$swiper_class = Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-		$this->add_render_attribute('swiper', 'class', 'swiper-tango ' . $swiper_class);
+		$this->add_render_attribute('swiper', 'class', 'swiper-tango swiper');
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider' ); ?>>
@@ -1108,7 +1136,7 @@ class Tango extends Widget_Base {
 
 		$thumb_url = Group_Control_Image_Size::get_attachment_image_src($slide['image']['id'], 'thumbnail_size', $settings);
 		if (!$thumb_url) {
-			printf('<img src="%1$s" alt="%2$s" class="bdt-img">', $slide['image']['url'], esc_html($slide['title']));
+			printf('<img src="%1$s" alt="%2$s" class="bdt-img">', esc_url($slide['image']['url']), esc_html($slide['title']));
 		} else {
 			print(wp_get_attachment_image(
 				$slide['image']['id'],
@@ -1125,42 +1153,41 @@ class Tango extends Widget_Base {
 	public function render_slides_loop() {
         $settings = $this->get_settings_for_display();
 
-        foreach ($settings['slides'] as $slide) : ?>
+        foreach ($settings['slides'] as $slide) : 
+		
+			if( ! empty($slide['title_link']['url']) && $slide['title']){
+				$this->add_link_attributes('title-link', $slide['title_link'], true);
+			}
+		
+			?>
 
             <div class="swiper-slide bdt-item">
-					<div class="bdt-image-wrap">
-						<?php $this->rendar_item_image($slide); ?>
-					</div>
-					<div class="bdt-content-wrap">
+				<div class="bdt-image-wrap">
+					<?php $this->rendar_item_image($slide); ?>
+				</div>
+				<div class="bdt-content-wrap">
 
-					<?php if ($slide['sub_title'] && ('yes' == $settings['show_sub_title'])) : ?>
-							<div class="bdt-subtitle" data-reveal="reveal-active">
-								<?php echo wp_kses_post($slide['sub_title']); ?>
-							</div>
-						<?php endif; ?>
+				<?php if ($slide['sub_title'] && ('yes' == $settings['show_sub_title'])) : ?>
+						<div class="bdt-subtitle" data-reveal="reveal-active">
+							<?php echo wp_kses_post($slide['sub_title']); ?>
+						</div>
+					<?php endif; ?>
 
-						<?php if ($slide['title'] && ('yes' == $settings['show_title'])) : ?>
-							<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title" data-reveal="reveal-active">
-								<?php if ('' !== $slide['title_link']['url']) : ?>
-
-									<?php
-										if(!empty($slide['title_link']['is_external'])){
-											$target = 'target="_blank"';
-										} else {
-											$target = '';
-										}
-										?>
-
-									<a href="<?php echo esc_url($slide['title_link']['url']); ?>" <?php echo wp_kses_post($target); ?>>
-									<?php endif; ?>
-									<?php echo prime_slider_first_word($slide['title']); ?>
-									<?php if ('' !== $slide['title_link']['url']) : ?>
-									</a>
+					<?php if ($slide['title'] && ('yes' == $settings['show_title'])) : ?>
+						<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title" data-reveal="reveal-active">
+							<?php if ('' !== $slide['title_link']['url']) : ?>
+								<a <?php $this->print_render_attribute_string('title-link'); ?>>
 								<?php endif; ?>
-							</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
-						<?php endif; ?>
-					</div>
-
+								<?php echo wp_kses_post(prime_slider_first_word($slide['title'])); ?>
+								<?php if ('' !== $slide['title_link']['url']) : ?>
+								</a>
+							<?php endif; ?>
+						</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
+					<?php endif; ?>
+				</div>
+				<?php if ($settings['item_wrapper_link'] == 'yes' and '' !== $slide['title_link']['url']) : ?>
+					<a class="bdt-tango-item-wrap-link" <?php $this->print_render_attribute_string('title-link'); ?>></a>
+				<?php endif; ?>
 			</div>
 
         <?php endforeach;

@@ -1,8 +1,8 @@
+import apiFetch from '@wordpress/api-fetch';
+import { safeParseJson } from '@shared/lib/parsing';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import { getTaskData, saveTaskData } from '@assist/api/Data';
 
-const key = 'extendify-assist-tasks';
 const startingState = {
 	// These are tests the user is in progress of completing.
 	// Not to be confused with tasks that are in progress.
@@ -16,14 +16,45 @@ const startingState = {
 	// so use ?.completedAt to check if it's completed with the (.?)
 	completedTasks: [],
 	inProgressTasks: [],
+	// These are the tasks dependencies
+	tasksDependencies: {
+		...safeParseJson(window.extAssistData.userData.tasksDependencies),
+	},
 	// initialize the state with default values
-	...((window.extAssistData.userData.taskData?.data || {})?.state ?? {}),
+	...(safeParseJson(window.extAssistData.userData.taskData)?.state ?? {}),
 };
 
 const state = (set, get) => ({
 	...startingState,
+	// We need to keep the tasks dependencies updated all the time,
+	// the user may complete the task from outside the cards, this will
+	// make sure they are always up-to-date.
+	tasksDependencies: {
+		...safeParseJson(window.extAssistData.userData.tasksDependencies),
+	},
 	isCompleted(taskId) {
-		return get().completedTasks.some((task) => task?.id === taskId);
+		const completed = get().completedTasks.some((task) => task?.id === taskId);
+
+		// overrides for specific plugin "behind the scenes" tasks
+		const {
+			completedWoocommerceStore,
+			completedSetupGivewp,
+			completedSetupAIOSeo,
+			completedWPFormsLite,
+			completedYourWebShop,
+			completedMonsterInsights,
+		} = get().tasksDependencies || {};
+		if (taskId === 'setup-givewp') return completedSetupGivewp || completed;
+		if (taskId === 'setup-woocommerce-store')
+			return completedWoocommerceStore || completed;
+		if (taskId === 'setup-aioses') return completedSetupAIOSeo || completed;
+		if (taskId === 'setup-wpforms') return completedWPFormsLite || completed;
+		if (taskId === 'setup-yourwebshop')
+			return completedYourWebShop || completed;
+		if (taskId === 'setup-monsterinsights')
+			return completedMonsterInsights || completed;
+
+		return completed;
 	},
 	completeTask(taskId) {
 		if (get().isCompleted(taskId)) {
@@ -88,15 +119,15 @@ const state = (set, get) => ({
 	},
 });
 
+const path = '/extendify/v1/assist/task-data';
 const storage = {
-	getItem: async () => JSON.stringify(await getTaskData()),
-	setItem: async (_, value) => await saveTaskData(value),
-	removeItem: () => undefined,
+	getItem: async () => await apiFetch({ path }),
+	setItem: async (_name, state) =>
+		await apiFetch({ path, method: 'POST', data: { state } }),
 };
 
 export const useTasksStore = create(
 	persist(devtools(state, { name: 'Extendify Assist Tasks' }), {
-		name: key,
 		storage: createJSONStorage(() => storage),
 		skipHydration: true,
 	}),

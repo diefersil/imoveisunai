@@ -5,9 +5,9 @@
 
 namespace Extendify\Assist\Controllers;
 
-if (!defined('ABSPATH')) {
-    die('No direct access.');
-}
+defined('ABSPATH') || die('No direct access.');
+
+use Extendify\Shared\Services\Sanitizer;
 
 /**
  * The controller for plugin dependency checking, etc
@@ -34,8 +34,8 @@ class GlobalsController
      */
     public static function store($request)
     {
-        $data = json_decode($request->get_param('data'), true);
-        update_option('extendify_assist_globals', $data);
+        $data = json_decode($request->get_param('state'), true);
+        update_option('extendify_assist_globals', Sanitizer::sanitizeArray($data));
         return new \WP_REST_Response($data);
     }
 }

@@ -1,28 +1,35 @@
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useGlobalStore } from '@launch/state/Global';
 import { usePagesStore } from '@launch/state/Pages';
-import { useUserSelectionStore } from '@launch/state/UserSelections';
+import { usePagesSelectionStore } from '@launch/state/pages-selections';
+import { useUserSelectionStore } from '@launch/state/user-selections';
+import { INSIGHTS_HOST } from '../../constants';
 
+// Dev note: This entire section is opt-in only when partnerID is set as a constant
 export const useTelemetry = () => {
 	const {
-		goals: selectedGoals,
-		pages: selectedPages,
-		plugins: selectedPlugins,
-		siteType: selectedSiteType,
-		style: selectedStyle,
+		goals,
+		getGoalsPlugins,
+		siteType,
 		siteTypeSearch,
+		siteStructure,
+		variation,
 	} = useUserSelectionStore();
+	const { pages: selectedPages, style: selectedStyle } =
+		usePagesSelectionStore();
+	const selectedPlugins = getGoalsPlugins();
 	const { generating } = useGlobalStore();
 	const { pages, currentPageIndex } = usePagesStore();
-	const [url, setUrl] = useState();
 	const [stepProgress, setStepProgress] = useState([]);
 	const [viewedStyles, setViewedStyles] = useState(new Set());
+	const running = useRef(false);
 
 	useEffect(() => {
 		const p = [...pages].map((p) => p[0]);
 		// Add pages as they move around
 		setStepProgress((progress) =>
-			progress?.at(-1) === p[currentPageIndex]
+			// Return early if launched, or on the same page
+			[p[currentPageIndex], 'launched'].includes(progress?.at(-1))
 				? progress
 				: [...progress, p[currentPageIndex]],
 		);
@@ -45,66 +52,69 @@ export const useTelemetry = () => {
 	}, [selectedStyle]);
 
 	useEffect(() => {
-		let mode = 'launch';
-		const search = window.location?.search;
-		mode = search?.indexOf('DEVMODE') > -1 ? 'launch-dev' : mode;
-		mode = search?.indexOf('LOCALMODE') > -1 ? 'launch-local' : mode;
-		setUrl(window?.extOnbData?.config?.api[mode]);
-	}, []);
-
-	useEffect(() => {
-		if (!url) return;
 		let id = 0;
 		let innerId = 0;
+		const timeout = currentPageIndex ? 1000 : 0;
 		id = window.setTimeout(() => {
+			if (running.current) return;
+			running.current = true;
 			const controller = new AbortController();
 			innerId = window.setTimeout(() => {
+				running.current = false;
 				controller.abort();
-			}, 500);
-			fetch(`${url}/progress`, {
+			}, 900);
+			fetch(`${INSIGHTS_HOST}/api/v1/launch`, {
 				method: 'POST',
 				headers: {
 					'Content-type': 'application/json',
 					Accept: 'application/json',
+					'X-Extendify': 'true',
 				},
 				signal: controller.signal,
 				body: JSON.stringify({
-					selectedGoals: selectedGoals?.map((g) => g.id),
-					selectedGoalsSlugs: selectedGoals?.map((g) => g.slug),
-					selectedPages: selectedPages?.map((p) => p.id),
-					selectedPagesSlugs: selectedPages?.map((p) => p.slug),
-					selectedPlugins: selectedPlugins?.map((p) => p.name),
-					selectedSiteType: selectedSiteType?.slug
-						? [selectedSiteType.slug]
-						: [],
-					selectedSiteTypeSlug: selectedSiteType?.slug,
-					selectedStyle: selectedStyle?.recordId
-						? [selectedStyle.recordId]
-						: [],
-					selectedStyleSlug: selectedStyle?.slug,
-					stepProgress,
-					viewedStyles: [...viewedStyles].map((s) => s.recordId).slice(1),
-					viewedStylesSlugs: [...viewedStyles].map((s) => s.slug).slice(1),
-					siteTypeSearch,
-					insightsId: window.extOnbData?.siteId,
-					activeTests: JSON.stringify(window.extOnbData?.activeTests),
-					partnerName: window.extOnbData?.partnerName,
-					wpLanguage: window.extOnbData?.wpLanguage,
-					siteCreatedAt: window.extOnbData?.siteCreatedAt,
+					siteType: siteType?.slug,
+					siteCreatedAt: window.extSharedData?.siteCreatedAt,
+					style: variation?.title,
+					siteStructure: siteStructure,
+					pages: selectedPages?.map((p) => p.slug),
+					goals: goals?.map((g) => g.slug),
+					lastCompletedStep: stepProgress?.at(-1),
+					progress: stepProgress,
+					stylesViewed: [...viewedStyles]
+						.filter((s) => s?.variation)
+						.map((s) => s.variation.title),
+					siteTypeSearches: siteTypeSearch,
+					insightsId: window.extSharedData?.siteId,
+					activeTests:
+						window.extOnbData?.activeTests?.length > 0
+							? JSON.stringify(window.extOnbData?.activeTests)
+							: undefined,
+					hostPartner: window.extSharedData?.partnerId,
+					language: window.extSharedData?.wpLanguage,
+					siteURL: window.extSharedData?.home,
 				}),
-			}).catch(() => undefined);
-		}, 1000);
-		return () => [id, innerId].forEach((i) => window.clearTimeout(i));
+			})
+				.catch(() => undefined)
+				.finally(() => {
+					running.current = false;
+				});
+		}, timeout);
+		return () => {
+			running.current = false;
+			[id, innerId].forEach((i) => window.clearTimeout(i));
+		};
 	}, [
-		url,
-		selectedGoals,
 		selectedPages,
 		selectedPlugins,
-		selectedSiteType,
 		selectedStyle,
 		pages,
 		stepProgress,
 		viewedStyles,
 		siteTypeSearch,
+		currentPageIndex,
+		goals,
+		siteType,
+		siteStructure,
+		variation,
 	]);
 };

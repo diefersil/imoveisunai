@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { getOption, updateOption } from '@launch/api/WPApi';
 import { LoadingIndicator } from '@launch/components/LoadingIndicator';
@@ -6,16 +7,16 @@ import { Title } from '@launch/components/Title';
 import { useFetch } from '@launch/hooks/useFetch';
 import { PageLayout } from '@launch/layouts/PageLayout';
 import { usePagesStore } from '@launch/state/Pages';
-import { useUserSelectionStore } from '@launch/state/UserSelections';
 import { pageState } from '@launch/state/factory';
+import { useUserSelectionStore } from '@launch/state/user-selections';
 
 export const fetcher = async () => ({ title: await getOption('blogname') });
 export const fetchData = () => ({ key: 'site-info' });
-export const state = pageState('Site Title', () => ({
-	title: __('Site Title', 'extendify-local'),
-	default: undefined,
-	showInSidebar: true,
+export const state = pageState('Site Information', () => ({
 	ready: false,
+	canSkip: false,
+	validation: null,
+	onRemove: () => {},
 }));
 
 export const SiteInformation = () => {
@@ -27,12 +28,12 @@ export const SiteInformation = () => {
 
 	return (
 		<PageLayout>
-			<div className="grow px-6 py-8 md:py-16 md:px-32 overflow-y-scroll">
+			<div className="grow overflow-y-scroll px-6 py-8 md:p-12 3xl:p-16">
 				<Title
 					title={__("What's the name of your new site?", 'extendify-local')}
 					description={__('You can change this later.', 'extendify-local')}
 				/>
-				<div className="w-full relative max-w-xl mx-auto">
+				<div className="relative mx-auto w-full max-w-xl">
 					{loading ? <LoadingIndicator /> : <Info />}
 				</div>
 			</div>
@@ -90,8 +91,8 @@ const Info = () => {
 					type="text"
 					name="site-title-input"
 					id="extendify-site-title-input"
-					className="w-full rounded border border-gray-200 h-12 py-6 px-4 input-focus ring-offset-0"
-					value={title ?? ''}
+					className="input-focus h-12 w-full rounded border border-gray-200 px-4 py-6 ring-offset-0"
+					value={decodeEntities(title) ?? ''}
 					onChange={(e) => setTitle(e.target.value)}
 					placeholder={__('Enter your website name', 'extendify-local')}
 				/>

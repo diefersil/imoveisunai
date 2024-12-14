@@ -1,53 +1,87 @@
-import { BlockPreview, transformStyles } from '@wordpress/block-editor';
+import { BlockPreview } from '@wordpress/block-editor';
 import { rawHandler } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import {
 	useRef,
 	useMemo,
 	useState,
-	useEffect,
+	useLayoutEffect,
 	useCallback,
 } from '@wordpress/element';
 import { forwardRef } from '@wordpress/element';
+import { pageNames } from '@shared/lib/pages';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePreviewIframe } from '@launch/hooks/usePreviewIframe';
-import { lowerImageQuality } from '@launch/lib/util';
+import { hexTomatrixValues, lowerImageQuality } from '@launch/lib/util';
 import themeJSON from '../_data/theme-processed.json';
 
 export const PagePreview = forwardRef(({ style }, ref) => {
 	const previewContainer = useRef(null);
 	const blockRef = useRef(null);
 	const [ready, setReady] = useState(false);
-	const transformedStyles = useMemo(
-		() =>
-			themeJSON?.[style?.variation?.title]
-				? transformStyles(
-						[{ css: themeJSON[style?.variation?.title] }],
-						'html body.editor-styles-wrapper',
-				  )
-				: null,
-		[style?.variation],
-	);
 
 	const onLoad = useCallback(
 		(frame) => {
-			// Remove load-styles in case WP laods them
-			frame?.contentDocument?.querySelector('[href*=load-styles]')?.remove();
+			frame.contentDocument?.getElementById('ext-tj')?.remove();
+			// Run this 150 times at an interval of 100ms (15s)
+			// This is a brute force check that the styles are there
+			let lastRun = performance.now();
+			let counter = 0;
+			const checkOnStyles = () => {
+				if (counter >= 150) return;
+				const now = performance.now();
+				if (now - lastRun < 100) return requestAnimationFrame(checkOnStyles);
+				lastRun = now;
+				frame?.contentDocument?.querySelector('[href*=load-styles]')?.remove();
+				if (!frame.contentDocument?.getElementById('ext-tj')) {
+					const primaryColor =
+						style?.variation?.settings?.color?.palette?.theme?.find(
+							({ slug }) => slug === 'primary',
+						)?.color;
+					const [r, g, b] = hexTomatrixValues(primaryColor);
+					frame.contentDocument?.body?.insertAdjacentHTML(
+						'beforeend',
+						`<style id="ext-tj">
+							.wp-block-missing { display: none !important }
+							[class*=wp-duotone-] img[src^="data"] {
+								filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="solid-color"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values="0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} 0 0 0 1 0"/></filter></svg>#solid-color') !important;
+							}
+							${themeJSON[style?.variation?.title]}
+						</style>`,
+					);
+				}
 
-			// Add variation styles
-			const style = `<style id="ext-tj">
-                html body.editor-styles-wrapper { background-color: var(--wp--preset--color--background) }
-                ${transformedStyles}
-            </style>`;
-			if (!frame.contentDocument?.getElementById('ext-tj')) {
-				frame.contentDocument?.body?.insertAdjacentHTML('beforeend', style);
-			}
+				// Look for any frames inside the iframe, like the html block
+				const innerFrames = frame.contentDocument?.querySelectorAll('iframe');
+				innerFrames?.forEach((inner) => {
+					inner?.contentDocument
+						?.querySelector('[href*=load-styles]')
+						?.remove();
+					inner?.contentDocument
+						?.querySelector('body')
+						?.classList.add('editor-styles-wrapper');
+					if (inner && !inner.contentDocument?.getElementById('ext-tj')) {
+						inner.contentDocument?.body?.insertAdjacentHTML(
+							'beforeend',
+							`<style id="ext-tj">
+								body { background-color: transparent !important; }
+								body, body * { box-sizing: border-box !important; }
+								${themeJSON[style?.variation?.title]}
+							</style>`,
+						);
+					}
+				});
+
+				counter++;
+				requestAnimationFrame(checkOnStyles); // recursive
+			};
+			checkOnStyles();
 		},
-		[transformedStyles],
+		[style?.variation],
 	);
 
-	const { ready: show } = usePreviewIframe({
+	const { ready: showPreview } = usePreviewIframe({
 		container: ref.current,
 		ready,
 		onLoad,
@@ -55,27 +89,40 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 	});
 
 	const blocks = useMemo(() => {
-		const code = [style?.headerCode, style?.code, style?.footerCode]
+		const links = [
+			pageNames.about.title,
+			pageNames.blog.title,
+			pageNames.contact.title,
+		];
+
+		const code = [
+			style?.headerCode,
+			style?.patterns
+				?.map(({ code }) => code)
+				.flat()
+				.join(''),
+			style?.footerCode,
+		]
 			.filter(Boolean)
 			.join('')
 			.replace(
 				// <!-- wp:navigation --> <!-- /wp:navigation -->
 				/<!-- wp:navigation[.\S\s]*?\/wp:navigation -->/g,
-				'<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">Link | Link | Link</p ><!-- /wp:paragraph -->',
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				// <!-- wp:navigation /-->
 				/<!-- wp:navigation.*\/-->/g,
-				'<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">Link | Link | Link</p ><!-- /wp:paragraph -->',
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				/<!-- wp:site-logo.*\/-->/g,
-				'<!-- wp:paragraph {"className":"custom-logo"} --><img class="custom-logo" style="height: 40px;" src="https://assets.extendify.com/demo-content/logos/extendify-demo-logo.png"><!-- /wp:paragraph -->',
+				'<!-- wp:paragraph {"className":"custom-logo"} --><img alt="" class="custom-logo" style="height: 40px;" src="https://assets.extendify.com/demo-content/logos/extendify-demo-logo.png"><!-- /wp:paragraph -->',
 			);
 		return rawHandler({ HTML: lowerImageQuality(code) });
 	}, [style]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		setReady(false);
 		const timer = setTimeout(() => setReady(true), 0);
 		return () => clearTimeout(timer);
@@ -84,14 +131,15 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 	return (
 		<>
 			<AnimatePresence>
-				{show || (
+				{showPreview || (
 					<motion.div
 						initial={{ opacity: 0.7 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.3 }}
-						className="absolute inset-0 z-30 pointer-events-none"
+						className="pointer-events-none absolute inset-0 z-30"
 						style={{
+							// opacity: showPreview || !ready ? 0 : 1,
 							backgroundColor: 'rgba(204, 204, 204, 0.25)',
 							backgroundImage:
 								'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%)',
@@ -99,7 +147,7 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 							animation: 'extendify-loading-skeleton 10s ease-in-out infinite',
 						}}>
 						<div className="absolute inset-0 flex items-center justify-center">
-							<Spinner className="w-10 h-10 text-design-main" />
+							<Spinner className="h-10 w-10 text-design-main" />
 						</div>
 					</motion.div>
 				)}
@@ -107,15 +155,16 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 			<div
 				data-test="layout-preview"
 				ref={blockRef}
-				className={classNames('group w-full bg-transparent z-10', {
-					'opacity-0': !show,
+				className={classNames('group z-10 w-full bg-transparent', {
+					'opacity-0': !showPreview,
 				})}>
-				<div ref={previewContainer} className="relative rounded-lg">
+				<div
+					ref={previewContainer}
+					className="relative m-auto max-w-[1440px] rounded-lg">
 					<BlockPreview
 						blocks={blocks}
-						viewportWidth={1400}
+						viewportWidth={1440}
 						additionalStyles={[
-							// TODO { css: themeJSON[style?.variation?.title] },
 							{
 								css: '.rich-text [data-rich-text-placeholder]:after { content: "" }',
 							},

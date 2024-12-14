@@ -1,4 +1,4 @@
-import { BlockPreview, transformStyles } from '@wordpress/block-editor';
+import { BlockPreview } from '@wordpress/block-editor';
 import { rawHandler } from '@wordpress/blocks';
 import {
 	useState,
@@ -8,6 +8,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { pageNames } from '@shared/lib/pages';
 import classNames from 'classnames';
 import { colord } from 'colord';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -22,32 +23,36 @@ export const SmallPreview = ({ style, onSelect, selected }) => {
 	const [ready, setReady] = useState(false);
 	const variation = style?.variation;
 	const theme = variation?.settings?.color?.palette?.theme;
-	const transformedStyles = useMemo(
-		() =>
-			themeJSON?.[style?.variation?.title]
-				? transformStyles(
-						[{ css: themeJSON[style?.variation?.title] }],
-						'html body.editor-styles-wrapper',
-				  )
-				: null,
-		[style?.variation],
-	);
 
 	const onLoad = useCallback(
 		(frame) => {
-			// Remove load-styles in case WP laods them
-			frame?.contentDocument?.querySelector('[href*=load-styles]')?.remove();
-
-			// Add variation styles
-			const style = `<style id="ext-tj">
-                html body.editor-styles-wrapper { background-color: var(--wp--preset--color--background) }
-                ${transformedStyles}
-            </style>`;
-			if (!frame.contentDocument?.getElementById('ext-tj')) {
-				frame.contentDocument?.body?.insertAdjacentHTML('beforeend', style);
-			}
+			// Run this 150 times at an interval of 100ms (15s)
+			// This is a brute force check that the styles are there
+			let lastRun = performance.now();
+			let counter = 0;
+			const checkOnStyles = () => {
+				if (counter >= 150) return;
+				const now = performance.now();
+				if (now - lastRun < 100) return requestAnimationFrame(checkOnStyles);
+				lastRun = now;
+				frame?.contentDocument?.querySelector('[href*=load-styles]')?.remove();
+				const stylesToInject = `<style id="ext-tj">
+               		${themeJSON[style?.variation?.title]}
+									.wp-block-missing { display: none !important }
+									img[src^=data] { filter: url(#wp-duotone-primary) !important }
+            	</style>`;
+				if (!frame.contentDocument?.getElementById('ext-tj')) {
+					frame.contentDocument?.body?.insertAdjacentHTML(
+						'beforeend',
+						stylesToInject,
+					);
+				}
+				counter++;
+				requestAnimationFrame(checkOnStyles); // recursive
+			};
+			checkOnStyles();
 		},
-		[transformedStyles],
+		[style?.variation?.title],
 	);
 
 	const { loading, ready: show } = usePreviewIframe({
@@ -57,9 +62,19 @@ export const SmallPreview = ({ style, onSelect, selected }) => {
 		loadDelay: 2000,
 	});
 	const blocks = useMemo(() => {
+		const links = [
+			pageNames.about.title,
+			pageNames.blog.title,
+			pageNames.contact.title,
+		];
+
 		const code = [
 			style?.headerCode,
-			style?.code.slice(0, 3).join('\n'),
+			style?.patterns
+				.map(({ code }) => code)
+				.flat()
+				.slice(0, 3)
+				.join('\n'),
 			style?.footerCode,
 		]
 			.filter(Boolean)
@@ -67,12 +82,12 @@ export const SmallPreview = ({ style, onSelect, selected }) => {
 			.replace(
 				// <!-- wp:navigation --> <!-- /wp:navigation -->
 				/<!-- wp:navigation[.\S\s]*?\/wp:navigation -->/g,
-				'<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">Link | Link | Link</p ><!-- /wp:paragraph -->',
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				// <!-- wp:navigation /-->
 				/<!-- wp:navigation.*\/-->/g,
-				'<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">Link | Link | Link</p ><!-- /wp:paragraph -->',
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				/<!-- wp:site-logo.*\/-->/g,
@@ -94,7 +109,7 @@ export const SmallPreview = ({ style, onSelect, selected }) => {
 		<>
 			<div
 				data-test="layout-preview"
-				className="w-full h-full relative overflow-hidden"
+				className="relative h-full w-full overflow-hidden"
 				ref={blockRef}
 				role={onSelect ? 'button' : undefined}
 				tabIndex={onSelect ? 0 : undefined}

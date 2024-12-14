@@ -63,6 +63,10 @@ class Elysium extends Widget_Base {
 		return 'https://youtu.be/S3c1G6AFGi0';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 
@@ -153,7 +157,7 @@ class Elysium extends Widget_Base {
 		$this->start_controls_section(
 			'section_content_layout',
 			[
-				'label' => esc_html__('Additional Settings', 'bdthemes-prime-slider'),
+				'label' => esc_html__('Additional Options', 'bdthemes-prime-slider'),
 			]
 		);
 
@@ -193,6 +197,7 @@ class Elysium extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .bdt-prime-slider-elysium .bdt-image-wrap .bdt-img' => 'height: {{SIZE}}{{UNIT}};',
 				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -414,7 +419,7 @@ class Elysium extends Widget_Base {
 		$this->add_responsive_control(
 			'title_padding',
 			[
-				'label'      => __( 'Padding', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC,
+				'label'      => __( 'Padding', 'bdthemes-prime-slider' ),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
@@ -623,6 +628,7 @@ class Elysium extends Widget_Base {
 				'condition' => [
 					'show_navigation_dots' => ['yes'],
 				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -637,6 +643,7 @@ class Elysium extends Widget_Base {
 				'condition' => [
 					'show_navigation_dots' => ['yes'],
 				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -861,7 +868,7 @@ class Elysium extends Widget_Base {
 			<?php
 			$thumb_url = Group_Control_Image_Size::get_attachment_image_src($slide['image']['id'], 'thumbnail_size', $settings);
 			if (!$thumb_url) {
-				printf('<img src="%1$s" alt="%2$s" class="bdt-img">', $slide['image']['url'], esc_html($slide['title']));
+				printf('<img src="%1$s" alt="%2$s" class="bdt-img">', esc_url($slide['image']['url']), esc_html($slide['title']));
 			} else {
 				print(wp_get_attachment_image(
 					$slide['image']['id'],
@@ -881,23 +888,27 @@ class Elysium extends Widget_Base {
 	public function render_slides_loop() {
         $settings = $this->get_settings_for_display();
 
-        foreach ($settings['slides'] as $slide) : ?>
-
+        foreach ($settings['slides'] as $slide) : 
+        	if ($slide['title']) {
+        		$this->add_link_attributes('title_link', $slide['title_link'], true);
+        	}
+			
+			?>
             <div class="bdt-item swiper-slide">
 					<?php $this->rendar_item_image($slide); ?>
 
 					<div class="bdt-content">
 						<?php if ($slide['title'] && ('yes' == $settings['show_title'])) : ?>
 							<div class="bdt-title-wrap"> 
-							<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title" data-reveal="reveal-active">
+							<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title" data-reveal="reveal-active">
 									<?php if ('' !== $slide['title_link']['url']) : ?>
-										<a href="<?php echo esc_url($slide['title_link']['url']); ?>">
+										<a <?php $this->print_render_attribute_string('title_link'); ?>>
 										<?php endif; ?>
-											<?php echo($slide['title']); ?>
+											<?php echo esc_html($slide['title']); ?>
 											<?php if ('' !== $slide['title_link']['url']) : ?>
 										</a>
 									<?php endif; ?>
-								</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+								</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 							</div>
 						<?php endif; ?>
 						

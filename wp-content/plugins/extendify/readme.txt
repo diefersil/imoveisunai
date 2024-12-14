@@ -1,9 +1,9 @@
-=== Extendify — Gutenberg Patterns and Templates ===
+=== Extendify ===
 Contributors: extendify, kbat82, clubkert, arturgrabo
 Tags: templates, patterns, layouts, blocks, gutenberg, layout, template, editor, library, page builder, gutenberg blocks, wordpress blocks
 Requires at least: 6.0
-Tested up to: 6.4
-Stable tag: 1.11.2
+Tested up to: 6.7
+Stable tag: 1.15.4
 Requires PHP: 7.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -96,6 +96,94 @@ Nope! Extendify imports lightweight block-based content that is served directly 
 3. The Extendify library, as seen with the Twenty Twenty Two block theme
 
 == Changelog ==
+
+= 1.15.4 - 2024-12-03 =
+- Added Romanian translations
+- Various bug fixes and improvements
+
+= 1.15.3 - 2024-11-12 =
+- Added Arabic, Romanian, Hindi, Colombian, and Mexican Spanish language support
+- Various bug fixes and improvements
+
+= 1.15.2 - 2024-10-08 =
+- Fixed a bug where svg images being imported would end up corrupted
+
+= 1.15.1 - 2024-10-07 =
+- Added Serbian language support
+- Various bug fixes and improvements
+
+= 1.15.0 - 2024-09-12 =
+- Added initial support for 3rd party plugin patterns
+- Added compatibility with new Extendable helpers
+- Various bug fixes and improvements
+
+= 1.14.6 - 2024-08-28 =
+- Added Bulgarian language support
+- Various bug fixes and improvements
+
+= 1.14.5 - 2024-08-14 =
+- Updated button styles to match WP designs
+- Updated Theme.json files to match the Extendable theme
+- Various bug fixes and improvements
+
+= 1.14.4 - 2024-07-17 =
+- Updated styles for WP 6.6 compatibility
+- Updated Polish translations
+
+= 1.14.3 - 2024-07-12 =
+- Removed the Exendify admin landing page
+- Fixed a few mobile style inconsistencies
+
+= 1.14.2 - 2024-07-04 =
+- Fixed an issue with the logo overflowing
+- Added language support for Czech, Hungarian, and Slovak
+- Added auto image imports for our pattern images
+
+= 1.14.1 - 2024-06-04 =
+- Fixes an issue with loading goals with some permalink structures
+- Adds Turkish language support
+
+= 1.14.0 - 2024-05-23 =
+- Adds Unsplash image search on Draft
+- Various bug fixes and improvements
+
+= 1.13.5 - 2024-04-24 =
+- Fixes a data conflict with an external plugin
+
+= 1.13.4 - 2024-04-22 =
+- Fixes a bug where users were redirected to the wrong Extendify page
+
+= 1.13.3 - 2024-04-21 =
+- Fixes a bug where a constant was being read before it was defined
+
+= 1.13.2 - 2024-04-18 =
+- Update WP script packages
+- Various bug fixes and improvements
+
+= 1.13.1 - 2024-03-14 =
+- Fixed a bug where buttons in Gutenberg would trigger a form submit
+- Fixed compatibility with Dark Reader Chrome extension
+- Various other bug fixes and improvements
+
+= 1.13.0 - 2024-03-14 =
+- Enhancements to editor AI tools
+- Redesign of the Site Assistant
+- Various bug fixes and improvements
+
+= 1.12.3 - 2024-02-04 =
+- Fixed an issue where some users would be incorrectly redirected
+
+= 1.12.2 - 2024-01-29 =
+- Various bug fixes and improvements
+
+= 1.12.1 - 2024-01-04 =
+- Fixes loading issues with live previews
+- Various bug fixes and improvements
+
+= 1.12.0 - 2023-12-12 =
+- Fixes a bug where an icon woudl show up within iframes
+- Updates Swedish translations and others
+- Fixes a conflict with Kadence and Google fonts
 
 = 1.11.2 - 2023-11-27 =
 - Fixes some issues with translation strings missing

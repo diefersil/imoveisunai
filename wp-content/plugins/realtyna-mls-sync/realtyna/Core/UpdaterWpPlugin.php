@@ -155,7 +155,7 @@ class UpdaterWpPlugin extends Updater
         $updateResult = false;
 
         if ( $this->isUpdateAvailable() && !empty( $this->getDownloadLink() ) && function_exists('download_url') && function_exists('unzip_file') ){
-            
+
             if ( file_exists( self::WP_FILE_CORE ) ){
                 
                 require_once self::WP_FILE_CORE;
@@ -187,6 +187,5 @@ class UpdaterWpPlugin extends Updater
         return $updateResult;
 
     }
-
 
 }

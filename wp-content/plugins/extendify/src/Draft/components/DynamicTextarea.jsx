@@ -64,6 +64,7 @@ export const DynamicTextarea = ({
 	return (
 		<AnimatePresence>
 			<motion.div
+				className="m-0.5 w-full"
 				key="input"
 				animate={{ height }}
 				transition={{ duration: 0.2 }}

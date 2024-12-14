@@ -10,37 +10,43 @@ import { Title } from '@launch/components/Title';
 import { useFetch } from '@launch/hooks/useFetch';
 import { useIsMountedLayout } from '@launch/hooks/useIsMounted';
 import { PageLayout } from '@launch/layouts/PageLayout';
-import { useUserSelectionStore } from '@launch/state/UserSelections';
 import { pageState } from '@launch/state/factory';
+import { usePagesSelectionStore } from '@launch/state/pages-selections';
+import { useUserSelectionStore } from '@launch/state/user-selections';
 import { Checkmark } from '@launch/svg';
 
-export const fetcher = ({ siteType }) => getHomeTemplates(siteType);
-export const fetchData = (siteType) => ({
-	key: 'home-pages-list',
-	siteType: siteType ?? useUserSelectionStore?.getState().siteType,
-});
+export const fetcher = getHomeTemplates;
+export const fetchData = () => {
+	const { siteType, siteStructure } = useUserSelectionStore?.getState() || {};
+	return {
+		key: 'home-pages-list',
+		siteType,
+		siteStructure,
+	};
+};
 
 export const state = pageState('Layout', () => ({
-	title: __('Layout', 'extendify-local'),
-	showInSidebar: true,
 	ready: false,
+	canSkip: false,
+	validation: null,
+	onRemove: () => {},
 }));
 
 export const HomeSelect = () => {
-	const { loading, data: styleData } = useFetch(fetchData, fetcher);
+	const { loading, data: homeTemplate } = useFetch(fetchData, fetcher);
 
 	return (
 		<PageLayout>
-			<div className="grow px-6 py-8 md:py-16 md:px-32 overflow-y-scroll">
+			<div className="grow overflow-y-scroll px-6 py-8 md:p-12 3xl:p-16">
 				<Title
 					title={__('Pick a design for your website', 'extendify-local')}
 					description={__('You can personalize this later.', 'extendify-local')}
 				/>
-				<div className="w-full relative max-w-6xl mx-auto">
+				<div className="relative mx-auto w-full max-w-6xl">
 					{loading ? (
 						<LoadingIndicator />
 					) : (
-						<DesignSelector styleData={styleData} />
+						<DesignSelector homeTemplate={homeTemplate} />
 					)}
 				</div>
 			</div>
@@ -48,25 +54,34 @@ export const HomeSelect = () => {
 	);
 };
 
-const DesignSelector = ({ styleData }) => {
+const DesignSelector = ({ homeTemplate }) => {
 	const { data: variations } = useFetch('variations', getThemeVariations);
 	const isMounted = useIsMountedLayout();
 	const [styles, setStyles] = useState([]);
-	const { setStyle, style: currentStyle } = useUserSelectionStore();
-	const onSelect = useCallback((style) => setStyle(style), [setStyle]);
+	const { setStyle, style: currentStyle } = usePagesSelectionStore();
+	const { setVariation, variation } = useUserSelectionStore();
+
+	const onSelect = useCallback(
+		(style) => {
+			setStyle(style);
+			setVariation(style?.variation);
+		},
+		[setStyle, setVariation],
+	);
 	const wrapperRef = useRef();
 	const once = useRef(false);
 
 	useEffect(() => {
-		state.setState({ ready: !!currentStyle?.variation?.title });
-	}, [currentStyle]);
+		state.setState({ ready: !!variation?.title });
+	}, [variation]);
 
 	useEffect(() => {
-		if (!styleData || !variations) return;
+		if (!homeTemplate || !variations) return;
 		if (styles.length) return;
 		setStyle(null);
+		setVariation(null);
 		(async () => {
-			const slicedEntries = Array.from(styleData.entries());
+			const slicedEntries = Array.from(homeTemplate.entries());
 			for (const [index, style] of slicedEntries) {
 				if (!isMounted.current) return;
 
@@ -83,7 +98,14 @@ const DesignSelector = ({ styleData }) => {
 				await new Promise((resolve) => setTimeout(resolve, random));
 			}
 		})();
-	}, [styleData, isMounted, variations, styles.length, setStyle]);
+	}, [
+		homeTemplate,
+		isMounted,
+		variations,
+		styles.length,
+		setStyle,
+		setVariation,
+	]);
 
 	useEffect(() => {
 		if (!currentStyle || !styles || once.current) return;
@@ -97,7 +119,7 @@ const DesignSelector = ({ styleData }) => {
 
 	return (
 		<div
-			className="gap-8 grid md:grid-cols-2 lg:grid-cols-3"
+			className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
 			data-test="layout-preview-wrapper"
 			ref={wrapperRef}>
 			{styles?.map((style) => (
@@ -108,10 +130,11 @@ const DesignSelector = ({ styleData }) => {
 							animate={{ opacity: 1 }}
 							duration={0.7}
 							className={classNames(
-								'relative overflow-hidden border border-gray-200 rounded cursor-pointer hover:ring-4 hover:ring-gray-300 ring-offset-2 ring-offset-white hover:outline-none focus-within:ring-4 focus-within:ring-offset-2 focus-within:ring-offset-white focus-within:ring-design-main focus-within:outline-none',
+								'relative cursor-pointer overflow-hidden rounded border border-gray-200 ring-offset-2 ring-offset-white focus-within:outline-none focus-within:ring-4 focus-within:ring-design-main focus-within:ring-offset-2 focus-within:ring-offset-white hover:outline-none hover:ring-4',
 								{
-									'ring-4 ring-offset-2 ring-offset-white ring-design-main hover:ring-design-main':
+									'ring-4 ring-design-main ring-offset-2 ring-offset-white hover:ring-design-main':
 										currentStyle?.id === style.id,
+									'hover:ring-gray-300': currentStyle?.id !== style.id,
 								},
 							)}
 							style={{ aspectRatio: '1.55' }}>
@@ -124,12 +147,12 @@ const DesignSelector = ({ styleData }) => {
 					</AnimatePresence>
 					<span aria-hidden="true">
 						{currentStyle?.id === style.id ? (
-							<Checkmark className="absolute top-0 right-0 m-2 text-design-text bg-design-main w-6 h-6 z-50 rounded-full translate-x-5 -translate-y-5" />
+							<Checkmark className="absolute right-0 top-0 z-50 m-2 h-6 w-6 -translate-y-5 translate-x-5 rounded-full bg-design-main text-design-text" />
 						) : null}
 					</span>
 				</div>
 			))}
-			{styleData?.slice(styles?.length).map((_, i) => (
+			{homeTemplate?.slice(styles?.length).map((_, i) => (
 				<AnimatePresence key={i}>
 					<motion.div
 						initial={{ opacity: 1 }}

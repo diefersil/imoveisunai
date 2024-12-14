@@ -1,3 +1,4 @@
+import apiFetch from '@wordpress/api-fetch';
 import { isBlobURL } from '@wordpress/blob';
 import {
 	DropZone,
@@ -11,9 +12,8 @@ import { useEffect } from '@wordpress/element';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { MediaUpload, uploadMedia } from '@wordpress/media-utils';
-import { getOption, updateOption } from '@assist/api/WPApi';
-import { useGlobalStore } from '@assist/state/Global.js';
-import { getMediaDetails } from '../lib/media';
+import { getMediaDetails } from '@assist/lib/media';
+import { useGlobalStore } from '@assist/state/globals';
 
 export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 	const { popModal } = useGlobalStore();
@@ -24,18 +24,36 @@ export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 		[imageId],
 	);
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(media);
+
 	useEffect(() => {
-		getOption(type).then((id) => setImageId(Number(id)));
+		const controller = new AbortController();
+
+		apiFetch({
+			path: '/wp/v2/settings',
+			signal: controller.signal,
+		}).then((settings) => {
+			if (settings[type]) setImageId(Number(settings[type]));
+		});
+
+		return () => controller.abort();
 	}, [type]);
 
-	const onUpdateImage = (image) => {
+	const updateOption = async (type, id) => {
+		await apiFetch({
+			path: '/wp/v2/settings',
+			method: 'post',
+			data: { [type]: id },
+		});
+	};
+
+	const onUpdateImage = async (image) => {
 		setImageId(image.id);
-		updateOption(type, image.id);
+		await updateOption(type, image.id);
 		onUpdate();
 	};
-	const onRemoveImage = () => {
+	const onRemoveImage = async () => {
 		setImageId(0);
-		updateOption(type, 0);
+		await updateOption(type, 0);
 	};
 
 	const onDropFiles = (filesList) => {
@@ -69,7 +87,7 @@ export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 						<div className="relative block">
 							<Button
 								className={
-									'editor-post-featured-image__toggle extendify-assist-upload-logo p-0 m-0 border-0 cursor-pointer flex w-full min-w-full text-center relative bg-gray-100 hover:bg-gray-300 hover:text-current h-48 justify-center text-gray-900'
+									'editor-post-featured-image__toggle extendify-assist-upload-logo relative m-0 flex h-48 w-full min-w-full cursor-pointer justify-center border-0 bg-gray-100 p-0 text-center text-gray-900 hover:bg-gray-300 hover:text-current'
 								}
 								onClick={open}
 								aria-label={
@@ -87,7 +105,7 @@ export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 											naturalHeight={mediaHeight}
 											isInline>
 											<img
-												className="block m-auto w-auto h-auto max-w-full max-h-48 inset-0 p-6"
+												className="inset-0 m-auto block h-auto max-h-48 w-auto max-w-96"
 												src={mediaSourceUrl}
 												alt=""
 											/>
@@ -98,7 +116,7 @@ export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 								{!imageId && !isLoading && actionLabel}
 							</Button>
 							<DropZone
-								className="w-full h-full absolute inset-0"
+								className="absolute inset-0 h-full w-full"
 								onFilesDrop={onDropFiles}
 							/>
 						</div>
@@ -106,7 +124,7 @@ export const ImageUploader = ({ type, onUpdate, title, actionLabel }) => {
 				/>
 			</MediaUploadCheck>
 			{Boolean(imageId) && (
-				<div className="mt-6 gap-4 flex justify-between">
+				<div className="mt-6 flex justify-between gap-4">
 					<MediaUploadCheck>
 						<div>
 							{imageId && (

@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name:       Extendify
- * Description:       Extendify is the platform of site design and creation tools for people that want to build a beautiful WordPress website with a library of patterns and full page layouts for the Gutenberg block editor.
+ * Plugin Name:       Extendify WordPress Onboarding and AI Assistant
+ * Description:       AI-powered WordPress assistant for onboarding and ongoing editing offered exclusively through select WordPress hosting providers.
  * Plugin URI:        https://extendify.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Author:            Extendify
  * Author URI:        https://extendify.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
- * Version:           1.11.2
+ * Version:           1.15.4
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       extendify-local
@@ -22,9 +22,7 @@
  * GNU General Public License for more details.
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
+defined('ABSPATH') || exit;
 
 /** ExtendifySdk is the previous class name used */
 if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
@@ -73,4 +71,51 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
         $extendify = new Extendify();
         $extendify();
     });
+
+    add_action('update_option', function ($option) {
+        if (in_array($option, ['WPLANG', 'blogname'], true)) {
+            \delete_transient('extendify_recommendations');
+            \delete_transient('extendify_domains');
+            \delete_transient('extendify_supportArticles');
+        }
+    });
+
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
+    add_action('upgrader_process_complete', function ($upgrader, $options) {
+        $updatedExtendify = isset($options['plugins']) && array_filter($options['plugins'], function ($plugin) {
+            return strpos($plugin, 'extendify') !== false;
+        });
+
+        if (!$updatedExtendify) {
+            return;
+        }
+
+        \delete_transient('extendify_recommendations');
+        \delete_transient('extendify_domains');
+        \delete_transient('extendify_supportArticles');
+    }, 10, 2);
+
+    // Redirect logins to the Extendify Assist dashboard if they are an admin.
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
+    \add_filter('login_redirect', function ($redirectTo, $requestedRedirectTo, $user) {
+        if (!$user || !is_a($user, 'WP_User')) {
+            return $redirectTo;
+        }
+
+        $partnerData = get_option('extendify_partner_data_v2', []);
+        if (!$user->has_cap('manage_options') || empty($partnerData)) {
+            return $redirectTo;
+        }
+
+        return \admin_url() . 'admin.php?page=extendify-assist';
+    }, 10, 3);
+
+    // ALlow Extendify requests to have a longer timeout.
+    add_filter('http_request_args', function ($args, $url) {
+        if (strpos($url, 'extendify') !== false) {
+            $args['timeout'] = 20;
+        }
+
+        return $args;
+    }, 100, 2);
 endif;

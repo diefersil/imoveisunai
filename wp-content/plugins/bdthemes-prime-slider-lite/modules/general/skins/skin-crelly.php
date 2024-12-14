@@ -30,10 +30,10 @@ class Skin_Crelly extends Elementor_Skin_Base {
 
                     <ul class="bdt-ps-counternav bdt-position-bottom bdt-visible@s">
                         <?php $slide_index = 1; foreach ( $settings['slides'] as $slide ) : ?>
-                            <li bdt-slideshow-item="<?php echo ($slide_index - 1); ?>" data-label="<?php echo str_pad( $slide_index, 2, '0', STR_PAD_LEFT); ?>" ><a href="#"><?php echo str_pad( $slide_index, 2, '0', STR_PAD_LEFT); ?></a></li>
+                            <li bdt-slideshow-item="<?php echo esc_attr($slide_index - 1); ?>" data-label="<?php echo esc_attr(str_pad( $slide_index, 2, '0', STR_PAD_LEFT)); ?>" ><a href="#"><?php echo esc_attr(str_pad( $slide_index, 2, '0', STR_PAD_LEFT)); ?></a></li>
                         <?php $slide_index++;  endforeach; ?>
 
-                        <span><?php echo str_pad( $slide_index - 1, 2, '0', STR_PAD_LEFT); ?></span>
+                        <span><?php echo esc_attr(str_pad( $slide_index - 1, 2, '0', STR_PAD_LEFT)); ?></span>
                     </ul>
 
                 </div>
@@ -76,18 +76,11 @@ class Skin_Crelly extends Elementor_Skin_Base {
     public function rendar_item_content($slide_content) {
         $settings = $this->parent->get_settings_for_display();
 
-        $this->parent->add_render_attribute(
-			[
-				'title-link' => [
-					'class' => [
-						'bdt-slider-title-link',
-					],
-					'href'   => $slide_content['title_link']['url'] ? esc_url($slide_content['title_link']['url']) : 'javascript:void(0);',
-					'target' => $slide_content['title_link']['is_external'] ? '_blank' : '_self'
-				]
-			], '', '', true
-        );
-
+        $this->parent->add_render_attribute('title-link', 'class', 'bdt-slider-title-link', true);
+        if ($slide_content['title']) {
+            $this->parent->add_link_attributes('title-link', $slide_content['title_link'], true);
+        }
+        
         $parallax_sub_title = 'data-bdt-slideshow-parallax="x: 300,0,-100; opacity: 1,1,0"';   
         $parallax_title     = 'data-bdt-slideshow-parallax="x: 500,0,-100; opacity: 1,1,0"';
         $parallax_excerpt   = 'data-bdt-slideshow-parallax="y: 200,0,-100; opacity: 1,1,0"';
@@ -113,53 +106,49 @@ class Skin_Crelly extends Elementor_Skin_Base {
         
         ?>
 
-        <div class="bdt-container">
-            <div class="bdt-slideshow-content-wrapper">
-                <div class="bdt-prime-slider-wrapper">
-                    <div class="bdt-prime-slider-content">
+        <div class="bdt-prime-slider-wrapper">
+            <div class="bdt-prime-slider-content">
 
-                        <div class="bdt-prime-slider-desc">
+                <div class="bdt-prime-slider-desc">
 
-                            <?php if ($slide_content['sub_title'] && ( 'yes' == $settings['show_sub_title'] )) : ?>
-                                <div class="bdt-sub-title bdt-text-left">
-                                    <<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?> <?php echo $parallax_sub_title; ?> data-reveal="reveal-active" class="bdt-ps-sub-title">
-                                    <?php echo wp_kses_post($slide_content['sub_title']); ?>
-                                    </<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?>>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php if ($slide_content['title'] && ( 'yes' == $settings['show_title'] )) : ?>
-                                <div class="bdt-main-title bdt-text-left"  <?php echo $parallax_title; ?> data-reveal="reveal-active">
-                                    <<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title-tag">
-                                        <?php if ( '' !== $slide_content['title_link']['url'] ) : ?>
-                                            <a <?php $this->parent->print_render_attribute_string( 'title-link' ); ?>>
-                                        <?php endif; ?>
-                                            <?php echo wp_kses_post($slide_content['title']); ?>
-                                        <?php if ( '' !== $slide_content['title_link']['url'] ) : ?>
-                                            </a>
-                                        <?php endif; ?>
-                                    </<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
-                                </div>
-                            <?php endif; ?>
-                            
+                    <?php if ($slide_content['sub_title'] && ( 'yes' == $settings['show_sub_title'] )) : ?>
+                        <div class="bdt-sub-title bdt-text-left">
+                            <<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?> <?php echo wp_kses_post($parallax_sub_title); ?> data-reveal="reveal-active" class="bdt-ps-sub-title">
+                            <?php echo wp_kses_post($slide_content['sub_title']); ?>
+                            </<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?>>
                         </div>
-                                    
-                    </div>
-                    <?php if ($slide_content['excerpt'] && ( 'yes' == $settings['show_excerpt'] )) : ?>
-                    <div class="bdt-slider-excerpt-content" <?php echo $parallax_excerpt; ?>>
-                        <?php if ($settings['show_otherview'] == 'yes') : ?>
-                        <h3 data-reveal="reveal-active"><?php echo esc_html('Overview', 'bdthemes-prime-slider') ?></h3>
-                        <?php endif; ?>
-                        <div class="bdt-slider-excerpt" data-reveal="reveal-active">
-                            <?php echo wp_kses_post($slide_content['excerpt']); ?>
-                        </div>
-                        <div class="bdt-crelly-btn" data-bdt-slideshow-parallax="y: 200,0,-100; opacity: 1,1,0">
-                            <?php $this->parent->render_button($slide_content); ?>
-                        </div>
-                    </div>
                     <?php endif; ?>
+
+                    <?php if ($slide_content['title'] && ( 'yes' == $settings['show_title'] )) : ?>
+                        <div class="bdt-main-title bdt-text-left"  <?php echo wp_kses_post($parallax_title); ?> data-reveal="reveal-active">
+                            <<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title-tag">
+                                <?php if ( '' !== $slide_content['title_link']['url'] ) : ?>
+                                    <a <?php $this->parent->print_render_attribute_string( 'title-link' ); ?>>
+                                <?php endif; ?>
+                                    <?php echo wp_kses_post($slide_content['title']); ?>
+                                <?php if ( '' !== $slide_content['title_link']['url'] ) : ?>
+                                    </a>
+                                <?php endif; ?>
+                            </<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
+                        </div>
+                    <?php endif; ?>
+                    
+                </div>
+                            
+            </div>
+            <?php if ($slide_content['excerpt'] && ( 'yes' == $settings['show_excerpt'] )) : ?>
+            <div class="bdt-slider-excerpt-content" <?php echo wp_kses_post($parallax_excerpt); ?>>
+                <?php if ($settings['show_otherview'] == 'yes') : ?>
+                <h3 data-reveal="reveal-active"><?php echo esc_html__('Overview', 'bdthemes-prime-slider') ?></h3>
+                <?php endif; ?>
+                <div class="bdt-slider-excerpt" data-reveal="reveal-active">
+                    <?php echo wp_kses_post($slide_content['excerpt']); ?>
+                </div>
+                <div class="bdt-crelly-btn" data-bdt-slideshow-parallax="y: 200,0,-100; opacity: 1,1,0">
+                    <?php $this->parent->render_button($slide_content); ?>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
         <?php
     }

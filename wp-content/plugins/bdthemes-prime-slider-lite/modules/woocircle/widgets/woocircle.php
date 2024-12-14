@@ -55,6 +55,10 @@ class Woocircle extends Widget_Base {
 		return 'https://youtu.be/nJUtQ28kb4A';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section(
@@ -379,7 +383,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'open_button_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-elastic-action--open' => 'color: {{VALUE}};',
@@ -399,7 +403,7 @@ class Woocircle extends Widget_Base {
 			Group_Control_Border::get_type(),
 			[
 				'name'        => 'open_button_border',
-				'label'       => esc_html__('Border', 'bdthemes-element-pack'),
+				'label'       => esc_html__('Border', 'bdthemes-prime-slider'),
 				'placeholder' => '1px',
 				'default'     => '1px',
 				'selector'    => '{{WRAPPER}} .bdt-elastic-action--open',
@@ -410,7 +414,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'open_button_radius',
 			[
-				'label'      => esc_html__('Border Radius', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Border Radius', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', '%'],
 				'selectors'  => [
@@ -422,7 +426,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'open_button_padding',
 			[
-				'label'      => esc_html__('Padding', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Padding', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', 'em', '%'],
 				'selectors'  => [
@@ -434,7 +438,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'open_button_margin',
 			[
-				'label'      => esc_html__('Margin', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Margin', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', 'em', '%'],
 				'selectors'  => [
@@ -472,7 +476,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'open_button_hover_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-elastic-action--open:focus,
@@ -492,7 +496,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'open_button_hover_border_color',
 			[
-				'label'     => esc_html__('Border Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Border Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'condition' => [
 					'close_button_border_border!' => '',
@@ -528,7 +532,7 @@ class Woocircle extends Widget_Base {
 				'selector' => '{{WRAPPER}} .bdt-elastic-slider .bdt-elastic-modal-wrap',
 				'fields_options' => [
 					'background' => [
-						'label' => esc_html__('Background', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+						'label' => esc_html__('Background', 'bdthemes-prime-slider'),
 					],
 				],
 			]
@@ -800,7 +804,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'close_button_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-elastic-action--close' => 'color: {{VALUE}};',
@@ -820,7 +824,7 @@ class Woocircle extends Widget_Base {
 			Group_Control_Border::get_type(),
 			[
 				'name'        => 'close_button_border',
-				'label'       => esc_html__('Border', 'bdthemes-element-pack'),
+				'label'       => esc_html__('Border', 'bdthemes-prime-slider'),
 				'placeholder' => '1px',
 				'default'     => '1px',
 				'selector'    => '{{WRAPPER}} .bdt-elastic-action--close',
@@ -831,7 +835,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'close_button_radius',
 			[
-				'label'      => esc_html__('Border Radius', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Border Radius', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', '%'],
 				'selectors'  => [
@@ -843,7 +847,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'close_button_padding',
 			[
-				'label'      => esc_html__('Padding', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Padding', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', 'em', '%'],
 				'selectors'  => [
@@ -855,7 +859,7 @@ class Woocircle extends Widget_Base {
 		$this->add_responsive_control(
 			'close_button_margin',
 			[
-				'label'      => esc_html__('Margin', 'bdthemes-element-pack'),
+				'label'      => esc_html__('Margin', 'bdthemes-prime-slider'),
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => ['px', 'em', '%'],
 				'selectors'  => [
@@ -893,7 +897,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'close_button_hover_color',
 			[
-				'label'     => esc_html__('Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-elastic-action--close:hover' => 'color: {{VALUE}};',
@@ -912,7 +916,7 @@ class Woocircle extends Widget_Base {
 		$this->add_control(
 			'close_button_hover_border_color',
 			[
-				'label'     => esc_html__('Border Color', 'bdthemes-element-pack'),
+				'label'     => esc_html__('Border Color', 'bdthemes-prime-slider'),
 				'type'      => Controls_Manager::COLOR,
 				// 'condition' => [
 				// 	'close_button_border_border!' => '',
@@ -1273,9 +1277,9 @@ class Woocircle extends Widget_Base {
 			<div class="bdt-elastic-slide-content">
 
 				<?php if ($settings['show_title']) : ?>
-					<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-elastic-title-preview">
+					<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-elastic-title-preview">
 						<?php the_title(); ?>
-					</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+					</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 				<?php endif; ?>
 
 				<?php if ($settings['show_price']) : ?>
@@ -1286,21 +1290,21 @@ class Woocircle extends Widget_Base {
 			<div class="bdt-elastic-image-action-btn">
 				<div class="bdt-elastic-image-action__inner">
 
-					<img class="bdt-elastic-img bdt-elastic-img-small" src="<?php echo esc_url($image_final_src); ?>" alt="<?php echo get_the_title(); ?>">
+					<img class="bdt-elastic-img bdt-elastic-img-small" src="<?php echo esc_url($image_final_src); ?>" alt="<?php echo esc_html(get_the_title()); ?>">
 
 					<button class="bdt-elastic-action bdt-elastic-action--open" aria-label="View details"><i class="ps-wi-plus"></i></button>
 				</div>
 			</div>
 			<div class="bdt-elastic-modal-wrap">
 				<div class="bdt-elastic-content-scroller">
-					<img class="bdt-elastic-img bdt-elastic-img-large" src="<?php echo esc_url($image_final_src); ?>" alt="<?php echo get_the_title(); ?>">
+					<img class="bdt-elastic-img bdt-elastic-img-large" src="<?php echo esc_url($image_final_src); ?>" alt="<?php echo esc_html(get_the_title()); ?>">
 
 					<div class="bdt-elastic-modal-details">
 
 						<?php if ($settings['show_title']) : ?>
-							<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-elastic-title--main">
+							<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-elastic-title--main">
 								<?php the_title(); ?>
-							</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+							</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 						<?php endif; ?>
 
 						<?php if ($settings['show_excerpt']) : ?>

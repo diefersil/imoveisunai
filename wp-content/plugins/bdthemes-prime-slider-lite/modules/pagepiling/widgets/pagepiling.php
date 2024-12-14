@@ -25,7 +25,7 @@ class Pagepiling extends Widget_Base {
 	}
 
 	public function get_title() {
-		return BDTPS . esc_html__( 'Pagepiling', 'bdthemes-element-pack' );
+		return BDTPS . esc_html__( 'Pagepiling', 'bdthemes-prime-slider' );
 	}
 
 	public function get_icon() {
@@ -52,12 +52,16 @@ class Pagepiling extends Widget_Base {
 		return 'https://youtu.be/L7eWKJaZj5I';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section(
 			'section_content_sliders',
 			[
-				'label' => esc_html__('Sliders', 'bdthemes-element-pack'),
+				'label' => esc_html__('Slide Items', 'bdthemes-prime-slider'),
 			]
 		);
 
@@ -118,7 +122,6 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
 			'slides',
 			[
-				'label'   => esc_html__('Slider Items', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::REPEATER,
 				'fields'  => $repeater->get_controls(),
 				'default' => [
@@ -149,7 +152,7 @@ class Pagepiling extends Widget_Base {
 		$this->start_controls_section(
 			'section_content_fancy_slider',
 			[
-				'label' => esc_html__( 'Layout', 'bdthemes-element-pack' ),
+				'label' => esc_html__( 'Additional Options', 'bdthemes-prime-slider' ),
 				'tab' => Controls_Manager::TAB_CONTENT,
 			]
 		);
@@ -199,7 +202,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_responsive_control(
             'content_max_width',
             [
-                'label' => __( 'Content Max Width', 'bdthemes-element-pack' ),
+                'label' => __( 'Content Max Width', 'bdthemes-prime-slider' ),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'range' => [
@@ -217,7 +220,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_responsive_control(
             'content_min_height',
             [
-                'label' => __( 'Height', 'bdthemes-element-pack' ),
+                'label' => __( 'Height', 'bdthemes-prime-slider' ),
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'range' => [
@@ -235,23 +238,23 @@ class Pagepiling extends Widget_Base {
 		$this->add_responsive_control(
 			'slide_text_align',
 			[
-				'label'   => __( 'Alignment', 'bdthemes-element-pack' ),
+				'label'   => __( 'Alignment', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::CHOOSE,
 				'options' => [
 					'left' => [
-						'title' => __( 'Left', 'bdthemes-element-pack' ),
+						'title' => __( 'Left', 'bdthemes-prime-slider' ),
 						'icon'  => 'eicon-text-align-left',
 					],
 					'center' => [
-						'title' => __( 'Center', 'bdthemes-element-pack' ),
+						'title' => __( 'Center', 'bdthemes-prime-slider' ),
 						'icon'  => 'eicon-text-align-center',
 					],
 					'right' => [
-						'title' => __( 'Right', 'bdthemes-element-pack' ),
+						'title' => __( 'Right', 'bdthemes-prime-slider' ),
 						'icon'  => 'eicon-text-align-right',
 					],
 					'justify' => [
-						'title' => __( 'Justified', 'bdthemes-element-pack' ),
+						'title' => __( 'Justified', 'bdthemes-prime-slider' ),
 						'icon'  => 'eicon-text-align-justify',
 					],
 				],
@@ -276,7 +279,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
 			'social_main_title',
 			[
-				'label'   => __('Social Text', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
+				'label'   => __('Social Text', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::TEXT,
 				'default' => __('Follow Us', 'bdthemes-prime-slider'),
 			]
@@ -293,14 +296,13 @@ class Pagepiling extends Widget_Base {
 			]
 		);
 
-		$repeater->add_control(
-			'social_link',
-			[
-				'label'   => __('Link', 'bdthemes-prime-slider'),
-				'type'    => Controls_Manager::TEXT,
-				'default' => __('http://www.facebook.com/bdthemes/', 'bdthemes-prime-slider'),
-			]
-		);
+        $repeater->add_control(
+            'social_icon_link',
+            [ 
+                'label'   => __( 'Link', 'bdthemes-prime-slider' ),
+                'type'    => Controls_Manager::URL,
+            ]
+        );
 
 		$this->add_control(
 			'social_link_list',
@@ -309,16 +311,22 @@ class Pagepiling extends Widget_Base {
 				'fields'  => $repeater->get_controls(),
 				'default' => [
 					[
-						'social_link'       => __('http://www.facebook.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Fb.',
+						'social_icon_link'       => [ 
+                            'url' => 'http://www.facebook.com/bdthemes/',
+                        ],
+						'social_link_title' => __('Fb.', 'bdthemes-prime-slider'),
 					],
 					[
-						'social_link'       => __('http://www.twitter.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Tw.',
+						'social_icon_link'       => [ 
+							'url' => 'http://www.twitter.com/bdthemes/',
+						],
+						'social_link_title' => __('Tw.', 'bdthemes-prime-slider'),
 					],
 					[
-						'social_link'       => __('http://www.instagram.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Inst.',
+						'social_icon_link'       => [ 
+							'url' => 'http://www.instagram.com/bdthemes/',
+						],
+						'social_link_title' => __('In.', 'bdthemes-prime-slider'),
 					],
 				],
 				'title_field' => '{{{ social_link_title }}}',
@@ -330,7 +338,7 @@ class Pagepiling extends Widget_Base {
 		$this->start_controls_section(
 			'section_additional_settings',
 			[
-				'label' => esc_html__( 'Additional Settings', 'bdthemes-element-pack' ),
+				'label' => esc_html__( 'Slider Settings', 'bdthemes-prime-slider' ),
 				'tab' => Controls_Manager::TAB_CONTENT,
 			]
 		);
@@ -338,7 +346,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
 			'scrollingSpeed',
 			[
-				'label'   => esc_html__( 'Scrolling Speed', 'bdthemes-element-pack' ),
+				'label'   => esc_html__( 'Scrolling Speed', 'bdthemes-prime-slider' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' 		 => [
 					'size' 			=> 700,
@@ -356,20 +364,21 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
             'navigation_position',
             [
-                'label'   => __( 'Navigation Position', 'bdthemes-element-pack' ) . BDTPS_CORE_PC,
+                'label'   => __( 'Navigation Position', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
                 'type' 	  => Controls_Manager::SELECT,
 				'default' => 'left',
                 'options' => [
-                    'left'       => __( 'Left', 'bdthemes-element-pack' ),
-                    'bottom'     => __( 'Bottom', 'bdthemes-element-pack' ),
+                    'left'       => __( 'Left', 'bdthemes-prime-slider' ),
+                    'bottom'     => __( 'Bottom', 'bdthemes-prime-slider' ),
 				],
+				'classes'    => BDTPS_CORE_IS_PC
             ]
 		);
 
 		$this->add_control(
 			'loopBottom',
 			[
-				'label'   => esc_html__( 'loop Bottom', 'bdthemes-element-pack' ),
+				'label'   => esc_html__( 'loop Bottom', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 			]
@@ -378,7 +387,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
 			'loopTop',
 			[
-				'label'   => esc_html__( 'loop Top', 'bdthemes-element-pack' ),
+				'label'   => esc_html__( 'loop Top', 'bdthemes-prime-slider' ),
 				'type'    => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 			]
@@ -387,16 +396,17 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
 			'autoplay',
 			[
-				'label'   => esc_html__( 'Autoplay', 'bdthemes-element-pack' ) . BDTPS_CORE_NC . BDTPS_CORE_PC,
+				'label'   => esc_html__( 'Autoplay', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
 				'type'    => Controls_Manager::SWITCHER,
 				'render_type' => 'template',
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
 		$this->add_control(
 			'autoplay_duration',
 			[
-				'label'   => esc_html__( 'AutoPlay Duration', 'bdthemes-element-pack' ),
+				'label'   => esc_html__( 'AutoPlay Duration', 'bdthemes-prime-slider' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
 					'size' 	 => 1000,
@@ -423,6 +433,22 @@ class Pagepiling extends Widget_Base {
 			[
 				'label'     => esc_html__('Sliders', 'bdthemes-prime-slider'),
 				'tab'       => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Background::get_type(),
+			[
+				'name' => 'overlay_background',
+				'label' => esc_html__('Background', 'bdthemes-prime-slider'),
+				'types' => ['classic', 'gradient'],
+				'exclude' => ['image'],
+				'selector' => '{{WRAPPER}} .bdt-pagepiling-slider .bdt-ps-overlay:before',
+				'fields_options' => [
+					'background' => [
+						'label' => esc_html__('Overlay', 'bdthemes-prime-slider'),
+					],
+				],
 			]
 		);
 
@@ -455,7 +481,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
             'first_word_title_color',
             [
-                'label'     => esc_html__('First Word Color', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'label'     => esc_html__('First Word Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .bdt-pagepiling-slider .bdt-prime-slider-content .bdt-main-title .bdt-title-tag .frist-word' => 'color: {{VALUE}};',
@@ -470,7 +496,7 @@ class Pagepiling extends Widget_Base {
 			Group_Control_Text_Shadow::get_type(),
 			[
 				'name' => 'text_shadow',
-				'label' => __( 'Text Shadow', 'plugin-domain' ) . BDTPS_CORE_NC,
+				'label' => __( 'Text Shadow', 'plugin-domain' ),
 				'selector' => '{{WRAPPER}} .bdt-pagepiling-slider .bdt-prime-slider-content .bdt-title-tag',
 				'condition' => [
 					'show_title' => ['yes'],
@@ -483,11 +509,6 @@ class Pagepiling extends Widget_Base {
 			[
 				'name' => 'title_text_stroke',
 				'selector' => '{{WRAPPER}} .bdt-pagepiling-slider .bdt-prime-slider-content .bdt-main-title .bdt-title-tag',
-				'fields_options' => [
-                    'text_stroke_type' => [
-                        'label' => esc_html__( 'Text Stroke', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC . BDTPS_CORE_PC,
-                    ],
-                ],
 				'condition' => [
 					'show_title' => ['yes'],
 				],
@@ -654,7 +675,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
             'readmore_text_color',
             [
-                'label'     => __('Text Color', 'bdthemes-element-pack'),
+                'label'     => __('Text Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .bdt-pagepiling-slider .bdt-slide-btn .bdt-button-text' => 'color: {{VALUE}};',
@@ -665,7 +686,7 @@ class Pagepiling extends Widget_Base {
         $this->add_control(
             'readmore_icon_color',
             [
-                'label'     => __('Icon Color', 'bdthemes-element-pack'),
+                'label'     => __('Icon Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
 					'{{WRAPPER}} .bdt-pagepiling-slider .bdt-slide-btn:hover .bdt-button-circle .icon.arrow' => 'background: {{VALUE}};',
@@ -695,7 +716,7 @@ class Pagepiling extends Widget_Base {
         $this->add_responsive_control(
             'readmore_radius',
             [
-                'label'      => __('Border Radius', 'bdthemes-element-pack'),
+                'label'      => __('Border Radius', 'bdthemes-prime-slider'),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors'  => [
@@ -707,7 +728,7 @@ class Pagepiling extends Widget_Base {
         $this->add_responsive_control(
             'readmore_icon_spacing',
             [
-                'label'      => __('Icon Spacing', 'bdthemes-element-pack'),
+                'label'      => __('Icon Spacing', 'bdthemes-prime-slider'),
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => ['px', 'em', '%'],
                 'selectors'  => [
@@ -736,7 +757,7 @@ class Pagepiling extends Widget_Base {
 		$this->add_control(
             'readmore_hover_text_color',
             [
-                'label'     => __('Text Color', 'bdthemes-element-pack'),
+                'label'     => __('Text Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .bdt-pagepiling-slider .bdt-slide-btn:hover .bdt-button-text' => 'color: {{VALUE}};',
@@ -747,7 +768,7 @@ class Pagepiling extends Widget_Base {
         $this->add_control(
             'readmore_hover_icon_color',
             [
-                'label'     => __('Icon Color', 'bdthemes-element-pack'),
+                'label'     => __('Icon Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
 					'{{WRAPPER}} .bdt-pagepiling-slider .bdt-slide-btn:hover .bdt-button-circle .icon.arrow' => 'background: {{VALUE}};',
@@ -767,7 +788,7 @@ class Pagepiling extends Widget_Base {
         $this->add_control(
             'readmore_hover_border_color',
             [
-                'label'     => __('Border Color', 'bdthemes-element-pack'),
+                'label'     => __('Border Color', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .bdt-pagepiling-slider .bdt-slide-btn:hover .bdt-button-circle' => 'border-color: {{VALUE}};',
@@ -1060,6 +1081,7 @@ class Pagepiling extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .bdt-pagepiling-slider #pp-nav li a, {{WRAPPER}} .bdt-pagepiling-slider .pp-slidesNav li a' => 'width: {{SIZE}}{{UNIT}};',
 				],
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -1076,6 +1098,7 @@ class Pagepiling extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .bdt-pagepiling-slider #pp-nav li a, {{WRAPPER}} .bdt-pagepiling-slider .pp-slidesNav li a' => 'height: {{SIZE}}{{UNIT}};',
 				],
+				'classes'    => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -1139,15 +1162,7 @@ class Pagepiling extends Widget_Base {
 
 				<h3><?php echo esc_html($settings['social_main_title']); ?></h3>
 
-				<?php foreach ($settings['social_link_list'] as $link) : ?>
-
-					<a href="<?php echo esc_url($link['social_link']); ?>" target="_blank">
-						<span class="bdt-social-share-title">
-							<?php echo esc_html($link['social_link_title']); ?>
-						</span>
-					</a>
-					
-				<?php endforeach; ?>
+				<?php $this->render_social_link_repeater(); ?>
 
 			</div>
 
@@ -1158,24 +1173,13 @@ class Pagepiling extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		$this->add_render_attribute('slider-button', 'class', 'bdt-slide-btn', true);
-
-		if ($content['button_link']['url']) {
-			$this->add_render_attribute('slider-button', 'href', $content['button_link']['url'], true);
-
-			if ($content['button_link']['is_external']) {
-				$this->add_render_attribute('slider-button', 'target', '_blank', true);
-			}
-
-			if ($content['button_link']['nofollow']) {
-				$this->add_render_attribute('slider-button', 'rel', 'nofollow', true);
-			}
-		} else {
-			$this->add_render_attribute('slider-button', 'href', '#', true);
+		if ($content['slide_button_text']) {
+			$this->add_link_attributes('slider-button', $content['button_link'], true);
 		}
-
+		
 		?>
 
-		<?php if ($content['slide_button_text'] && ('yes' == $settings['show_button_text'])) : ?>
+		<?php if ( $content['slide_button_text'] && ('yes' == $settings['show_button_text']) && ! empty($content['button_link']['url']) ) : ?>
 
 			<a <?php $this->print_render_attribute_string('slider-button'); ?>>
 
@@ -1202,7 +1206,7 @@ class Pagepiling extends Widget_Base {
 
 		// remove global lightbox
 		$this->add_render_attribute( 'lightbox-content', 'data-elementor-open-lightbox', 'no', true );
-		$this->add_render_attribute( 'lightbox-content', 'href', $slide['lightbox_link']['url'], true );
+		$this->add_link_attributes( 'lightbox-content', $slide['lightbox_link'], true );
 		
 		$this->add_render_attribute( 'lightbox', 'class', 'bdt-slide-play-button', true );
 		$this->add_render_attribute( 'lightbox', 'bdt-lightbox', 'video-autoplay: true;', true );
@@ -1221,6 +1225,11 @@ class Pagepiling extends Widget_Base {
 	public function render_item_content($slide_content) {
         $settings = $this->get_settings_for_display();
 
+        if ($slide_content['title']) {
+        	$this->add_link_attributes( 'title-link', $slide_content['title_link'], true );
+        }
+		
+
 		?>
 		<div class="bdt-prime-slider-content">
 			<div data-bdt-slideshow-parallax="y: 150,0,-100; opacity: 1,1,0">
@@ -1229,23 +1238,23 @@ class Pagepiling extends Widget_Base {
 
 			<?php if ($slide_content['sub_title'] && ('yes' == $settings['show_sub_title'])) : ?>
 				<div class="bdt-sub-title">
-					<<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?> class="bdt-sub-title-tag" data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0">
+					<<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?> class="bdt-sub-title-tag" data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0">
 						<?php echo wp_kses_post($slide_content['sub_title']); ?>
-					</<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?>>
+					</<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?>>
 				</div>
 			<?php endif; ?>
 
 			<?php if ($slide_content['title'] && ('yes' == $settings['show_title'])) : ?>
 				<div class="bdt-main-title">
-					<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title-tag"  data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0">
+					<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title-tag"  data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0">
 						<?php if ('' !== $slide_content['title_link']['url']) : ?>
-							<a href="<?php echo esc_url($slide_content['title_link']['url']); ?>">
+							<a <?php $this->print_render_attribute_string('title-link'); ?>>
 							<?php endif; ?>
-							<?php echo prime_slider_first_word($slide_content['title']); ?>
+							<?php echo wp_kses_post(prime_slider_first_word($slide_content['title'])); ?>
 							<?php if ('' !== $slide_content['title_link']['url']) : ?>
 							</a>
 						<?php endif; ?>
-					</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+					</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 				</div>
 			<?php endif; ?>
 
@@ -1305,6 +1314,7 @@ class Pagepiling extends Widget_Base {
 
 					<?php $this->render_item_content($slide); ?>
 
+					<div class="bdt-ps-overlay"></div>
 				</div>
 
 			<?php endforeach;

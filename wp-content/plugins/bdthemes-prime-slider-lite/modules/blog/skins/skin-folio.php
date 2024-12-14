@@ -18,14 +18,6 @@ class Skin_Folio extends Elementor_Skin_Base {
     return esc_html__('Folio', 'bdthemes-prime-slider');
   }
 
-  public function render_category() {
-?>
-    <div class="bdt-ps-category" data-reveal="reveal-active">
-      <?php echo get_the_category_list(', '); ?>
-  </div>
-  <?php
-  }
-
   public function render_footer() {
     $settings = $this->parent->get_settings_for_display();
   ?>
@@ -38,7 +30,7 @@ class Skin_Folio extends Elementor_Skin_Base {
         <?php if ('yes' == $settings['show_admin_info']) : ?>
           <div class="bdt-prime-slider-meta bdt-flex bdt-flex-middle" data-bdt-slideshow-parallax="x: 250,-250">
             <div class="bdt-post-slider-author bdt-margin-small-right bdt-border-circle bdt-overflow-hidden bdt-visible@s">
-              <?php echo get_avatar(get_the_author_meta('ID'), 48); ?>
+              <?php echo get_avatar(get_the_author_meta('ID'), 100); ?>
             </div>
             <div class="bdt-meta-author">
               <span class="bdt-author bdt-text-capitalize">
@@ -76,7 +68,7 @@ class Skin_Folio extends Elementor_Skin_Base {
               <div class="bdt-meta-text">
                 <span>
                   <strong><?php esc_html_e('Comments By', 'bdthemes-prime-slider'); ?></strong><br>
-                  <?php echo get_comments_number(); ?>
+                  <?php echo esc_attr(get_comments_number()); ?>
                 </span>
               </div>
             </div>
@@ -139,23 +131,23 @@ class Skin_Folio extends Elementor_Skin_Base {
 
             <?php if ('yes' == $settings['show_category']) : ?>
               <div data-bdt-slideshow-parallax="y: 80,0,-80; opacity: 1,1,0">
-                <?php $this->render_category(); ?>
+                <?php $this->parent->render_category(); ?>
               </div>
             <?php endif; ?>
 
             <?php if ('yes' == $settings['show_title']) : ?>
               <div class="bdt-main-title" data-reveal="reveal-active">
-                <<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title-tag" <?php echo $parallax_title; ?>>
+                <<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title-tag" <?php echo wp_kses_post($parallax_title); ?>>
 
                   <a href="<?php echo esc_url(get_permalink($post->ID)); ?>">
-                    <?php echo prime_slider_first_word(get_the_title()); ?>
+                    <?php echo wp_kses_post(prime_slider_first_word(get_the_title())); ?>
                   </a>
 
-                </<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+                </<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
                 
               </div>
               <?php endif; ?>
-              <div <?php echo $parallax_text; ?>>
+              <div <?php echo wp_kses_post($parallax_text); ?>>
                 <?php $this->parent->render_excerpt(); ?>
               </div>
               <?php if ('yes' == $settings['show_button_text']) : ?>
@@ -192,7 +184,7 @@ class Skin_Folio extends Elementor_Skin_Base {
 
     ?>
 
-      <li class="bdt-slideshow-item bdt-flex bdt-flex-middle elementor-repeater-item-<?php echo get_the_ID(); ?>">
+      <li class="bdt-slideshow-item bdt-flex bdt-flex-middle elementor-repeater-item-<?php echo esc_attr(get_the_ID()); ?>">
 
         <?php if ('yes' == $settings['kenburns_animation']) : ?>
           <div class="bdt-position-cover bdt-animation-kenburns<?php echo esc_attr($kenburns_reverse); ?> bdt-transform-origin-center-left">

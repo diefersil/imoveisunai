@@ -35,22 +35,22 @@ final class ThemeProviders
     static public function getProviders()
     {
 
-        $providers = [];
+        $providersArray = [];
 
         foreach( static::$providers as $theme ){
 
             if ( $theme ){
 
-                $providers[] = [ "object" => $theme , 
-                                 "name" => $theme::strtolowerThemeName() , 
-                                 "url" => $theme::getThemeURL(),
-                                 "active" => $theme::isActiveTheme() ];
+                $providersArray[] = [ "object" => $theme , 
+                                 "name" => $theme::strtolowerName() , 
+                                 "url" => $theme::getURL(),
+                                 "active" => $theme::isActive() ];
 
             }
 
         }        
         
-        return $providers;
+        return $providersArray;
 
     }
     

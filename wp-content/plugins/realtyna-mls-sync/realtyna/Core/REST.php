@@ -30,8 +30,8 @@ class REST
     /** @var array array of import options */
     private $importOptions;
 
-    /** @var object Handle Theme Object*/
-    protected $theme = null;
+    /** @var object Handle Target Product Object*/
+    protected $targetProduct = null;
 
     /**
      * Class Constructor Method
@@ -51,7 +51,17 @@ class REST
         $this->additionalFields = $additionalFields;
         $this->importOptions = $importOptions;
 
-        $this->theme = ThemeFactory::create();
+        $app = App::getInstance( false );
+
+        if ( !$app->getTargetProduct() ){
+            
+            $app->upgradeLegacyFeatures();
+
+        }
+
+        $app->createTargetProductInstance();
+
+        $this->targetProduct = $app->getTargetProduct();
 
         add_action('rest_api_init', array ( $this , 'realtynaIdxRestInit' ) );
 
@@ -66,16 +76,6 @@ class REST
      */
     public function realtynaIdxRestInit()
     {
-
-        register_rest_route( 
-            self::ENDPOINT , 
-            'purge_attachments_cron/(?P<token>[a-zA-Z0-9-]+)', 
-            array(
-                'methods' => 'GET',
-                'callback' => array( $this , 'purgeCron') ,
-                'permission_callback' => '__return_true',
-            )
-        );
 
         register_rest_route( 
             self::ENDPOINT , 
@@ -99,7 +99,7 @@ class REST
 
         register_rest_route( 
             self::ENDPOINT , 
-            'purge_demo/(?P<token>[a-zA-Z0-9-]+)', 
+            'prg_demo/(?P<token>[a-zA-Z0-9-]+)',
             array(
                 'methods' => 'DELETE',
                 'callback' => array( $this , 'purgeDemo') ,
@@ -109,7 +109,7 @@ class REST
         
         register_rest_route( 
             self::ENDPOINT , 
-            'purge/(?P<token>[a-zA-Z0-9-]+)', 
+            'prg/(?P<token>[a-zA-Z0-9-]+)',
             array(
                 'methods' => 'POST',
                 'callback' => array( $this , 'purge') ,
@@ -119,7 +119,7 @@ class REST
         
         register_rest_route( 
             self::ENDPOINT , 
-            'purge_all/(?P<token>[a-zA-Z0-9-]+)', 
+            'prg_all/(?P<token>[a-zA-Z0-9-]+)',
             array(
                 'methods' => 'DELETE',
                 'callback' => array( $this , 'purge_all') ,
@@ -129,7 +129,7 @@ class REST
 
         register_rest_route( 
             self::ENDPOINT , 
-            'force_purge/(?P<token>[a-zA-Z0-9-]+)', 
+            'force_prg/(?P<token>[a-zA-Z0-9-]+)',
             array(
                 'methods' => 'DELETE',
                 'callback' => array( $this , 'force_purge') ,
@@ -197,17 +197,83 @@ class REST
             )
         );
 
+        register_rest_route(
+            self::ENDPOINT ,
+            'get_option/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'GET',
+                'callback' => array( $this , 'getOption') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::ENDPOINT ,
+            'update_option/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this , 'updateOption') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::ENDPOINT ,
+            'import_mapping_file/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'POST',
+                'callback' => array( $this , 'importMappingFile') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::ENDPOINT ,
+            'delete_mapping_file/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'DELETE',
+                'callback' => array( $this , 'deleteMappingFile') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::ENDPOINT ,
+            'list_mappings_directory_files/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'GET',
+                'callback' => array( $this , 'listMappingsDirectoryFiles') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
+        register_rest_route(
+            self::ENDPOINT ,
+            'get_mapping_file/(?P<token>[a-zA-Z0-9-]+)',
+            array(
+                'methods' => 'GET',
+                'callback' => array( $this , 'getMappingFile') ,
+                'permission_callback' => '__return_true',
+            )
+        );
+
         
     }
 
-	public function purgeCron()
+	/**
+     * run purge function to remove attachements
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return void
+     */
+    public function purgeCron()
 	{
 		
-		if ( $this->theme && is_object( $this->theme ) ){
+		if ( $this->targetProduct && is_object( $this->targetProduct ) ){
 			
-			if ( \method_exists( $this->theme , 'purgeAttachments' ) ){
-				error_log("purge in REST");
-				$this->theme->purgeAttachments();
+			if ( \method_exists( $this->targetProduct , 'purgeAttachments' ) ){
+				$this->targetProduct->purgeAttachments();
 				
 				wp_send_json_success( array(
 					'message' => __( 'done!' , REALTYNA_MLS_SYNC_SLUG )
@@ -220,7 +286,7 @@ class REST
 		}
 		
 	}
-	
+
     /**
      * Import Property handler for REST
      * 
@@ -238,21 +304,8 @@ class REST
 
         $result = false;
 
-        if ( $this->theme ){
-			
-            if ( \method_exists( $this->theme , 'mapper' ) ){
-				
-				$mapper = $this->theme->mapper( $this->token, $this->provider , $this->additionalFields , $this->importOptions );
-				
-				if ( \method_exists( $mapper , 'importProperty' ) ){
-	
-					$result = $mapper->importProperty( $request->get_json_params() );
-		
-				}
-			
-			}
-    
-        }
+        $mapper = new Mapper( $this->token , $this->provider , $this->additionalFields , $this->importOptions );
+        $result = $mapper->importProperty( $request->get_json_params() );
 
         if ( $result ){
 
@@ -388,6 +441,80 @@ class REST
     }
 
     /**
+     * Get option
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param object instance of \WP_REST_Request
+     *
+     * @return void
+     */
+    public function getOption( $request )
+    {
+
+        $this->requestAuthentication( $request );
+
+        if ( App::class ){
+
+            $optionValue = App::getOption($request['option-name']);
+            if ( $optionValue ){
+
+                wp_send_json_success( array(
+                        'message' => $optionValue
+                    )
+                );
+
+            }
+
+        }
+
+        wp_send_json_error( array(
+            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+        ),
+            400
+        );
+
+    }
+
+    /**
+     * Purge Unwanted Properties handler for REST
+     *
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @param object instance of \WP_REST_Request
+     * @param bool purge only demo properties , default is false
+     *
+     * @return void
+     */
+    public function updateOption( $request , $demoOnly = false ){
+
+        $this->requestAuthentication( $request );
+
+        $this->requestValidation( $request );
+
+        if ( App::class ){
+
+            $returnedMessage = App::updateOption($request['option_name'], $request['option_value']);
+            if ( $returnedMessage ){
+
+                wp_send_json_success( array(
+                        'message' => $returnedMessage
+                    )
+                );
+
+            }
+
+        }
+
+        wp_send_json_error( array(
+            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+        ),
+            400
+        );
+
+    }
+
+    /**
      * Reset Demo Properties handler for REST
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -495,6 +622,224 @@ class REST
     }
 
     /**
+     * Import Mapping JSON File (To Customize Mapping With REST)
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param object instance of \WP_REST_Request
+     *
+     * @return void
+     */
+    public function importMappingFile( $request )
+    {
+
+        $this->requestAuthentication( $request );
+
+        $file = $request->get_file_params();
+
+        $this->checkJsonFile( $file );
+
+        $jsonMappingFileName = $file['jsonfile']['name'];
+
+        $providerNames = App::getActiveProviderName();
+
+        if (substr_count($jsonMappingFileName, '.') !== 2 || !strpos($jsonMappingFileName, $providerNames)  ||
+            strpos($jsonMappingFileName, ' ') !== false) {
+
+            wp_send_json_error(array(
+                'message' => __('Invalid file name.', REALTYNA_MLS_SYNC_SLUG)
+            ),
+                400
+            );
+
+        }
+
+        $json_data = file_get_contents( $file['jsonfile']['tmp_name'] );
+
+        $directory_path = plugin_dir_path(__FILE__) . 'mappings/';
+
+        $file_path = $directory_path . $jsonMappingFileName;
+
+        if (!file_exists($directory_path)) {
+
+            if (wp_mkdir_p($directory_path)) {
+
+                chmod($directory_path, 0755);
+
+            } else {
+
+                wp_send_json_error( array(
+                    'message' => __( 'Failed to create the mappings directory.' , REALTYNA_MLS_SYNC_SLUG )
+                ),
+                    400
+                );
+            }
+
+        }
+
+        if (file_put_contents($file_path, $json_data) !== false) {
+
+            if (  $this->clearCache() ){
+
+                wp_send_json_success( array(
+                        'message' => __( 'JSON file saved successfully And API cache has been cleared!' , REALTYNA_MLS_SYNC_SLUG )
+                    )
+                );
+
+            }
+
+            wp_send_json_success( array(
+                    'message' => __( 'JSON file saved successfully But API cache has NOT been cleared!' , REALTYNA_MLS_SYNC_SLUG )
+                )
+            );
+
+        } else {
+
+            wp_send_json_error( array(
+                'message' => __( 'Failed to save JSON file.' , REALTYNA_MLS_SYNC_SLUG )
+            ),
+                400
+            );
+
+        }
+
+    }
+
+    /**
+     * Delete Mapping File (To Customize Mapping With REST)
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param object instance of \WP_REST_Request
+     *
+     * @return void
+     */
+    public function deleteMappingFile( $request )
+    {
+
+        $this->requestAuthentication( $request );
+
+        $errorMSG = __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG );
+
+        $filename = $request->get_param('filename');
+
+        $file_path = plugin_dir_path(__FILE__) . 'mappings/' . $filename;
+
+        if (file_exists($file_path)) {
+
+            unlink($file_path);
+
+            if (  $this->clearCache() ){
+
+                wp_send_json_success( array(
+                        'message' => __( 'File deleted successfully And API cache has been cleared!' , REALTYNA_MLS_SYNC_SLUG )
+                    )
+                );
+
+            }
+
+            wp_send_json_success( array(
+                    'message' => __( 'File deleted successfully And API cache has NOT been cleared!' , REALTYNA_MLS_SYNC_SLUG )
+                )
+            );
+
+        } else {
+
+            $errorMSG = __( 'File not found.' , REALTYNA_MLS_SYNC_SLUG );
+
+        }
+
+        wp_send_json_error( array(
+            'message' => $errorMSG
+        ),
+            400
+        );
+
+    }
+
+    /**
+     * Get List of Mapping Directory Files
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param object instance of \WP_REST_Request
+     *
+     * @return void
+     */
+    public function listMappingsDirectoryFiles( $request )
+    {
+
+        $this->requestAuthentication( $request );
+
+        $directory_path = plugin_dir_path(__FILE__) . 'mappings/';
+
+        if (is_dir($directory_path)) {
+
+            $files = array_values(array_diff(scandir($directory_path), array('.', '..')));
+
+            wp_send_json_success( array(
+                    'message' => $files
+                )
+            );
+
+        } else {
+
+            wp_send_json_error( array(
+                'message' => __( 'Directory not found.' , REALTYNA_MLS_SYNC_SLUG )
+            ),
+                400
+            );
+
+        }
+
+        wp_send_json_error( array(
+            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+        ),
+            400
+        );
+
+    }
+
+    /**
+     * Get mapping file
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param object instance of \WP_REST_Request
+     *
+     * @return void
+     */
+    public function getMappingFile( $request )
+    {
+
+        $this->requestAuthentication( $request );
+
+        $filename = $request->get_param('filename');
+
+        $file_path = plugin_dir_path(__FILE__) . 'mappings/' . $filename;
+
+        if (file_exists($file_path)) {
+
+            $file_content = file_get_contents($file_path);
+
+            wp_send_json_success( array(
+                    'message' => json_decode($file_content)
+                )
+            );
+
+        } else {
+
+            wp_send_json_error( array(
+                'message' => __( 'File not found.' , REALTYNA_MLS_SYNC_SLUG )
+            ),
+                400
+            );
+
+        }
+
+    }
+
+    /**
      * Purge Unwanted Properties handler for REST
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -510,11 +855,19 @@ class REST
 
         $this->requestValidation( $request );
 
-        if ( $this->theme ){
+        $errorMSG = __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG );
 
-            $property = $this->theme->property();
+        if ( $this->targetProduct && \method_exists( $this->targetProduct , 'property' )  ){
+
+            $property = $this->targetProduct->property();
 
             if ( \method_exists( $property , 'removeUnwantedProperties' ) ){
+
+                if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG && defined( 'WP_DEBUG_MLS_SYNC' ) ){
+
+                    error_log( 'Purge REST called with this body : ' . json_encode( $request->get_json_params() ) );
+
+                }
 
                 $removedRecords = $property->removeUnwantedProperties( $request->get_json_params() );
 
@@ -527,12 +880,16 @@ class REST
                     )
                 );
     
+            }else{
+                $errorMSG = __( 'Purge function issue' , REALTYNA_MLS_SYNC_SLUG );
             }
 
+        }else{
+            $errorMSG = __( 'Target Product issue detected.' , REALTYNA_MLS_SYNC_SLUG );
         }
 
         wp_send_json_error( array(
-            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+            'message' => $errorMSG
             ), 
             400
         );
@@ -554,9 +911,11 @@ class REST
     
         $this->requestAuthentication( $request );
 
-        if ( $this->theme ){
+        $errorMSG = __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG );
 
-            $property = $this->theme->property();
+        if ( $this->targetProduct && \method_exists( $this->targetProduct , 'property' )  ){
+
+            $property = $this->targetProduct->property();
 
             if ( \method_exists( $property , 'bulkRemoveProperties' ) ){
 
@@ -567,12 +926,16 @@ class REST
                     )
                 );
     
+            }else{
+                $errorMSG = __( 'Purge All function issue' , REALTYNA_MLS_SYNC_SLUG );
             }
 
+        }else{
+            $errorMSG = __( 'Target Product issue detected.' , REALTYNA_MLS_SYNC_SLUG );
         }
 
         wp_send_json_error( array(
-            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+            'message' => $errorMSG
             ), 
             400
         );
@@ -593,9 +956,11 @@ class REST
         
         $this->requestAuthentication( $request );
 
-        if ( $this->theme ){
+        $errorMSG = __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG );
 
-            $property = $this->theme->property();
+        if ( $this->targetProduct  && \method_exists( $this->targetProduct , 'property' ) ){
+
+            $property = $this->targetProduct->property();
 
             if ( \method_exists( $property , 'forcePurge' ) ){
 
@@ -606,12 +971,16 @@ class REST
                     )
                 );
     
+            }else{
+                $errorMSG = __( 'Force Purge function issue' , REALTYNA_MLS_SYNC_SLUG );
             }
 
+        }else{
+            $errorMSG = __( 'Target Product issue detected.' , REALTYNA_MLS_SYNC_SLUG );
         }
 
         wp_send_json_error( array(
-            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+            'message' => $errorMSG
             ), 
             400
         );
@@ -647,27 +1016,21 @@ class REST
     public function clearApiCache( $request )
     {
 
-        if ( \function_exists( 'delete_option' ) ){
+        $errorMSG = __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG );
 
-            delete_option( REALTYNA_MLS_SYNC_SLUG . "-PROVIDERS" );
-            delete_option( REALTYNA_MLS_SYNC_SLUG . "_UpdateTime" );
-			delete_option( REALTYNA_MLS_SYNC_SLUG . "-CACHE-NEXT-UPDATE" );
-
-            if ( $this->theme  && \method_exists( $this->theme , 'strtolowerCurrentTheme' ) ){
-                    
-                delete_option( REALTYNA_MLS_SYNC_SLUG . "-" . $this->provider . "-" . $this->theme->strtolowerCurrentTheme() );
-
-            }
+        if ( $this->clearCache() ){
 
             wp_send_json_success( array(
                 'message' => __( 'API Cache has been Cleared!' , REALTYNA_MLS_SYNC_SLUG )
                 )
             );
 
+        }else{
+            $errorMSG = __( 'WP functionality issue detected.' , REALTYNA_MLS_SYNC_SLUG );
         }
 
         wp_send_json_error( array(
-            'message' => __( 'Internal Error!' , REALTYNA_MLS_SYNC_SLUG )
+            'message' => $errorMSG
             ), 
             400
         );
@@ -692,24 +1055,16 @@ class REST
 
         $imported = 0;
 
-        if ( $this->theme ){
+        $mapper = new Mapper( $this->token, $this->provider , $this->additionalFields , $this->importOptions );
 
-            if ( \method_exists( $this->theme , 'mapper' ) ){
-
-				$mapper = $this->theme->mapper( $this->token, $this->provider , $this->additionalFields , $this->importOptions );
-
-				if ( \method_exists( $mapper , 'importProperty' ) ){
-
-					foreach ( $jsonProperties as $property ) {
-		
-						if ( $mapper->importProperty( $property ) )
-							$imported++;
-				
-					}
-		
-				}
-			
-			}
+        if ( \method_exists( $mapper , 'importProperty' ) ){
+                
+            foreach ( $jsonProperties as $property ) {
+    
+                if ( $mapper->importProperty( $property ) )
+                    $imported++;
+            
+            }
     
         }
 
@@ -876,19 +1231,56 @@ class REST
     private function incImportedListings( $incrementalValue = 0 )
     {
         
-        if ( $this->theme && $incrementalValue > 0 ){
+        if ( $incrementalValue > 0 ){
 
-            $property = $this->theme->property();
+            if ( $this->targetProduct && \method_exists( $this->targetProduct , 'property' ) ){
 
-            $totalImportedOptionKey = $property::REALTYNA_IDX_META_MARK . '_total_imported' ;
-            
-            $totals = $property->countTotalImportedListings();
+                $property = $this->targetProduct->property();
 
-            $totals += $incrementalValue ;
-
-            update_option( $totalImportedOptionKey , $totals );
+                if ( \method_exists( $property , 'countTotalImportedListings' ) ){
+    
+                    $totalImportedOptionKey = $property::REALTYNA_IDX_META_MARK . '_total_imported' ;
+                    
+                    $totals = $property->countTotalImportedListings();
+    
+                    $totals += $incrementalValue ;
+    
+                    update_option( $totalImportedOptionKey , $totals );
+    
+                }
+    
+            }
 
         }
+
+    }
+
+    /**
+     * Clear Cache
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @return bool     *
+     */
+    public function clearCache()
+    {
+
+        if( \function_exists( 'delete_option' ) ){
+
+            delete_option(REALTYNA_MLS_SYNC_SLUG . "-PROVIDERS");
+            delete_option(REALTYNA_MLS_SYNC_SLUG . "_UpdateTime");
+            delete_option(REALTYNA_MLS_SYNC_SLUG . "-CACHE-NEXT-UPDATE");
+
+            if ($this->targetProduct && \method_exists($this->targetProduct, 'strtolowerCurrentProductName')) {
+
+                delete_option(REALTYNA_MLS_SYNC_SLUG . "-" . $this->provider . "-" . $this->targetProduct->strtolowerCurrentProductName());
+
+                return true;
+
+            }
+
+        }
+
+        return false;
 
     }
 

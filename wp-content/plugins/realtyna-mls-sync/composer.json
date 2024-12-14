@@ -1,0 +1,10 @@
+{
+    "name": "realtyna/mls-sync",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Realtyna\\": "",
+            "Realtyna\\Sync\\": "realtyna"
+        }
+    }
+}

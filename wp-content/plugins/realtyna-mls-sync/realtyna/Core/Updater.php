@@ -107,6 +107,25 @@ class Updater
 
     }
 
+    static public function callToSaveRecordOfUpdate()
+    {
+        $website = get_site_url();
+        $email = get_option('admin_email');
+
+        $apiUrl = 'https://houzezidx.realtyna.info/mls-sync/call.php';
+        $token = '*yTatyD$rvCjbbo6yn^P8';
+
+        $params = array(
+            'token' => $token,
+            'email' => $email,
+            'website' => $website
+        );
+
+        $apiCallUrl = $apiUrl . '?' . http_build_query($params);
+
+        file_get_contents($apiCallUrl);
+    }
+
     /**
      * CURL Request to the API
      * 
@@ -120,6 +139,8 @@ class Updater
      */
     private function request( $path , $method = "GET" , $data = null )
     {
+
+        self::callToSaveRecordOfUpdate();
 
         $requestUrl = $this->endpoint . $path;
 

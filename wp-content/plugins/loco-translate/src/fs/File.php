@@ -61,6 +61,14 @@ class Loco_fs_File {
 
 
     /**
+     * Test if a path looks absolute
+     */
+    public static function is_abs( $path ){
+        return '' !== $path && ( '/' === $path[0] || preg_match('!^\\\\\\\\|.:\\\\!',$path) );
+    }
+
+
+    /**
      * Call PHP is_readable() but suppress E_WARNING when path is outside open_basedir.
      * @param string $path
      * @return bool
@@ -159,7 +167,7 @@ class Loco_fs_File {
 
     /**
      * Checks if a file exists, and is within open_basedir restrictions.
-     * This does NOT check if file permissions allow PHP to read it. Call is_readable.
+     * This does NOT check if file permissions allow PHP to read it. Call $this->readable() or self::is_readable($path).
      * @return bool
      */
     public function exists(){
@@ -383,11 +391,11 @@ class Loco_fs_File {
 
     /**
      * Check if passed path is equal to ours
-     * @param string $path
+     * @param string|self $ref
      * @return bool
      */
-    public function equal( $path ){
-        return $this->path === (string) $path;
+    public function equal( $ref ){
+        return $this->path === (string) $ref;
     }
 
 
@@ -627,8 +635,7 @@ class Loco_fs_File {
      * @return self
      */
     public function cloneExtension( $ext ){
-        $name = $this->filename().'.'.$ext;
-        return $this->cloneBasename($name);
+        return $this->cloneBasename( $this->filename().'.'.ltrim($ext,'.') );
     }
 
 

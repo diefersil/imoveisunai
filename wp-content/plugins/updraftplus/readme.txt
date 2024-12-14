@@ -1,14 +1,14 @@
-=== UpdraftPlus: WordPress Backup & Migration Plugin ===
+=== UpdraftPlus: WP Backup & Migration Plugin ===
 Contributors: Backup with UpdraftPlus, DavidAnderson, pmbaldha, DNutbourne, aporter, bcrodua
 Tags: backup, database backup, wordpress backup, cloud backup, migration
 Requires at least: 3.2
-Tested up to: 6.4
-Stable tag: 1.23.13
+Tested up to: 6.7
+Stable tag: 1.24.11
 Author URI: https://updraftplus.com
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
 
-Backup, restoration and migration - world's most popular backup tool. Backup to the cloud - schedule backups or backup manually.
+Backup, restore or migrate your WordPress website to another host or domain. Schedule backups or run manually. Migrate in minutes. Reliable and easy to use.
 
 == Description ==
 
@@ -179,9 +179,130 @@ The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the b
 
 N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.16.32.x of the free version correspond to changes made in 2.16.32.x of the paid version.
 
-The [UpdraftPlus backup blog](https://updraftplus.com/news/) is the best place to learn in more detail about any important changes.
+= 1.24.11 - 15/Nov/2024 =
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.23.1.x of the free version correspond to changes made in 2.23.1.x of the paid version.
+* TWEAK: Do not request drive.readonly scope on Google Drive connections, due to Google's app permissions review (unannounced and requires us to create a Youtube video for their review process) - this means that (until the review completes) new connections to Google Drive can only access backups created by UpdraftPlus directly, and not backups which you manually upload to Google Drive. This restores the ability to make new connections to Google Drive.
+* TWEAK: Adjustment of the UpdraftPlus_S3_Compat class to preserve compatibility with the external UpdraftPlus AWS SDK plugin (https://github.com/DavidAnderson684/updraftplus-aws-sdk).
+
+= 1.24.9 - 14/Nov/2024 =
+
+* FIX: A regression in 1.24.8 when handling restoration of wp-config.php
+* TWEAK: The changes in handling of loading text domains in 1.24.8 did not cover most cases
+
+= 1.24.8 - 13/Nov/2024 =
+
+* TWEAK: Add descriptions for the 'Clone Package' dropdown when creating a clone.
+* TWEAK: Move the "load_plugin_textdomain" call from being called through "plugins_loaded" action to being called via "init" action
+* TWEAK: Update the log message to specify that backup files are marked as "processed" when no remote storage is selected, and as "uploaded" when remote storage is selected.
+* TWEAK: Some code tidying in the restore class
+
+= 1.24.7 - 04/Nov/2024 =
+
+* TWEAK: Include the .part file extension into the cleanup list, guaranteeing that files associated with this extension are regularly deleted from the backup directory
+* TWEAK: The update functionalities in the WordPress plugin information box (6.5 and later) have been adjusted to stop updates from taking place in the same window, ensuring that the "auto-backup before update" dialog appears as intended
+* TWEAK: Add customized "unserialized" method into the UpdraftPlus class which can handle the use of the "options" argument or its absence when running across different PHP versions
+* TWEAK: Add the UPDRAFTPLUS_SEND_UNWRITABLE_BACKUP_DIRECTORY_EMAIL constant to disable the sending of unwritable backup directory emails to users.
+* TWEAK: Clearer notifications to users regarding unconfigured remote storage settings and/or the selection of remote storage that are not part of their UpdraftPlus version
+* TWEAK: During the resumption of OneDrive’s chunk uploads, the authorisation header and bearer token should not be included as it may lead to an unauthenticated error due to a different upload URL.
+* TWEAK: Implement code to enable automatic activation of the UpdraftPlus plugin during the migration process from a multisite setup to a standalone site
+* TWEAK: In a multisite environment, ensure that users can access the UpdraftPlus plugin page even in the absence of the WP_ALLOW_MULTISITE constant
+* TWEAK: UpdraftClone now supports PHP 8.4
+* TWEAK: Prevent a potential PHP deprecation notice when zip creation fails
+
+= 1.24.6 - 25/Sep/2024 =
+
+* TWEAK: In 1.24.5, the browser title wrongly displayed as "UpdraftPlus" when accessing an unrelated plugin page using the main menu.
+
+= 1.24.5 - 24/Sep/2024 =
+
+* FIX: Incorrect regular expression for DigitalOcean Spaces endpoint
+* FIX: CSS conflicts with the LearnDash LMS Instructor Role Add-on plugin which caused some UI elements to disappear
+* TWEAK: Reorganize UpdraftPlus in left-hand menu and rename it to "UpdraftPlus"; to disable it, follow this guide: https://updraftplus.com/new-location-of-updraftplus-in-the-wordpress-dashboard/
+* TWEAK: Add span wrapper to UpdraftCentral connection failed message
+* TWEAK: Add the "Go here to complete your settings" link into the appropriate admin notice that when clicked will jump to the UpdraftVault configuration if no settings are specified.
+* TWEAK: Adjust regex patterns that didn't match some temporary files, causing them to not be automatically removed
+* TWEAK: After a restoration, clicking "Delete old folders" will also remove the wp-config-pre-ud-restore-backup.php file
+* TWEAK: On the settings page/tab; prevent the floating "Save changes" button from getting clicked multiple times and/or sending multiple AJAX requests
+* TWEAK: Remove pCloud from the add-ons list on the "Premium / Extensions" tab (there is no change in its availability)
+* TWEAK: Renamed wp-config-backup.php to wp-config-pre-ud-restore-backup.php to clarify its purpose as a backup file created before restoring WordPress core entities, and it will only be generated if the user does not select the "Over-write wp-config.php" option during restoration, as the previous name was too generic and could cause confusion
+* TWEAK: The popup modal for automatic plugin updates fails to retain the backup checkbox selection when the "remember" option is enabled in a Multisite environment.
+* TWEAK: Updated autobackup selector to resolve issues caused by the missing "update-link" class in WPForms Pro plugin
+
+= 1.24.4 - 2/Jul/2024 =
+
+* FIX: Case-sensitive issue of bit field type names in a table.
+* FIX: Resolved issue where backup files could not be deleted from remote storage when either the root directory was active or no directory was specified in the OneDrive configuration form.
+* FIX: When users attempt to update a plugin using the "View Version x.x.x Details" link instead of choosing "Update Now," the plugin is successfully updated; however, the UI incorrectly displays an "Update Failed" message
+* FIX: Conflict with the Gravity Forms plugin when there was an older version of jQuery UI presented on the "Installed Plugins" page.
+* TWEAK: Ensure compliance with Google Granular Consent and check for required permissions during storage access authorisation of Google Drive and Google Cloud
+* TWEAK: Prevent PHP warning and deprecation messages after completing access authorisation to Google Drive storage.
+* TWEAK: Prevent PHP warning when Dropbox remote storage has been authenticated and the page is refreshed.
+* TWEAK: Added filter updraftplus_working_dir_localpath to allow temporary unzip path to be modified by developers
+* TWEAK: Modify the displayed title of the plugin from "WordPress Backup & Migration Plugin" to "WP Backup & Migration Plugin" as required by the plugin directory team
+* TWEAK: Parse certain php events and log proper error messages
+
+= 1.24.3 - 30/Apr/2024 =
+
+* FIX: Regression in 1.23.16 for improving logs which then caused incorrect_offset error reported by Dropbox wasn't properly handled.
+* TWEAK: The UpdraftVault remote storage can handle Wasabi as well as Amazon S3 storage in the background.
+* TWEAK: Fix WP_Theme_JSON_Resolver::theme_has_support deprecation warning for UpdraftCentral  
+* TWEAK: Prevent "PHP Warning: Undefined property: UpdraftPlus_BackupModule_pcloud::$description" during rescan remote storage.
+* TWEAK: Prevent PHP deprecation warnings during database backups when encountering null values in bit field types.
+* TWEAK: Show a warning message when the WP_ACCESSIBLE_HOSTS constant is defined and updraftplus.com is not permitted by its value
+* TWEAK: Update notices
+* TWEAK: Split multiple sentences into separate translation function calls.
+* TWEAK: Trim spaces from S3-Compatible (Generic) endpoint.
+
+= 1.24.2 - 26/Mar/2024 =
+
+* FIX: The "Continue restoration" and "Dismiss" buttons on the unfinished restoration dialog were not responsive to being pressed due to a recent regression
+* FIX: Conflict with other plugins due to different version of third party library (Guzzle) and the composer autoload.php was called too early
+* FIX: Undefined "NET_SCP_LOCAL_FILE" constant when SCP was in use for the SFTP/SCP remote storage
+* TWEAK: Add compatibility fields when returning plugins and themes to UpdraftCentral
+* TWEAK: Due to issues in some cURL versions 7.x in handling HTTP/2 connections, all HTTP connections to the OneDrive API are now forced to use HTTP/1.1 version, on cURL versions after 7.61 and before 8.0. Also, a constant named UPDRAFTPLUS_ONEDRIVE_CURL_HTTP_VERSION can be set in the wp-config.php file to change the default HTTP version to another preferred version
+* TWEAK: Adjust margin to fix broken UI for the 'View logs' button on backups.
+* TWEAK: Ensure all "SET SQL_MODE" statements in the database backup file are internally handled and are subjected only to a restoration outside UpdraftPlus plugin
+* TWEAK: Prevent PHP 8.2 coding style deprecation notices in the autobackup addon
+* TWEAK: In the context of OneDrive's chunk upload, authorisation header and bearer token should not be included during upload session as it may lead to 401 HTTP status due to different upload URL
+* TWEAK: Remove default value for updraftplus_https_to_http_additional_warning and updraftplus_http_to_https_additional_warning filters.
+* TWEAK: Set the SQL_MODE to 'NO_AUTO_VALUE_ON_ZERO' in the database backup file.
+* TWEAK: Seasonal notice content update for 2024 
+* TWEAK: During the operations that require phpseclib, include the composer autoload.php only when the phpseclib is really needed
+
+= 1.24.1 - 21/Feb/2024 =
+
+* FEATURE: Implement Backblaze Object Lock support (Premium version)
+* FIX: The email backup and basic report setting didn't work causing notification email confirming backup status couldn't be delivered to admin's email address (free version)
+* FIX: Fix WP-Optimize premium discovery for UpdraftCentral
+* FIX: Regression in 1.23.16 for correcting calls to translation functions which then caused some HTML attributes to be empty
+* FIX: Restoring backup sets via Migrate/Clone tab had caused all associated backup entities being downloaded immediately ignoring user preferences about the entities they wanted to restore
+* FIX: Third-party library conflict (phpseclib) with WP All Import Pro and AIO WP Migration plugins that caused failure in testing SFTP credentials and backing up to the SFTP remote storage
+* FIX: Restore compatibility with WordPress multisite running on versions < 4.9 caused by use of function not present before then
+* TWEAK: Add new translation entries for UpdraftCentral 
+* TWEAK: Got rid of PHP 8.2 deprecation messages caused by a null value being passed to the htmlspecialchars() function and creation of dynamic property
+* TWEAK: Got rid of PHP 8.3 deprecation messages caused by calling get_class() without arguments.
+* TWEAK: Refactor methods in UpdraftPlus_Database_Utility class
+* TWEAK: Send an email if the backup directory is not writable.
+* TWEAK: Add and set the `filename_only` parameter to reduce search times when looking for specific backup files in Dropbox.
+* TWEAK: Autoload PHP secure communication library (phpseclib) in a better way that would prevent already-loaded phpseclib classes (by other plugin) from being used in certain operations
+* TWEAK: Add updraftplus_backup_db_header_append filter to allow site owners to include arbitrary content in their database backup header
+
+= 1.23.16 - 23/Dec/2023 =
+
+* TWEAK: Added demo link for the family plugin in advertisement
+* TWEAK: Removed https / http prefix from s3generic endpoints
+* TWEAK: Resolve PHP 8.0 compatibility with ob_implicit_flush function
+* TWEAK: Dropbox error logs improvement
+* TWEAK: As required by the wordpress.org plugin team, all UpdraftPlus news is forbidden to be displayed in the "WordPress News" section of the dashboard for users of the free plugin even if consent is first given.
+* TWEAK: Fix some incorrect calls to translation functions
+
+= 1.23.14 - 30/Nov/2023 =
+
+* FIX: Resolved Google Cloud remote storage authentication flow
+* TWEAK: Changed updraftvault links functionality to open in different tab
+* TWEAK: Clarify significance of warnings in report emails
+* TWEAK: Make the news-consent's layer fit with the confirmation text thus removing empty space that can reveal some of the UpdraftPlus news
+* TWEAK: Declare a shim "php_uname" function when it's found to be undefined to prevent a fatal error in the phpseclib library (which calls it)
 
 = 1.23.13 - 22/Nov/2023 =
 
@@ -1840,7 +1961,7 @@ Older changes are found <a href="https://plugins.svn.wordpress.org/updraftplus/t
 
 == License ==
 
-    Copyright 2011-23 David Anderson
+    Copyright 2011-24 David Anderson
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1861,4 +1982,4 @@ Non-English translators are provided by volunteers, and wordpress.org does not g
 We recognise and thank those mentioned at https://updraftplus.com/acknowledgements/ for code and/or libraries used and/or modified under the terms of their open source licences.
 
 == Upgrade Notice ==
-* 1.23.13: Fixes issues that prevented incremental backups from running via WP-CLI or Cron when the option to backup mu-plugins was enabled but no mu-plugins existed and prevented OneDrive authentication flow. Various further tweaks. A recommended update for all.
+* 1.24.11: Restore ability to connect new sites to Google Drive. A recommended update for all.

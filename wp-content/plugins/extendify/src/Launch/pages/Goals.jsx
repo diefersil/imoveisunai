@@ -1,38 +1,40 @@
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
-import { getGoals, getSuggestedPlugins } from '@launch/api/DataApi';
+import { getGoals } from '@launch/api/DataApi';
 import { CheckboxInputCard } from '@launch/components/CheckboxInputCard';
 import { LoadingIndicator } from '@launch/components/LoadingIndicator';
 import { Title } from '@launch/components/Title';
 import { useFetch } from '@launch/hooks/useFetch';
 import { PageLayout } from '@launch/layouts/PageLayout';
 import { usePagesStore } from '@launch/state/Pages';
-import { useUserSelectionStore } from '@launch/state/UserSelections';
 import { pageState } from '@launch/state/factory';
+import { useUserSelectionStore } from '@launch/state/user-selections';
 import * as IconComponents from '@launch/svg';
 
-export const goalsFetcher = () => getGoals();
-export const goalsParams = () => ({ key: 'goals' });
-export const pluginsFetcher = () => getSuggestedPlugins();
-export const pluginsParams = () => ({ key: 'plugins' });
+export const goalsFetcher = async (params) => ({
+	goals: await getGoals(params),
+});
+export const goalsParams = () => ({
+	key: 'goals',
+	siteTypeSlug: useUserSelectionStore.getState()?.siteType?.slug,
+});
 
 export const state = pageState('Goals', () => ({
 	title: __('Goals', 'extendify-local'),
-	default: undefined,
-	showInSidebar: true,
 	ready: false,
-	// If no goals are selected
-	isDefault: () => useUserSelectionStore.getState().goals?.length === 0,
+	canSkip: false,
+	validation: null,
+	onRemove: () => {},
 }));
 
 export const Goals = () => {
-	const { loading: goalsLoading } = useFetch(goalsParams, goalsFetcher);
-	const { loading: pluginsLoading } = useFetch(pluginsParams, pluginsFetcher);
+	const { error, loading, data } = useFetch(goalsParams(), goalsFetcher);
+	const { goals } = data ?? {};
 
 	return (
 		<PageLayout>
-			<div className="grow px-6 py-8 md:py-16 md:px-32 overflow-y-scroll">
+			<div className="grow overflow-y-scroll px-6 py-8 md:p-12 3xl:p-16">
 				<Title
 					title={__('What are your goals for your website?', 'extendify-local')}
 					description={__(
@@ -40,11 +42,11 @@ export const Goals = () => {
 						'extendify-local',
 					)}
 				/>
-				<div className="w-full relative max-w-3xl mx-auto">
-					{goalsLoading || pluginsLoading ? (
+				<div className="relative mx-auto w-full max-w-3xl">
+					{loading || error ? (
 						<LoadingIndicator />
 					) : (
-						<GoalsSelector />
+						<GoalsSelector goals={goals} />
 					)}
 				</div>
 			</div>
@@ -52,11 +54,10 @@ export const Goals = () => {
 	);
 };
 
-const GoalsSelector = () => {
-	const { addMany, toggle, goals: selected } = useUserSelectionStore();
+const GoalsSelector = ({ goals }) => {
+	const { addMany, goals: selected } = useUserSelectionStore();
 	const [selectedGoals, setSelectedGoals] = useState(selected ?? []);
-	const { data: goals } = useFetch(goalsParams, goalsFetcher);
-	const { data: suggestedPlugins } = useFetch(pluginsParams, pluginsFetcher);
+
 	const nextPage = usePagesStore((state) => state.nextPage);
 
 	useEffect(() => {
@@ -74,19 +75,8 @@ const GoalsSelector = () => {
 	};
 
 	useEffect(() => {
-		state.setState({ ready: false });
-		const timer = setTimeout(() => {
-			addMany('goals', selectedGoals, { clearExisting: true });
-			const goalSlugs = selectedGoals?.map((goal) => goal.slug);
-			// Select all plugins that match the selected goals
-			const plugins = suggestedPlugins?.filter((p) =>
-				p.goals.find((goalSlug) => goalSlugs?.includes(goalSlug)),
-			);
-			addMany('plugins', plugins, { clearExisting: true });
-			state.setState({ ready: true });
-		}, 750);
-		return () => clearTimeout(timer);
-	}, [selectedGoals, addMany, toggle, suggestedPlugins]);
+		addMany('goals', selectedGoals, { clearExisting: true });
+	}, [selectedGoals, addMany]);
 
 	return (
 		<form
@@ -95,7 +85,7 @@ const GoalsSelector = () => {
 				e.preventDefault();
 				nextPage();
 			}}
-			className="w-full grid xl:grid-cols-2 gap-4 goal-select">
+			className="goal-select grid w-full gap-4 xl:grid-cols-2">
 			{/* Added so forms can be submitted by pressing Enter */}
 			<input type="submit" className="hidden" />
 			{goals?.map((goal, index) => {
@@ -105,13 +95,13 @@ const GoalsSelector = () => {
 					<div
 						key={goal.id}
 						className={classNames(
-							'relative border rounded-lg border-gray-300',
+							'relative rounded-lg border border-gray-300',
 							{
 								'bg-gray-100': selected,
 							},
 						)}
 						data-test="goal-item">
-						<div className="flex items-center gap-4 h-full">
+						<div className="flex h-full items-center gap-4">
 							<CheckboxInputCard
 								autoFocus={index === 0}
 								label={goal.title}

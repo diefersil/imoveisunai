@@ -7,6 +7,8 @@
  * @class   Redux_Extension_Color_Scheme
  *
  * @version 4.4.10
+ *
+ * @noinspection PhpIgnoredClassAliasDeclaration
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -24,14 +26,14 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		 *
 		 * @var string
 		 */
-		public static $version = '4.4.10';
+		public static string $version = '4.4.10';
 
 		/**
 		 * Extension friendly name.
 		 *
 		 * @var string
 		 */
-		public $extension_name = 'Color Schemes';
+		public string $extension_name = 'Color Schemes';
 
 		/**
 		 * Field ID.
@@ -45,14 +47,14 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		 *
 		 * @var bool
 		 */
-		public $output_transparent = false;
+		public bool $output_transparent = false;
 
 		/**
 		 * Extension field name.
 		 *
 		 * @var string
 		 */
-		public $field_name = '';
+		public string $field_name = '';
 
 		/**
 		 * Class Constructor. Defines the args for the extensions class
@@ -102,7 +104,7 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 
 			// Create uploads/redux_scheme_colors/ folder.
 			if ( ! is_dir( $upload_dir ) ) {
-				$redux->filesystem->execute( 'mkdir', $upload_dir );
+				Redux_Core::$filesystem->execute( 'mkdir', $upload_dir );
 			}
 		}
 
@@ -448,11 +450,84 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 						// Export scheme file.
 					} elseif ( 'export' === $_REQUEST['type'] ) {
 						$this->download_schemes();
+
+						// Import scheme file.
+					} elseif ( 'import' === $_REQUEST['type'] ) {
+						$this->import_schemes();
 					}
 				}
 			} else {
 				wp_die( esc_html__( 'Invalid Security Credentials.  Please reload the page and try again.', 'redux-framework' ) );
 			}
+		}
+
+		/**
+		 * Download Scheme File.
+		 *
+		 * @since       4.4.18
+		 * @access      private
+		 * @return      void
+		 */
+		private function import_schemes() {
+			if ( isset( $_REQUEST['content'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				$content = wp_unslash( $_REQUEST['content'] ); // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				$content = is_array( $content ) ? array_map( 'stripslashes_deep', $content ) : stripslashes( $content );
+				$content = json_decode( $content, true );
+
+				if ( is_null( $content ) ) {
+					$result = array(
+						'result' => false,
+						'data'   => esc_html__( 'Import unsuccessful! Malformed JSON data detected.', 'redux-framework' ),
+					);
+
+					$result = wp_json_encode( $result );
+
+					echo $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+					die;
+				}
+
+				if ( isset( $content['Default']['color_scheme_name'] ) ) {
+					$content = wp_json_encode( $content );
+
+					$param_array = array(
+						'content'   => $content,
+						'overwrite' => true,
+						'chmod'     => FS_CHMOD_FILE,
+					);
+
+					$import_file = Redux_Color_Scheme_Functions::$upload_dir . Redux_Color_Scheme_Functions::$parent->args['opt_name'] . '_' . Redux_Color_Scheme_Functions::$field_id . '.json';
+
+					if ( true === Redux_Core::$filesystem->execute( 'put_contents', $import_file, $param_array ) ) {
+						$result = array(
+							'result' => true,
+							// translators: %s = HTML content.
+							'data'   => sprintf( esc_html__( 'Import successful! Click %s to refresh.', 'redux-framework' ), '<strong>' . esc_html__( 'OK', 'redux-framework' ) . '</strong>' ),
+						);
+					} else {
+						$result = array(
+							'result' => false,
+							'data'   => esc_html__( 'Import unsuccessful! File permission error: Could not write import data to server.', 'redux-framework' ),
+						);
+					}
+				} else {
+					$result = array(
+						'result' => false,
+						'data'   => esc_html__( 'Import unsuccessful! The selected file is not a valid color scheme file.', 'redux-framework' ),
+					);
+				}
+			} else {
+				$result = array(
+					'result' => false,
+					'data'   => esc_html__( 'Import unsuccessful! No data detected in the import file.', 'redux-framework' ),
+				);
+			}
+
+			$result = wp_json_encode( $result );
+
+			echo $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+			die;
 		}
 
 		/**
@@ -489,13 +564,13 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		/**
 		 * Save Scheme. Saved an individual scheme to JSON scheme file.
 		 *
-		 * @param       object $redux ReduxFramework object.
+		 * @param ReduxFramework $redux ReduxFramework object.
 		 *
+		 * @return      void
 		 * @since       1.0.0
 		 * @access      private
-		 * @return      void
 		 */
-		private function save_scheme( $redux ) {
+		private function save_scheme( ReduxFramework $redux ) {
 			Redux_Color_Scheme_Functions::$parent   = $redux;
 			Redux_Color_Scheme_Functions::$field_id = $this->field_id;
 
@@ -540,13 +615,13 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		/**
 		 * Delete Scheme. Delete individual scheme from JSON scheme file.
 		 *
-		 * @param       object $redux ReduxFramework object.
+		 * @param ReduxFramework $redux ReduxFramework object.
 		 *
+		 * @return      void
 		 * @since       1.0.0
 		 * @access      private
-		 * @return      void
 		 */
-		private function delete_scheme( $redux ) {
+		private function delete_scheme( ReduxFramework $redux ) {
 
 			// Get deleted scheme ID.
 			if ( isset( $_REQUEST['scheme_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
@@ -607,13 +682,13 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		/**
 		 * Gets the new scheme based on selection.
 		 *
-		 * @param       object $redux ReduxFramework object.
+		 * @param ReduxFramework $redux ReduxFramework object.
 		 *
+		 * @return      void
 		 * @since       1.0.0
 		 * @access      private
-		 * @return      void
 		 */
-		private function get_scheme_html( $redux ) {
+		private function get_scheme_html( ReduxFramework $redux ) {
 			if ( isset( $_POST['scheme_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 
 				// Get the selected scheme name.
@@ -658,7 +733,6 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 			$def_opts = $this->parent->options_defaults[ $this->field_id ];
 
 			if ( isset( $def_opts['color_scheme_name'] ) ) {
-				// error_log(print_r($def_opts,true));
 				return array();
 			}
 

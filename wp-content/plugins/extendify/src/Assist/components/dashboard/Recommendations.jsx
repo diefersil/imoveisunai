@@ -1,102 +1,75 @@
-import { Spinner } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
-import { Icon, chevronRightSmall } from '@wordpress/icons';
-import { motion, AnimatePresence } from 'framer-motion';
-import { RecommendationItem } from '@assist/components/task-items/RecommendationItem';
-import { useRecommendations } from '@assist/hooks/useRecommendations';
-import { useRecommendationsStore } from '@assist/state/Recommendations';
-import { Confetti } from '@assist/svg';
+import { __ } from '@wordpress/i18n';
+import { safeParseJson } from '@shared/lib/parsing';
+import { RecommendationCard } from '@assist/components/dashboard/RecommendationCard';
+import { isAtLeastNDaysAgo } from '@assist/lib/recommendations';
+
+const siteCreatedAt = window.extSharedData?.siteCreatedAt ?? '';
+const recommendations =
+	safeParseJson(window.extSharedData.resourceData)?.recommendations || [];
+const goals =
+	safeParseJson(window.extSharedData?.userData?.userSelectionData)?.state
+		?.goals || [];
+const plugins =
+	window.extSharedData?.activePlugins?.map((plugin) => plugin.split('/')[0]) ||
+	[];
+
+const getRecommendations = () =>
+	// Filter out recs that have goal deps that don't appear in the user's goals list
+	// If no goal deps, show the rec
+	recommendations
+		.filter((rec) =>
+			rec?.goalDepSlugs?.length
+				? rec?.goalDepSlugs?.every((dep) =>
+						goals.find(({ slug }) => slug === dep),
+					)
+				: true,
+		)
+		// Filter out recs that have pluginExclusions, and the plugin is already installed
+		.filter((rec) =>
+			rec?.pluginExclusions?.length
+				? rec?.pluginExclusions?.every(
+						(dep) => !plugins.find((plugin) => plugin === dep)?.length,
+					)
+				: true,
+		)
+		// Filter out recs where there is a plugin dep, and the plugin is not installed
+		.filter((rec) =>
+			rec?.pluginDepSlugs?.length
+				? rec?.pluginDepSlugs?.every(
+						(dep) => plugins.find((plugin) => plugin === dep)?.length,
+					)
+				: true,
+		)
+		.sort((a, b) => b.priority - a.priority)
+		// filter out recs based on the showAfterDay field
+		.filter((rec) =>
+			// Only show recommendations after the number of days set in rec.showAfterDay
+			isAtLeastNDaysAgo(siteCreatedAt, rec?.showAfterDay ?? 0) ? rec : false,
+		);
 
 export const Recommendations = () => {
-	const { recommendations, loading, error } = useRecommendations();
-	const { isDismissedRecommendation } = useRecommendationsStore();
+	const filteredRecommendations = getRecommendations();
 
-	const notDismissed = recommendations?.filter(
-		(rec) => !isDismissedRecommendation(rec.slug),
-	);
-
-	if (loading || error) {
-		return (
-			<div className="assist-recommendations-module w-full flex justify-center bg-white border border-gray-300 p-2 lg:p-4 rounded">
-				<Spinner />
-			</div>
-		);
-	}
+	if (!filteredRecommendations?.length) return;
 
 	return (
 		<div
+			data-test="assist-recommendations-module"
 			id="assist-recommendations-module"
-			className="w-full border border-gray-300 text-base bg-white p-4 md:p-8 rounded">
-			<div className="flex justify-between items-center gap-2">
-				<h2 className="text-lg leading-tight m-0 flex flex-1 items-center gap-1">
-					<span>{__('Recommendations', 'extendify-local')}</span>
-				</h2>
-				<a
-					href="admin.php?page=extendify-assist#recommendations"
-					className="inline-flex items-center no-underline text-sm text-design-main hover:underline">
-					{notDismissed?.length > 0
-						? sprintf(
-								// translators: %s is the number of tasks
-								__('View all (%s)', 'extendify-local'),
-								recommendations?.length,
-						  )
-						: __('View all recommendations', 'extendify-local')}
-					<Icon icon={chevronRightSmall} className="fill-current" />
-				</a>
+			className="h-full w-full rounded border border-gray-300 bg-white p-5 text-base lg:p-8">
+			<h2 className="mb-4 mt-0 text-lg font-semibold">
+				{__('Website Tools & Plugins', 'extendify-local')}
+			</h2>
+			<div
+				className="grid gap-y-3 md:grid-cols-3 md:gap-3"
+				data-test="assist-recommendations-module-list">
+				{filteredRecommendations.map((recommendation) => (
+					<RecommendationCard
+						key={recommendation.slug}
+						recommendation={recommendation}
+					/>
+				))}
 			</div>
-			{notDismissed.length === 0 ? (
-				<RecommendationsDismissed />
-			) : (
-				<div
-					className="border border-b-0 border-gray-300 mt-4"
-					id="assist-recommendations-module-list">
-					<AnimatePresence>
-						{notDismissed.slice(0, 3).map((rec) => (
-							<motion.div
-								key={rec.slug}
-								variants={{
-									fade: {
-										opacity: 0,
-										x: 15,
-										transition: {
-											duration: 0.5,
-										},
-									},
-									shrink: {
-										height: 0,
-										transition: {
-											delay: 0.5,
-											duration: 0.2,
-										},
-									},
-								}}
-								exit={['fade', 'shrink']}>
-								<RecsItemWrapper rec={rec} />
-							</motion.div>
-						))}
-					</AnimatePresence>
-				</div>
-			)}
-		</div>
-	);
-};
-
-const RecsItemWrapper = ({ rec, Action }) => (
-	<div className="px-3 sm:px-4 py-3 flex gap-2 justify-between border-0 border-b border-gray-300 relative items-center min-h-16">
-		<RecommendationItem rec={rec} Action={Action} />
-	</div>
-);
-
-const RecommendationsDismissed = () => {
-	return (
-		<div className="flex flex-col items-center justify-center border-gray-300 p-4 lg:p-8">
-			<Confetti aria-hidden={true} />
-			<p className="mb-0 text-lg font-bold">
-				{__('All caught up!', 'extendify-local')}
-			</p>
-			<p className="mb-0 text-sm">
-				{__('Congratulations! Take a moment to celebrate.', 'extendify-local')}
-			</p>
 		</div>
 	);
 };

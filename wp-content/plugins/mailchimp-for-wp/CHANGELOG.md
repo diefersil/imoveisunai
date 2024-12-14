@@ -1,6 +1,46 @@
 Changelog
 =========
 
+#### 4.9.19 - Nov 11, 2024
+
+- Add integration with [Prosopo](https://prosopo.io/), a GDPR compliant anti-spam solution for protecting your sign-up forms against bot sign-ups. Thanks [Maxim Akimov](https://github.com/light-source)!
+
+
+#### 4.9.18 - Oct 21, 2024
+
+- Bump required PHP version to 7.2.
+- Prevent non-functional checkbox from showing up on WooCommerce my account page if WooCommerce checkout integration is enabled.
+- Update default form content to include a "for" attribute on the label element.
+- Minor performance optimizations to `MC4WP_Form::get_subscriber_tags()`
+- Begrudgingly rename Mailchimp lists to Mailchimp audiences throughout the plugin's admin interfaces.
+
+
+#### 4.9.17 - Sep 17, 2024
+
+- Fix compatibility with WooCommerce versions 8.5 to 8.8 because of private method that was later made public.
+- Fix potential reflected XSS by stripping and escaping all HTML from `{email}` tag replacements. Thanks to kauenavarro for responsibly disclosing.
+- Fix potential stored XSS for attackers with both administrator access and Mailchimp account access by escaping HTML from interest group name. Thanks to Jorge Diaz (ddiax) for responsibly disclosing.
+
+
+#### 4.9.16 - Sep 11, 2024
+
+- Add support for WooCommerce Checkout Block in sign-up checkbox integration.
+
+
+#### 4.9.15 - Aug 13, 2024
+
+- Improved anti-spam measures on the [custom form integration](https://www.mc4wp.com/kb/subscribe-mailchimp-custom-html-form/). If you are using the custom form integration (using the `mc4wp-subscribe` checkbox), please test your forms after upgrading and report any issues to us.
+- Improved anti-spam measures on all sign-up forms.
+- Remove unsupported filter hook from Gravity Forms integration. 
+
+
+#### 4.9.14 - Jul 17, 2024
+
+- Very minor code-size improvements to public forms related JavaScript.
+- Update third-party JS dependencies.
+- Bump tested WordPress version to 6.6.
+
+
 #### 4.9.13 - Apr 25, 2024
 
 - Fix issue with Composer classmap throwing a fatal error when an older version of Composer is already loaded.
@@ -74,7 +114,7 @@ This drops support for some very old browsers, but results in smaller bundle siz
 
 #### 4.9.2 - Mar 21, 2023
 
-- Add support for a field named `MARKETING_PERMISSIONS` to enable GDPR fields configured in Mailchimp. A [sample code snippet can be found here](https://github.com/ibericode/mailchimp-for-wordpress/blob/master/sample-code-snippets/forms/gdpr-marketing-permissions.md).
+- Add support for a field named `MARKETING_PERMISSIONS` to enable GDPR fields configured in Mailchimp. A [sample code snippet can be found here](https://github.com/ibericode/mailchimp-for-wordpress/blob/main/sample-code-snippets/forms/gdpr-marketing-permissions.md).
 - Remove Google reCaptcha feature. This was already disabled if you were not already using it.
 
 

@@ -55,7 +55,7 @@ class Agent {
         else
             $post = get_page_by_title( $agent , 'OBJECT', self::$postType );
 
-        if ( !empty( $post ) || !is_wp_error( $post ) ) {
+        if ( !empty( $post ) && !is_wp_error( $post ) ) {
 
             return $post->ID ;
 

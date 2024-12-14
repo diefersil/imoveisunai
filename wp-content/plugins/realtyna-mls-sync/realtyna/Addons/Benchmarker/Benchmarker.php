@@ -1,10 +1,5 @@
 <?php
 
-namespace Realtyna\Sync\Addons\Benchmarker;
-
-/** Block direct access to file.*/ 
-defined( 'ABSPATH' ) || die( 'Access Denied!' );
-
 /**
  * Realtyna Benchmarker
  * Copyright (C) 2022 Realtyna Inc.
@@ -15,7 +10,7 @@ defined( 'ABSPATH' ) || die( 'Access Denied!' );
  * Realtyna Benchmarker - client
  * @author Ashton <ashton@realtyna.com>
  */
-class Benchmarker
+class RealtynaBenchmarker
 {
     /**
      * Client Version
@@ -48,7 +43,7 @@ class Benchmarker
     public function __construct()
     {
         $protocol = ( isset( $_SERVER['HTTPS'] ) && ( $_SERVER['HTTPS'] == 'on' ) ) ? 'https' : 'http';
-		$this->url = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$this->url = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];        
         ini_set('memory_limit', '128M');
     }
 
@@ -76,7 +71,7 @@ class Benchmarker
      */
     public function check_disk_space()
     {
-        $free_space_bytes = diskfreespace(__FILE__);
+        $free_space_bytes = diskfreespace(__DIR__);
         if(!$free_space_bytes) return;
         if(self::$diskspace_required > $free_space_bytes) {
             $this->output(
@@ -165,6 +160,7 @@ class Benchmarker
         return ['success' => 1];
     }
 
+
     /**
      * Get a view's content
      * @author Ashton <ashton@realtyna.com>
@@ -191,6 +187,7 @@ class Benchmarker
                 break;
         }
     }
+
 
     /**
      * Run Network test
@@ -238,7 +235,7 @@ class Benchmarker
         $write_size = self::$diskspace_required * 1.00;
         $block_size = 2 * pow(1024, 2);
         $phrase = mt_rand(10000, 99999);
-        $data = str_repeat($phrase, $block_size / strlen($phrase));
+        $data = str_repeat($phrase, (int)($block_size / strlen($phrase)));
 
         $start = microtime(true);
         $written = 0;
@@ -270,29 +267,32 @@ class Benchmarker
     /**
      * View home page
      * @author Ashton <ashton@realtyna.com>
+     * Updated on
      * @return string
      */
     protected function view_home()
     {
-        return sprintf('
-			<!DOCTYPE html>
-			<html lang="en">
-				<head>
-					<title>Realtyna Benchmarker</title>
-				</head>
-				<body>
-					<div class="test-container">
-						<h3>
-							Realtyna Benchmarker
-						</h3>
-						<sub>(version %s)</sub>
-						<hr/>
-						<p>Running tests, please wait...</p>
-					</div>
-					<script>window.location = "%s";</script>
-				</body>
-			</html>
-		', self::$version, $this->url . (strpos($this->url, '?') === false ? '?' : '&') . 'run_tests');
+    	$view = sprintf('<div class="hbp-result"></div>
+								<div class="hbp-row">
+									<div class="hbp-col-lg-12">
+										<div class="hbp-start-button">
+											<a id="hbp-start-test" href="benchmarker.php">
+												<span id="hbp-start-ring" class="hbp-start-ring-high"></span>
+												<span id="hbp-start-border" class="hbp-start-border"></span>
+												<span id="hbp-start-text" class="hbp-start-text">
+						                                <span id="hbp-speed-test" class="hbp-speed-test">Testing...</span>
+						                                <span id="hbp-mbps-text" class="hbp-mbps-text"></span>
+						                            </span>
+												<span class="hbp-progress-bar"></span>
+											</a>
+										</div>
+										<div id="hbp-running" class="hbp-running"></div>
+									</div>
+								</div>
+								<script>window.location = "%s";</script>'
+		                        ,$this->url . (strpos($this->url, '?') === false ? '?' : '&') . 'run_tests');
+
+	    return $this->view_template($view);
     }
 
     /**
@@ -350,90 +350,191 @@ class Benchmarker
 
     /**
      * View test results page
+     * Updated by Zein on 26 February 2022
      * @param $data
      * @return string
      */
     protected function view_test_results($data)
     {
-        $title = "Realtyna Benchmarker | Test Results";
-        $result = "<title>$title</title><h3>$title</h3><sub>(version " . self::$version . ")</sub><hr/>";
+    	$networkResult = $diskResult = $cpuResult = '';
 
-        $result .= '<h4>Network Test</h4>';
-        if(isset($data['network']['error'])) {
-            $result .= '<p><b>Error:</b> ' . $data['network']['error'] . '</p>';
-        }
-        else {
-            $result .= sprintf(
-                '<p>
-					Speed: <b>%s</b>
-					<br/>
-					(Downloaded %.2fMB in %.2f seconds)
-				</p>',
-                $data['network']['speed'] ,
-                $data['network']['size'] / pow(1024, 2),
-                $data['network']['time']
-            );
-        }
+	    if(isset($data['network']['error'])) {
+		    $networkResult = "<span class='hbp-speed-text'>Error!</span>";
+		    $networkResult .= "<h4>".$data['network']['error']."</h4>";
+        } else {
+		    $networkResult = "<h3>";
+            $networkResult .= "<span class='hbp-speed-text'>Speed</span>";
+		    $networkResult .= "<span class='hbp-measure-text'>" . $data['network']['speed'] . "</span>";
+		    $networkResult .= "<span class='hbp-unit-text'>Mbps</span>";
+		    $networkResult .= "</h3>";
+		    $networkResult .= "<h4>";
+		    $networkResult .= "(Downloaded ". round( $data['network']['size'] / pow(1024, 2),2) ."MB in ".round( $data['network']['time'],2)." seconds)";
+            $networkResult .= "</h4>";
+	    }
 
-        $result .= '<h4>Disk Test</h4>';
-        if(isset($data['disk']['error'])) {
-            $result .= '<p><b>Error:</b> ' . $data['disk']['error'] . '</p>';
-        }
-        else {
-            $result .= sprintf(
-                '<p>
-					Speed: <b>%dMB/s</b>
-					<br/>
-					(Created %d files, %dMB in total size)
-				</p>',
-                $data['disk']['rate'] ,
-                $data['disk']['written']['count'],
-                $data['disk']['written']['size']
-            );
-        }
 
-        $result .= '<h4>CPU Test</h4>';
-        if(!is_array($data['cpu'])) {
-            $result .= '<p>' . $data['cpu'] . '</p>';
-        }
-        else {
-            $load_avg_rows = '';
-            foreach ($data['cpu']['load_avg'] as $minutes => $load_avg)
-            {
-                $minutes_labeled = $minutes . ($minutes > 1 ? ' minutes' : ' minute');
-                $load_avg_rows .= sprintf(
-                    '<tr>
-                        <td>%s</td>
-                        <td>%.2f</td>
-                        <td>%s</td>
-                     </tr>', $minutes_labeled, $load_avg['value'], $load_avg['label']);
-            }
+	    if(isset($data['disk']['error'])) {
+		    $diskResult = "<span class='hbp-speed-text'>Error!</span>";
+		    $diskResult .= "<h4>".$data['disk']['error']."</h4>";
+	    } else {
+		    $diskResult = "<h3>";
+		    $diskResult .= "<span class='hbp-speed-text'>Speed</span>";
+		    $diskResult .= "<span class='hbp-measure-text'>" . round($data['disk']['rate'] ,2) . "</span>";
+		    $diskResult .= "<span class='hbp-unit-text'>MB/s</span>";
+		    $diskResult .= "</h3>";
+		    $diskResult .= "<h4>";
+		    $diskResult .= "(Created ". $data['disk']['written']['count'] ." files, ". $data['disk']['written']['size'] ."MB in total size)";
+		    $diskResult .= "</h4>";
+	    }
 
-            $result .= sprintf(
-                '<p>
-					Score: <b>%.1f of 10</b>
-				</p>
-				<p>
-				    <table class="load-avg">
-                        <caption>System Load averages<br/><sub>(Lower is better)</sub></caption> 
-                        %s	    
-                    </table>
-                </p>
-                <style>
-                    table.load-avg {border-collapse: collapse;}
-                    table.load-avg caption {background-color: #ddd; padding: 3px 5px;}
-                    table.load-avg td { border-top: 1px solid #999; padding: 3px 5px;}
-                </style>',
-                $data['cpu']['score'] ,
-                $load_avg_rows
-            );
-        }
 
-        $result .= '<p><a href="#" onclick="window.location.reload()">Run again</a></p>';
+	    if(!is_array($data['cpu'])) {
+		    $cpuResult = "<h4>".$data['cpu']."</h4>";
+	    } else {
+		    $cpuResult = "<h3>";
+		    $cpuResult .= "<span class='hbp-speed-text'>Score</span>";
+		    $cpuResult .= "<span class='hbp-measure-text'>" . $data['cpu']['score'] . "</span>";
+		    $cpuResult .= "<span class='hbp-unit-text'>of 10</span>";
+		    $cpuResult .= "</h3>";
+		    $cpuResult .= "<h4>";
+		    $cpuResult .= "System Load averages";
+		    $cpuResult .= "<span class='hbp-sub-text'>(Lower is better)</span>";
+		    $cpuResult .= "</h4>";
+		    $cpuResult .= "<table class='hbp-load-avg'><tbody>";
+		    foreach ($data['cpu']['load_avg'] as $minutes => $load_avg)
+		    {
+			    $minutes_labeled = $minutes . ($minutes > 1 ? ' minutes' : ' minute');
+			    $cpuResult .= "<tr>";
+			    $cpuResult .= "<td>".$minutes_labeled."</td>";
+			    $cpuResult .= "<td>".$load_avg['value']."</td>";
+			    $cpuResult .= "<td>".$load_avg['label']."</td>";
+			    $cpuResult .= "</tr>";
+		    }
+		    $cpuResult .= "</tbody></table>";
+	    }
 
-        $result .= '<hr/><p>Get Ultra Fast Hosting at <a href="https://hosting.realtyna.com">hosting.realtyna.com</a></p>';
-        return $result;
+
+	    $result = '<div class="hbp-result">
+                        <div class="hbp-row">
+                            <div class="hbp-col-lg-4">
+                                <div class="hbp-network-test">
+                                        <span class="hbp-network-icon">
+                                            <img src="img/icon/Wifi.png" alt="Network Test">
+                                        </span>
+                                    <h2>Network Test</h2>'
+                                    .$networkResult.
+                                '</div>
+                            </div>
+                            <div class="hbp-col-lg-4">
+                                <div class="hbp-disk-test">
+                                        <span class="hbp-disk-icon">
+                                            <img src="img/icon/HDD.png" alt="Disk Test">
+                                        </span>
+                                    <h2>Disk Test</h2>'
+                                    .$diskResult.
+                                '</div>
+                            </div>
+                            <div class="hbp-col-lg-4">
+                                <div class="hbp-cpu-test">
+                                        <span class="hbp-cpu-icon">
+                                            <img src="img/icon/CPU.png" alt="CPU Test">
+                                        </span>
+                                    <h2>CPU Test</h2>'
+                                    .$cpuResult.
+                                '</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hbp-row">
+                        <div class="hbp-col-lg-12">
+                            <div class="hbp-start-button">
+                                <a id="hbp-start-test" href="benchmarker.php">
+                                    <span id="hbp-start-ring" class="hbp-start-ring"></span>
+                                    <span id="hbp-start-border" class="hbp-start-border"></span>
+                                    <span id="hbp-start-text" class="hbp-start-text">
+                                            <span id="hbp-speed-test" class="hbp-speed-test">Again!</span>
+                                            <span id="hbp-mbps-text" class="hbp-mbps-text"></span>
+                                        </span>
+                                    <span class="hbp-progress-bar"></span>
+                                </a>
+                            </div>
+                            <div id="hbp-running" class="hbp-running">
+                            Get Ultra Fast Hosting at <a href="https://hosting.realtyna.com/" target="_blank">hosting.realtyna.com</a>
+							</div>
+                   
+                        </div>
+                    </div>';
+	    $title = '<h1>Test Result</h1>';
+        return $this->view_template($result,$title);
     }
+
+	/**
+	 * Create full view of content's template
+	 * @author Zein <zein.z@realtyna.net>
+	 * @param string $hunk
+	 * @return  string
+	 */
+	public function view_template($hunk , $title = '<h1>Realtyna Benchmarker</h1><p>A unique tool to measure your server\'s performance</p>') {
+
+		$page_view = '<!DOCTYPE html>
+					<html lang="en-US">
+					<head>
+						<!-- Required meta tags -->
+						<meta charset="UTF-8">
+						<meta http-equiv="X-UA-Compatible" content="IE=edge">
+						<meta name="viewport" content="width=device-width, initial-scale=1.0">
+						<!-- CSS -->
+						<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+					
+						<link href="css/style.css" rel="stylesheet">
+										
+						<title>Benchmark product</title>
+					</head>
+					<body>
+					<header>
+						<nav class="hbp-navbar">
+							<div class="hbp-container">
+								<div class="hbp-row">
+									<div class="hbp-navbar-header">
+										<a class="hbp-navbar-brand" href="https://realtyna.com" target="_blank">
+											<img src="img/logo/Realtyna-Logo.png" alt="Realtyna logo">
+											<span>
+					                                <span class="hbp-fw-300">Realtyna</span>
+					                                <br />
+					                                BENCHMARKER
+					                            </span>
+										</a>
+									</div>
+									<div class="hbp-navbar-list">
+										<ul class="hbp-navbar-item">
+											<li><a href="https://benchmarker.host/">Test Our Servers</a></li>
+											<li><a href="https://realtyna.com/hosting/" target="_blank">Realtyna Ultra fast Hosting</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</nav>
+					</header>
+					<div class="hbp-content hbp-text-center">
+						<div class="hbp-container">
+							<div class="hbp-row">
+								<div class="hbp-col-lg-12">
+									<div class="hbp-title">'
+										.$title.
+									'</div>
+								</div>
+							</div>'
+		             .$hunk.
+		             '</div>
+						</div>
+						<div class="hbp-top-shave"></div>
+						<div class="hbp-bottom-shave"></div>
+						<!-- JS -->
+						<script src="js/script.js"></script>
+						</body>
+						</html>';
+		return $page_view;
+	}
 
     /**
      * Download a file
@@ -545,7 +646,9 @@ class CPUTest
             foreach ($methods as $method) {
                 if (!preg_match("/^test_.+/", $method)) continue;
                 $result = $this->$method();
-                if (stripos($result, 'error') !== false) return $result;
+                if ($result !== null && stripos($result, 'error') !== false) {
+                    return $result;
+                }
             }
         }
 
@@ -654,3 +757,5 @@ class CPUTest
     }
 }
 
+$checker = new RealtynaBenchmarker();
+$checker->load();

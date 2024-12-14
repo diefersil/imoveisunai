@@ -45,19 +45,19 @@ export const SiteTypeControl = () => {
 							// translators: %s is the site type name
 							__('Site Type: %s', 'extendify-local'),
 							siteType.name,
-					  )
+						)
 					: __('Site Type', 'extendify-local')
 			}
 			className="ext-type-control p-0"
 			onToggle={setIsOpen}
 			opened={isOpen}
 			initialOpen={isOpen}>
-			<PanelRow className="m-0 w-full p-4 border border-gray-300 overflow-y-auto max-h-half -mt-1.5 rounded-b flex flex-col gap-2">
+			<PanelRow className="m-0 -mt-1.5 flex max-h-half w-full flex-col gap-2 overflow-y-auto rounded-b border border-gray-300 p-4">
 				<SearchControl
 					ref={searchRef}
 					className="w-full"
-					label={__('Search for your business type', 'extendify-local')}
-					placeholder={__('Search for your business type', 'extendify-local')}
+					label={__('Search for your site type', 'extendify-local')}
+					placeholder={__('Search for your site type', 'extendify-local')}
 					value={search}
 					onChange={setSearch}
 				/>
@@ -70,7 +70,7 @@ export const SiteTypeControl = () => {
 					</div>
 				)}
 				{data?.siteTypes?.length > 0 && !searching && (
-					<ul className="m-0 w-full pb-2 px-0 overflow-y-auto">
+					<ul className="m-0 w-full overflow-y-auto px-0 pb-2">
 						{data.siteTypes.slice(0, 5).map((siteType) => (
 							<li key={siteType.id} className="m-0 p-0">
 								<button
@@ -81,7 +81,7 @@ export const SiteTypeControl = () => {
 										setSearch('');
 										setIsOpen(false);
 									}}
-									className="text-sm w-full text-left px-3 py-1 mb-0.5 block cursor-pointer rounded bg-transparent text-gray-900 hover:bg-gray-100">
+									className="mb-0.5 block w-full cursor-pointer rounded bg-transparent px-3 py-1 text-left text-sm text-gray-900 hover:bg-gray-100 rtl:text-right">
 									{siteType.name}
 								</button>
 							</li>

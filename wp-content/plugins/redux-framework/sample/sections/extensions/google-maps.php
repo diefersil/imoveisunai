@@ -1,7 +1,7 @@
 <?php
 /**
  * Redux Google Maps Sample config.
- * For full documentation, please visit: http:https://devs.redux.io/
+ * For full documentation, please visit: https://devs.redux.io
  *
  * @package Redux
  */
@@ -12,7 +12,7 @@ Redux::set_section(
 	$opt_name,
 	array(
 		'title'      => esc_html__( 'Google Maps', 'your-textdomain-here' ),
-		'desc'       => esc_html__( 'For full documentation on this field, visit: ', 'your-textdomain-here' ) . '<a href="https://devs.redux.io/premium/google-maps.html" target="_blank">https://devs.redux.io/premium/google-maps.html</a>',
+		'desc'       => esc_html__( 'For full documentation on this field, visit: ', 'your-textdomain-here' ) . '<a href="https://devs.redux.io/core-extensions/google-maps.html" target="_blank">https://devs.redux.io/core-extensions/google-maps.html</a>',
 		'subsection' => true,
 		'fields'     => array(
 			array(

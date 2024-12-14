@@ -34,17 +34,29 @@ class Skin_Locate extends Elementor_Skin_Base {
 			<div <?php $this->parent->print_render_attribute_string('social-icon'); ?>>
 
 				<?php if ($label) : ?>
-					<h3><?php esc_html_e('Share Us', 'bdthemes-prime-slider'); ?></h3>
+					<h3><?php esc_html_e('Follow Us', 'bdthemes-prime-slider'); ?></h3>
 				<?php endif; ?>
 
-				<?php
-						foreach ($settings['social_link_list'] as $link) :
-							$tooltip = ('yes' == $settings['social_icon_tooltip']) ? ' title="' . esc_attr($link['social_link_title']) . '" bdt-tooltip="pos: ' . $position . '"' : ''; ?>
+                <?php
+                foreach ( $settings['social_link_list'] as $index => $link ) :
+                    
+                    $link_key = 'link_' . $index;
 
-					<a href="<?php echo esc_url($link['social_link']); ?>" target="_blank" <?php echo wp_kses_post($tooltip); ?>>
-						<?php Icons_Manager::render_icon($link['social_icon'], ['aria-hidden' => 'true', 'class' => 'fa-fw']); ?>
-					</a>
-				<?php endforeach; ?>
+                    if ( 'yes' === $settings['social_icon_tooltip'] ) {
+                        $tooltip = 'title: ' . wp_kses_post( $link['social_link_title'] ) . '; pos: ' . esc_attr( $position );
+                    
+                        $this->parent->add_render_attribute( $link_key, 'data-bdt-tooltip', $tooltip, true );
+                    }
+
+                    if ( isset($link['social_icon_link']['url']) && ! empty($link['social_icon_link']['url']) ) {
+                        $this->parent->add_link_attributes($link_key, $link['social_icon_link']);
+                    }
+                    
+                    ?>
+                    <a <?php $this->parent->print_render_attribute_string($link_key); ?>>
+                        <?php Icons_Manager::render_icon( $link['social_icon'], [ 'aria-hidden' => 'true', 'class' => 'fa-fw' ] ); ?>
+                    </a>
+                <?php endforeach; ?>
 			</div>
 
 		<?php
@@ -86,10 +98,10 @@ class Skin_Locate extends Elementor_Skin_Base {
 
             <ul class="bdt-ps-dotnav bdt-position-bottom-right reveal-muted">
                 <?php $slide_index = 1; foreach ( $settings['slides'] as $slide ) : ?>
-                    <li bdt-slideshow-item="<?php echo ($slide_index - 1); ?>" data-label="<?php echo str_pad( $slide_index, 2, '0', STR_PAD_LEFT); ?>" ><a href="#"><?php echo str_pad( $slide_index, 2, '0', STR_PAD_LEFT); ?></a></li>
+                    <li bdt-slideshow-item="<?php echo esc_attr($slide_index - 1); ?>" data-label="<?php echo esc_attr(str_pad( $slide_index, 2, '0', STR_PAD_LEFT)); ?>" ><a href="#"><?php echo esc_attr(str_pad( $slide_index, 2, '0', STR_PAD_LEFT)); ?></a></li>
                 <?php $slide_index++;  endforeach; ?>
 
-                <span><?php echo str_pad( $slide_index - 1, 2, '0', STR_PAD_LEFT); ?></span>
+                <span><?php echo esc_attr(str_pad( $slide_index - 1, 2, '0', STR_PAD_LEFT)); ?></span>
             </ul>
 
         <?php endif; ?>
@@ -117,27 +129,32 @@ class Skin_Locate extends Elementor_Skin_Base {
         $settings = $this->parent->get_settings_for_display();
 
         $parallax_button = $parallax_sub_title = $parallax_title = $parallax_inner_excerpt = $parallax_excerpt = '';
-			if ( $settings['animation_parallax'] == 'yes' ) {
-				$parallax_sub_title     = 'data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0"';
-				$parallax_title 	    = ' data-bdt-slideshow-parallax="y: 75,0,-75; opacity: 1,1,0"'; 
-				$parallax_excerpt 	    = 'data-bdt-slideshow-parallax="y: 100,0,-80; opacity: 1,1,0"';
-				$parallax_button 	    = 'data-bdt-slideshow-parallax="y: 150,0,-100; opacity: 1,1,0"';
-			}
+        if ( $settings['animation_parallax'] == 'yes' ) {
+            $parallax_sub_title     = 'data-bdt-slideshow-parallax="y: 50,0,-50; opacity: 1,1,0"';
+            $parallax_title 	    = ' data-bdt-slideshow-parallax="y: 75,0,-75; opacity: 1,1,0"'; 
+            $parallax_excerpt 	    = 'data-bdt-slideshow-parallax="y: 100,0,-80; opacity: 1,1,0"';
+            $parallax_button 	    = 'data-bdt-slideshow-parallax="y: 150,0,-100; opacity: 1,1,0"';
+        }
 
-			if ( true === _is_ps_pro_activated() ) {
-				if ($settings['animation_status'] == 'yes' && !empty($settings['animation_of'])) {
+        if ( true === _is_ps_pro_activated() ) {
+            if ($settings['animation_status'] == 'yes' && !empty($settings['animation_of'])) {
 
-					if (in_array(".bdt-ps-sub-title", $settings['animation_of'])) {
-						$parallax_sub_title = '';
-					}
-					if (in_array(".bdt-title-tag", $settings['animation_of'])) {
-						$parallax_title = '';
-					}
-					if (in_array(".bdt-slider-excerpt", $settings['animation_of'])) {
-						$parallax_excerpt = '';
-					}
-				}
-			}
+                if (in_array(".bdt-ps-sub-title", $settings['animation_of'])) {
+                    $parallax_sub_title = '';
+                }
+                if (in_array(".bdt-title-tag", $settings['animation_of'])) {
+                    $parallax_title = '';
+                }
+                if (in_array(".bdt-slider-excerpt", $settings['animation_of'])) {
+                    $parallax_excerpt = '';
+                }
+            }
+        }
+
+        if ($slide_content['title']) {
+            $this->parent->add_link_attributes('title-link', $slide_content['title_link'], true);
+        }
+        
 
         ?>
             <div class="bdt-slideshow-content-wrapper">
@@ -147,34 +164,34 @@ class Skin_Locate extends Elementor_Skin_Base {
 
                             <?php if ($slide_content['sub_title'] && ('yes' == $settings['show_sub_title'])) : ?>
                                 <div class="bdt-sub-title bdt-ps-sub-title">
-                                    <h4 data-reveal="reveal-active" <?php echo $parallax_sub_title; ?>>
+                                    <<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?>  class="bdt-sub-title-tag" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_sub_title); ?>>
                                         <?php echo wp_kses_post($slide_content['sub_title']); ?>
-                                    </h4>
+                                    </<?php echo esc_attr( Utils::get_valid_html_tag( $settings['sub_title_html_tag'] ) ); ?>>
                                 </div>
                             <?php endif; ?>
 
                            <?php if ($slide_content['title'] && ('yes' == $settings['show_title'])) : ?>
                                 <div class="bdt-main-title">
-                                    <<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> 
-                                    class="bdt-title-tag" data-reveal="reveal-active" <?php echo $parallax_title; ?>>
+                                    <<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> 
+                                    class="bdt-title-tag" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_title); ?>>
                                         <?php if ('' !== $slide_content['title_link']['url']) : ?>
-                                            <a href="<?php echo esc_url($slide_content['title_link']['url']); ?>">
+                                            <a <?php $this->parent->print_render_attribute_string('title-link');?>>
                                             <?php endif; ?>
-                                            <?php echo prime_slider_first_word($slide_content['title']); ?>
+                                            <?php echo wp_kses_post(prime_slider_first_word($slide_content['title'])); ?>
                                             <?php if ('' !== $slide_content['title_link']['url']) : ?>
                                             </a>
                                         <?php endif; ?>
-                                    </<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+                                    </<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
                                 </div>
                             <?php endif; ?>
 
                             <?php if ($slide_content['excerpt'] && ('yes' == $settings['show_excerpt'])) : ?>
-                                <div class="bdt-slider-excerpt" data-reveal="reveal-active" <?php echo $parallax_excerpt; ?>>
+                                <div class="bdt-slider-excerpt" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_excerpt); ?>>
                                     <?php echo wp_kses_post($slide_content['excerpt']); ?>
                                 </div>
                             <?php endif; ?>
 
-                            <div class="bdt-isolate-btn" data-reveal="reveal-active" <?php echo $parallax_button; ?>>
+                            <div class="bdt-isolate-btn" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_button); ?>>
                                 <?php $this->parent->render_button($slide_content); ?>
 							</div>
 							

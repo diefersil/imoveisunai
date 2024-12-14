@@ -5,42 +5,19 @@
 
 namespace Extendify\Library;
 
-use Extendify\Config;
+defined('ABSPATH') || die('No direct access.');
 
 /**
  * This class handles any file loading for the frontend of the site.
  */
 class Frontend
 {
-
-    /**
-     * The instance
-     *
-     * @var $instance
-     */
-    public static $instance = null;
-
     /**
      * Adds various actions to set up the page
      *
-     * @return self|void
-     */
-    public function __construct()
-    {
-        if (self::$instance) {
-            return self::$instance;
-        }
-
-        self::$instance = $this;
-        $this->loadScripts();
-    }
-
-    /**
-     * Adds scripts and styles to every page is enabled
-     *
      * @return void
      */
-    public function loadScripts()
+    public function __construct()
     {
         \add_action('wp_enqueue_scripts', [$this, 'enqueueUtilityStyles']);
         \add_action('admin_init', [$this, 'enqueueUtilityStyles']);
@@ -53,13 +30,13 @@ class Frontend
      */
     public function enqueueUtilityStyles()
     {
-        if (get_option('extendify_pattern_was_imported', false)) {
+        // This only is in the database in older versions of the plugin that require these styles.
+        if (\get_option('extendify_pattern_was_imported', false)) {
             $this->themeCompatInlineStyles();
+            // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
             \wp_enqueue_style(
-                Config::$slug . '-utility-styles',
-                EXTENDIFY_BASE_URL . 'public/build/utility-minimum.css',
-                [],
-                Config::$version
+                'extendify-utility-styles',
+                EXTENDIFY_BASE_URL . 'public/build/utility-minimum.css'
             );
         }
     }
@@ -268,10 +245,10 @@ class Frontend
             return;
         }
 
-        $version = Config::$environment === 'PRODUCTION' ? Config::$version : uniqid();
-        \wp_register_style(Config::$slug . '-utility-extras', false, [], $version);
-        \wp_enqueue_style(Config::$slug . '-utility-extras');
-        \wp_add_inline_style(Config::$slug . '-utility-extras', $css);
+        // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+        \wp_register_style('extendify-utility-extras', false);
+        \wp_enqueue_style('extendify-utility-extras');
+        \wp_add_inline_style('extendify-utility-extras', $css);
         // Adds inline to the live preview.
         \wp_add_inline_style('wp-components', $css);
     }

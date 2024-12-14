@@ -1,15 +1,38 @@
-import { Axios as api } from './axios';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
-export const getLaunchPages = () => api.get('assist/launch-pages');
+export const installPlugin = async (slug) => {
+	try {
+		return await apiFetch({
+			path: '/wp/v2/plugins',
+			method: 'POST',
+			data: {
+				slug: slug,
+				status: 'active',
+			},
+		});
+	} catch {
+		// Fail silently
+	}
 
-export const updateOption = (option, value) =>
-	api.post('assist/options', { option, value });
-
-export const getOption = async (option) => {
-	const { data } = await api.get('assist/options', {
-		params: { option },
-	});
-	return data;
+	await activatePlugin(slug);
 };
 
-export const getActivePlugins = () => api.get('assist/active-plugins');
+export const activatePlugin = async (slug) => {
+	const plugin = await getPlugin(slug);
+	return await apiFetch({
+		path: `/wp/v2/plugins/${plugin.plugin}`,
+		method: 'POST',
+		data: {
+			status: 'active',
+		},
+	});
+};
+
+export const getPlugin = async (slug) => {
+	const response = await apiFetch({
+		path: addQueryArgs('/wp/v2/plugins', { search: slug }),
+	});
+
+	return response?.[0];
+};

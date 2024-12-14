@@ -69,7 +69,11 @@ class Vertex extends Widget_Base {
         return 'https://youtu.be/ktEB9YdU8A8';
     }
 
-    protected function register_controls() {
+    protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	protected function register_controls() {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
         $this->start_controls_section(
             'section_content_layout',
@@ -91,6 +95,7 @@ class Vertex extends Widget_Base {
                     3 => '3',
                     5 => '5',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -126,6 +131,7 @@ class Vertex extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .bdt-vertex-slider .swiper-vertex' => 'padding: {{SIZE}}{{UNIT}} 0;',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -315,6 +321,7 @@ class Vertex extends Widget_Base {
                     '{{WRAPPER}} .bdt-vertex-slider .swiper-vertex::before' => 'height: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .bdt-vertex-slider .bdt-img-wrap .bdt-img' => 'border-width: {{SIZE}}{{UNIT}};',
                 ],
+                'classes'   => BDTPS_CORE_IS_PC
             ]
         );
 
@@ -708,9 +715,11 @@ class Vertex extends Widget_Base {
             return;
         }
 
+        $post_id = get_the_ID();
+
         ?>
         <div class="bdt-category" data-reveal="reveal-active" data-swiper-parallax="-200" data-swiper-parallax-duration="700">
-            <?php echo get_the_category_list(' '); ?>
+        <?php echo $this->ps_get_taxonomy_list( $post_id, $this->ps_taxonomy_switcher() ); ?>
         </div>
         <?php
     }
@@ -775,8 +784,7 @@ class Vertex extends Widget_Base {
             ]
         );
 
-        $swiper_class = Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-		$this->add_render_attribute('swiper', 'class', 'swiper-vertex ' . $swiper_class);
+		$this->add_render_attribute('swiper', 'class', 'swiper-vertex swiper');
 
         ?>
         <div <?php $this->print_render_attribute_string('prime-slider'); ?>>

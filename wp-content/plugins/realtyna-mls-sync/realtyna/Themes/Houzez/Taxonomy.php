@@ -30,7 +30,7 @@ class Taxonomy {
      */
     public function import( $value , $postId , $parentInfo = array() ){
 
-        if ( taxonomy_exists( static::TAXONOMY ) ) {
+        if ( taxonomy_exists( static::TAXONOMY ) && !empty( trim( $value ) ) ) {
 			
 			$term = term_exists( $value, static::TAXONOMY );
 
@@ -45,8 +45,10 @@ class Taxonomy {
 				);
 		
 			}
-		
-			wp_set_post_terms( $postId, $term, static::TAXONOMY, true );
+			
+			if ( !is_wp_error( $term ) ) {
+				wp_set_post_terms( $postId, $term, static::TAXONOMY, true );
+			}
 			
 		}
 

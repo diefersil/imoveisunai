@@ -151,7 +151,8 @@ trait Group_Control_Query {
 				],
 				'condition'   => [
 					'posts_source!' => ['manual_selection', 'current_query'],
-				]
+				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -229,13 +230,13 @@ trait Group_Control_Query {
 		$this->add_control(
 			'product_show_product_type',
 			[
-				'label'   => esc_html__('Show Product', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Show Product', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'all',
 				'options' => [
-					'all'      => esc_html__('All Products', 'bdthemes-element-pack'),
-					'onsale'   => esc_html__('On Sale', 'bdthemes-element-pack'),
-					'featured' => esc_html__('Featured', 'bdthemes-element-pack'),
+					'all'      => esc_html__('All Products', 'bdthemes-prime-slider'),
+					'onsale'   => esc_html__('On Sale', 'bdthemes-prime-slider'),
+					'featured' => esc_html__('Featured', 'bdthemes-prime-slider'),
 				],
 				'condition' => [
 					'posts_source'                => 'product',
@@ -350,7 +351,7 @@ trait Group_Control_Query {
 		$this->add_control(
 			'product_hide_free',
 			[
-				'label'   => esc_html__('Hide Free Product', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Hide Free Product', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::SWITCHER,
 				'condition' => [
 					'posts_source' => 'product',
@@ -360,7 +361,7 @@ trait Group_Control_Query {
 		$this->add_control(
 			'product_hide_out_stock',
 			[
-				'label'   => esc_html__('Hide Out of Stock', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Hide Out of Stock', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::SWITCHER,
 				'condition' => [
 					'posts_source' => 'product',
@@ -400,6 +401,7 @@ trait Group_Control_Query {
 				'description' => __('Give your Query a custom unique id to allow server side filtering', 'bdthemes-prime-slider'),
 				'type'        => Controls_Manager::TEXT,
 				'separator'   => 'before',
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 	}

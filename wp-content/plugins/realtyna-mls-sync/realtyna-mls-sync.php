@@ -5,7 +5,7 @@
  * Description: Sync MLS listings with third-party themes
  * Author: Realtyna
  * Author URI: https://realtyna.com/
- * Version: 1.0.20
+ * Version: 1.5.12
  * Text Domain: realtyna-mls-sync
  */
 
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || die( 'Access Denied!' );
 define( "REALTYNA_MLS_SYNC_SLUG" , "realtyna-mls-sync" );
 
 /** @var string plugin Version */
-define( "REALTYNA_MLS_SYNC_VERSION" , "1.0.20" );
+define( "REALTYNA_MLS_SYNC_VERSION" , "1.5.12" );
 
 /** @var string plugin root path */
 define( "REALTYNA_MLS_SYNC_PLUGIN_FILE" , __FILE__ );

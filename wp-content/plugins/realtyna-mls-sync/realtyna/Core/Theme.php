@@ -29,7 +29,6 @@ abstract class Theme
     /**
      * @var string Theme Requirements 
      * @static
-     * @abstract
      */
     static public $requirements;
 
@@ -37,9 +36,10 @@ abstract class Theme
      * Get Theme Name entered in class
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string
      */
-    static public function getThemeName()
+    static public function getName()
     {
         
         return static::$name;
@@ -50,9 +50,10 @@ abstract class Theme
      * Get Theme URL entered in class
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string
      */
-    static public function getThemeURL()
+    static public function getURL()
     {
         
         return static::$url;
@@ -63,12 +64,13 @@ abstract class Theme
      * Get Theme Name entered in class in lowercase
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string|bool
      */
-    static public function strtolowerThemeName()
+    static public function strtolowerName()
     {
 
-        return static::getThemeName() ? \strtolower( static::getThemeName() ) : false ;
+        return static::getName() ? \strtolower( static::getName() ) : false ;
 
     }
 
@@ -76,6 +78,7 @@ abstract class Theme
      * Get Current Active Theme Name in Wordpress
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string
      */
     static public function getCurrentTheme()
@@ -97,9 +100,10 @@ abstract class Theme
      * Get lowercase of Current Active Theme Name in Wordpress
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string|bool
      */
-    static public function strtolowerCurrentTheme()
+    static public function strtolowerCurrentProductName()
     {
 
         return static::getCurrentTheme() ? \strtolower( static::getCurrentTheme() ) : false ;
@@ -110,13 +114,90 @@ abstract class Theme
      * Check if the theme is active
      * @author Chris A <chris.a@realtyna.net>
      *
+     * @static
      * @return string
      */
-    static public function isActiveTheme()
+    static public function isActive()
     {
 
-        return \substr( static::strtolowerCurrentTheme() , 0 , \strlen( static::strtolowerThemeName() ) ) == static::strtolowerThemeName()  ;
+        return \substr( static::strtolowerCurrentProductName() , 0 , \strlen( static::strtolowerName() ) ) == static::strtolowerName()  ;
 
     }
+
+    /**
+     * Get new object of Agency
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     *
+     * @return object
+     */
+    abstract public function agencies();
+
+    /**
+     * Get Agent Object
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     *
+     * @return object
+     */
+    abstract public function agents();
+
+    /**
+     * Return Property Object
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     *
+     * @param bool initialize fields on create class
+     * @param string|null mls Provider
+     * @param array import options array
+     * 
+     * @return object
+     */
+    abstract public function property( $initFields , $mlsProvider , $importOptions );
+
+    /**
+     * Bulk Remove Imported Properties
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     * 
+     * @param bool Remove Only Demo Properties
+     * 
+     * @return bool
+     */
+    abstract public function removeProperties( $demoOnly );
+
+    /**
+     * Update Agent display option for Imported Properties
+     * it may return false/true in case of unused
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     * 
+     * @param int code defined by Product
+     * 
+     * @return bool
+     */
+    abstract public function updatePropertiesAgentDisplayOption( $agentOption );
+
+    /**
+     * Update Agency for Imported Properties
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     * 
+     * @param int ID for Selected Agency
+     * 
+     * @return bool
+     */
+    abstract public function updatePropertiesAgency( $agency );
+    
+    /**
+     * Update Agent for Imported Properties
+     * @author Chris A <chris.a@realtyna.net>
+     * @abstract
+     * 
+     * @param int ID for Selected Agent
+     * 
+     * @return bool
+     */
+    abstract public function updatePropertiesAgents( $agent );
 
 }

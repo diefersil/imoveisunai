@@ -26,6 +26,118 @@ class UpdraftPlus_Migrator_Lite {
 	public $new_blogid;
 
 	/**
+	 * Whether to use $wpdb or not
+	 *
+	 * @var Bool
+	 */
+	private $use_wpdb;
+
+	/**
+	 * Table prefix
+	 *
+	 * @var String
+	 */
+	private $base_prefix;
+
+	/**
+	 * The database handle object or false boolean
+	 *
+	 * @var Mixed
+	 */
+	private $mysql_dbh;
+
+	/**
+	 * Whether the object is using mysqli or not
+	 *
+	 * @var Boolean
+	 */
+	private $use_mysqli;
+
+	/**
+	 * Variable to store migration progress
+	 *
+	 * @var Array
+	 */
+	private $report;
+
+	/**
+	 * The site url
+	 *
+	 * @var String
+	 */
+	protected $siteurl;
+
+	/**
+	 * The old site url
+	 *
+	 * @var String
+	 */
+	private $old_siteurl;
+
+	/**
+	 * The home url
+	 *
+	 * @var String
+	 */
+	protected $home;
+
+	/**
+	 * The old home url
+	 *
+	 * @var String
+	 */
+	private $old_home;
+
+	/**
+	 * The wp-content url
+	 *
+	 * @var String
+	 */
+	protected $content;
+
+	/**
+	 * The old wp-content url
+	 *
+	 * @var String
+	 */
+	protected $old_content;
+
+	/**
+	 * The uploads url
+	 *
+	 * @var String
+	 */
+	protected $uploads;
+
+	/**
+	 * The old uploads url
+	 *
+	 * @var String
+	 */
+	protected $old_uploads;
+	
+	/**
+	 * Tables for search and replace operation
+	 *
+	 * @var Array
+	 */
+	private $which_tables;
+
+	/**
+	 * Tables that have been searched and replaced
+	 *
+	 * @var Array
+	 */
+	private $tables_replaced;
+
+	/**
+	 * Sites array of multisite
+	 *
+	 * @var Array
+	 */
+	private $original_sites;
+
+	/**
 	 * Constructor, called during UD initialisation
 	 */
 	public function __construct() {
@@ -79,7 +191,7 @@ class UpdraftPlus_Migrator_Lite {
 	public function restored_plugins() {
 		if (true !== $this->is_migration) return;
 		global $updraftplus;
-		$active_plugins = maybe_unserialize($updraftplus->option_filter_get('active_plugins'));
+		$active_plugins = $updraftplus->unserialize($updraftplus->option_filter_get('active_plugins'));
 		if (!is_array($active_plugins)) return;
 		$disable_plugins = array(
 			'w3-total-cache/w3-total-cache.php' => 'W3 Total Cache',
@@ -104,7 +216,7 @@ class UpdraftPlus_Migrator_Lite {
 	public function restorecachefiles($val, $file) {
 		// On a migration, we don't want to add cache files if they do not already exist (because usually they won't work until re-installed)
 		if (true !== $this->is_migration || false == $val) return $val;
-		$val = (is_file(WP_CONTENT_DIR.'/'.$file)) ? $val : false;
+		$val = is_file(WP_CONTENT_DIR.'/'.$file) ? $val : false;
 		if (false == $val) {
 			global $updraftplus;
 			$updraftplus->log_e("%s: Skipping cache file (does not already exist)", $file);
@@ -121,16 +233,17 @@ class UpdraftPlus_Migrator_Lite {
 			'show_heading' => true,
 		));
 	
-		if (!empty($options['show_heading'])) echo '<h2>'.__('Search / replace database', 'updraftplus').'</h2>';
-		echo '<strong>'.__('Search for', 'updraftplus').':</strong> '.htmlspecialchars($_POST['search'])."<br>";
-		echo '<strong>'.__('Replace with', 'updraftplus').':</strong> '.htmlspecialchars($_POST['replace'])."<br>";
-		$this->page_size = (empty($_POST['pagesize']) || !is_numeric($_POST['pagesize'])) ? 5000 : $_POST['pagesize'];
-		$this->which_tables = (empty($_POST['whichtables'])) ? '' : explode(',', ($_POST['whichtables']));
+		if (!empty($options['show_heading'])) echo '<h2>'.esc_html__('Search / replace database', 'updraftplus').'</h2>';
+		echo '<strong>'.esc_html__('Search for', 'updraftplus').':</strong> '.esc_html(stripslashes($_POST['search']))."<br>";
+		echo '<strong>'.esc_html__('Replace with', 'updraftplus').':</strong> '.esc_html(stripslashes($_POST['replace']))."<br>";
+		$this->page_size = (empty($_POST['pagesize']) || !is_numeric($_POST['pagesize'])) ? 5000 : (int) $_POST['pagesize'];
+		$this->which_tables = empty($_POST['whichtables']) ? '' : explode(',', (stripslashes($_POST['whichtables'])));
 		if (empty($_POST['search'])) {
-			echo sprintf(__("Failure: No %s was given.", 'updraftplus'), __('search term', 'updraftplus'))."<br>";
+			// trnaslators: "search term"
+			echo sprintf(esc_html__("Failure: No %s was given.", 'updraftplus'), esc_html__('search term', 'updraftplus'))."<br>";
 			
 			if (!empty($options['show_return_link'])) {
-				echo '<a href="'.UpdraftPlus_Options::admin_page_url().'?page=updraftplus">'.__('Return to UpdraftPlus Configuration', 'updraftplus').'</a>';
+				echo '<a href="'.UpdraftPlus_Options::admin_page_url().'?page=updraftplus">'.esc_html__('Return to UpdraftPlus configuration', 'updraftplus').'</a>';
 			}
 			
 			return;
@@ -145,8 +258,8 @@ class UpdraftPlus_Migrator_Lite {
 		}
 		$this->updraftplus_restore_db_pre();
 		$this->tables_replaced = array();
-		$this->updraftplus_restored_db_dosearchreplace($_POST['search'], $_POST['replace'], $this->base_prefix, false);
-		if (!empty($options['show_return_link'])) echo '<a href="'.UpdraftPlus_Options::admin_page_url().'?page=updraftplus">'.__('Return to UpdraftPlus Configuration', 'updraftplus').'</a>';
+		$this->updraftplus_restored_db_dosearchreplace(stripslashes($_POST['search']), stripslashes($_POST['replace']), $this->base_prefix, false);
+		if (!empty($options['show_return_link'])) echo '<a href="'.UpdraftPlus_Options::admin_page_url().'?page=updraftplus">'.esc_html__('Return to UpdraftPlus Configuration', 'updraftplus').'</a>';
 	}
 
 	/**
@@ -167,7 +280,7 @@ class UpdraftPlus_Migrator_Lite {
 		global $updraftplus_admin;
 	?>
 		<div class="advanced_tools search_replace">
-			<h3><?php _e('Search / replace database', 'updraftplus'); ?></h3>
+			<h3><?php esc_html_e('Search / replace database', 'updraftplus'); ?></h3>
 			<p><em><?php _e('This can easily destroy your site; so, use it with care!', 'updraftplus');?></em></p>
 			<form id="search_replace_form" method="post" onsubmit="return(confirm('<?php echo esc_js(__('A search/replace cannot be undone - are you sure you want to do this?', 'updraftplus'));?>'))">
 				<input type="hidden" name="nonce" value="<?php echo wp_create_nonce('updraftplus-credentialtest-nonce');?>">
@@ -255,7 +368,7 @@ class UpdraftPlus_Migrator_Lite {
 	public function lite_restore_all_downloaded_postscan($backups, $timestamp, $elements, &$info, &$mess, &$warn, &$err) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Filter use
 		if (is_array($info) && isset($info['migration']) && true === $info['migration']) {
 			if (empty($info['addui'])) $info['addui'] = '';
-			$info['addui'] .= '<div id="updraft_restorer_dboptions" class="notice before-h2 updraft-restore-option updraft-hidden">';
+			$info['addui'] .= '<div id="updraft_restorer_dboptions" class="udp-notice before-h2 updraft-restore-option updraft-hidden">';
 			$info['addui'] .= '<h4>' . __('Database restoration options:', 'updraftplus') . '</h4>';
 			$info['addui'] .= '<input name="updraft_restorer_replacesiteurl" id="updraft_restorer_replacesiteurl" type="checkbox" value="1" checked><label for="updraft_restorer_replacesiteurl" title="'.sprintf(__('All references to the site location in the database will be replaced with your current site URL, which is: %s', 'updraftplus'), htmlspecialchars(untrailingslashit(site_url()))).'"> '.__('Search and replace site location in the database (migrate)', 'updraftplus').'</label>';
 			$info['addui'] .= '</div>';

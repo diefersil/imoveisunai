@@ -50,7 +50,7 @@ $agencyPostType = $_REALTYNA['agency_post_type'] ?? '';
 			</p>
 			
 			<p>
-				<b><?php _e("Select Agent" , REALTYNA_MLS_SYNC_SLUG );?></b>: <a href="post-new.php?post_type=<?php echo $agentPostType;?>"><?php _e("Click here to Add New" , REALTYNA_MLS_SYNC_SLUG);?></a>
+				<b><?php _e("Select Agent" , REALTYNA_MLS_SYNC_SLUG );?></b>: <?php if ( $agentPostType ) { ?><a href="post-new.php?post_type=<?php echo $agentPostType;?>"><?php _e("Click here to Add New", REALTYNA_MLS_SYNC_SLUG);?></a> <?php } ?>
 			</p>
 
 			<p>
@@ -67,7 +67,7 @@ $agencyPostType = $_REALTYNA['agency_post_type'] ?? '';
 			</p>
 
 			<p>
-				<b><?php _e("Select Agency" , REALTYNA_MLS_SYNC_SLUG );?></b>: <a href="post-new.php?post_type=<?php echo $agencyPostType;?>"><?php _e("Click here to Add New" , REALTYNA_MLS_SYNC_SLUG);?></a>
+				<b><?php _e("Select Agency" , REALTYNA_MLS_SYNC_SLUG );?></b>: <?php if ( $agencyPostType ) { ?><a href="post-new.php?post_type=<?php echo $agencyPostType;?>"><?php _e("Click here to Add New", REALTYNA_MLS_SYNC_SLUG);?></a><?php } ?>
 			</p>
 
 			<p>

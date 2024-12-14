@@ -22,8 +22,8 @@ final class App
      */
     static public $instance = false;
 
-    /** @var object Handle Theme Object*/
-    protected $theme = null;
+    /** @var object Handle Target Object*/
+    protected $targetProduct = null;
 
     /** @var array Store App Requirements*/
     protected $requirements = [];
@@ -63,12 +63,17 @@ final class App
      * 
      * @author Chris A <chris.a@realtyna.net>
      * 
+     * @param bool $initializeForWP
      * @return void
      */
-    public function __construct()
+    public function __construct( $initializeForWP = true )
     {
         
-        $this->init();
+        if ( $initializeForWP ){
+
+            $this->init();
+
+        }        
         
     }
 
@@ -82,7 +87,11 @@ final class App
     public function init()
     {
 
-        if ( $this->isSupportedTheme() ){            
+        $this->checkIfWPLPluignIsActive();
+
+        if ( $this->isSupportedProduct() ){      
+            
+            $this->createTargetProductInstance();
 
             register_activation_hook( REALTYNA_MLS_SYNC_PLUGIN_FILE , array( $this, 'activatePlugin'));
             register_deactivation_hook( REALTYNA_MLS_SYNC_PLUGIN_FILE , array( $this, 'deactivatePlugin' ) );
@@ -97,23 +106,22 @@ final class App
             add_filter( 'get_attached_file', array( $this , 'handleExternalMedia') , 100, 2 );        
             add_filter( 'post_thumbnail_html', array( $this , 'handleExternalThumbnail' ), 100, 5);
             add_filter( 'wp_get_attachment_image', array( $this , 'fixExternalThumbnailsInEditPage' ), 100, 5);
-			
+    
 			add_action('admin_notices', array( $this, 'checkCronJob' ) ); 
     
-            //add_action( 'wp_loaded' , array( $this , 'autoUpdatePlugin' ) );
 			add_filter( 'cron_schedules', array( $this , 'cronSchedule' ) );
 			
 			add_action( 'realtyna_mls_sync_update_plugin',  array( $this , 'updatePlugin' ) );
 			add_action( 'realtyna_mls_sync_purge_listings',  array( $this , 'purgeListings' ) );
-			add_action( 'realtyna_mls_sync_purge_attachments',  array( $this , 'purgeAttachments' ) );
+			add_action( 'realtyna_mls_sync_purge_attachments',  array( $this , 'purgeAttachments' ) );            
     
+            $this->upgradeLegacyFeatures();
             $this->initRestRoutes();
             $this->setScheduler();
-			
     
         }else{
 
-            add_action('admin_notices', array( $this, 'noticeThemeIsNotSupported' ) ); 
+            add_action('admin_notices', array( $this, 'noticeNotSupportedProduct' ) ); 
 
         }
 
@@ -125,14 +133,16 @@ final class App
      * @static
      * @author Chris A <chris.a@realtyna.net>
      * 
+     * @param bool $initializeForWP
      * @return object
      */
-	static public function getInstance()
+	static public function getInstance( $initializeForWP = true )
     {
 		
-		if ( !self::$instance )
-			self::$instance = new self;
-
+		if ( !self::$instance ){
+            self::$instance = new self( $initializeForWP );
+        }
+		
 		return self::$instance;
 		
 	}
@@ -142,24 +152,285 @@ final class App
      * 
      * @author Chris A <chris.a@realtyna.net>
      * 
-     * @return bool 
+     * @return bool|string
      */
     private function isSupportedTheme()
     {
 
-        if ( ThemeProviders::class ){
+        $themes = $this->getSupportedThemes();
 
-            foreach( ThemeProviders::$providers as $theme ){
+        if ( !empty( $themes ) ){
 
-                if ( $theme::isActiveTheme() ){
+            foreach( $themes as $theme ){
 
-                    $this->theme = ThemeFactory::create();
+                if ( $theme::isActive() ){
 
-                    return true;
+                    return $theme::strtolowerName();
 
                 }
 
             }
+
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Check if there is a supported product or no
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return bool 
+     */
+    private function isSupportedProduct()
+    {
+
+        if ( $this->isSupportedTheme() ){
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Get Supported Themes Array
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return array
+     */
+    private function getSupportedThemes()
+    {
+        
+        $themes = array();
+
+        if ( ThemeProviders::class ){
+
+            $themes = ThemeProviders::$providers;
+
+        }
+
+        return $themes;
+
+    }
+
+    /**
+     * Get providers Array (Themes and Plugins)
+     * @author Mateo m <mateo.m@realtyna.com>
+     *
+     * @return array
+     */
+    public static function getProvidersName()
+    {
+
+        $providers = array();
+
+        if ( ThemeProviders::class ){
+
+            $themeProviders = ThemeProviders::getProviders();
+
+            foreach ($themeProviders as $themeProvider){
+
+                $providers[] = $themeProvider['name'];
+
+            }
+
+        }
+
+        return $providers;
+
+    }
+
+    /**
+     * Get providers Array (Themes and Plugins)
+     * @author Mateo m <mateo.m@realtyna.com>
+     *
+     * @return string
+     */
+    public static function getActiveProviderName()
+    {
+
+        if ( ThemeProviders::class ){
+
+            $themeProviders = ThemeProviders::getProviders();
+
+            foreach ($themeProviders as $themeProvider){
+
+                if ( $themeProvider['active'] ){
+
+                    return $themeProvider['name'];
+
+                }
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Update Legacy Features
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return void
+     */
+    public function upgradeLegacyFeatures()
+    {
+
+        $this->storeActiveThemeAsTargetProduct();
+
+    }
+
+    /**
+     * Store Active Theme as TargetProduct
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return void
+     */
+    private function storeActiveThemeAsTargetProduct()
+    {
+
+        $themeAsTarget = $this->isSupportedTheme() ;
+
+        if ( !$this->getTargetProductOption() ){
+
+            if ( !empty( $this->getCredentials() ) && !empty( $themeAsTarget ) ){
+
+                $this->setTargetProductOption( $themeAsTarget , true );
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Get Stored Target Product from Options
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return false|null|string
+     */
+    public function getTargetProductOption()
+    {
+        
+        $storedTargetProductKey = REALTYNA_MLS_SYNC_SLUG . '-target-product';
+        return get_option( $storedTargetProductKey );
+
+    }
+
+    /**
+     * Set Target Product in Options
+     *@author Chris A <chris.a@realtyna.net>
+     * 
+     * @param string $targetProductName
+     * @param bool $createInstance
+     * @return bool
+     */
+    private function setTargetProductOption( $targetProductName , $createInstance = false )
+    {
+
+        $storedTargetProductKey = REALTYNA_MLS_SYNC_SLUG . '-target-product';
+        $result = update_option( $storedTargetProductKey , $targetProductName );
+
+        if ( $createInstance ){
+
+            $result = $this->createTargetProductInstance();
+
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * check Target Product is set or no and try to set it , if there is an active supported theme
+     * 
+     * @auther Chris A <chris.a@realtyna.net>
+     *
+     * @return bool
+     */
+    private function checkTargetProduct()
+    {
+        
+        if ( ! $this->getTargetProduct() &&  empty(  $this->getTargetProductOption() ) ){
+
+            add_action('admin_notices', array( $this, 'noticeFailedTargetProduct' ) ); 
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Create an instance of target product and assign it to targetProduct
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return bool
+     */
+    public function createTargetProductInstance()
+    {
+
+        if ( function_exists('get_option') ){
+
+            $targetProductOption = $this->getTargetProductOption();
+
+            if ( !empty( $targetProductOption ) && empty( $this->getTargetProduct() ) ){
+
+                if ( $targetProductOption == $this->isSupportedTheme() ){
+
+                    if ( ThemeFactory::class ){
+
+                        return $this->setTargetProduct( ThemeFactory::create() );
+
+                    }
+
+                }
+
+                add_action('admin_notices', array( $this, 'noticeTargetProductIsNotActive' ) ); 
+
+            }
+
+        }        
+
+        return false;
+
+    }
+
+    /**
+     * Get target product instance
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @return null|object
+     */
+    public function getTargetProduct()
+    {
+        
+        return $this->targetProduct;
+
+    }
+
+    /**
+     * Set instance of target product
+     * @author Chris A <chris.a@realtyna.net>
+     *
+     * @param Object $productInstance
+     * @return bool
+     */
+    private function setTargetProduct( $productInstance )
+    {
+
+        if ( $productInstance ){
+
+            $this->targetProduct = $productInstance ;
+
+            return ( \is_object( $this->targetProduct ) );
 
         }
 
@@ -176,14 +447,20 @@ final class App
      */
 	public function drawMenu()
     {
-				
-		if ( is_super_admin() || current_user_can( 'administrator' ) ){
+		
+        $targetProductIsAvailable = $this->checkTargetProduct();
+		
+        if ( is_super_admin() || current_user_can( 'administrator' ) ){
 
             add_menu_page( __('Realtyna MLS Sync' , REALTYNA_MLS_SYNC_SLUG ) , __('Realtyna MLS Sync' , REALTYNA_MLS_SYNC_SLUG ) , 'manage_options', REALTYNA_MLS_SYNC_SLUG , array ( $this , 'screenMain' ) , self::REALTYNA_MLS_SYNC_ICON );
 
 			//add_submenu_page( REALTYNA_MLS_SYNC_SLUG, __('Hosting Benchmark' , REALTYNA_MLS_SYNC_SLUG ) , __('Hosting Benchmark' , REALTYNA_MLS_SYNC_SLUG) , 'manage_options', 'realtyna-hosting-benchmark' , array ( $this , 'screenBenchmark' ) );	
 
-			add_submenu_page( REALTYNA_MLS_SYNC_SLUG, __('Settings' , REALTYNA_MLS_SYNC_SLUG ) , __('Settings' , REALTYNA_MLS_SYNC_SLUG) , 'manage_options', 'realtyna-mls-sync-settings' , array ( $this , 'screenSettings' ) );
+            if ( $targetProductIsAvailable ){
+
+                add_submenu_page( REALTYNA_MLS_SYNC_SLUG, __('Settings' , REALTYNA_MLS_SYNC_SLUG ) , __('Settings' , REALTYNA_MLS_SYNC_SLUG) , 'manage_options', 'realtyna-mls-sync-settings' , array ( $this , 'screenSettings' ) );
+
+            }
 
         }
 
@@ -201,15 +478,15 @@ final class App
 
         $this->showHeader();
 
-        if ( $this->theme ){
+        if ( $this->targetProduct ){
 
-            $agencies = $this->theme->agencies()->get();
-            $agents = $this->theme->agents()->get();
-            $agentsDisplayOptions = $this->theme->agents()->getDisplayOptions();
+            $agencies = $this->targetProduct->agencies()->get();
+            $agents = $this->targetProduct->agents()->get();
+            $agentsDisplayOptions = $this->targetProduct->agents()->getDisplayOptions();
             $realtyna['agencies'] = $agencies;
-            $realtyna['agency_post_type'] = $this->theme->agencies()->getPostType();
+            $realtyna['agency_post_type'] = $this->targetProduct->agencies()->getPostType();
             $realtyna['agents'] = $agents;
-            $realtyna['agent_post_type'] = $this->theme->agents()->getPostType();
+            $realtyna['agent_post_type'] = $this->targetProduct->agents()->getPostType();
             $realtyna['agents_display_options'] = $agentsDisplayOptions;
 
         }
@@ -237,9 +514,9 @@ final class App
     public function screenBenchmark()
     {
 
-        //include_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'Addons' . DIRECTORY_SEPARATOR  . 'Benchmarker' . DIRECTORY_SEPARATOR . 'Benchmarker.php'  );
-        //$benchmarker = new \Realtyna\Sync\Addons\Benchmarker\Benchmarker();
-        //$benchmarker->load();        
+        //include_once( dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . 'addon' . DIRECTORY_SEPARATOR . 'benchmarker.php'  );
+        // $benchmarker = new \Realtyna\Sync\Addons\Benchmarker\Benchmarker();
+        // $benchmarker->load();        
 
     }
 
@@ -267,7 +544,7 @@ final class App
 
 
         }else{
-			
+
             if ( isset( $_GET['purge_attachments'] ) ){
 				
                 $this->purgeAttachments();
@@ -279,12 +556,12 @@ final class App
                 $this->purgeListings();
                 
             }			
-			
+
             if ( isset( $_GET['reset_mls'] ) ){
             
                 self::resetMlsData();
                 
-            }			
+            }
     
             $step = ( isset( $_GET['step'] ) && is_numeric( $_GET['step'] ) ) ? $_GET['step'] : $this->determineCurrentStep() ;
 
@@ -360,6 +637,9 @@ final class App
             $requirements = new Requirements();
             $realtyna['requirements-are-met'] = $requirements->check();
             $realtyna['requirements-list'] = $requirements->getRequirements();
+            $realtyna['targetProductSelected'] = !empty(  $this->targetProduct ) ? true : false;
+            $realtyna['targetProductOption'] = $this->getTargetProductOption();
+            $realtyna['supported-themes'] = $this->getSupportedThemes();
             
             View::view( 'steps.first' , $realtyna );
 
@@ -392,11 +672,19 @@ final class App
      */
     private function secondStep()
     {
-        if ( $this->validateFirstStep() ){
+        
+        if ( $this->validateFirstStep() && ( !empty( $_GET['realtyna_idx_target_product'] ) || !empty( $this->getTargetProductOption() ) ) ){
+
+            if ( !empty( $_GET['realtyna_idx_target_product'] ) ){
+
+                $this->setTargetProductOption( $_GET['realtyna_idx_target_product'] , true );
+
+            }
 
             if ( View::class ){
 
                 $realtyna['credentials'] = $this->getCredentials();
+
                 View::view('steps.second' , $realtyna );
 
                 return;
@@ -421,6 +709,7 @@ final class App
     {
 
         $credentials = static::getCredentials();
+
         return ( is_array( $credentials ) && !empty( $credentials ) ) ;
 
     }
@@ -437,15 +726,15 @@ final class App
         
         if ( $this->validateSecondStep() ){
 
-            if ( $this->theme ){
+            if ( $this->targetProduct ){
 
-                $agencies = $this->theme->agencies()->get();
-                $agents = $this->theme->agents()->get();
-                $agentsDisplayOptions = $this->theme->agents()->getDisplayOptions();
+                $agencies = $this->targetProduct->agencies()->get();
+                $agents = $this->targetProduct->agents()->get();
+                $agentsDisplayOptions = $this->targetProduct->agents()->getDisplayOptions();
                 $realtyna['agencies'] = $agencies;
-                $realtyna['agency_post_type'] = $this->theme->agencies()->getPostType();
+                $realtyna['agency_post_type'] = $this->targetProduct->agencies()->getPostType();
                 $realtyna['agents'] = $agents;
-                $realtyna['agent_post_type'] = $this->theme->agents()->getPostType();
+                $realtyna['agent_post_type'] = $this->targetProduct->agents()->getPostType();
                 $realtyna['agents_display_options'] = $agentsDisplayOptions;
 
             }
@@ -496,7 +785,7 @@ final class App
 
             if ( !$this->validateThirdStep() ){
 
-                if ( $this->theme->strtolowerCurrentTheme() == 'houzez' ) {
+                if ( $this->targetProduct && $this->targetProduct->strtolowerName() == 'houzez' ) {
 
                     if (isset( $_GET['realtyna_idx_selected_agent'] ) && 
                         isset( $_GET['realtyna_idx_selected_agency'] ) && 
@@ -548,16 +837,21 @@ final class App
 
                             }
 
-                            if ( $this->theme ){
+	                        if ( isset($realtyna['mlsData']['repayment_url_save_timestamp']) &&
+		                        $realtyna['mlsData']['status'] === 'pending' &&
+		                        strpos($realtyna['mlsData']['checkout'], 'checkout.stripe.com') !== false &&
+		                        ( ( time() - $realtyna['mlsData']['repayment_url_save_timestamp'] ) >= 82800 ) ){
 
-                                $property = $this->theme->property();
+		                        self::resetMlsData();
+
+		                        $this->gotoStep( 4 );
+
+	                        }
+
+                            if ( $this->targetProduct ){
+
+                                $property = $this->targetProduct->property();
     
-                                // if ( \method_exists( $property , 'countCurrentImportedListings' ) ){
-    
-                                //     $realtyna['currentImportedListings'] = $property->countCurrentImportedListings();
-    
-                                // }
-                                
                                 if ( \method_exists( $property , 'countTotalImportedListings' ) ){
     
                                     $realtyna['totalImportedListings'] = $property->countTotalImportedListings();
@@ -574,8 +868,7 @@ final class App
     
                                     $realtyna['totalTodayImportedListings'] = $property->countTodayImportedListings();
     
-                                }
-								
+                                }                                
     
                             }
 
@@ -971,7 +1264,7 @@ final class App
 
         $response = [ "status" => "ERROR" , "message" => __("Demo Import Error!" , REALTYNA_MLS_SYNC_SLUG) ];
 
-        if ( $this->theme ){
+        if ( $this->targetProduct ){
             
             if ( $waitFor > 0 ){
 
@@ -979,7 +1272,7 @@ final class App
                 
             }
 
-            $countImportedDemo = $this->theme->property()->countImportedProperties( true );
+            $countImportedDemo = $this->targetProduct->property()->countImportedProperties( true );
 
             if ( $countImportedDemo > 0 ){
 
@@ -1027,9 +1320,9 @@ final class App
     private function ajaxResponseRemoveDemo()
     {
 
-        if ( $this->theme ){
+        if ( $this->targetProduct ){
 
-            $this->theme->removeProperties( true );
+            $this->targetProduct->removeProperties( true );
         
             return $this->deleteIdxImport();
     
@@ -1070,33 +1363,33 @@ final class App
             $response['status'] = ( !empty( $updateResult ) ) ? "OK" : "ERROR";
             $response['message'] = ( $response['status'] == "OK" ) ? __("Settings Updated Successfully!" , REALTYNA_MLS_SYNC_SLUG ) : __("Settings Update Error!" , REALTYNA_MLS_SYNC_SLUG );
 
-            if ( $this->theme ){
+            if ( $this->targetProduct ){
 
-                if ( \method_exists( $this->theme , 'update_properties_agency' ) ) {
+                if ( \method_exists( $this->targetProduct , 'updatePropertiesAgency' ) ) {
 
                     if ( $params['apply_agency_to_all'] == "true" ){
 
-                        $this->theme->update_properties_agency( $params['agency'] );
+                        $this->targetProduct->updatePropertiesAgency( $params['agency'] );
 
                     }
     
                 }
 
-                if ( \method_exists( $this->theme , 'update_properties_agents' ) ) {
+                if ( \method_exists( $this->targetProduct , 'updatePropertiesAgents' ) ) {
 
                     if ( $params['apply_agent_to_all'] == "true" ){
 
-                        $this->theme->update_properties_agents( $params['agent'] );
+                        $this->targetProduct->updatePropertiesAgents( $params['agent'] );
 
                     }
 
                 }
 
-                if ( \method_exists( $this->theme , 'updatePropertiesAgentDisplayOption' ) ) {
+                if ( \method_exists( $this->targetProduct , 'updatePropertiesAgentDisplayOption' ) ) {
 
                     if ( $params['apply_agent_display_option_to_all'] == "true" ){
 
-                        $this->theme->updatePropertiesAgentDisplayOption( $params['agent_option'] );
+                        $this->targetProduct->updatePropertiesAgentDisplayOption( $params['agent_option'] );
 
                     }
 
@@ -1147,6 +1440,7 @@ final class App
 
                         $params['status'] = "pending";
                         $params['checkout'] = $checkout['message'];
+                        $params['repayment_url_save_timestamp'] = time();
 
                         $this->setMlsData( $params );
 
@@ -1259,21 +1553,29 @@ final class App
 
             if ( $this->getCredentials() === false ){
 
-                $params['source'] = $this->theme->getName();
+                $params['source'] = $this->getTargetProductOption();
                 
-                $api = new Api();
+                if ( !empty( $params['source'] ) ){
 
-                $result = $api->register( $params );
+                    $api = new Api();
 
-                if ( $result['status'] == 'OK' && is_array( $result['message'] ) ){
+                    $result = $api->register( $params );
+    
+                    if ( $result['status'] == 'OK' && is_array( $result['message'] ) ){
+    
+                        $this->setCredentials( $result['message'] );
+    
+                        $response = (array) $result['message'];
+                        $response['status'] = 'OK';
+    
+                    }elseif ( isset( $result['message'] ) ) {
+                        $response['message'] = $result['message'];
+                    }
+    
+                }else{
 
-                    $this->setCredentials( $result['message'] );
+                    $response['message'] = __( "Target Product not detected!" , REALTYNA_MLS_SYNC_SLUG );
 
-                    $response = (array) $result['message'];
-                    $response['status'] = 'OK';
-
-                }elseif ( isset( $result['message'] ) ) {
-                    $response['message'] = $result['message'];
                 }
     
             }else{
@@ -1312,7 +1614,7 @@ final class App
 
                 $response['message'] = __("Demo Listing Already Imported!" , REALTYNA_MLS_SYNC_SLUG);
                 
-            }else{
+            }elseif( $this->getTargetProduct() ){
                 error_log("demo import started");
 
                 $this->setIdxOptions( $params );
@@ -1321,7 +1623,7 @@ final class App
     
                 $additionalFields = [];
              
-                if ( $this->theme && $this->theme->strtolowerCurrentTheme() == 'houzez' ){
+                if ( $this->targetProduct->strtolowerName() == 'houzez' ){
    
                    $additionalFields = [ 
                        "fave_property_agency" => $params['agency'] ,
@@ -1347,7 +1649,7 @@ final class App
                     "post_author" => $params['post_author']
                 ];
         
-                $mapper = $this->theme->mapper( $this->getCredentialToken() , self::DEMO_PROVIDER , $additionalFields , $importOptions );
+                $mapper = new Mapper( $this->getCredentialToken() , self::DEMO_PROVIDER , $additionalFields , $importOptions );
                 $result = $mapper->run();
                 error_log("demo import result:" . var_export( $result , true));
         
@@ -1378,6 +1680,50 @@ final class App
 
     }
 
+	/**
+	* Remove Listings cron job
+	*
+	* @author Chris A <chris.a@realtyna.net>
+	* 
+	* @return void
+	*/
+	public function purgeListings()
+	{
+				
+		if ( $this->targetProduct && is_object( $this->targetProduct ) ){
+			
+			if ( \method_exists( $this->targetProduct , 'purgeListings' ) ){
+				
+				$this->targetProduct->purgeListings();
+				
+			}else error_log("App: PurgeListings : error call core");
+			
+		}else error_log("App: PurgeListings : error in object");
+		
+	}
+
+	/**
+	* Remove Attachments cron job
+	*
+	* @author Chris A <chris.a@realtyna.net>
+	* 
+	* @return void
+	*/
+	public function purgeAttachments()
+	{
+		
+		if ( $this->targetProduct && is_object( $this->targetProduct ) ){
+			
+			if ( \method_exists( $this->targetProduct , 'purgeAttachments' ) ){
+				
+				$this->targetProduct->purgeAttachments();
+				
+			}else error_log("App: purgeAttachments : error call core ");
+			
+		}else error_log("App: purgeAttachments : error in object ");
+		
+	}
+    
     /**
      * Update Plugin if it's available
      * 
@@ -1390,7 +1736,9 @@ final class App
      */
     static public function updatePlugin()
     {
-        error_log("MLS SYNC : Update check");
+        
+        $updateResult = false;
+
         if ( Updater::class && UpdaterWpPlugin::class && !defined('DISABLE_MLS_SYNC_UPDATE') ){
 
             $pluginInfo = self::getPluginDetails();
@@ -1406,20 +1754,20 @@ final class App
                 if ( $pluginUpdater->isUpdateAvailable() ){
 
                     $updateResult = $pluginUpdater->updatePlugin() ;
-
+                    
                     if ( $updateResult ){
-						error_log("MLS SYNC : Updated");
+						
                         return update_option( REALTYNA_MLS_SYNC_SLUG . "_UpdateTime" , time() );
 
-                    }else error_log("MLS SYNC : not updated");
-
-                }else error_log("MLS SYNC : Update is not available");
+                    }
+                    
+                }
     
             }
 
         }        
 
-        return false;
+        return $updateResult;
 
     }
 
@@ -1430,7 +1778,6 @@ final class App
      * 
      * @return bool
      */
-	 /*
     public function autoUpdatePlugin()
     {
         
@@ -1449,7 +1796,6 @@ final class App
         return false;
 
     }
-	*/
 
     /**
      * Store mls data to DB
@@ -1610,7 +1956,7 @@ final class App
     static public function getCredentials()
     {
 
-		return ( get_option( self::REALTYNA_IDX_CREDENTIAL ) ? json_decode( get_option( self::REALTYNA_IDX_CREDENTIAL ) , true ) : false );
+        return ( get_option( self::REALTYNA_IDX_CREDENTIAL ) ? json_decode( get_option( self::REALTYNA_IDX_CREDENTIAL ) , true ) : false );
 
     }
 
@@ -1872,37 +2218,46 @@ final class App
     }
 
     /**
-     * Dispaly Notice : Realtyna MLS Sync Error : Your current theme is not in the supported themes List
+     * Dispaly Notice : Realtyna MLS Sync Error : There is no supported Theme/Plugin
      * 
      * @author Chris A <chris.a@realtyna.net>
      * 
      * @return void
      */
-    public function noticeThemeIsNotSupported()
+    public function noticeNotSupportedProduct()
     {
 
-        $this->notice( 'Realtyna MLS Sync Error : Your current theme is not in the supported themes List' , "error" );
+        $this->notice( 'Realtyna MLS Sync Error : There is no supported Theme/Plugin' , "error" );
 
     }
-	
+
     /**
-     * Dispaly Notice : Realtyna MLS Sync Error : WP CronJobs should be enable for purge functionality
+     * Dispaly Notice : Realtyna MLS Sync Error : Could not set a Target Product to Sync with the MLS
      * 
      * @author Chris A <chris.a@realtyna.net>
      * 
      * @return void
      */
-    public function checkCronJob()
+    public function noticeFailedTargetProduct()
     {
 
-        if ( defined( 'DISABLE_WP_CRON' ) && !empty( DISABLE_WP_CRON ) ){
-		
-			$this->notice( 'Realtyna MLS Sync Error : WP CronJobs should be enable for purge functionality ' , "warning" );
-		
-		}
+        $this->notice( 'Realtyna MLS Sync : Could not set a Target Product to Sync with the MLS, <a href="admin.php?page=realtyna-mls-sync">Run Setup Wizard</a>' , "warning" );
 
     }
-	
+
+    /**
+     * Dispaly Notice : Realtyna MLS Sync Error : Target Product is not Active to Sync with the MLS
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return void
+     */
+    public function noticeTargetProductIsNotActive()
+    {
+
+        $this->notice( 'Realtyna MLS Sync Error : Target Product is not Active to Sync with the MLS' , "error" );
+
+    }
 
     /**
      * Display External Media in Wordpress
@@ -1921,7 +2276,7 @@ final class App
 
             $post = get_post( $attachmentId );
 
-            return ( !empty( $post->guid ) ) ? $post->guid : $file;			
+            return ( !empty( $post->guid ) ) ? $post->guid : $file;
         
         }
 
@@ -2013,6 +2368,50 @@ final class App
     }
 
     /**
+     * Dispaly Notice : Realtyna MLS Sync Error : WP CronJobs should be enable for purge functionality
+     * 
+     * @author Chris A <chris.a@realtyna.net>
+     * 
+     * @return void
+     */
+    public function checkCronJob()
+    {
+
+        if ( defined( 'DISABLE_WP_CRON' ) && !empty( DISABLE_WP_CRON ) ){
+		
+			$this->notice( 'Realtyna MLS Sync Error : WP CronJobs should be enable for purge functionality ' , "warning" );
+		
+		}
+
+    }
+
+	/**
+	 * Adds a custom cron schedule.
+	 *
+	 * @author Chris A <chris.a@realtyna.net>
+	 *
+	 * @param array $schedules An array of non-default cron schedules.
+     * 
+	 * @return array Filtered array of non-default cron schedules.
+	 */
+	public function cronSchedule( $schedules )
+	{
+		
+		$interval = 30 * MINUTE_IN_SECONDS;
+		
+		if ( defined( 'REALTYNA_MLS_SYNC_CRON_INTERVAL' ) && !empty( REALTYNA_MLS_SYNC_CRON_INTERVAL ) && is_numeric( REALTYNA_MLS_SYNC_CRON_INTERVAL ) ){
+			
+			$interval = REALTYNA_MLS_SYNC_CRON_INTERVAL * MINUTE_IN_SECONDS;
+			
+		}
+		
+		$schedules[ 'realtyna-mls-sync-interval' ] = array( 'interval' => $interval, 'display' => __( "Every {$interval} seconds", REALTYNA_MLS_SYNC_SLUG ) );
+		
+		return $schedules;
+		
+	}
+
+    /**
      * Force Max Execution Time to minimum needed seconds
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -2085,7 +2484,7 @@ final class App
             
              $additionalFields = [];
              
-             if ( $this->theme->strtolowerThemeName() == 'houzez' ){
+             if ( $this->targetProduct && $this->targetProduct->strtolowerName() == 'houzez' ){
 
                 $additionalFields = [ 
                     "fave_property_agency" => $agency ,
@@ -2134,6 +2533,68 @@ final class App
     }
 
     /**
+     * Get option data from DB
+     *
+     * @static
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @return array
+     */
+    static public function getOption($optionName)
+    {
+        $lowercaseOptionName = strtolower($optionName);
+
+        if (stripos($lowercaseOptionName, 'realtyna') !== false) {
+            $optionValue = get_option($optionName);
+
+            if ($optionValue && is_string($optionValue)) {
+                $decodedValue = json_decode($optionValue, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $decodedValue;
+                }
+            }
+
+            return $optionValue;
+        }
+
+        return false;
+    }
+
+    /**
+     * Update option data in DB
+     *
+     * @static
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @return array
+     */
+    static public function updateOption($optionName, $optionValue)
+    {
+        if (stripos($optionName, 'realtyna') === false) {
+            return 'Error: Invalid option name - ' . $optionName;
+        }
+
+        $existingOptionValue = get_option($optionName);
+
+        if (is_array($optionValue)) {
+            $updatedOptionValue = json_encode($optionValue);
+        } else {
+            $updatedOptionValue = $optionValue;
+        }
+
+        if (!$existingOptionValue) {
+            add_option($optionName, $updatedOptionValue);
+            return 'Added: Option <' . $optionName . '> added successfully';
+        } else {
+            update_option($optionName, $updatedOptionValue);
+            return 'Updated: Option <' . $optionName . '> updated successfully';
+        }
+
+        return 'Error: Something went wrong';
+    }
+
+    /**
      * Check Stripe CallBack
      * 
      * @author Chris A <chris.a@realtyna.net>
@@ -2154,77 +2615,6 @@ final class App
         return false;
 
     }
-	
-	/**
-	 * Adds a custom cron schedule.
-	 *
-	 * @author Chris A <chris.a@realtyna.net>
-	 *
-	 * @param array $schedules An array of non-default cron schedules.
-	 * @return array Filtered array of non-default cron schedules.
-	 */
-	public function cronSchedule( $schedules )
-	{
-		
-		$interval = 30 * MINUTE_IN_SECONDS;
-		
-		if ( defined( 'REALTYNA_MLS_SYNC_CRON_INTERVAL' ) && !empty( REALTYNA_MLS_SYNC_CRON_INTERVAL ) && is_numeric( REALTYNA_MLS_SYNC_CRON_INTERVAL ) ){
-			
-			$interval = REALTYNA_MLS_SYNC_CRON_INTERVAL * MINUTE_IN_SECONDS;
-			
-		}
-		
-		$schedules[ 'realtyna-mls-sync-interval' ] = array( 'interval' => $interval, 'display' => __( "Every {$interval} seconds", REALTYNA_MLS_SYNC_SLUG ) );
-		
-		return $schedules;
-		
-	}
-	
-	
-	/**
-	* Remove Listings cron job
-	*
-	* @author Chris A <chris.a@realtyna.net>
-	* 
-	* @return void
-	*/
-	public function purgeListings()
-	{
-		
-		error_log("App: PurgeListings");
-		if ( $this->theme && is_object( $this->theme ) ){
-			
-			if ( \method_exists( $this->theme , 'purgeListings' ) ){
-				error_log("App: PurgeListings : call core");
-				$this->theme->purgeListings();
-				
-			}else error_log("App: PurgeListings : error call core");
-			
-		}else error_log("App: PurgeListings : error in object");
-		
-	}
-	
-	/**
-	* Remove Attachments cron job
-	*
-	* @author Chris A <chris.a@realtyna.net>
-	* 
-	* @return void
-	*/
-	public function purgeAttachments()
-	{
-		error_log("App: purgeAttachments");
-		if ( $this->theme && is_object( $this->theme ) ){
-			
-			if ( \method_exists( $this->theme , 'purgeAttachments' ) ){
-				error_log("App: purgeAttachments : call core ");
-				$this->theme->purgeAttachments();
-				
-			}else error_log("App: purgeAttachments : error call core ");
-			
-		}else error_log("App: purgeAttachments : error in object ");
-		
-	}	
 
     /**
      * Redirect User to specefic URL
@@ -2281,7 +2671,7 @@ final class App
             echo    '
                     <div class="notice ' . $noticeClass . ' ' . $isDismissible .  ' "  style="margin-top: 10px;margin-bottom: 10px;">
                         
-                        <p>' . esc_html__( $text , REALTYNA_MLS_SYNC_SLUG ) . '</p>
+                        <p>' . __( $text , REALTYNA_MLS_SYNC_SLUG ) . '</p>
                 
                     </div>
                     ';
@@ -2298,7 +2688,7 @@ final class App
      */
     public function setScheduler()
     {
-		
+
 		if ( wp_get_scheduled_event( 'realtyna_mls_sync_update_plugin' ) === false ){
 			
 			if ( !wp_next_scheduled ( 'realtyna_mls_sync_update_plugin' ) ) {
@@ -2328,15 +2718,6 @@ final class App
 			}
 		
 		}
-		
-
-    //     if ( Realtyna\Sync\Addons\Dashboard\Dashboard::class ){
-
-    //         $dashboard = new \Realtyna\Sync\Addons\Dashboard\Dashboard( $this->getCredentialToken() , $this->getCredentialUser() );
-
-    //         $dashboard->setStatusSignalScheduler();
-
-    //     }
 
     }
 
@@ -2350,15 +2731,7 @@ final class App
     public function activatePlugin()
     {
 
-		$this->setScheduler();
-
-    //     if ( Realtyna\Sync\Addons\Dashboard\Dashboard::class ){
-
-    //         $dashboard = new \Realtyna\Sync\Addons\Dashboard\Dashboard( $this->getCredentialToken() , $this->getCredentialUser() );
-
-    //         $dashboard->activationSignal();
-
-    //     }
+        $this->setScheduler();
 
     }
 
@@ -2379,6 +2752,38 @@ final class App
     //         $dashboard->deactivationSignal();
 
     //     }
+
+    }
+
+    /**
+     * Check if the WPL plugin is active and display a notice if it is.
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @return void
+     */
+    private function checkIfWPLPluignIsActive()
+    {
+
+        if ( defined('WPL_VERSION') ) {
+
+            add_action('admin_notices', array( $this, 'idx_api_exists_notice' ) );
+
+        }
+
+    }
+
+    /**
+     * Dispaly Notice : Deactivate the WPL plugin to ensure proper functionality of the Realtyna MLS Sync plugin.
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @return void
+     */
+    public function idx_api_exists_notice()
+    {
+
+        $this->notice( 'Deactivate the WPL plugin to ensure proper functionality of the Realtyna MLS Sync plugin.' , "error" );
 
     }
 

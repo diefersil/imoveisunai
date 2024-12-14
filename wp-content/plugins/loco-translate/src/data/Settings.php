@@ -20,13 +20,14 @@
  * @property bool $jed_pretty Whether to pretty print JSON JED files
  * @property bool $jed_clean Whether to clean up redundant JSON files during compilation
  * @property bool $ajax_files Whether to submit PO data as concrete files (requires Blob support in Ajax)
- *
+ * 
  * @property string $deepl_api_key API key for DeepL Translator
  * @property string $google_api_key API key for Google Translate
  * @property string $lecto_api_key API key for Lecto Translation API
  * @property string $microsoft_api_key API key for Microsoft Translator text API
  * @property string $microsoft_api_region API region for Microsoft Translator text API
- *
+ * 
+ * TODO @property bool $php_pretty Whether to pretty print .l10n.php files
  */
 class Loco_data_Settings extends Loco_data_Serializable {
 
@@ -222,13 +223,16 @@ class Loco_data_Settings extends Loco_data_Serializable {
     /**
      * Map a file extension to registered types, defaults to "php"
      * @param string $ext File extension
-     * @return string php, js or twig
+     * @param string $default Optional default
+     * @return string php, js, json, twig or $default
      */
-    public function ext2type($ext){
+    public function ext2type( $ext, $default = 'php' ){
+        $types = ['php'=>'php', 'js'=>'js', 'json'=>'json', 'twig'=>'twig'] // <- canonical
+               + array_fill_keys( $this->php_alias, 'php')
+               + array_fill_keys( $this->jsx_alias, 'js')
+        ;
         $ext = strtolower($ext);
-        $types = array_fill_keys( $this->jsx_alias, 'js' );
-        $types['twig'] = 'twig'; // <- temporary hack in lieu of dedicated twig extractor
-        return isset($types[$ext]) ? $types[$ext] : 'php';
+        return isset($types[$ext]) ? $types[$ext] : $default;
     }
    
 }

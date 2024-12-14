@@ -1,20 +1,12 @@
+import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { safeParseJson } from '@shared/lib/parsing';
+import { useActivityStore } from '@shared/state/activity';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import { getRouterData, saveRouterData } from '@assist/api/Data';
 import { Dashboard } from '@assist/pages/Dashboard';
-import { KnowledgeBase } from '@assist/pages/KnowledgeBase';
-import { Recommendations } from '@assist/pages/Recommendations';
-import { Tasks } from '@assist/pages/Tasks';
-import { Tours } from '@assist/pages/Tours';
-import {
-	helpIcon,
-	homeIcon,
-	recommendationsIcon,
-	tasksIcon,
-	toursIcon,
-} from '@assist/svg';
+import { homeIcon } from '@assist/svg';
 
 const pages = [
 	{
@@ -23,45 +15,15 @@ const pages = [
 		icon: homeIcon,
 		component: Dashboard,
 	},
-	{
-		slug: 'tasks',
-		name: __('Tasks', 'extendify-local'),
-		icon: tasksIcon,
-		component: Tasks,
-	},
-	{
-		slug: 'tours',
-		name: __('Tours', 'extendify-local'),
-		icon: toursIcon,
-		component: Tours,
-	},
-	{
-		slug: 'recommendations',
-		name: __('Recommendations', 'extendify-local'),
-		icon: recommendationsIcon,
-		component: Recommendations,
-	},
-	{
-		slug: 'knowledge-base',
-		name: __('Knowledge Base', 'extendify-local'),
-		icon: helpIcon,
-		component: KnowledgeBase,
-	},
 ];
-const { themeSlug, launchCompleted, disableRecommendations } =
-	window.extAssistData;
-const disableTasks = themeSlug !== 'extendable' || !launchCompleted;
-const filteredPages = pages.filter((page) => {
-	const noTasks = page.slug === 'tasks' && disableTasks;
-	const noRecs = page.slug === 'recommendations' && disableRecommendations;
-	return !noTasks && !noRecs;
-});
 
 let onChangeEvents = [];
 const state = (set, get) => ({
 	history: [],
 	viewedPages: [],
 	current: null,
+	// initialize the state with default values
+	...(safeParseJson(window.extAssistData.userData.routerData)?.state ?? {}),
 	setCurrent: async (page) => {
 		if (!page) return;
 		for (const event of onChangeEvents) {
@@ -69,6 +31,7 @@ const state = (set, get) => ({
 		}
 		// If history is the same, dont add (they pressed the same nav button)
 		if (get().history[0]?.slug === page.slug) return;
+		useActivityStore.getState().incrementActivity(`assist-${page.slug}`);
 		set((state) => {
 			const lastViewedAt = new Date().toISOString();
 			const firstViewedAt = lastViewedAt;
@@ -87,16 +50,18 @@ const state = (set, get) => ({
 								firstViewedAt,
 								lastViewedAt,
 								count: 1,
-						  },
+							},
 				],
 			};
 		});
 	},
 });
+
+const path = '/extendify/v1/assist/router-data';
 const storage = {
-	getItem: async () => JSON.stringify(await getRouterData()),
-	setItem: async (_, value) => await saveRouterData(value),
-	removeItem: () => undefined,
+	getItem: async () => await apiFetch({ path }),
+	setItem: async (_name, state) =>
+		await apiFetch({ path, method: 'POST', data: { state } }),
 };
 
 const useRouterState = create(
@@ -144,7 +109,7 @@ export const useRouter = () => {
 		// watch url changes for #dashboard, etc
 		const handle = () => {
 			const hash = window.location.hash.replace('#', '');
-			const page = filteredPages.find((page) => page.slug === hash);
+			const page = pages.find((page) => page.slug === hash);
 			if (!page) {
 				navigateTo(current?.slug ?? 'dashboard');
 				return;
@@ -173,7 +138,7 @@ export const useRouter = () => {
 			),
 			[current],
 		),
-		filteredPages,
+		pages,
 		navigateTo,
 		history,
 	};

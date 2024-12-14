@@ -64,6 +64,10 @@ class dragon extends Widget_Base {
 		return 'https://youtu.be/eL0a9f7VEtc';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 
@@ -201,10 +205,11 @@ class dragon extends Widget_Base {
 		$this->add_control(
 			'show_blur_effect',
 			[
-				'label'   => esc_html__('Show Blur Effect', 'bdthemes-prime-slider') . BDTPS_CORE_NC . BDTPS_CORE_PC,
+				'label'   => esc_html__('Show Blur Effect', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
 				'type'    => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'prefix_class' => 'bdt-ps-blur-effect--',
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -218,58 +223,10 @@ class dragon extends Widget_Base {
 
 		$this->end_controls_section();
 
-		$this->start_controls_section(
-			'section_content_social_link',
-			[
-				'label' 	=> __('Social Link', 'bdthemes-prime-slider'),
-				'condition' => [
-					'show_social_icon' => 'yes',
-				],
-			]
-		);
-
-		$repeater = new Repeater();
-
-		$repeater->add_control(
-			'social_link_title',
-			[
-				'label'   => __('Title', 'bdthemes-prime-slider'),
-				'type'    => Controls_Manager::TEXT,
-			]
-		);
-
-		$repeater->add_control(
-			'social_link',
-			[
-				'label'   => __('Link', 'bdthemes-prime-slider'),
-				'type'    => Controls_Manager::TEXT,
-			]
-		);
-
-		$this->add_control(
-			'social_link_list',
-			[
-				'type'    => Controls_Manager::REPEATER,
-				'fields'  => $repeater->get_controls(),
-				'default' => [
-					[
-						'social_link'       => __('http://www.facebook.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Facebook',
-					],
-					[
-						'social_link'       => __('http://www.twitter.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Twitter',
-					],
-					[
-						'social_link'       => __('http://www.instagram.com/bdthemes/', 'bdthemes-prime-slider'),
-						'social_link_title' => 'Instagram',
-					],
-				],
-				'title_field' => '{{{ social_link_title }}}',
-			]
-		);
-
-		$this->end_controls_section();
+		/**
+		 * Global social link settings
+		 */
+		$this->register_social_links_text_controls();
 		
 		$this->start_controls_section(
 			'section_content_animation',
@@ -291,7 +248,7 @@ class dragon extends Widget_Base {
         $this->start_controls_section(
             'section_advanced_animation',
             [
-                'label'     => esc_html__('Advanced Animation', 'bdthemes-prime-slider'),
+                'label'     => esc_html__('Advanced Animation', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
                 'tab'       => Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -299,7 +256,7 @@ class dragon extends Widget_Base {
         $this->add_control(
             'animation_status',
             [
-                'label'   => esc_html__('Advanced Animation', 'bdthemes-element-pack') . BDTPS_CORE_PC,
+                'label'   => esc_html__('Advanced Animation', 'bdthemes-prime-slider'),
                 'type'    => Controls_Manager::SWITCHER,
                 'classes'   => BDTPS_CORE_IS_PC
             ]
@@ -310,13 +267,13 @@ class dragon extends Widget_Base {
 			$this->add_control(
 				'animation_of',
 				[
-					'label'	   => __('Animation Of', 'bdthemes-element-pack'),
+					'label'	   => __('Animation Of', 'bdthemes-prime-slider'),
 					'type' 	   => Controls_Manager::SELECT2,
 					'multiple' => true,
 					'options'  => [
-						'.bdt-sub-title-inner' => __('Sub Title', 'bdthemes-element-pack'),
-						'.bdt-title-tag' => __('Title', 'bdthemes-element-pack'),
-						'.bdt-slider-excerpt' => __('Excerpt', 'bdthemes-element-pack'),
+						'.bdt-sub-title-inner' => __('Sub Title', 'bdthemes-prime-slider'),
+						'.bdt-title-tag' => __('Title', 'bdthemes-prime-slider'),
+						'.bdt-slider-excerpt' => __('Excerpt', 'bdthemes-prime-slider'),
 					],
 					'default'  => ['.bdt-title-tag'],
 					'condition' => [
@@ -360,6 +317,7 @@ class dragon extends Widget_Base {
 					'blend'      => esc_html__('Blend', 'bdthemes-prime-slider'),
 				],
 				'separator' => 'before',
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -470,7 +428,7 @@ class dragon extends Widget_Base {
 		$this->add_control(
 			'first_word_title_color',
 			[
-				'label'     => esc_html__( 'First Word Color', 'bdthemes-prime-slider' ) . BDTPS_CORE_NC,
+				'label'     => esc_html__( 'First Word Color', 'bdthemes-prime-slider' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .bdt-prime-slider .bdt-prime-slider-content .bdt-main-title .frist-word' => 'color: {{VALUE}}; -webkit-text-stroke-color: {{VALUE}};',
@@ -494,7 +452,7 @@ class dragon extends Widget_Base {
             Group_Control_Text_Stroke::get_type(),
             [
                 'name' => 'title_text_stroke',
-				'label'    => esc_html__('Text Stroke', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+				'label'    => esc_html__('Text Stroke', 'bdthemes-prime-slider'),
                 'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-prime-slider-content .bdt-main-title .bdt-title-tag',
             ]
         );
@@ -948,6 +906,7 @@ class dragon extends Widget_Base {
 				'condition' => [
 					'show_navigation_dots' => ['yes'],
 				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -985,7 +944,7 @@ class dragon extends Widget_Base {
                 <ul class="bdt-slideshow-nav bdt-dotnav bdt-dotnav-vertical reveal-muted">
 
                     <?php $slide_index = 1; foreach ( $settings['slides'] as $slide ) : ?>
-                    <li bdt-slideshow-item="<?php echo ($slide_index - 1); ?>" data-label="<?php echo str_pad( $slide_index, 2, '0', STR_PAD_LEFT); ?>" ><a href="#"></a></li>
+                    <li bdt-slideshow-item="<?php echo (esc_attr($slide_index) - 1); ?>" data-label="<?php echo wp_kses_post(str_pad( $slide_index, 2, '0', STR_PAD_LEFT)); ?>" ><a href="#"></a></li>
                     <?php $slide_index++;  endforeach; ?>
                     
                 </ul>
@@ -1023,17 +982,7 @@ class dragon extends Widget_Base {
 		?>
 
 		<div <?php $this->print_render_attribute_string('social-icon'); ?>>
-
-			<?php foreach ($settings['social_link_list'] as $link) : ?>
-
-				<a href="<?php echo esc_url($link['social_link']); ?>" target="_blank">
-					<span class="bdt-social-share-title">
-						<?php echo esc_html($link['social_link_title']); ?>
-					</span>
-				</a>
-				
-			<?php endforeach; ?>
-
+			<?php $this->render_social_link_repeater(); ?>
 		</div>
 
 		<?php
@@ -1042,7 +991,7 @@ class dragon extends Widget_Base {
 	public function render_button($content, $link_key) {
 		$settings = $this->get_settings_for_display();
 
-		if (!empty($content['button_link']['url'])) {
+		if ($content['slide_button_text'] && !empty($content['button_link']['url'])) {
 			$this->add_link_attributes($link_key, $content['button_link']);
 		}
 		$this->add_render_attribute($link_key, 'class', 'bdt-ps-dragon-button reveal-muted', true);
@@ -1085,9 +1034,9 @@ class dragon extends Widget_Base {
 	public function render_item_content($slide_content, $link_key) {
         $settings = $this->get_settings_for_display();
 
-		$parallax_sub_title     = 'data-bdt-slideshow-parallax="x: 100,-100; opacity: 1,1,0"';
-		$parallax_title         = 'data-bdt-slideshow-parallax="x: 200,-200; opacity: 1,1,0"';
-		$parallax_text           = 'data-bdt-slideshow-parallax="x: 300,-300; opacity: 1,1,0"';
+		$parallax_sub_title     = 'x: 100,-100; opacity: 1,1,0';
+		$parallax_title         = 'x: 200,-200; opacity: 1,1,0';
+		$parallax_text          = 'x: 300,-300; opacity: 1,1,0';
 
 		if ( true === _is_ps_pro_activated() ) {
 			if ($settings['animation_status'] == 'yes' && !empty($settings['animation_of'])) {
@@ -1105,40 +1054,46 @@ class dragon extends Widget_Base {
 			}
 		}
 
+		if ($slide_content['title']) {
+			$this->add_link_attributes( 'title-link', $slide_content['title_link'], true );
+		}
+		
         ?>
 		<div class="bdt-prime-slider-wrapper">
 			<div class="bdt-prime-slider-content">
 
 				<?php if ($slide_content['sub_title'] && ('yes' == $settings['show_sub_title'])) : ?>
 					<div class="bdt-sub-title">
-						<<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?> class="bdt-sub-title-inner" <?php echo $parallax_sub_title; ?> data-reveal="reveal-active">
-							<?php echo wp_kses_post($slide_content['sub_title']); ?>
-						</<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?>>
+
+						<<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?> class="bdt-sub-title-inner" data-bdt-slideshow-parallax="<?php echo esc_attr($parallax_sub_title); ?>" data-reveal="reveal-active">
+                            <?php echo wp_kses_post($slide_content['sub_title']); ?>
+                        </<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?>>
+
 					</div>
 				<?php endif; ?>
 
 				<?php if ($slide_content['title'] && ('yes' == $settings['show_title'])) : ?>
 					<div class="bdt-main-title">
-						<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title-tag" <?php echo $parallax_title; ?>  data-reveal="reveal-active">
+						<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title-tag" data-bdt-slideshow-parallax="<?php echo esc_attr($parallax_title); ?>"  data-reveal="reveal-active">
 							<?php if ('' !== $slide_content['title_link']['url']) : ?>
-								<a href="<?php echo esc_url($slide_content['title_link']['url']); ?>">
+								<a <?php $this->print_render_attribute_string('title-link'); ?>>
 								<?php endif; ?>
-								<?php echo prime_slider_first_word($slide_content['title']); ?>
+								<?php echo wp_kses_post( prime_slider_first_word($slide_content['title']) ); ?>
 								<?php if ('' !== $slide_content['title_link']['url']) : ?>
 								</a>
 							<?php endif; ?>
-						</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+						</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 					</div>
 				<?php endif; ?>
 
 				<?php if ($slide_content['excerpt'] && ('yes' == $settings['show_excerpt'])) : ?>
-					<div class="bdt-slider-excerpt" data-reveal="reveal-active" <?php echo $parallax_text; ?>>
+					<div class="bdt-slider-excerpt" data-reveal="reveal-active" data-bdt-slideshow-parallax="<?php echo esc_attr($parallax_text); ?>">
 						<?php echo wp_kses_post($slide_content['excerpt']); ?>
 					</div>
 				<?php endif; ?>
 
 				<div data-bdt-slideshow-parallax="x: 400,-400; opacity: 1,1,0">
-					<?php $this->render_button($slide_content, $link_key); ?>
+					<?php $this->render_button($slide_content, 'bdt-ps-button' . $link_key); ?>
 				</div>
 					
 			</div>

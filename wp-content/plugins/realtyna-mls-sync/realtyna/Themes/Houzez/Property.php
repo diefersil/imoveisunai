@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || die( 'Access Denied!' );
 class Property {
 
     /** @var string custom post type for Houzez Properties */
-    const THEME_POST_TYPE = 'property';
+    const PRODUCT_POST_TYPE = 'property';
 
     /** @var string houzez field prefix */
     const THEME_FIELD_PREFIX = 'fave_';
@@ -74,6 +74,8 @@ class Property {
 
         if ( $initFields )
             $this->initFields();
+        
+        $this->checkIdentityPostMeta();
 
     }
 
@@ -97,8 +99,8 @@ class Property {
         
         $this->addField( 'post_status', 'Property Status', 'string', array(
             'publish' => "Published" ,
-            'pending' => "Pending Review",
-            'draft' => 'Draft'
+            'pending' => "Pending Review" ,
+            'draft' => "Draft"
         ) , '' , true , 'publish' , true );
 
         //MLS_KEY
@@ -557,24 +559,33 @@ class Property {
      */
     private function setValue( $slug , $value ){
 
-        if ( isset( $this->customFields[ $slug ] ) ){            
+        $result = false;
+        
+		if ( isset( $this->customFields[ $slug ] ) ){
+
+			if ( !isset( $this->customFields[ $slug ]['idxMappedTo'] ) ){
+				
+				 $this->customFields[ $slug ] = array ( "idxMappedTo" => array( "value" => $value )  ) ;
+				
+				$result = true;
+				
+			}elseif ( !isset( $this->customFields[ $slug ]['idxMappedTo']['value'] ) ){
+				
+				 $this->customFields[ $slug ]['idxMappedTo'] = array( "value" => $value ) ;
+				
+				$result = true;
+				
+			}else{
             
-            if ( !isset( $this->customFields[ $slug ]['idxMappedTo'] ) || !isset( $this->customFields[ $slug ]['idxMappedTo']['value'] ) ) {
-                if ( !isset( $this->customFields[ $slug ]['idxMappedTo'] ) ){
-                    $this->customFields[ $slug ] = array( 'idxMappedTo' => array('value' => $value ) );
-                }elseif( !isset( $this->customFields[ $slug ]['idxMappedTo']['value'] )  ){
-                    $this->customFields[ $slug ]['idxMappedTo'] = array( 'value' => $value );
-                }
-                error_log( ' value offset error:' . $slug );
-            }else{
-                $this->customFields[ $slug ]['idxMappedTo']['value'] = $value ;
-            }
-            
-            return true;
+				$this->customFields[ $slug ]['idxMappedTo']['value'] = $value;
+				
+				$result = true;
+				
+			}
 
         }
 
-        return false;
+        return $result;
         
     }
 
@@ -607,7 +618,7 @@ class Property {
         return $value;
 
     }
-	
+
     /**
      * Get Replacement Values of a Custom Field
      * 
@@ -617,7 +628,8 @@ class Property {
      * 
      * @return array
      */
-    private function getReplacements( $slug ){
+    private function getReplacements( $slug )
+    {
 
         $value = [];
 
@@ -645,7 +657,7 @@ class Property {
      * 
      * @param string Field Slug
      * 
-     * @return string|array|object
+     * @return mixed
      */
     private function getValuePostType( $fieldSlug ){
 
@@ -657,7 +669,7 @@ class Property {
 
                 $method = ( $this->customFields[ $fieldSlug ]['enumValues'] ['callBackMethod'] ) ? $this->customFields[ $fieldSlug ]['enumValues'] ['callBackMethod'] : '' ;
 
-                if ( !empty( $class ) && !empty( $method ) )
+                if ( !empty( $class ) && !empty( $method ) ){
 
                     if ( method_exists( $class , $method ) ){
 						
@@ -665,9 +677,9 @@ class Property {
 						
 						$replacements = $this->getReplacements( $fieldSlug );
 						
-						if ( is_array( $replacements ) && !empty( $replacements ) && isset( $replacements[ $finalValue ] ) ){
+						if ( is_array( $replacements ) && !empty( $replacements ) && ( isset( $replacements[ $finalValue ] ) || isset( $replacements['*'] ) ) ){
 							
-							$finalValue = $replacements[ $finalValue ];
+							$finalValue = $replacements[ $finalValue ] ?? $replacements[ '*' ];
 							
 						}
 						
@@ -675,9 +687,11 @@ class Property {
 						
                     }
 
+                }
+
             }
 
-        return '';
+        return false;
 
     }
 
@@ -712,7 +726,6 @@ class Property {
                         }
 
                 }
-
 
             }
 
@@ -1018,7 +1031,7 @@ class Property {
         $searchArgs = array(
             'numberposts' => -1,
             'posts_per_page' => -1,
-            'post_type'   => self::THEME_POST_TYPE,
+            'post_type'   => self::PRODUCT_POST_TYPE,
             'meta_query' => $meta
         );
         
@@ -1151,7 +1164,9 @@ class Property {
                     $externalImagesMark = ( class_exists('RealtynaMlsSync') ) ? \Realtyna\Sync\Core\App::getExternalImagesMark() : '_REALTYNA_MLS_SYNC_EXTERNAL_IMAGE';
 
                     update_post_meta( $attachmentId, $externalImagesMark, 1 );
-                                            
+
+                    $this->addMetaToAttachment($attachmentId);
+
                     return $attachmentId;
     
                 }    
@@ -1177,12 +1192,13 @@ class Property {
      * 
      * @return int|bool Attahcment ID or False on fails
      */
-    private function downloadToMedia( $url , $generateThumbnails = true , $postId = null ){
-
+    private function downloadToMedia( $url , $generateThumbnails = true , $postId = null )
+    {
+        
         $fileStored = false;
 
 		if ( !empty( $url ) ){
-			error_log("download $url");
+			
             $uploadDir = wp_upload_dir();
 
             $context = stream_context_create( array(
@@ -1193,26 +1209,26 @@ class Property {
                 ) 
             );
                     
-                $filename = basename( $url );
+            $filename = basename( $url );
             
-                if ( wp_mkdir_p( $uploadDir['path'] ) ) 
+            if ( wp_mkdir_p( $uploadDir['path'] ) )
         
-                    $file = $uploadDir['path'] . '/' . $filename;
+                $file = $uploadDir['path'] . '/' . $filename;
                 
-                else
+            else
 				
-                    $file = $uploadDir['basedir'] . '/' . $filename;
+                $file = $uploadDir['basedir'] . '/' . $filename;
                 
             $fileData = file_get_contents( $url ,false ,$context );
             
             if ( $fileData !== false ){
 				
                 $fileStored = file_put_contents( $file, $fileData );
-				error_log("method1 : " . $fileStored );
+				
 			}else{
 				
 				if ( function_exists('fopen') && function_exists('curl_init') ){
-					error_log("method2 started " );
+					
 					if ( $file ) {
 							
 						$localFile = fopen( $file, 'w' );
@@ -1236,12 +1252,12 @@ class Property {
 									
 									$fileStored = true;
 									
-								}else error_log("method2 not stored " );
+								}
 
-							}else error_log("method2 curl error " );
+							}
 					
-						}else error_log("method2 fopen issue " );
-					}else error_log("method2 file: " . $file );
+						}
+					}
 						
 				}
 				
@@ -1278,6 +1294,8 @@ class Property {
                         $attachData = wp_generate_attachment_metadata( $attachId, $file );
             
                         wp_update_attachment_metadata( $attachId, $attachData );
+
+                        $this->addMetaToAttachment($attachId);
         
                     }
             
@@ -1287,10 +1305,79 @@ class Property {
     
             }
             
-        }else error_log("empty url : $url");
+        }
 
         return $fileStored;
-        
+
+    }
+
+
+
+    /**
+     * Add common metadata to a WordPress attachment post.
+     *
+     * @author Mateo M <mateo.m@realtyna.com>
+     *
+     * @param int $attachmentId Attachment post ID
+     *
+     * @return bool True on success, false on failure
+     */
+    private function addMetaToAttachment($attachmentId)
+    {
+
+        if(!get_post($attachmentId) || get_post_type($attachmentId) != 'attachment') {
+
+            return false;
+
+        }
+
+        update_post_meta( $attachmentId, '_ADDED_BY_REALTYNA_MLS_SYNC', 1 );
+
+        $images_alternative_text = $this->getValue('images_alternative_text');
+        if ( isset($images_alternative_text) ) {
+
+            update_post_meta( $attachmentId, '_wp_attachment_image_alt', $images_alternative_text );
+
+        }
+
+        $images_title = $this->getValue('images_title');
+        if ( isset($images_title) ) {
+
+            $updated_post_data = array(
+                'ID'         => $attachmentId,
+                'post_title' => $images_title,
+            );
+
+            wp_update_post( $updated_post_data );
+
+        }
+
+        $images_caption = $this->getValue('images_caption');
+        if ( isset($images_caption) ) {
+
+            $updated_post_data = array(
+                'ID'         => $attachmentId,
+                'post_excerpt' => $images_caption,
+            );
+
+            wp_update_post( $updated_post_data );
+
+        }
+
+        $images_description = $this->getValue('images_description');
+        if ( isset($images_description) ) {
+
+            $updated_post_data = array(
+                'ID'         => $attachmentId,
+                'post_content' => $images_description,
+            );
+
+            wp_update_post( $updated_post_data );
+
+        }
+
+        return true;
+
     }
 
     /**
@@ -1545,6 +1632,21 @@ class Property {
             
         }
 
+		//fix map issue in houzez on Canadian MLSs
+		$mapAddress = $this->getValue( self::THEME_FIELD_PREFIX . 'property_map_address' );
+		
+		if ( !empty( $mapAddress ) ){
+			
+			if ( substr( strtolower( $mapAddress ) , -4  ) == ', ca' ){
+				
+				$mapAddress = substr( $mapAddress , 0 , strlen( $mapAddress ) - 4 ) . ', Canada';
+				
+				$this->setValue( self::THEME_FIELD_PREFIX . 'property_map_address' , $mapAddress );
+				
+			}
+			
+		}
+
         if ( !empty( $this->getValue( self::THEME_FIELD_PREFIX . 'property_images' ) ) ){
             
             if ( empty( $this->getValue( '_thumbnail_id' ) ) ){
@@ -1552,12 +1654,16 @@ class Property {
                 $gallery_images = $this->getValue( self::THEME_FIELD_PREFIX . 'property_images' );
     
                 $gallery_images_array = explode( '|' , $gallery_images );
-    
-                $this->setDefaultValue( '_thumbnail_id' , $gallery_images_array[0]  );
-                    error_log("thumb: " . $gallery_images_array[0]);
-            }else error_log("thumb is empty");
+
+                if ( !empty( $gallery_images_array )  && is_array( $gallery_images_array ) ){
                     
-        }else error_log("no image");
+                    $this->setDefaultValue( '_thumbnail_id' , $gallery_images_array[0]  );
+
+                }
+                    
+            }
+                
+        }
 
         if ( empty( $this->getValue( '_thumbnail_id' ) ) ){
 
@@ -1575,19 +1681,20 @@ class Property {
             $this->setDefaultValue( self::THEME_FIELD_PREFIX . 'agent_display_option' , 'none'  );
         }
             
+            
         if ( !empty( $this->getValue( self::THEME_FIELD_PREFIX . 'virtual_tour' )  ) ){
             
             $this->addIframeToVirtualTour();
 
         }
-
+        /*
         if ( !empty( $this->getValue( self::THEME_FIELD_PREFIX . 'property_price' ) ) ){
             
             $propertyPrice = sprintf('%.2f', $this->getValue( self::THEME_FIELD_PREFIX . 'property_price' ) ) ;
-            $this->setValue( self::THEME_FIELD_PREFIX . 'property_sec_price' , $propertyPrice );
+            $this->setValue( self::THEME_FIELD_PREFIX . 'property_price' , $propertyPrice );
 
         }
-
+        */
         if ( !empty( $this->getValue( self::THEME_FIELD_PREFIX . 'property_sec_price' ) ) ){
             
             $propertySecPrice = sprintf('%.2f', $this->getValue( self::THEME_FIELD_PREFIX . 'property_sec_price' ) ) ;
@@ -1621,7 +1728,8 @@ class Property {
             $this->setValue( self::THEME_FIELD_PREFIX . 'property_bathrooms' , floor( $bathRooms ) );
 
         }
-		
+        
+        //trick to bypass titles and map address that have no unit#
 		$postTitle = $this->getValue( 'post_title' );
 		$newPostTitle = str_replace( ' Unit#,' , ',' , $postTitle );
 		if ( $newPostTitle != $postTitle ){
@@ -1640,7 +1748,7 @@ class Property {
 			$newPropertyAddress = str_replace( ' Unit#' , '' , $propertyAddress );
 			$newPropertyAddress = str_replace( '  ' , ' ' , $newPropertyAddress );
 			$this->setValue( self::THEME_FIELD_PREFIX . 'property_address' , $newPropertyAddress );
-		}		
+		}
 
         $this->applyMLSCustomizations();
 
@@ -1676,26 +1784,31 @@ class Property {
      * 
      * @return bool
      */
-    private function postMeta( $postId , $slug , $value , $voidEmpty = true , $update = true){
+    private function postMeta( $postId , $slug , $value , $voidEmpty = true , $update = true , $checkReplacements = true)
+    {
 
         if ( $voidEmpty && empty( $value ) )
             return false;
-		
-		$finalValue = $value;
-		
-		$replacements = $this->getReplacements( $slug );
 
-		if ( is_array( $replacements ) && !empty( $replacements ) && isset( $replacements[ $value ] ) ){
-			
-			$finalValue = $replacements[ $value ];
-			
-		}
+        $finalValue = $value;
+		
+        if ( $checkReplacements ){
 
+            $replacements = $this->getReplacements( $slug );
+    
+            if ( is_array( $replacements ) && !empty( $replacements ) && ( isset( $replacements[ $value ] ) || isset( $replacements[ '*' ] ) ) ){
+                    
+                $finalValue = $replacements[ $value ] ?? $replacements[ '*' ];
+                    
+            }
+    
+        }
+    
         if ( $update )
             return update_post_meta( $postId , $slug , $finalValue );
         else
             return add_post_meta( $postId , $slug , $finalValue );
-
+    
     }
 
     /**
@@ -1734,49 +1847,15 @@ class Property {
      * 
      * @return void 
      */
-    public function bulkRemoveProperties( $demoOnly = false )
-	{
-		
+    public function bulkRemoveProperties( $demoOnly = false ){
+
 		global $wpdb;
 		
 		$metaKey = $demoOnly ? self::REALTYNA_IDX_META_MARK . "_demo" : self::REALTYNA_IDX_META_MARK ;
 					
-		$sql = "update {$wpdb->prefix}posts set `post_status` = 'trash' WHERE `post_type` = '" . self::THEME_POST_TYPE . "' AND `ID` IN ( SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = '" . $metaKey . "' AND `meta_value` = '1' )";
+		$sql = "update {$wpdb->prefix}posts set `post_status` = 'trash' WHERE `post_type` = '" . self::PRODUCT_POST_TYPE . "' AND `ID` IN ( SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = '" . $metaKey . "' )";
     
         $removedPosts = $wpdb->query( $sql );
-
-        /*
-		$meta = array();
-
-        $metaKey = $demoOnly ? self::REALTYNA_IDX_META_MARK . "_demo" : self::REALTYNA_IDX_META_MARK ;
-
-        $meta[] = array( "key" => $metaKey , "value" => 1 , "compare" => "=" );
-
-        $deleteArgs = array(
-            'numberposts' => -1,
-            'posts_per_page' => -1,
-            'post_type'   => self::THEME_POST_TYPE,
-            'meta_query' => $meta
-        );
-        
-        $selectedPosts = new \WP_Query( $deleteArgs );
-
-        if ( $selectedPosts->have_posts() ) {
-
-            while ( $selectedPosts->have_posts() ){
-
-                $selectedPosts->the_post();
-
-                $this->deletePropertyAttachments( get_the_ID() );
-           
-                wp_delete_post( get_the_ID() );
-
-            }
-
-            wp_reset_postdata(); 
-
-        }       
-		*/		
 
     }
 
@@ -1804,97 +1883,66 @@ class Property {
      * 
      * @param array , excluded properties array ids from delete
      * 
-     * @return void 
+     * @return int
      */
-    public function removeUnwantedProperties( $excludedProperties ){
+    public function removeUnwantedProperties( $excludedProperties )
+    {
+
+        global $wpdb;
+
+        $removedPosts = 0;
 
         if ( isset( $excludedProperties['listing_ids'] ) && !empty( $excludedProperties['listing_ids'] ) && is_array( $excludedProperties['listing_ids'] ) ){
-            
-			global $wpdb;
-			
+            			
             $excludedIDs = "'" . implode( "','" , $excludedProperties['listing_ids'] ) . "'";
 			
-            $sql = "update {$wpdb->prefix}posts set `post_status` = 'trash' WHERE `post_type` = '" . self::THEME_POST_TYPE . "' AND `ID` IN ( SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = '" . self::IDX_IDENTITY_FIELD . "' AND `meta_value` NOT IN (" . $excludedIDs . ") )";
+            $sql = "UPDATE {$wpdb->prefix}posts SET `post_status` = 'trash' WHERE `post_type` = '" . self::PRODUCT_POST_TYPE . "' AND `ID` IN ( SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = '" . self::IDX_IDENTITY_FIELD . "' AND `meta_value` NOT IN (" . $excludedIDs . ") )";
     
             $removedPosts = $wpdb->query( $sql );
-			
-			/*
 
-            $sql = "DELETE FROM {$wpdb->prefix}posts WHERE `ID` IN ( SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = '" . self::IDX_IDENTITY_FIELD . "' AND `meta_value` NOT IN (" . $excludedIDs . ") ) LIMIT " . self::REALTYNA_REMOVE_RECORDS_PER_REQUEST;
-    
-            $removedPosts = $wpdb->query( $sql );
-						
-
-            if ( $removedPosts > 0 ){
-
-                $sql = "DELETE FROM {$wpdb->prefix}postmeta WHERE `post_id` NOT IN ( SELECT `ID` FROM {$wpdb->prefix}posts ) ";
-				    
-                $removedPostMeta = $wpdb->query( $sql );
-    
-            }
-			
-			*/
-
-            return $removedPosts;
-
-/*    
-            $meta = array();
-            $meta[] = array( "key" => self::REALTYNA_IDX_META_MARK , "value" => 1 , "compare" => "=" );
-            $meta[] = array( "key" => self::IDX_IDENTITY_FIELD , "value" => $excludedProperties , "compare" => "NOT IN" );
-            
-            $deleteArgs = array(
-                'numberposts' => self::REALTYNA_REMOVE_RECORDS_PER_REQUEST,
-                'post_type'   => self::THEME_POST_TYPE,
-                'meta_query' => $meta
-            );
-            
-            $selectedPosts = new \WP_Query( $deleteArgs );
-    
-            if ( $selectedPosts->have_posts() ) {
-    
-                while ( $selectedPosts->have_posts() ){
-    
-                    $selectedPosts->the_post();
-    
-                    $this->deletePropertyAttachments( get_the_ID() );
-               
-                    wp_delete_post( get_the_ID() );
-    
-                }                
-    
-            }
-
-            wp_reset_postdata(); 
-*/                
         }
 
+        return $removedPosts;
+
     }
-	
+
 	/**
 	* Purge Trashed Listings
+     *
 	* @author Chris A <chris.a@realtyna.net>
 	*
 	* @return void
 	*/
 	public function purgeListings()
 	{
-		error_log("Property: purgeListings");
+		
         global $wpdb;
 
 		$purgeLimit = ( defined( 'REALTYNA_MLS_SYNC_PURGE_LIMIT' ) && !empty( REALTYNA_MLS_SYNC_PURGE_LIMIT ) && is_numeric( REALTYNA_MLS_SYNC_PURGE_LIMIT ) )  ? REALTYNA_MLS_SYNC_PURGE_LIMIT : 50;
 
         $listings = $wpdb->get_results(
-							"SELECT `ID` FROM {$wpdb->prefix}posts WHERE `post_type` = '". self::THEME_POST_TYPE ."' AND `post_parent` = 0 AND `post_status` = 'trash' LIMIT {$purgeLimit}"
+							"SELECT `ID` FROM {$wpdb->prefix}posts WHERE `post_type` = '". self::PRODUCT_POST_TYPE ."' AND `post_parent` = 0 AND `post_status` = 'trash' LIMIT {$purgeLimit}"
 					);
-		error_log("total listings: " . count( $listings ) );
+		
 		foreach( $listings as $listing ){
 			
+			if ( function_exists( 'has_post_thumbnail' ) ) {
+				
+				if( has_post_thumbnail( $listing->ID ) ){
+					
+					$thumbnail = get_post_thumbnail_id( $listing->ID );
+					wp_delete_attachment( $thumbnail , true );
+					
+				}
+				
+			}
+
 			wp_delete_post( $listing->ID , true );
-			error_log("post removed # {$listing->ID}");
+			
 		}
 		
 	}
-	
+
 	/**
 	* Purge all attachments of Trashed Listings
 	* @author Chris A <chris.a@realtyna.net>
@@ -1903,22 +1951,66 @@ class Property {
 	*/
 	public function purgeAttachments()
 	{
-		error_log("Property: purgeAttachments");
+		
         global $wpdb;
 		
-		$purgeLimit = ( defined( 'REALTYNA_MLS_SYNC_PURGE_LIMIT' ) && !empty( REALTYNA_MLS_SYNC_PURGE_LIMIT ) && is_numeric( REALTYNA_MLS_SYNC_PURGE_LIMIT ) )  ? REALTYNA_MLS_SYNC_PURGE_LIMIT : 200;
+		$purgeLimit = ( defined( 'REALTYNA_MLS_SYNC_PURGE_LIMIT' ) && !empty( REALTYNA_MLS_SYNC_PURGE_LIMIT ) && is_numeric( REALTYNA_MLS_SYNC_PURGE_LIMIT ) )  ? REALTYNA_MLS_SYNC_PURGE_LIMIT : 100;
 
-        $attachments = $wpdb->get_results(						
-							"SELECT `ID` FROM {$wpdb->prefix}posts WHERE `post_type` = 'attachment'  AND `post_parent` > 0  AND `post_parent` NOT IN ( SELECT `ID` FROM {$wpdb->prefix}posts ) LIMIT {$purgeLimit}"
-						);
-		error_log("total attachments: " . count( $attachments ) );
+		$attachments = $wpdb->get_results(
+			"SELECT p.`ID`
+				FROM {$wpdb->prefix}posts AS p
+				INNER JOIN {$wpdb->prefix}postmeta AS pm ON p.`ID` = pm.`post_id`
+				WHERE p.`post_type` = 'attachment'
+				AND p.`post_parent` > 0
+			    AND pm.`meta_key` = '_ADDED_BY_REALTYNA_MLS_SYNC'
+				AND p.`post_parent` NOT IN (
+					SELECT `ID`
+					FROM {$wpdb->prefix}posts
+				) LIMIT {$purgeLimit}");
+
+        if ( empty( $attachments ) ){
+
+            $attachments = $wpdb->get_results(						
+                               "SELECT `ID` FROM {$wpdb->prefix}posts WHERE `post_parent` = 0 AND `post_type` = 'attachment' AND `guid` LIKE 'https://idxmedia.realtyfeed.com%' LIMIT {$purgeLimit}"
+                        );
+                            
+        }
+                        
 		foreach( $attachments as $attachment ){
-			error_log("attachment removed # {$attachment->ID}");
+			
 			wp_delete_attachment( $attachment->ID , true );
 			
 		}
 		
-	}	
+	}
+
+	/**
+	 * Add new post metas for all of the listings
+	 *
+	 * @author Chris A <chris.a@realtyna.net>
+	 *
+	 * @return void
+	 */
+	private function checkIdentityPostMeta()
+	{
+		
+		$identityPostMeta = get_option( "REALTYNA_IDENTITY_POSTMETA" , 0 );
+		
+		if ( empty( $identityPostMeta ) ) {
+			
+			
+			global $wpdb;
+						
+            $sql = "INSERT INTO `{$wpdb->prefix}postmeta` ( `post_id`, `meta_key` , `meta_value` )
+						SELECT `post_id` , concat( `meta_key` , '_' , `meta_value` ) , '1' from `{$wpdb->prefix}postmeta` WHERE `meta_key` = '" . self::IDX_IDENTITY_FIELD . "' ";
+    
+            $insertedRecords = $wpdb->query( $sql );
+			
+			update_option( "REALTYNA_IDENTITY_POSTMETA" , 1  , true );
+			
+		}
+		
+	}
 
     /**
      * Is Propertiy Active (Allowed to import) or no
@@ -1964,35 +2056,33 @@ class Property {
 
         $idxIdentityFieldValue = $this->getValue( self::IDX_IDENTITY_FIELD );
 
+		$exists = false;
+
         if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG && defined( 'WP_DEBUG_MLS_SYNC' ) ){
 
             error_log( 'propertyExists -> ' . self::IDX_IDENTITY_FIELD . ' : ' . $idxIdentityFieldValue );
             
         }
 
-		$exists = false;
-
         if ( !empty( $idxIdentityFieldValue ) ){
-    
+			
 			global $wpdb;
 			
 			if ( !empty( $wpdb ) ){
 
-				$totalsQuery =  "SELECT count(1) FROM `" . $wpdb->prefix . "postmeta` 
-										WHERE	`meta_key` = '" . self::IDX_IDENTITY_FIELD . "' AND
-												`meta_value` = '" . $idxIdentityFieldValue . "' AND 
-												`post_id` IN ( SELECT `ID` FROM  `" . $wpdb->prefix . "posts` WHERE `post_status` <> 'trash' AND `post_type` =  '" . self::THEME_POST_TYPE . "' )
-												
-								";
+				$totalsQuery =  "SELECT COUNT(1) FROM `" . $wpdb->prefix . "posts` 
+										WHERE	`post_status` <> 'trash' AND 
+												`post_type` =  '" . self::PRODUCT_POST_TYPE . "' AND
+												`ID` = ( SELECT `post_id` FROM `" . $wpdb->prefix . "postmeta` WHERE `meta_key` = '". self::IDX_IDENTITY_FIELD . "_" . $idxIdentityFieldValue  ."' LIMIT 1 )";
 				
 				$result = $wpdb->get_var( $totalsQuery );
 				
 				$exists = ( (int) $result > 0 );
-				
+
 			}
     
         }
-		
+
         return $exists;
 
     }
@@ -2004,24 +2094,29 @@ class Property {
      * 
      * @return int WordPress Post ID
      */
-    private function getPropertyIdByIdxIdentity(){
+    private function getPropertyIdByIdxIdentity()
+    {
 
         global $wpdb;
 
         $idxIdentityFieldValue = $this->getValue( self::IDX_IDENTITY_FIELD );
-
-        $postId = 0 ;
+		
+        $postId = 0;
 
         if ( !empty( $wpdb ) ){
+
+			$query = "SELECT `ID` FROM `" . $wpdb->prefix . "posts` 
+							WHERE 	`post_status` <> 'trash' AND 
+									`post_type` = '". self::PRODUCT_POST_TYPE ."' AND 
+									`ID` = ( SELECT `post_id` FROM `" . $wpdb->prefix . "postmeta` WHERE `meta_key` = '". self::IDX_IDENTITY_FIELD . "_" . $idxIdentityFieldValue  ."' LIMIT 1 )";
     
-            $query =  "SELECT `post_id` FROM `" . $wpdb->prefix . "postmeta` 
-                                    WHERE `meta_key` = '" . self::IDX_IDENTITY_FIELD . "' AND `meta_value` = '" . $idxIdentityFieldValue . "' AND 
-									`post_id` IN ( SELECT `ID` FROM  `" . $wpdb->prefix . "posts` WHERE `post_status` <> 'trash' AND `post_type` =  '" . self::THEME_POST_TYPE . "' )
-                            ";
-    
-            $postId = $wpdb->get_var( $query );
-    
-        }
+            $result = $wpdb->get_var( $query );
+			
+			if ( $result > 0 ) {
+				$postId = $result;
+			}
+
+        }		
 
         return $postId;
 
@@ -2036,8 +2131,20 @@ class Property {
      * 
      * @return void
      */
-    private function deletePropertyAttachments( $postId ){
+    private function deletePropertyAttachments( $postId )
+    {
 
+        if ( function_exists( 'has_post_thumbnail' ) ) {
+			
+			if( has_post_thumbnail( $postId ) ){
+				
+				$thumbnail = get_post_thumbnail_id( $postId );
+				wp_delete_attachment( $thumbnail , true );
+				
+			}
+			
+		}
+        
         $attachments = get_posts( array( 
                 'post_type' => 'attachment' , 
                 'posts_per_page' => -1, 
@@ -2130,7 +2237,7 @@ class Property {
                     
                     if ( !in_array( $field['slug'] , array( self::THEME_FIELD_PREFIX . 'featured' ) ) ){
 						
-						delete_metadata( self::THEME_POST_TYPE , $postId , $field['slug'] );
+						delete_metadata( self::PRODUCT_POST_TYPE , $postId , $field['slug'] );
 						
 					}
 
@@ -2140,7 +2247,7 @@ class Property {
 
             //remove all taxonomies related to the post
             if ( !empty( $taxonomies ) && is_array( $taxonomies ) ){
-				
+
                 wp_delete_object_term_relationships( $postId, $taxonomies );
 
             }
@@ -2182,6 +2289,7 @@ class Property {
 
     /**
      * Count Total Imported Listings
+     * @author Chris A <chris.a@realtyna.net>
      *
      * @return int
      */
@@ -2201,57 +2309,56 @@ class Property {
         return $totals;
 
     }
-
+    
     /**
-     * Count Total Available Listings
-     *
-     * @return int
-     */
-    public function countAvailableListings()
-    {
-        
-        global $wpdb;
-		
-		$totals = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(1) FROM $wpdb->posts WHERE post_type = '%s' AND post_parent = 0 AND post_status IN ( 'publish' , 'pending' , 'draft' )", self::THEME_POST_TYPE ) );
+	 * Count Total Available Listings
+	 *
+	 * @return int
+	 */
+	public function countAvailableListings()
+	{
 
-        return $totals;
-
-    }
-	
-    /**
-     * Count Today Imported Listings
-     *
-     * @return int
-     */
-    public function countTodayImportedListings()
-    {
-        
-        global $wpdb;
-		
-		$totals = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(1) FROM $wpdb->posts WHERE post_type = '%s' AND post_parent = 0 AND post_date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)", self::THEME_POST_TYPE ) );
-
-        return $totals;
-
-    }
-	
-    /**
-     * Make sure post id exists
-     *
-	 * @param $postId
-     * @return bool
-     */
-    private function postIdExists( $postId )
-    {
-        	
 		global $wpdb;
-		
+
+		$totals = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(1) FROM $wpdb->posts WHERE post_type = '%s' AND post_parent = 0 AND post_status IN ( 'publish' , 'pending' , 'draft' )", self::PRODUCT_POST_TYPE ) );
+
+		return $totals;
+
+	}
+
+	/**
+	 * Count Today Imported Listings
+	 *
+	 * @return int
+	 */
+	public function countTodayImportedListings()
+	{
+
+		global $wpdb;
+
+		$totals = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(1) FROM $wpdb->posts WHERE post_type = '%s' AND post_parent = 0 AND post_date > DATE_SUB(CURDATE(), INTERVAL 1 DAY)", self::PRODUCT_POST_TYPE ) );
+
+		return $totals;
+
+	}
+
+	/**
+	 * Make sure post id exists
+	 *
+	 * @param $postId
+	 * @return bool
+	 */
+	private function postIdExists( $postId )
+	{
+
+		global $wpdb;
+
 		$totals = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(1) FROM $wpdb->posts WHERE `post_status` In ( 'publish' , 'draft' , 'pending' ) AND `ID` = %s ", $postId ) );
 		$result = ( (int) $totals > 0 );
 
-        return $result;
+		return $result;
 
-    }
-	
+	}
 
     /**
      * Insert Metas For Property
@@ -2263,7 +2370,11 @@ class Property {
      * 
      * @return void
      */
-    private function insertPropertyMetas( $postId , $demo = false ){
+    private function insertPropertyMetas( $postId , $demo = false )
+    {
+
+        $idxIdentityFieldValue = $this->getValue( self::IDX_IDENTITY_FIELD );
+		update_post_meta( $postId , self::IDX_IDENTITY_FIELD . '_' . $idxIdentityFieldValue , 1 );
 
         update_post_meta( $postId , self::REALTYNA_IDX_META_MARK , 1 );
         update_post_meta( $postId , self::REALTYNA_IDX_META_MARK . '_time' , time() );
@@ -2276,7 +2387,7 @@ class Property {
         foreach ($this->customFields as $key => $value) {
             
             if ( $value['isMainField'] ) continue;
-			
+
 			if ( in_array( $value['slug'] , array( self::THEME_FIELD_PREFIX . 'featured' ) ) ){
 				$metaValue = get_option( $value['slug'] );
 				if ( $metaValue ) continue;
@@ -2309,11 +2420,11 @@ class Property {
                     break;
 
                 case 'postType' :
-				
+
 					$postTypeValue = $this->getValuePostType( $value['slug'] ) ;
 					
 					if ( $postTypeValue )
-						$this->postMeta( $postId , $value['slug'] , $postTypeValue );
+						$this->postMeta( $postId , $value['slug'] , $postTypeValue  , true , true , false );
 
                     break;
 
@@ -2325,13 +2436,12 @@ class Property {
 
                 case 'image' :
                     
-					$imgId = false;
-					
+                    $imgId = false;
+
                     if (isset( $this->importOptions['use_external_thumbnail'] ) &&
                         $this->importOptions['use_external_thumbnail'] ) {
                         
                         $imgId = $this->attachImageWithoutDownloadToMedia( $this->getValue( $value['slug'] ) , $postId );
-
 
                     }else{
 
@@ -2339,9 +2449,8 @@ class Property {
                         
                     }
 
-                    if ( $imgId !== false ){
+                    if ( $imgId !== false )
                         $this->postMeta( $postId , $value['slug'] , $imgId );
-					}
 
                     break;
 
@@ -2381,53 +2490,45 @@ class Property {
         set_time_limit( 0 );
         
         $result = false;
-				
+		
 		if ( !empty( $postId ) && is_numeric( $postId ) ){
 			
-			if ( $this->postIdExists( $postId ) ){
-			
-				$postTitle = str_replace( ',,' , ', ' , $this->getValue( 'post_title' ) );
-				$postTitle = str_replace( ' Unit#,' , ',' , $postTitle );
-				$postTitle = str_replace( '  ' , ' ' , $postTitle );
-				$postTitle = str_replace( '  ' , ' ' , $postTitle );
-				$postSlug = $this->getValue( 'post_name' ) ?? str_replace("," , " " , $postTitle );
+			$postTitle = str_replace( ',,' , ', ' , $this->getValue( 'post_title' ) );
+			$postTitle = str_replace( ' Unit#,' , ',' , $postTitle );
+			$postTitle = str_replace( '  ' , ' ' , $postTitle );
+			$postTitle = str_replace( '  ' , ' ' , $postTitle );
+			$postSlug = $this->getValue( 'post_name' ) ?? str_replace("," , " " , $postTitle );
 
-				$arrayPost = array(
-					'ID' => $postId,
-					'post_content' => nl2br( $this->getValue( 'post_content' ) ),
-					'post_name'    => $postSlug ,
-					'post_title'   => $postTitle,
-					'post_type'    => self::THEME_POST_TYPE,
-					'post_status'  => $this->getValue( 'post_status' ),
-					'post_excerpt' => $this->getValue( 'post_excerpt' )
-				);
+			$arrayPost = array(
+				'ID' => $postId,
+				'post_content' => nl2br( $this->getValue( 'post_content' ) ),
+				'post_name'    => $postSlug ,
+				'post_title'   => $postTitle,
+				'post_type'    => self::PRODUCT_POST_TYPE,
+				'post_status'  => $this->getValue( 'post_status' ),
+				'post_excerpt' => $this->getValue( 'post_excerpt' )
+			);
 
-				$updateResult = wp_update_post( $arrayPost , true );
+			$updateResult = wp_update_post( $arrayPost , true );
 
-				if ( is_wp_error( $updateResult ) ){
-					
-					error_log("Update WP Error:" . var_export( $updateResult->get_error_message() , true ) );
-					
-				}elseif( empty( $updateResult ) ){
-					
-					error_log("Update Error:" . var_export( $updateResult , true ) );
-
-				}elseif( is_numeric( $updateResult ) ){
-
-					$result = true;
-					//remove old metas from the property
-					$this->deletePropertyMetas( $postId );
-					
-					$this->insertPropertyMetas( $postId , $demo );
-
-					$this->importedProperty++;
-
-				}
-			
-			}else{
+			if ( is_wp_error( $updateResult ) ){
 				
-				$result = $this->insertProperty( $demo );
+				error_log("Update WP Error:" . var_export( $updateResult->get_error_message() , true ) );
 				
+			}elseif( empty( $updateResult ) ){
+				
+				error_log("Update Error:" . var_export( $updateResult , true ) );
+				
+			}elseif( is_numeric( $updateResult ) ){
+
+				$result = true;
+				//remove old metas from the property
+				$this->deletePropertyMetas( $postId );
+				
+				$this->insertPropertyMetas( $postId , $demo );
+
+				$this->importedProperty++;
+			
 			}
 		
 		}
@@ -2445,12 +2546,13 @@ class Property {
      * 
      * @return int|bool Propert ID or False on fails
      */
-    private function insertProperty( $demo = true ){
+    private function insertProperty( $demo = true )
+    {
 
         set_time_limit( 0 );
         
 		$result = false;
-        
+
 		$images = $this->getValue( self::THEME_FIELD_PREFIX . 'property_images' );
 		
 		if ( empty( $images ) && defined('MLS_SYNC_SKIP_LISTINGS_WITHOUT_IMAGE') && !empty( MLS_SYNC_SKIP_LISTINGS_WITHOUT_IMAGE )  ){
@@ -2458,7 +2560,7 @@ class Property {
 			return true;
 			
 		}
-			
+        
         $postTitle = str_replace( ',,' , ', ' , $this->getValue( 'post_title' ) );
 		$postTitle = str_replace( ' Unit#,' , ',' , $postTitle );
 		$postTitle = str_replace( '  ' , ' ' , $postTitle );
@@ -2470,7 +2572,7 @@ class Property {
             'post_content' => nl2br( $this->getValue( 'post_content' ) ),
             'post_name'    => $postSlug ,
             'post_title'   => $postTitle ,
-            'post_type'    => self::THEME_POST_TYPE,
+            'post_type'    => self::PRODUCT_POST_TYPE,
             'post_status'  => $this->getValue( 'post_status' ),
             'post_excerpt' => $this->getValue( 'post_excerpt' ),
             'post_author'  => $postAuthor
@@ -2490,11 +2592,11 @@ class Property {
 		}elseif( is_numeric( $postId ) ){
 
 			$result = $postId;
-        
-        $this->insertPropertyMetas( $postId , $demo );
+				
+			$this->insertPropertyMetas( $postId , $demo );
 
-        $this->importedProperty++;
-
+			$this->importedProperty++;
+			
 		}
 
         return $result;
@@ -2511,7 +2613,8 @@ class Property {
      * 
      * @return bool
      */
-    public function import( $slugValues , $demo = true ){
+    public function import( $slugValues , $demo = true )
+    {
 
         $importResult = false;
         
@@ -2544,7 +2647,7 @@ class Property {
             }
     
         }
-
+        
         return $importResult;
 
     }

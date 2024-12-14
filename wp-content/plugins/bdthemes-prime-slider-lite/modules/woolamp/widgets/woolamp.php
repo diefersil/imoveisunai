@@ -51,21 +51,25 @@ class Woolamp extends Widget_Base {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 		if ('on' === $reveal_effects) {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-woolamp', 'goodshare'];
+				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-woolamp', 'bdt-goodshare'];
 			} else {
-				return ['goodshare'];
+				return ['bdt-goodshare'];
 			}
 		} else {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'ps-woolamp', 'goodshare'];
+				return ['gsap', 'split-text', 'ps-woolamp', 'bdt-goodshare'];
 			} else {
-				return ['goodshare'];
+				return ['bdt-goodshare'];
 			}
 		}
 	}
 
 	public function get_custom_help_url() {
 		return 'https://youtu.be/cBhYGPhiye4';
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
 	}
 
 	protected function register_controls() {
@@ -157,6 +161,7 @@ class Woolamp extends Widget_Base {
 				'label'   => esc_html__('Social Share Hide on Mobile', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
 				'type'    => Controls_Manager::SWITCHER,
 				'prefix_class' => 'bdt-social-share-hide--',
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -269,7 +274,7 @@ class Woolamp extends Widget_Base {
 		$this->start_controls_section(
 			'section_advanced_animation',
 			[
-				'label'     => esc_html__('Advanced Animation', 'bdthemes-prime-slider') . BDTPS_CORE_NC . BDTPS_CORE_PC,
+				'label'     => esc_html__('Advanced Animation', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
 				'tab'       => Controls_Manager::TAB_CONTENT,
 			]
 		);
@@ -277,7 +282,7 @@ class Woolamp extends Widget_Base {
 		$this->add_control(
 			'animation_status',
 			[
-				'label'   => esc_html__('Advanced Animation', 'bdthemes-element-pack'),
+				'label'   => esc_html__('Advanced Animation', 'bdthemes-prime-slider'),
 				'type'    => Controls_Manager::SWITCHER,
 				'classes'   => BDTPS_CORE_IS_PC,
 			]
@@ -288,12 +293,12 @@ class Woolamp extends Widget_Base {
 			$this->add_control(
 				'animation_of',
 				[
-					'label'	   => __('Animation Of', 'bdthemes-element-pack'),
+					'label'	   => __('Animation Of', 'bdthemes-prime-slider'),
 					'type' 	   => Controls_Manager::SELECT2,
 					'multiple' => true,
 					'options'  => [
-						'.bdt-ps-title' => __('Title', 'bdthemes-element-pack'),
-						'.bdt-ps-text' => __('Excerpt', 'bdthemes-element-pack'),
+						'.bdt-ps-title' => __('Title', 'bdthemes-prime-slider'),
+						'.bdt-ps-text' => __('Excerpt', 'bdthemes-prime-slider'),
 					],
 					'default'  => ['.bdt-ps-title'],
 					'condition' => [
@@ -334,7 +339,8 @@ class Woolamp extends Widget_Base {
 				'description' => esc_html__('NOTE: It just works on Mobile Device.', 'bdthemes-prime-slider'),
 				'selectors' => [
 					'(mobile){{WRAPPER}} .bdt-prime-slider-woolamp .bdt-ps-wc-product-img:before' => 'background: {{VALUE}};',
-				]
+				],
+				'classes'   => BDTPS_CORE_IS_PC
 			]
 		);
 
@@ -1221,7 +1227,7 @@ class Woolamp extends Widget_Base {
 				while ($wp_query->have_posts()) : $wp_query->the_post();
 				?>
 
-					<li bdt-slideshow-item="<?php echo ($slide_index - 1); ?>" data-label="<?php echo str_pad($slide_index, 2, '0', STR_PAD_LEFT); ?>"><a href="#"><?php echo str_pad($slide_index, 2, '0', STR_PAD_LEFT); ?></a>
+					<li bdt-slideshow-item="<?php echo esc_attr($slide_index - 1); ?>" data-label="<?php echo esc_attr(str_pad($slide_index, 2, '0', STR_PAD_LEFT)); ?>"><a href="#"><?php echo esc_attr(str_pad($slide_index, 2, '0', STR_PAD_LEFT)); ?></a>
 						<?php $slide_index++; ?>
 					</li>
 
@@ -1316,15 +1322,15 @@ class Woolamp extends Widget_Base {
 				<?php endif; ?>
 
 				<?php if ($settings['show_title']) : ?>
-					<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-ps-title" data-reveal="reveal-active" <?php echo $parallax_title; ?>>
+					<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-ps-title" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_title); ?>>
 						<a href="<?php the_permalink(); ?>">
 							<?php the_title(); ?>
 						</a>
-					</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+					</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 				<?php endif; ?>
 
 				<?php if ($settings['show_excerpt']) : ?>
-					<div class="bdt-ps-text" data-reveal="reveal-active" <?php echo $parallax_text; ?>><?php the_excerpt(); ?></div>
+					<div class="bdt-ps-text" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_text); ?>><?php the_excerpt(); ?></div>
 				<?php endif; ?>
 
 				<?php if ($settings['show_price']) : ?>
@@ -1368,7 +1374,7 @@ class Woolamp extends Widget_Base {
 
 			?>
 
-				<li class="bdt-slideshow-item bdt-flex elementor-repeater-item-<?php echo get_the_ID(); ?>">
+				<li class="bdt-slideshow-item bdt-flex elementor-repeater-item-<?php echo esc_attr(get_the_ID()); ?>">
 
 					<div class="bdt-ps-item-inner bdt-flex bdt-flex-middle">
 

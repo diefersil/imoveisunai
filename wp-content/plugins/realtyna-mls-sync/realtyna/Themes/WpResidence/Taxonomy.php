@@ -28,23 +28,30 @@ class Taxonomy {
      * 
      * @return void
      */
-    public function import( $value , $postId , $parentInfo = array() ){
+    public function import( $value , $postId , $parentInfo = array() )
+    {
 
-        $term = term_exists( $value, static::TAXONOMY );
+        if ( taxonomy_exists( static::TAXONOMY ) && !empty( trim( $value ) ) ) {
+			
+			$term = term_exists( $value, static::TAXONOMY );
 
-        if ( 0 === $term || null === $term ) {
-    
-            $term = wp_insert_term(
-                $value,
-                static::TAXONOMY,
-                array(
-                    'slug' => strtolower( str_ireplace( ' ', '-', $value ) )
-                )
-            );
-    
-        }
-    
-        wp_set_post_terms( $postId, $term, static::TAXONOMY, true );
+			if ( 0 === $term || null === $term ) {
+		
+				$term = wp_insert_term(
+					$value,
+					static::TAXONOMY,
+					array(
+						'slug' => strtolower( str_replace( ' ', '-', $value ) )
+					)
+				);
+		
+			}
+			
+			if ( !is_wp_error( $term ) ) {
+				wp_set_post_terms( $postId, $term, static::TAXONOMY, true );
+			}
+			
+		}
 
     }
 

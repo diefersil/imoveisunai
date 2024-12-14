@@ -54,6 +54,10 @@ class Omatic extends Widget_Base {
 		return 'https://youtu.be/ndqeKBM8wfw?si=F3-PLdDn_79QizNM';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 
 		$this->start_controls_section(
@@ -1239,8 +1243,7 @@ class Omatic extends Widget_Base {
 			]
 		);
 
-		$swiper_class = Plugin::$instance->experiments->is_feature_active( 'e_swiper_latest' ) ? 'swiper' : 'swiper-container';
-		$this->add_render_attribute('swiper', 'class', 'swiper-carousel ' . $swiper_class);
+		$this->add_render_attribute('swiper', 'class', 'swiper-carousel swiper');
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider-omatic' ); ?>>
@@ -1271,21 +1274,25 @@ class Omatic extends Widget_Base {
 			<div thumbsSlider="" class="bdt-omatic-thumbs-slide">
                 <div class="swiper-wrapper">
 
-				<?php foreach ($settings['slides'] as $slide) : ?>
+				<?php foreach ($settings['slides'] as $slide) : 
+					if($slide['title']) {
+						$this->add_link_attributes( 'title-link', $slide['title_link'], true );
+					}
+					?>
 					<div class="swiper-slide bdt-omatic-item">
 					<div class="bdt-slide-content">
 					<?php $this->render_sub_title($slide); ?>
 					<?php if ($slide['title'] && ('yes' == $settings['show_title'])) : ?>
 						<div class="bdt-title-wrap">
-							<<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?> class="bdt-title">
+							<<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> class="bdt-title">
 								<?php if ('' !== $slide['title_link']['url']) : ?>
-									<a href="<?php echo esc_url($slide['title_link']['url']); ?>">
+									<a <?php $this->print_render_attribute_string('title-link'); ?>>
 									<?php endif; ?>
-									<?php echo prime_slider_first_word($slide['title']); ?>
+									<?php echo wp_kses_post(prime_slider_first_word($slide['title'])); ?>
 									<?php if ('' !== $slide['title_link']['url']) : ?>
 									</a>
 								<?php endif; ?>
-							</<?php echo Utils::get_valid_html_tag($settings['title_html_tag']); ?>>
+							</<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?>>
 						</div>
 					<?php endif; ?>
 				</div>
@@ -1327,7 +1334,7 @@ class Omatic extends Widget_Base {
 
 		?>
 		<?php if ($slide['text'] && ('yes' == $settings['show_text'])) : ?>
-		<div class="bdt-inner-content <?php echo $text_hide_on_setup; ?>">
+		<div class="bdt-inner-content <?php echo esc_attr($text_hide_on_setup); ?>">
 			<span class="bdt-line"></span>
 			<div class="bdt-desc-wrap">
 				<div class="bdt-desc" >
@@ -1348,9 +1355,9 @@ class Omatic extends Widget_Base {
 
 		?>
 		<div class="bdt-sub-title-wrap">
-			<<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?> class="bdt-sub-title">
+			<<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?> class="bdt-sub-title">
 				<?php echo wp_kses($slide['sub_title'], prime_slider_allow_tags('title')); ?>
-			</<?php echo Utils::get_valid_html_tag($settings['sub_title_html_tag']); ?>>
+			</<?php echo esc_attr(Utils::get_valid_html_tag($settings['sub_title_html_tag'])); ?>>
 			<span class="bdt-sub-line"></span>
 		</div>
 
