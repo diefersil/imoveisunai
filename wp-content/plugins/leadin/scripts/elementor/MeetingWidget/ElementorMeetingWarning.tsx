@@ -1,6 +1,4 @@
 import React, { Fragment } from 'react';
-import { portalId, hubspotBaseUrl } from '../../constants/leadinConfig';
-import { leadinConnectCalendar } from '../../api/hubspotPluginApi';
 import { CURRENT_USER_CALENDAR_MISSING } from '../../shared/Meeting/constants';
 import ElementorButton from '../Common/ElementorButton';
 import ElementorBanner from '../Common/ElementorBanner';
@@ -12,25 +10,25 @@ const Container = styled.div`
 `;
 
 interface IMeetingWarningPros {
-  triggerReload: Function;
+  onConnectCalendar: React.MouseEventHandler<HTMLButtonElement>;
   status: string;
 }
 
 export default function MeetingWarning({
-  triggerReload,
+  onConnectCalendar,
   status,
 }: IMeetingWarningPros) {
   const isMeetingOwner = status === CURRENT_USER_CALENDAR_MISSING;
   const titleText = isMeetingOwner
-    ? __('Your calendar is not connected.', 'leadin')
-    : __('Calendar is not connected.', 'leadin');
+    ? __('Your calendar is not connected', 'leadin')
+    : __('Calendar is not connected', 'leadin');
   const titleMessage = isMeetingOwner
     ? __(
-        'Please connect your calendar to activate your scheduling pages.',
+        'Please connect your calendar to activate your scheduling pages',
         'leadin'
       )
     : __(
-        'Make sure that everybody in this meeting has connected their calendar from the Meetings page in HubSpot.',
+        'Make sure that everybody in this meeting has connected their calendar from the Meetings page in HubSpot',
         'leadin'
       );
   return (
@@ -45,9 +43,7 @@ export default function MeetingWarning({
       {isMeetingOwner && (
         <ElementorButton
           id="meetings-connect-calendar"
-          onClick={() =>
-            leadinConnectCalendar({ hubspotBaseUrl, portalId, triggerReload })
-          }
+          onClick={onConnectCalendar}
         >
           {__('Connect calendar', 'leadin')}
         </ElementorButton>

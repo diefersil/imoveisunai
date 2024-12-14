@@ -4,7 +4,7 @@ namespace Leadin\admin;
 
 use Leadin\data\User;
 use Leadin\admin\Connection;
-use Leadin\admin\ReviewController;
+use Leadin\data\User_Metadata;
 use Leadin\admin\AdminConstants;
 use Leadin\admin\ReviewBanner;
 
@@ -12,6 +12,7 @@ use Leadin\admin\ReviewBanner;
  * Class responsible for rendering the admin notices.
  */
 class NoticeManager {
+
 
 	/**
 	 * Class constructor, adds the necessary hooks.
@@ -30,11 +31,12 @@ class NoticeManager {
 					<img src="<?php echo esc_attr( LEADIN_ASSETS_PATH . '/images/sprocket.svg' ); ?>" height="16" style="margin-bottom: -3px" />
 					&nbsp;
 					<?php
-						echo sprintf(
-							esc_html( __( 'The HubSpot plugin isn’t connected right now. To use HubSpot tools on your WordPress site, %1$sconnect the plugin now%2$s.', 'leadin' ) ),
-							'<a class="leadin-banner__link" href="admin.php?page=leadin&bannerClick=true">',
-							'</a>'
-						);
+					echo sprintf(
+						/* translators: %1$s: HTML anchor opening tag %2$s: HTML anchor closing tag */
+						esc_html( __( 'The HubSpot plugin is not connected right now To use HubSpot tools on your WordPress site, %1$sconnect the plugin now%2$s', 'leadin' ) ),
+						'<a class="leadin-banner__link" href="admin.php?page=leadin&bannerClick=true">',
+						'</a>'
+					);
 					?>
 				</p>
 			</div>
@@ -70,9 +72,8 @@ class NoticeManager {
 	public function should_show_review_notice() {
 		$current_screen = get_current_screen();
 		$is_dashboard   = 'index' === $current_screen->parent_base;
-		return $is_dashboard && Connection::is_connected() &&
-		! ReviewController::is_reviewed_or_skipped() && ReviewController::is_after_introductary_period()
-		&& ReviewController::has_contacts_created_since_activation();
+		$is_not_skipped = empty( User_Metadata::get_skip_review() );
+		return $is_dashboard && Connection::is_connected() && $is_not_skipped;
 	}
 
 }

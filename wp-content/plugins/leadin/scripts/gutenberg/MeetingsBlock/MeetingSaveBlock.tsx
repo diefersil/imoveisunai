@@ -1,17 +1,21 @@
 import React from 'react';
 import { RawHTML } from '@wordpress/element';
-import { useBlockProps } from '@wordpress/block-editor';
 import { IMeetingBlockAttributes } from './registerMeetingBlock';
+
+import useCustomCssBlockProps from '../Common/useCustomCssBlockProps';
+
+const DefaultCssClasses = 'wp-block-leadin-hubspot-meeting-block';
 
 export default function MeetingSaveBlock({
   attributes,
 }: IMeetingBlockAttributes) {
   const { url } = attributes;
+  const blockProps = useCustomCssBlockProps(DefaultCssClasses);
 
   if (url) {
     return (
       <RawHTML
-        {...useBlockProps.save()}
+        {...blockProps}
       >{`[hubspot url="${url}" type="meeting"]`}</RawHTML>
     );
   }

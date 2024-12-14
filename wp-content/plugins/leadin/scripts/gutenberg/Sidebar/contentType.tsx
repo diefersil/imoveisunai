@@ -1,5 +1,5 @@
 import React from 'react';
-import { registerPlugin } from '@wordpress/plugins';
+import * as WpPluginsLib from '@wordpress/plugins';
 import { PluginSidebar } from '@wordpress/edit-post';
 import { PanelBody, Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
@@ -7,6 +7,10 @@ import UISidebarSelectControl from '../UIComponents/UISidebarSelectControl';
 import SidebarSprocketIcon from '../Common/SidebarSprocketIcon';
 import styled from 'styled-components';
 import { __ } from '@wordpress/i18n';
+import { BackgroudAppContext } from '../../iframe/useBackgroundApp';
+import { refreshToken } from '../../constants/leadinConfig';
+import { getOrCreateBackgroundApp } from '../../utils/backgroundAppUtils';
+import { isFullSiteEditor } from '../../utils/withMetaData';
 
 export function registerHubspotSidebar() {
   const ContentTypeLabelStyle = styled.div`
@@ -17,14 +21,14 @@ export function registerHubspotSidebar() {
   const ContentTypeLabel = (
     <ContentTypeLabelStyle>
       {__(
-        'Select the content type HubSpot Analytics uses to track this page.',
+        'Select the content type HubSpot Analytics uses to track this page',
         'leadin'
       )}
     </ContentTypeLabelStyle>
   );
 
   const LeadinPluginSidebar = ({ postType }: { postType: string }) =>
-    postType ? (
+    postType && !isFullSiteEditor() ? (
       <PluginSidebar
         name="leadin"
         title="HubSpot"
@@ -36,22 +40,29 @@ export function registerHubspotSidebar() {
         }
       >
         <PanelBody title={__('HubSpot Analytics', 'leadin')} initialOpen={true}>
-          <UISidebarSelectControl
-            metaKey="content-type"
-            className="select-content-type"
-            label={ContentTypeLabel}
-            options={[
-              { label: __('Detect Automatically', 'leadin'), value: '' },
-              { label: __('Blog Post', 'leadin'), value: 'blog-post' },
-              {
-                label: __('Knowledge Article', 'leadin'),
-                value: 'knowledge-article',
-              },
-              { label: __('Landing Page', 'leadin'), value: 'landing-page' },
-              { label: __('Listing Page', 'leadin'), value: 'listing-page' },
-              { label: __('Standard Page', 'leadin'), value: 'standard-page' },
-            ]}
-          />
+          <BackgroudAppContext.Provider
+            value={refreshToken && getOrCreateBackgroundApp(refreshToken)}
+          >
+            <UISidebarSelectControl
+              metaKey="content-type"
+              className="select-content-type"
+              label={ContentTypeLabel}
+              options={[
+                { label: __('Detect Automatically', 'leadin'), value: '' },
+                { label: __('Blog Post', 'leadin'), value: 'blog-post' },
+                {
+                  label: __('Knowledge Article', 'leadin'),
+                  value: 'knowledge-article',
+                },
+                { label: __('Landing Page', 'leadin'), value: 'landing-page' },
+                { label: __('Listing Page', 'leadin'), value: 'listing-page' },
+                {
+                  label: __('Standard Page', 'leadin'),
+                  value: 'standard-page',
+                },
+              ]}
+            />
+          </BackgroudAppContext.Provider>
         </PanelBody>
       </PluginSidebar>
     ) : null;
@@ -64,9 +75,10 @@ export function registerHubspotSidebar() {
         data.getEditedPostAttribute('meta'),
     };
   })(LeadinPluginSidebar);
-
-  registerPlugin('leadin', {
-    render: LeadinPluginSidebarWrapper,
-    icon: SidebarSprocketIcon,
-  });
+  if (WpPluginsLib) {
+    WpPluginsLib.registerPlugin('leadin', {
+      render: LeadinPluginSidebarWrapper,
+      icon: SidebarSprocketIcon,
+    });
+  }
 }

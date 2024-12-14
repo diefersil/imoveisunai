@@ -13,7 +13,6 @@ use Leadin\auth\OAuth;
 class Connection {
 
 	const CONNECT_KEYS = array(
-		'access_token',
 		'refresh_token',
 		'expires_in',
 		'portal_id',
@@ -29,16 +28,7 @@ class Connection {
 	 * Returns true if a portal has been connected to the plugin
 	 */
 	public static function is_connected() {
-		return ! empty( Portal_Options::get_portal_id() );
-	}
-
-	/**
-	 * Returns true if existing portal is the same into a connect attempt
-	 */
-	public static function is_same_portal() {
-		$connect_params = QueryParameters::get_parameters( self::CONNECT_KEYS, 'hubspot-nonce', self::CONNECT_NONCE_ARG );
-		$portal_id      = $connect_params['portal_id'];
-		return Portal_Options::get_portal_id() === $portal_id;
+		return ! empty( Portal_Options::get_portal_id() ) && ! empty( OAuth::get_refresh_token() );
 	}
 
 	/**
@@ -46,9 +36,9 @@ class Connection {
 	 */
 	public static function is_connection_requested() {
 		$maybe_leadin_connect = QueryParameters::get_param( self::CONNECT_NONCE_ARG, 'hubspot-nonce', self::CONNECT_NONCE_ARG );
-		$maybe_access_token   = QueryParameters::get_param( 'access_token', 'hubspot-nonce', self::CONNECT_NONCE_ARG );
+		$maybe_refresh_token  = QueryParameters::get_param( 'refresh_token', 'hubspot-nonce', self::CONNECT_NONCE_ARG );
 
-		return isset( $maybe_leadin_connect ) && isset( $maybe_access_token );
+		return isset( $maybe_leadin_connect ) && isset( $maybe_refresh_token );
 	}
 
 	/**
@@ -120,16 +110,21 @@ class Connection {
 			$connect_params['hublet']
 		);
 
-		OAuth::authorize( $connect_params['access_token'], $connect_params['refresh_token'], $connect_params['expires_in'] );
+		OAuth::authorize( $connect_params['refresh_token'] );
 	}
 
 	/**
 	 * Removes portal id and domain from the WordPress options.
 	 */
 	public static function disconnect() {
+		Portal_Options::set_last_disconnect_time();
+
 		self::delete_portal_info();
 
-		$users = get_users( array( 'fields' => array( 'ID' ) ) );
+		$users = get_users(
+			array( 'role__in' => array( 'administrator', 'editor' ) ),
+			array( 'fields' => array( 'ID' ) )
+		);
 		foreach ( $users as $user ) {
 			delete_user_meta( $user->ID, 'leadin_email' );
 			delete_user_meta( $user->ID, 'leadin_skip_review' );

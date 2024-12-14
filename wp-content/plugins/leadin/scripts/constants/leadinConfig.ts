@@ -2,14 +2,18 @@ interface KeyStringObject {
   [key: string]: string;
 }
 
-interface Routes {
-  [key: string]: string | KeyStringObject;
-}
+export type ContentEmbedDetails = {
+  activated: boolean;
+  installed: boolean;
+  canActivate: boolean;
+  canInstall: boolean;
+  nonce: string;
+};
 
-interface LeadinConfig {
+export interface LeadinConfig {
   accountName: string;
   adminUrl: string;
-  backgroundIframeUrl: string;
+  activationTime: string;
   connectionStatus?: 'Connected' | 'NotConnected';
   deviceId: string;
   didDisconnect: '1' | '0';
@@ -19,13 +23,16 @@ interface LeadinConfig {
   formsScriptPayload: string;
   hublet: string;
   hubspotBaseUrl: string;
+  hubspotNonce: string;
   iframeUrl: string;
   impactLink?: string;
+  lastAuthorizeTime: string;
+  lastDeauthorizeTime: string;
+  lastDisconnectTime: string;
   leadinPluginVersion: string;
-  leadinQueryParamsKeys: string[];
+  leadinQueryParams: KeyStringObject;
   loginUrl: string;
   locale: string;
-  oauth?: 'true';
   phpVersion: string;
   pluginPath: string;
   plugins: KeyStringObject;
@@ -36,17 +43,19 @@ interface LeadinConfig {
   restNonce: string;
   restUrl: string;
   reviewSkippedDate: string;
-  routeNonce: string;
-  routes: Routes;
+  refreshToken?: string;
   theme: string;
-  trackConsent?: boolean;
+  trackConsent?: boolean | string;
   wpVersion: string;
+  contentEmbed: ContentEmbedDetails;
+  requiresContentEmbedScope?: boolean;
+  decryptError?: string;
 }
 
 const {
   accountName,
   adminUrl,
-  backgroundIframeUrl,
+  activationTime,
   connectionStatus,
   deviceId,
   didDisconnect,
@@ -56,13 +65,16 @@ const {
   formsScriptPayload,
   hublet,
   hubspotBaseUrl,
+  hubspotNonce,
   iframeUrl,
   impactLink,
+  lastAuthorizeTime,
+  lastDeauthorizeTime,
+  lastDisconnectTime,
   leadinPluginVersion,
-  leadinQueryParamsKeys,
+  leadinQueryParams,
   locale,
   loginUrl,
-  oauth,
   phpVersion,
   pluginPath,
   plugins,
@@ -72,19 +84,21 @@ const {
   redirectNonce,
   restNonce,
   restUrl,
+  refreshToken,
   reviewSkippedDate,
-  routeNonce,
-  routes,
   theme,
   trackConsent,
   wpVersion,
+  contentEmbed,
+  requiresContentEmbedScope,
+  decryptError,
 }: //@ts-expect-error global
 LeadinConfig = window.leadinConfig;
 
 export {
   accountName,
   adminUrl,
-  backgroundIframeUrl,
+  activationTime,
   connectionStatus,
   deviceId,
   didDisconnect,
@@ -94,13 +108,16 @@ export {
   formsScriptPayload,
   hublet,
   hubspotBaseUrl,
+  hubspotNonce,
   iframeUrl,
   impactLink,
+  lastAuthorizeTime,
+  lastDeauthorizeTime,
+  lastDisconnectTime,
   leadinPluginVersion,
-  leadinQueryParamsKeys,
+  leadinQueryParams,
   loginUrl,
   locale,
-  oauth,
   phpVersion,
   pluginPath,
   plugins,
@@ -110,10 +127,12 @@ export {
   redirectNonce,
   restNonce,
   restUrl,
+  refreshToken,
   reviewSkippedDate,
-  routeNonce,
-  routes,
   theme,
   trackConsent,
   wpVersion,
+  contentEmbed,
+  requiresContentEmbedScope,
+  decryptError,
 };

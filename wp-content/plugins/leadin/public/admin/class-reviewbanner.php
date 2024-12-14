@@ -11,6 +11,7 @@ use Leadin\AssetsManager;
  */
 class ReviewBanner {
 
+
 	/**
 	 * Constructor enqueues scripts for tracking events and creates background leadin iframe
 	 */
@@ -23,17 +24,21 @@ class ReviewBanner {
 	 */
 	public function leadin_render_review_banner() {
 		$nonce               = wp_create_nonce( 'leadin-review' );
-		$dismiss_notice_text = __( 'Dismiss this notice.', 'leadin' );
-		$hello_text          = sprintf(
+		$dismiss_notice_text = __( 'Dismiss this notice', 'leadin' );
+
+		$hello_text = sprintf(
+			/* translators: %1$s: Current user name or nickname */
 			__( 'Hey %1$s,', 'leadin' ),
 			User_Metadata::get_first_name() ? User_Metadata::get_first_name() : User_Metadata::get_nickname()
 		);
-		$notice_text         = __( 'Have you got 2 minutes to complete %1$sthis survey%2$s about the HubSpot for WordPress plugin?', 'leadin' );
-		$feedback_text       = __( 'We read every response. Your feedback helps our team make the improvements that you need the most.', 'leadin' );
-		$from_hubspot_text   = __( 'HubSpot for WordPress Team', 'leadin' );
-		$thanks_message      = __( 'Thanks,', 'leadin' );
+
+		/* translators: %1$s: HTML anchor opening tag %2$s: HTML anchor closing tag */
+		$notice_text       = __( 'Have you got 2 minutes to complete %1$sthis survey%2$s about the HubSpot for WordPress plugin?', 'leadin' );
+		$feedback_text     = __( 'We read every response Your feedback helps our team make the improvements that you need the most', 'leadin' );
+		$from_hubspot_text = __( 'HubSpot for WordPress Team', 'leadin' );
+		$thanks_message    = __( 'Thanks,', 'leadin' );
 		?>
-			<div id="leadin-review-banner" class="leadin-banner leadin-review-banner notice notice-warning">
+			<div id="leadin-review-banner" class="leadin-banner leadin-review-banner leadin-review-banner--hide notice notice-warning">
 
 				<a href="?leadin_review=false&_wpnonce=<?php echo esc_html( $nonce ); ?>"
 					id="dismiss-review-banner-button">
