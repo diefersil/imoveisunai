@@ -5,8 +5,9 @@ use Elementor\Controls_Manager;
 use Elementor\Utils;
 use ElementorPro\Base\Module_Base;
 use ElementorPro\License\API;
+use ElementorPro\Modules\DisplayConditions\Classes\Experiments;
+use ElementorPro\Modules\DisplayConditions\Classes\Or_Condition;
 use ElementorPro\Plugin;
-use Elementor\Core\Experiments\Manager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -15,16 +16,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Module extends Module_Base {
 
 	private $hidden_elements_ids = array();
+
 	const LICENSE_FEATURE_NAME = 'display-conditions';
 
 	public function __construct() {
 		parent::__construct();
 
-		if ( self::can_use_display_conditions() ) {
-			$this->maybe_add_actions_and_components();
-		} else {
+		if ( ! self::can_use_display_conditions() ) {
 			$this->add_common_actions();
+			return;
 		}
+
+		$this->register_display_conditions_experiments();
+		$this->maybe_add_actions_and_components();
 	}
 
 	public static function is_experiment_active(): bool {
@@ -39,6 +43,7 @@ class Module extends Module_Base {
 		$this->add_render_actions();
 
 		add_action( 'elementor/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
+		add_filter( 'elementor/element/is_dynamic_content', [ $this, 'filter_element_caching_is_dynamic_content' ], 10, 3 );
 	}
 
 	private function add_components() {
@@ -173,28 +178,15 @@ class Module extends Module_Base {
 	public function before_element_render( $element ) {
 		$settings   = $element->get_settings_for_display();
 		$is_visible = true;
+		$saved_conditions = $this->get_saved_conditions( $settings );
 
-		if ( empty( $settings['e_display_conditions'] ) || Plugin::elementor()->editor->is_edit_mode() ) {
+		if ( empty( $settings['e_display_conditions'] ) || Plugin::elementor()->editor->is_edit_mode() || empty( $saved_conditions ) ) {
 			return $is_visible;
 		}
 
-		$conditions_manager = $this->get_conditions_manager();
-		$conditions = $this->get_saved_conditions( $settings );
-
-		foreach ( $conditions as $options ) {
-			if ( ! isset( $options['condition'] ) ) {
-				continue;
-			}
-
-			$condition_instance = $conditions_manager->get_condition( $options['condition'] );
-
-			if ( ! $condition_instance || $condition_instance->check( $options ) ) {
-				continue;
-			}
-
-			$is_visible = false;
-			break;
-		}
+		$saved_conditions = $this->get_converted_conditions( $saved_conditions );
+		$saved_conditions = new Or_Condition( $this->get_conditions_manager(), $saved_conditions );
+		$is_visible = $saved_conditions->check();
 
 		if ( ! $is_visible ) {
 			add_filter( 'elementor/element/get_child_type', '__return_false' ); // Prevent getting content of inner elements.
@@ -213,28 +205,12 @@ class Module extends Module_Base {
 		remove_filter( 'elementor/frontend/' . $element->get_type() . '/should_render', '__return_false' );
 	}
 
-	public static function get_experimental_data() {
+	public function register_display_conditions_experiments() {
 		if ( ! self::can_use_display_conditions() ) {
-			return [];
+			return;
 		}
 
-		$experiment_data = [
-			'name'           => self::LICENSE_FEATURE_NAME,
-			'title'          => esc_html__( 'Display Conditions', 'elementor-pro' ),
-			'description' => sprintf(
-			/* translators: 1: opening link tag, 2: closing link tag, 3: line break, 4: opening span tag, 5: closing span tag. */
-				esc_html__( 'Define one or multiple conditions per widget, controlling when they\'re visible. Widgets will only appear on the front end if these conditions are met. It\'s ideal for showing content to specific audiences based on time, date, user role, and more. %1$sLearn More%2$s%3$s%4$sRequires: Elementor version 3.19%5$s', 'elementor-pro' ),
-				'<a href="https://go.elementor.com/wp-dash-display-conditions/" target="_blank">',
-				'</a>',
-				'<br>',
-				'<span style="display: block; font-weight: 700; color: #21759b; font-style: italic; line-height: 18px; padding-block-start: 10px; margin-block-end: -5px;">',
-				'</span>',
-			),
-			'release_status' => Manager::RELEASE_STATUS_ALPHA,
-			'default'        => Manager::STATE_INACTIVE,
-		];
-
-		return $experiment_data;
+		Experiments::register_dc_experiment();
 	}
 
 	/**
@@ -258,11 +234,23 @@ class Module extends Module_Base {
 		$ajax_manager->register_ajax_action( 'display_conditions_set_cache_notice_status', [ $this->get_component( 'cache_notice' ), 'set_notice_status' ] );
 	}
 
+	public function filter_element_caching_is_dynamic_content( $is_dynamic_content, $element_rqw_data, $element_instance ) {
+		if ( ! empty( $element_rqw_data['settings']['e_display_conditions'] ) ) {
+			$is_dynamic_content = true;
+		}
+
+		return $is_dynamic_content;
+	}
+
 	/**
 	 * @return bool
 	 */
 	public static function can_use_display_conditions(): bool {
-		return API::is_license_active() && API::is_licence_has_feature( self::LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK );
+		if ( is_admin() ) {
+			return API::is_license_active() && API::is_licence_has_feature( self::LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK );
+		}
+
+		return API::is_licence_has_feature( self::LICENSE_FEATURE_NAME, API::BC_VALIDATION_CALLBACK );
 	}
 
 	/**
@@ -274,5 +262,16 @@ class Module extends Module_Base {
 			$this->add_actions();
 			$this->add_components();
 		}
+	}
+
+	private function get_converted_conditions( $conditions ) {
+		foreach ( $conditions as $condition ) {
+			if ( ! isset( $condition['condition'] ) ) {
+				return $conditions;
+			}
+		}
+		return count( $conditions )
+			? [ $conditions ]
+			: [];
 	}
 }

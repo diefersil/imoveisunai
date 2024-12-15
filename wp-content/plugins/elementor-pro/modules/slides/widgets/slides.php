@@ -11,6 +11,7 @@ use Elementor\Repeater;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
 use ElementorPro\Plugin;
+use ElementorPro\Modules\Slides\Controls\Control_Slides_Animation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -36,6 +37,24 @@ class Slides extends Base_Widget {
 
 	public function get_script_depends() {
 		return [ 'imagesloaded' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'e-swiper', 'widget-slides' ];
 	}
 
 	public static function get_button_sizes() {
@@ -279,7 +298,6 @@ class Slides extends Base_Widget {
 			[
 				'label' => esc_html__( 'Link', 'elementor-pro' ),
 				'type' => Controls_Manager::URL,
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 				'dynamic' => [
 					'active' => true,
 				],
@@ -701,32 +719,8 @@ class Slides extends Base_Widget {
 			'content_animation',
 			[
 				'label' => esc_html__( 'Content Animation', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT,
+				'type' => Control_Slides_Animation::TYPE,
 				'default' => 'fadeInUp',
-				'options' => [
-					'' => esc_html__( 'None', 'elementor-pro' ),
-					'fadeInDown' => esc_html__( 'Down', 'elementor-pro' ),
-					'fadeInUp' => esc_html__( 'Up', 'elementor-pro' ),
-					'fadeInRight' => esc_html__( 'Right', 'elementor-pro' ),
-					'fadeInLeft' => esc_html__( 'Left', 'elementor-pro' ),
-					'zoomIn' => esc_html__( 'Zoom', 'elementor-pro' ),
-				],
-				'assets' => [
-					'styles' => [
-						[
-							'name' => 'e-animations',
-							'conditions' => [
-								'terms' => [
-									[
-										'name' => 'content_animation',
-										'operator' => '!==',
-										'value' => '',
-									],
-								],
-							],
-						],
-					],
-				],
 			]
 		);
 
@@ -1148,6 +1142,21 @@ class Slides extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'button_hover_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-slide-button' => 'transition-duration: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
@@ -1392,9 +1401,9 @@ class Slides extends Base_Widget {
 				$ken_class = ' elementor-ken-burns elementor-ken-burns--' . $slide['zoom_direction'];
 			}
 
-			$slide_html = '<div class="swiper-slide-bg' . $ken_class . '" role="img"></div>' . $slide_html;
+			$slide_html = '<div class="swiper-slide-bg' . esc_attr( $ken_class ) . '" role="img"></div>' . $slide_html;
 
-			$slides[] = '<div class="elementor-repeater-item-' . $slide['_id'] . ' swiper-slide">' . $slide_html . '</div>';
+			$slides[] = '<div class="elementor-repeater-item-' . esc_attr( $slide['_id'] ) . ' swiper-slide">' . $slide_html . '</div>';
 			$slide_count++;
 		}
 
@@ -1457,12 +1466,12 @@ class Slides extends Base_Widget {
 			<div class="elementor-slides-wrapper elementor-main-swiper {{ elementorFrontend.config.swiperClass }}" dir="{{ direction }}" data-animation="{{ settings.content_animation }}">
 				<div class="swiper-wrapper elementor-slides">
 					<# jQuery.each( settings.slides, function( index, slide ) { #>
-						<div class="elementor-repeater-item-{{ slide._id }} swiper-slide">
+						<div class="elementor-repeater-item-{{ _.escape( slide._id ) }} swiper-slide">
 							<#
 							var kenClass = '';
 
 							if ( '' != slide.background_ken_burns ) {
-								kenClass = ' elementor-ken-burns elementor-ken-burns--' + slide.zoom_direction;
+								kenClass = ' elementor-ken-burns elementor-ken-burns--' + _.escape( slide.zoom_direction );
 							}
 							#>
 							<div class="swiper-slide-bg{{ kenClass }}" role="img"></div>

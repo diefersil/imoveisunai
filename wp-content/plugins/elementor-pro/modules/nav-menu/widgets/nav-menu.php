@@ -43,6 +43,20 @@ class Nav_Menu extends Base_Widget {
 		return [ 'smartmenus' ];
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-nav-menu' ];
+	}
+
 	protected function get_nav_menu_index() {
 		return $this->nav_menu_index++;
 	}
@@ -65,6 +79,15 @@ class Nav_Menu extends Base_Widget {
 			'section_layout',
 			[
 				'label' => esc_html__( 'Layout', 'elementor-pro' ),
+			]
+		);
+
+		$this->add_control(
+			'menu_name',
+			[
+				'label' => esc_html__( 'Menu Name', 'elementor-pro' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Menu', 'elementor-pro' ),
 			]
 		);
 
@@ -92,16 +115,16 @@ class Nav_Menu extends Base_Widget {
 			$this->add_control(
 				'menu',
 				[
-					'type' => Controls_Manager::RAW_HTML,
-					'raw' => '<strong>' . esc_html__( 'There are no menus in your site.', 'elementor-pro' ) . '</strong><br>' .
-							sprintf(
-								/* translators: 1: Link opening tag, 2: Link closing tag. */
-								esc_html__( 'Go to the %1$sMenus screen%2$s to create one.', 'elementor-pro' ),
-								sprintf( '<a href="%s" target="_blank">', admin_url( 'nav-menus.php?action=edit&menu=0' ) ),
-								'</a>'
-							),
+					'type' => Controls_Manager::ALERT,
+					'alert_type' => 'info',
+					'heading' => esc_html__( 'There are no menus in your site.', 'elementor-pro' ),
+					'content' => sprintf(
+						/* translators: 1: Link opening tag, 2: Link closing tag. */
+						esc_html__( 'Go to the %1$sMenus screen%2$s to create one.', 'elementor-pro' ),
+						sprintf( '<a href="%s" target="_blank">', admin_url( 'nav-menus.php?action=edit&menu=0' ) ),
+						'</a>'
+					),
 					'separator' => 'after',
-					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 				]
 			);
 		}
@@ -1007,7 +1030,6 @@ class Nav_Menu extends Base_Widget {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-nav-menu--dropdown' => 'background-color: {{VALUE}}',
 				],
-				'separator' => 'none',
 			]
 		);
 
@@ -1046,7 +1068,6 @@ class Nav_Menu extends Base_Widget {
 					{{WRAPPER}} .elementor-nav-menu--dropdown a.elementor-item-active,
 					{{WRAPPER}} .elementor-nav-menu--dropdown a.highlighted' => 'background-color: {{VALUE}}',
 				],
-				'separator' => 'none',
 			]
 		);
 
@@ -1080,7 +1101,6 @@ class Nav_Menu extends Base_Widget {
 				'selectors' => [
 					'{{WRAPPER}} .elementor-nav-menu--dropdown a.elementor-item-active' => 'background-color: {{VALUE}}',
 				],
-				'separator' => 'none',
 			]
 		);
 
@@ -1467,6 +1487,10 @@ class Nav_Menu extends Base_Widget {
 
 		if ( empty( $menu_html ) ) {
 			return;
+		}
+
+		if ( $settings['menu_name'] ) {
+			$this->add_render_attribute( 'main-menu', 'aria-label', $settings['menu_name'] );
 		}
 
 		$is_migrated = isset( $settings['__fa4_migrated']['submenu_icon'] );

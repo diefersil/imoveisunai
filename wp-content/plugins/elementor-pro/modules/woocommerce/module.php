@@ -3,6 +3,7 @@ namespace ElementorPro\Modules\Woocommerce;
 
 use Elementor\Widget_Base;
 use ElementorPro\Modules\Woocommerce\Skins\Skin_Loop_Product;
+use ElementorPro\Modules\Woocommerce\Skins\Skin_Loop_Product_Taxonomy;
 use ElementorPro\Core\Utils as ProUtils;
 use ElementorPro\Plugin;
 use ElementorPro\Base\Module_Base;
@@ -39,6 +40,7 @@ class Module extends Module_Base {
 	const SITE_SETTINGS_NOTICES_LICENSE_FEATURE_NAME = 'settings-woocommerce-notices';
 	const DYNAMIC_TAGS_LICENSE_FEATURE_NAME = 'dynamic-tags-wc';
 	const LOOP_PRODUCT_SKIN_ID = 'product';
+	const LOOP_PRODUCT_TAXONOMY_SKIN_ID = 'product_taxonomy';
 	const WC_PERSISTENT_SITE_SETTINGS = [
 		'woocommerce_cart_page_id',
 		'woocommerce_checkout_page_id',
@@ -247,9 +249,7 @@ class Module extends Module_Base {
 				<span class="elementor-button-text"><?php echo $sub_total; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 				<span class="elementor-button-icon">
 					<span class="elementor-button-icon-qty" data-counter="<?php echo esc_attr( $product_count ); ?>"><?php echo $product_count; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-					<?php
-					self::render_menu_icon( $settings, $icon );
-					?>
+					<?php self::render_menu_icon( $settings, $icon ); ?>
 					<span class="elementor-screen-only"><?php esc_html_e( 'Cart', 'elementor-pro' ); ?></span>
 				</span>
 			</a>
@@ -624,14 +624,16 @@ class Module extends Module_Base {
 				$wp_http_referer = wp_unslash( $post_data['_wp_http_referer'] );
 
 				$wp_http_referer_query_string = wp_parse_url( $wp_http_referer, PHP_URL_QUERY );
-				parse_str( $wp_http_referer_query_string, $wp_http_referer_query_string );
+				if ( ! empty( $wp_http_referer_query_string ) ) {
+					parse_str( $wp_http_referer_query_string, $wp_http_referer_query_string );
 
-				if ( isset( $wp_http_referer_query_string['elementorPageId'] ) ) {
-					$page_id = $wp_http_referer_query_string['elementorPageId'];
-				}
+					if ( isset( $wp_http_referer_query_string['elementorPageId'] ) ) {
+						$page_id = $wp_http_referer_query_string['elementorPageId'];
+					}
 
-				if ( isset( $wp_http_referer_query_string['elementorWidgetId'] ) ) {
-					$widget_id = $wp_http_referer_query_string['elementorWidgetId'];
+					if ( isset( $wp_http_referer_query_string['elementorWidgetId'] ) ) {
+						$widget_id = $wp_http_referer_query_string['elementorWidgetId'];
+					}
 				}
 			}
 		}
@@ -838,6 +840,14 @@ class Module extends Module_Base {
 		$this->add_products_to_options( $form, 'source' );
 	}
 
+	public function add_products_taxonomy_type_to_template_popup( $form ) {
+		$this->add_taxonomies_to_options( $form, '_elementor_source' );
+	}
+
+	public function add_products_taxonomy_type_to_loop_settings_query( $form ) {
+		$this->add_taxonomies_to_options( $form, 'source' );
+	}
+
 	public function e_cart_count_fragments( $fragments ) {
 		$product_count = WC()->cart->get_cart_contents_count();
 
@@ -864,6 +874,21 @@ class Module extends Module_Base {
 
 		$options = $controls['options'];
 		$options[ self::LOOP_PRODUCT_SKIN_ID ] = esc_html__( 'Products', 'elementor-pro' );
+
+		$form->update_control( $control_name, [
+			'options' => $options,
+		] );
+	}
+
+	protected function add_taxonomies_to_options( $form, $control_name ) {
+		$controls = $form->get_controls( $control_name );
+
+		if ( ! $controls || ! isset( $controls['options'] ) ) {
+			return;
+		}
+
+		$options = $controls['options'];
+		$options[ self::LOOP_PRODUCT_TAXONOMY_SKIN_ID ] = esc_html__( 'Product Taxonomy', 'elementor-pro' );
 
 		$form->update_control($control_name, [
 			'options' => $options,
@@ -1360,6 +1385,9 @@ class Module extends Module_Base {
 		add_action( 'elementor/template-library/create_new_dialog_fields', [ $this, 'add_products_type_to_template_popup' ], 11 );
 		add_action( 'elementor-pro/modules/loop-builder/documents/loop/query_settings', [ $this, 'add_products_type_to_loop_settings_query' ], 11 );
 
+		add_action( 'elementor/template-library/create_new_dialog_fields', [ $this, 'add_products_taxonomy_type_to_template_popup' ], 13 );
+		add_action( 'elementor-pro/modules/loop-builder/documents/loop/query_settings', [ $this, 'add_products_taxonomy_type_to_loop_settings_query' ], 13 );
+
 		$this->use_mini_cart_template = 'yes' === get_option( 'elementor_' . self::OPTION_NAME_USE_MINI_CART, 'no' );
 
 		if ( is_admin() ) {
@@ -1460,6 +1488,9 @@ class Module extends Module_Base {
 			add_action( 'elementor/widget/' . $widget_type . '/skins_init', function( Widget_Base $widget ) {
 				$widget->add_skin( new Skin_Loop_Product( $widget ) );
 			} );
+			add_action( 'elementor/widget/' . $widget_type . '/skins_init', function ( Widget_Base $widget ) {
+				$widget->add_skin( new Skin_Loop_Product_Taxonomy( $widget ) );
+			}, 13 );
 		}
 
 		// WooCommerce Notice Site Settings
@@ -1478,6 +1509,8 @@ class Module extends Module_Base {
 		add_filter( 'elementor/editor/localize_settings', function ( $config ) {
 			return $this->populate_persistent_settings( $config );
 		});
+
+		add_action( 'wp_enqueue_scripts', [ $this, 'register_style' ] );
 	}
 
 	public function add_system_status_data( $response, $system_status, $request ) {
@@ -1611,5 +1644,31 @@ class Module extends Module_Base {
 			self::WC_PERSISTENT_SITE_SETTINGS;
 
 		return $config;
+	}
+
+	/**
+	 * Get the base URL for assets.
+	 *
+	 * @return string
+	 */
+	public function get_assets_base_url(): string {
+		return ELEMENTOR_PRO_URL;
+	}
+
+	/**
+	 * Register styles.
+	 *
+	 * At build time, Elementor compiles `/modules/woocommerce/assets/scss/frontend.scss`
+	 * to `/assets/css/widget-woocommerce.min.css`.
+	 *
+	 * @return void
+	 */
+	public function register_style() {
+		wp_register_style(
+			'widget-woocommerce',
+			$this->get_css_assets_url( 'widget-woocommerce', null, true, true ),
+			[],
+			ELEMENTOR_PRO_VERSION
+		);
 	}
 }

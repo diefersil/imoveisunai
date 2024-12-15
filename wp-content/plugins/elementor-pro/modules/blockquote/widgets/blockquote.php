@@ -17,14 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Blockquote extends Base_Widget {
 
-	public function get_style_depends() {
-		if ( Icons_Manager::is_migration_allowed() ) {
-			return [ 'elementor-icons-fa-brands' ];
-		}
-
-		return [];
-	}
-
 	public function get_name() {
 		return 'blockquote';
 	}
@@ -37,8 +29,22 @@ class Blockquote extends Base_Widget {
 		return 'eicon-blockquote';
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	public function get_keywords() {
 		return [ 'blockquote', 'quote', 'paragraph', 'testimonial', 'text', 'twitter', 'tweet' ];
+	}
+
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-blockquote' ];
+
+		if ( Icons_Manager::is_migration_allowed() ) {
+			$style_depends[] = 'elementor-icons-fa-brands';
+		}
+
+		return $style_depends;
 	}
 
 	protected function register_controls() {
@@ -139,9 +145,9 @@ class Blockquote extends Base_Widget {
 				'label' => esc_html__( 'View', 'elementor-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
-					'icon-text' => 'Icon & Text',
-					'icon' => 'Icon',
-					'text' => 'Text',
+					'icon-text' => esc_html__( 'Icon & Text', 'elementor-pro' ),
+					'icon' => esc_html__( 'Icon', 'elementor-pro' ),
+					'text' => esc_html__( 'Text', 'elementor-pro' ),
 				],
 				'prefix_class' => 'elementor-blockquote--button-view-',
 				'default' => 'icon-text',
@@ -158,9 +164,9 @@ class Blockquote extends Base_Widget {
 				'label' => esc_html__( 'Skin', 'elementor-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
-					'classic' => 'Classic',
-					'bubble' => 'Bubble',
-					'link' => 'Link',
+					'classic' => esc_html__( 'Classic', 'elementor-pro' ),
+					'bubble' => esc_html__( 'Bubble', 'elementor-pro' ),
+					'link' => esc_html__( 'Link', 'elementor-pro' ),
 				],
 				'default' => 'classic',
 				'prefix_class' => 'elementor-blockquote--button-skin-',
@@ -493,6 +499,21 @@ class Blockquote extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'button_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-blockquote__tweet-button' => 'transition-duration: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
@@ -620,6 +641,21 @@ class Blockquote extends Base_Widget {
 				'selectors' => [
 					'body:not(.rtl) {{WRAPPER}} .elementor-blockquote:hover' => 'padding-left: {{SIZE}}{{UNIT}}',
 					'body.rtl {{WRAPPER}} .elementor-blockquote:hover' => 'padding-right: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'border_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-blockquote' => 'transition-duration: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -771,6 +807,21 @@ class Blockquote extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'box_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-blockquote' => 'transition-duration: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
@@ -837,6 +888,10 @@ class Blockquote extends Base_Widget {
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
+
+		if ( empty( $settings['blockquote_content'] ) && empty( $settings['author_name'] ) && 'yes' !== $settings['tweet_button'] ) {
+			return;
+		}
 
 		$tweet_button_view = $settings['tweet_button_view'];
 		$share_link = 'https://twitter.com/intent/tweet';
@@ -923,8 +978,12 @@ class Blockquote extends Base_Widget {
 	protected function content_template() {
 		?>
 		<#
-			var tweetButtonView = settings.tweet_button_view;
-			#>
+		if ( '' === settings.blockquote_content && '' === settings.author_name && 'yes' !== settings.tweet_button) {
+			return;
+		}
+
+		var tweetButtonView = settings.tweet_button_view;
+		#>
 			<blockquote class="elementor-blockquote">
 				<p class="elementor-blockquote__content elementor-inline-editing" data-elementor-setting-key="blockquote_content">
 					{{{ settings.blockquote_content }}}

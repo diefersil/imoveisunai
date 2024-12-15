@@ -30,6 +30,20 @@ class Reviews extends Base {
 		return [ 'reviews', 'social', 'rating', 'testimonial', 'carousel' ];
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'e-swiper', 'widget-carousel', 'widget-star-rating' ];
+	}
+
 	public function get_inline_css_depends() {
 		$slides = $this->get_settings_for_display( 'slides' );
 
@@ -651,6 +665,7 @@ class Reviews extends Base {
 						'stack-overflow',
 						'steam',
 						'telegram',
+						'threads',
 						'tripadvisor',
 						'tumblr',
 						'twitch',
@@ -661,6 +676,7 @@ class Reviews extends Base {
 						'weixin',
 						'whatsapp',
 						'wordpress',
+						'x-twitter',
 						'xing',
 						'yelp',
 						'youtube',
@@ -678,8 +694,6 @@ class Reviews extends Base {
 				'dynamic' => [
 					'active' => true,
 				],
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
-
 			]
 		);
 

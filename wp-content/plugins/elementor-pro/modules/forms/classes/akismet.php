@@ -34,16 +34,30 @@ class Akismet {
 		);
 
 		$form->add_control(
+			'akismet_enabled',
+			[
+				'label' => esc_html__( 'Akismet Spam Protection', 'elementor-pro' ),
+				'type' => Controls_Manager::SWITCHER,
+				'label_off' => esc_html__( 'Off', 'elementor-pro' ),
+				'label_on' => esc_html__( 'On', 'elementor-pro' ),
+				'default' => 'yes',
+			]
+		);
+
+		$form->add_control(
 			'akismet_info',
 			[
-				'type' => Controls_Manager::RAW_HTML,
-				'raw' => sprintf(
+				'type' => Controls_Manager::ALERT,
+				'alert_type' => 'info',
+				'content' => sprintf(
 					/* translators: 1: Link opening tag, 2: Link closing tag. */
 					esc_html__( 'Assign shortcodes to the fields below to enable spam protection on your form. %1$sShow me how%2$s', 'elementor-pro' ),
 					'<a href="http://go.elementor.com/widget-form-akismet/" target="_blank">',
 					'</a>'
 				),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition' => [
+					'akismet_enabled' => 'yes',
+				],
 			]
 		);
 
@@ -58,6 +72,9 @@ class Akismet {
 				],
 				'label_block' => true,
 				'render_type' => 'none',
+				'condition' => [
+					'akismet_enabled' => 'yes',
+				],
 			]
 		);
 
@@ -72,6 +89,9 @@ class Akismet {
 				],
 				'label_block' => true,
 				'render_type' => 'none',
+				'condition' => [
+					'akismet_enabled' => 'yes',
+				],
 			]
 		);
 
@@ -86,6 +106,9 @@ class Akismet {
 				],
 				'label_block' => true,
 				'render_type' => 'none',
+				'condition' => [
+					'akismet_enabled' => 'yes',
+				],
 			]
 		);
 
@@ -100,6 +123,9 @@ class Akismet {
 				],
 				'label_block' => true,
 				'render_type' => 'none',
+				'condition' => [
+					'akismet_enabled' => 'yes',
+				],
 			]
 		);
 
@@ -134,6 +160,10 @@ class Akismet {
 
 	private function is_spammed( Form_Record $record ) : bool {
 		$settings = $record->get( 'form_settings' );
+
+		if ( empty( $settings['akismet_enabled'] ) ) {
+			return false;
+		}
 
 		$params = [];
 

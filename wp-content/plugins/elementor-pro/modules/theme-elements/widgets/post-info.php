@@ -34,15 +34,15 @@ class Post_Info extends Base {
 		return [ 'post', 'info', 'date', 'time', 'author', 'taxonomy', 'comments', 'terms', 'avatar' ];
 	}
 
-	public function get_style_depends() {
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-theme-elements', 'widget-icon-list' ];
+
 		if ( Icons_Manager::is_migration_allowed() ) {
-			return [
-				'elementor-icons-fa-regular',
-				'elementor-icons-fa-solid',
-			];
+			$style_depends[] = 'elementor-icons-fa-regular';
+			$style_depends[] = 'elementor-icons-fa-solid';
 		}
 
-		return [];
+		return $style_depends;
 	}
 
 	public function get_inline_css_depends() {
@@ -991,7 +991,11 @@ class Post_Info extends Base {
 					[
 						'class' => 'elementor-avatar',
 						'src' => $item_data['image'],
-						'alt' => $item_data['text'],
+						'alt' => sprintf(
+							/* translators: %s: Author name. */
+							esc_attr__( 'Picture of %s', 'elementor-pro' ),
+							$item_data['text']
+						),
 						'loading' => 'lazy',
 					]
 				);
@@ -1031,9 +1035,18 @@ class Post_Info extends Base {
 				<?php
 				foreach ( $item_data['terms_list'] as $term ) :
 					if ( ! empty( $term['url'] ) ) :
-						$terms_list[] = '<a href="' . esc_attr( $term['url'] ) . '" class="' . $item_class . '">' . esc_html( $term['text'] ) . '</a>';
+						$terms_list[] = sprintf(
+							'<a href="%1$s" class="%2$s">%3$s</a>',
+							esc_url( $term['url'] ),
+							esc_attr( $item_class ),
+							esc_html( $term['text'] )
+						);
 					else :
-						$terms_list[] = '<span class="' . $item_class . '">' . esc_html( $term['text'] ) . '</span>';
+						$terms_list[] = sprintf(
+							'<span class="%1$s">%2$s</span>',
+							esc_attr( $item_class ),
+							esc_html( $term['text'] )
+						);
 					endif;
 				endforeach;
 
@@ -1043,12 +1056,17 @@ class Post_Info extends Base {
 				</span>
 			<?php else : ?>
 				<?php
-				echo wp_kses( $item_data['text'], [
+				$content = ( 'date' === $item_data['type'] || 'time' === $item_data['type'] )
+					? sprintf( '<time>%s</time>', $item_data['text'] )
+					: $item_data['text'];
+
+				echo wp_kses( $content, [
 					'a' => [
 						'href' => [],
 						'title' => [],
 						'rel' => [],
 					],
+					'time' => [],
 				] );
 				?>
 			<?php endif; ?>
