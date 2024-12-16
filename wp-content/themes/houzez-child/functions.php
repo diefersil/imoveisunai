@@ -1,5 +1,5 @@
 <?php
-//add_action('wp_footer','hide');
+add_action('wp_footer','hide');
 function hide(){
     if(is_page('my-profile')){?>
         <script type="text/javascript">
