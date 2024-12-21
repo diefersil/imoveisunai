@@ -57,7 +57,7 @@ Template: houzez
 /*--------------------------------------------------Imobiliárias-----------------------------------------*/
 /*Find Agent*/
 #houzez_agent_search-1{
-  display: none;
+  display: none !important;
 
 }
 
