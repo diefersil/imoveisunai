@@ -10,8 +10,8 @@ function hide(){
             document.querySelector("input[name='specialties']").parentNode.parentNode.style.display='none'
             document.querySelector("input[name='service_areas']").parentNode.parentNode.style.display='none'
             document.querySelector("input[name='usermobile']").parentNode.parentNode.style.display='none'
-            document.querySelector("input[name='title']").parentNode.parentNode.style.display='none'
-            document.querySelector('[name=display_name]').parentNode.parentNode.style.display='none'
+            //document.querySelector("input[name='title']").parentNode.parentNode.style.display='none'
+            //document.querySelector('[name=display_name]').parentNode.parentNode.style.display='none'
 
             document.querySelector("input[name='facebook']").parentNode.parentNode.style.display='none'
             document.querySelector("input[name='linkedin']").parentNode.parentNode.style.display='none'
