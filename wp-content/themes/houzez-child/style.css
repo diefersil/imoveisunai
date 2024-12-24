@@ -70,7 +70,7 @@ footer .item-price{
 
 
 /*------------------------------------Admin Area------------------------------------*/
-/*a[href="https://imoveisunai.com.br/favorite-properties/"],
+a[href="https://imoveisunai.com.br/favorite-properties/"],
 a[href="https://imoveisunai.com.br/invoices/"],
 a[href="https://imoveisunai.com.br/insights/"],
 a[href="https://imoveisunai.com.br/saved-search/"],
@@ -85,6 +85,6 @@ a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
 .clone-property,
 .property-author-wrap
 /*.put-on-hold*/
-/*{
+{
   display:none !important;
-}*/
+}
