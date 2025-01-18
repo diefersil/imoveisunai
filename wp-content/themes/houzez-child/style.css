@@ -61,8 +61,8 @@ Template: houzez
 
 }*/
 
-.agent-contacts-wrap .email{
-  display: none !important;
+.agent-contacts-wrap li.email {
+  display: none;
 }
 
 div#houzez_agent_search-1 {
