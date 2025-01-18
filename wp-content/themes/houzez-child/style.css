@@ -65,8 +65,8 @@ Template: houzez
   display: none !important;
 }
 
-#houzez_agent_search-1{
-  display: none !important;
+div#houzez_agent_search-1 {
+    display: none;
 }
 
 /*--------------------------------------------------------Footer------------------------------------------*/
