@@ -38,6 +38,11 @@ Template: houzez
   display: none !important;
 }
 
+.item-title{
+  text-transform: inherit !important;
+}
+
+
 
 /*-----------------------------------Header Search-------------------------------*/
 .advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
