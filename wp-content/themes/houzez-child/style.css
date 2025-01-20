@@ -40,8 +40,8 @@ Template: houzez
 
 .item-title{
   text-transform: inherit !important;
+  white-space: inherit;
 }
-
 
 
 /*-----------------------------------Header Search-------------------------------*/
