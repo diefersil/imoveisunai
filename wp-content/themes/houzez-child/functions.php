@@ -34,3 +34,17 @@ function hide(){
         </script>
     <?php }
 }
+
+
+add_action('wp_footer', 'ga');
+function ga(){?>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YSCEVGGKC3"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-YSCEVGGKC3');
+    </script>
+<?php }
