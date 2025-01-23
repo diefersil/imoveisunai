@@ -1,4 +1,6 @@
 <?php
+
+/*Esconder campos desnecessários no painel do usuário*/
 add_action('wp_footer','hide');
 function hide(){
     if(is_page('my-profile')){?>
