@@ -58,6 +58,13 @@ Template: houzez
   display: none !important;
 }*/
 
+/*--------------------------------------------------Single-----------------------------------------*/
+
+
+.single .page-title h1{
+  text-transform: inherit !important;
+}
+
 
 /*--------------------------------------------------Imobiliárias-----------------------------------------*/
 /*Find Agent*/
