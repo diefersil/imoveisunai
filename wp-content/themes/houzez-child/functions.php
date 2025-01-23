@@ -36,7 +36,7 @@ function hide(){
 }
 
 
-add_action('wp_footer', 'ga');
+add_action('wp_head', 'ga');
 function ga(){?>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YSCEVGGKC3"></script>
