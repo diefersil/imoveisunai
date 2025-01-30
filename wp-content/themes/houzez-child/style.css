@@ -43,6 +43,11 @@ Template: houzez
   white-space: inherit;
 }
 
+/*Altura imagem lista*/
+.img-fluid {
+  max-height: 265px !important;
+}
+
 
 /*-----------------------------------Header Search-------------------------------*/
 .advanced-search-nav, .search-expandable, .overlay-search-advanced-module {
