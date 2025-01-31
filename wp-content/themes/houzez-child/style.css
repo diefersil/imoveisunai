@@ -44,7 +44,7 @@ Template: houzez
 }
 
 /*Altura imagem lista*/
-.img-fluid {
+.home .img-fluid {
   max-height: 265px !important;
 }
 
