@@ -71,7 +71,11 @@ Template: houzez
 }
 
 /*Esconder campo Termos de Uso*/
-.hz-terms-of-use {
+.single .hz-terms-of-use {
+  display: none !important;
+}
+
+.single select[name='user_type']{
   display: none !important;
 }
 
