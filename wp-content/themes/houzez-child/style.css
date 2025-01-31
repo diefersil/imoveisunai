@@ -44,7 +44,7 @@ Template: houzez
 }
 
 /*Altura imagem lista*/
-.listing-view .img-fluid {
+.listing-view .img-fluid, .houzez_properties_viewed-2 .img-fluid  {
   max-height: 265px !important;
 }
 
