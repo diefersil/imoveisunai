@@ -79,6 +79,10 @@ Template: houzez
   display: none !important;
 }
 
+.single . .property-form .dropdown{
+  display: none !important;
+}
+
 
 /*--------------------------------------------------Imobiliárias-----------------------------------------*/
 /*Find Agent*/
