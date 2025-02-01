@@ -54,9 +54,11 @@ if( $key != false || $key != '' ) {
 									</div>
 								</li>
 								<?php } ?>
+								<?php if( houzez_option('agent_form_gallery') ){ ?>
 								<li class="list-inline-item btn-email">
 									<a href="#"><i class="houzez-icon icon-envelope"></i></a>
 								</li>
+								<?php } ?>
 							</ul>
 						</div><!-- lightbox-tools -->
 					</div><!-- d-flex -->

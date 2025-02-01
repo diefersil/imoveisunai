@@ -27,7 +27,7 @@ if( isset( $_GET['agent_form']) && $_GET['agent_form'] == 'yes' ) {
             dynamic_sidebar( 'single-property' );
         }
     } else {
-        if( $sidebar_meta['specific_sidebar'] == 'yes' ) {
+        if(isset($sidebar_meta['specific_sidebar']) && $sidebar_meta['specific_sidebar'] == 'yes' ) {
             if( is_active_sidebar( $sidebar_meta['selected_sidebar'] ) ) {
                 dynamic_sidebar( $sidebar_meta['selected_sidebar'] );
             }

@@ -108,6 +108,8 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
                                     $get_time = houzez_get_formatted_time($datetime_unix);
 
                                     $import_link = add_query_arg( array('hpage' => 'import-leads', 'file' => $file['name'], 'import' => 1 ), $dashboard_crm );
+
+                                    $delete_nonce = wp_create_nonce('delete_leads_csv_file_nonce');
                                 ?>
                                 <tr>
                                     <td data-label="<?php esc_html_e( 'File Name', 'houzez' ); ?>"><?php echo esc_html($file['name']); ?></td>
@@ -119,7 +121,7 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
                                             <button class="btn btn-primary-outlined dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php esc_html_e( 'Actions', 'houzez' ); ?></button>
                                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                                 <a class="dropdown-item" data-file="<?php echo esc_html($file['name']); ?>" href="<?php echo esc_url($import_link); ?>"><?php esc_html_e('Import', 'houzez'); ?></a>
-                                                <a class="delete-lead-csv-js dropdown-item" data-file="<?php echo esc_html($file['name']); ?>" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
+                                                <a class="delete-lead-csv-js dropdown-item" data-nonce="<?php echo esc_attr($delete_nonce); ?>" data-file="<?php echo esc_html($file['name']); ?>" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
                                             </div>
                                         </div>
                                     </td>

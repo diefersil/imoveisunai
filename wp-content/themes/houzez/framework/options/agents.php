@@ -241,6 +241,20 @@ Redux::setSection( $houzez_opt_name, array(
             ),
             'default' => 'default'
         ),
+
+        array(
+            'id'       => 'agent_listing_pagination',
+            'type'     => 'button_set',
+            'title'    => esc_html__( 'Pagination', 'houzez' ),
+            'subtitle' => '',
+            'default'  => '_loadmore',
+            'options' => array(
+                '_number' => esc_html__('Number', 'houzez'), 
+                '_loadmore' => esc_html__('Load More', 'houzez'), 
+                '_infinite' => esc_html__('Infinite Scroll', 'houzez'), 
+            ), 
+        ),
+
         array(
             'id'       => 'agent_stats',
             'type'     => 'switch',

@@ -22,6 +22,7 @@ if( ( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() && ! h
                 <div class="form-group">
                     <?php wp_nonce_field( 'houzez_role_pass_ajax_nonce', 'houzez-role-security-pass' );   ?>
                     <select name="houzez_user_role" id="houzez_user_role" class="selectpicker form-control" data-live-search="false" data-live-search-style="begins" title="">
+                        <option value=""><?php esc_html_e( 'Select Role', 'houzez' )?></option>
                         <?php
                         if( $show_hide_roles['agent'] != 1 ) {
                             echo '<option value="houzez_agent" '.selected( 'houzez_agent', $role  ).'> '.houzez_option('agent_role').' </option>';

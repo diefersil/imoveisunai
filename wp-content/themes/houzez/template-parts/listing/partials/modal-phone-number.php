@@ -1,5 +1,5 @@
 <?php 
-global $post, $listing_agent_info; 
+global $post, $random_token, $listing_agent_info; 
 $prop_id = houzez_get_listing_data('property_id');
 
 $agent_mobile = $listing_agent_info['agent_mobile'] ?? '';
@@ -7,7 +7,7 @@ $agent_mobile_call = $listing_agent_info['agent_mobile_call'] ?? '';
 
 if( ! empty( $agent_mobile ) ) {
 ?>
-<div class="modal fade modal-phone-number" id="call-action-<?php echo esc_attr($post->ID); ?>" tabindex="-1" role="dialog">
+<div class="modal fade modal-phone-number" id="call-action-<?php echo esc_attr($post->ID).'-'.$random_token; ?>" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

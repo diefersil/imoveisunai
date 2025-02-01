@@ -144,24 +144,24 @@ if( $show_similer ) {
         $properties_args['orderby'] = 'rand date';
     }
 
-	$wp_query = new WP_Query($properties_args);
+	$wpQry = new WP_Query($properties_args);
 
-	if ($wp_query->have_posts()) : ?>
+	if ($wpQry->have_posts()) : ?>
 		<div id="similar-listings-wrap" class="similar-property-wrap <?php echo esc_attr($wrap_class); ?>">
 			<div class="block-title-wrap">
 				<h2><?php echo houzez_option('sps_similar_listings', 'Similar Listings'); ?></h2>
 			</div><!-- block-title-wrap -->
 			<div class="listing-view <?php echo esc_attr($view_class); ?>">
 				<?php
-				while ($wp_query->have_posts()) : $wp_query->the_post();
+				while ($wpQry->have_posts()) : $wpQry->the_post();
 
 					get_template_part('template-parts/listing/item', $item_layout);
 
 				endwhile;
+                wp_reset_postdata();
 				?> 
 			</div><!-- listing-view -->
 		</div><!-- similar-property-wrap -->
 	<?php
 	endif;
-	wp_reset_query();
 }?>

@@ -60,8 +60,8 @@ class Houzez_Admin {
         if( class_exists('\HouzezStudio\Houzez_Studio') ) {
         	$sub_menus['houzez_studio'] = array( 
 	            'houzez_dashboard', 
-	            esc_html__( 'Header & Footer Builder', 'houzez' ),
-	            esc_html__( 'Header & Footer Builder', 'houzez' ),
+	            esc_html__( 'Theme Builder', 'houzez' ),
+	            esc_html__( 'Theme Builder', 'houzez' ),
 	            'edit_pages', 
 	            'edit.php?post_type=fts_builder',
 	        );

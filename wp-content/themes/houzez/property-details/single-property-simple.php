@@ -2,7 +2,7 @@
 global $post, $top_area, $map_street_view;
 
 $layout = houzez_option('property_blocks');
-$layout = $layout['enabled'];
+$layout = isset($layout['enabled']) ? $layout['enabled'] : [];
 
 if ($layout): foreach ($layout as $key=>$value) {
 

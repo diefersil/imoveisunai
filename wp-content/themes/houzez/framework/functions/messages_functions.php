@@ -1,5 +1,4 @@
 <?php
-add_action( 'wp_ajax_nopriv_houzez_start_thread', 'houzez_start_thread' );
 add_action( 'wp_ajax_houzez_start_thread', 'houzez_start_thread' );
 
 if ( !function_exists( 'houzez_start_thread' ) ) {
@@ -50,9 +49,7 @@ if ( !function_exists( 'houzez_start_thread' ) ) {
 
 }
 
-add_action( 'wp_ajax_nopriv_houzez_thread_message', 'houzez_thread_message' );
 add_action( 'wp_ajax_houzez_thread_message', 'houzez_thread_message' );
-
 if ( !function_exists( 'houzez_thread_message' ) ) {
 
 	function houzez_thread_message() {
@@ -422,7 +419,6 @@ if ( !function_exists( 'houzez_chcek_messages_notifications' ) ) {
 }
 
 add_action( 'wp_ajax_houzez_message_attacment_upload', 'houzez_message_attacment_upload' );    // only for logged in user
-add_action( 'wp_ajax_nopriv_houzez_message_attacment_upload', 'houzez_message_attacment_upload' );
 
 if( !function_exists( 'houzez_message_attacment_upload' ) ) {
 
@@ -479,39 +475,6 @@ if( !function_exists( 'houzez_message_attacment_upload' ) ) {
 
 }
 
-// houzez_remove_message_attachment
-add_action( 'wp_ajax_houzez_remove_message_attachment', 'houzez_remove_message_attachment' );
-add_action( 'wp_ajax_nopriv_houzez_remove_message_attachment', 'houzez_remove_message_attachment' );
-
-if ( !function_exists( 'houzez_remove_message_attachment' ) ) {
-	function houzez_remove_message_attachment() {
-
-
-		$attachment_removed = false;
-
-		if ( isset($_POST['thumbnail_id'] ) ) {
-
-			$attachment_id = intval( $_POST['thumbnail_id'] );
-
-			if ( $attachment_id > 0 ) {
-				$attachment_removed = wp_delete_attachment($attachment_id);
-			} elseif ($attachment_id > 0) {
-				if( false == wp_delete_attachment( $attachment_id )) {
-					$attachment_removed = false;
-				} else {
-					$attachment_removed = true;
-				}
-			}
-		}
-
-		$ajax_response = array(
-			'attachment_remove' => $attachment_removed,
-		);
-		echo json_encode($ajax_response);
-		wp_die();
-
-	}
-}
 
 add_filter( 'houzez_message_email_notification', 'houzez_message_email_notification_filter', 4, 9 );
 
@@ -624,7 +587,6 @@ if ( !function_exists( 'houzez_thread_email_notification_filter' ) ) {
 }
 
 add_action( 'wp_ajax_houzez_message_delete', 'houzez_message_delete' );    // only for logged in user
-add_action( 'wp_ajax_nopriv_houzez_message_delete', 'houzez_message_delete' );
 
 if ( !function_exists( 'houzez_message_delete' ) ) {
 	function houzez_message_delete()

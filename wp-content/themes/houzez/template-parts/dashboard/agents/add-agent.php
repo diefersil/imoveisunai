@@ -1,29 +1,4 @@
 <?php
-/*
-Fix glaring security issue that allows an agency to edit any user
-*/
-$agency_user_id = isset($_GET['id']) ? $_GET['id'] : '';
-$userID       = get_current_user_id();
-$wp_user_query = new WP_User_Query( array(
-    array( 'role' => 'houzez_agent' ),
-    'meta_key' => 'fave_agent_agency',
-    'meta_value' => $userID
-));
-$agents = $wp_user_query->get_results();
-$user_agents = [];
-foreach($agents as $agent){
-    array_push($user_agents, $agent->ID);
-}
-if (!in_array($agency_user_id, $user_agents)){
-    //echo 'You do not have access to this.';
-    //exit();
-    $_GET['id'] = null;
-}
-/*
-END
-*/
-
-
 $userID       = get_current_user_id();
 $dash_profile_link = houzez_get_template_link_2('template/user_dashboard_profile.php');
 $agency_agent_add = add_query_arg( 'agents', 'list', $dash_profile_link );
@@ -34,18 +9,6 @@ $action = 'houzez_agency_agent';
 $submit_id = 'houzez_agency_agent_register';
 
 $username = $user_email = $first_name = $last_name = $agency_user_agent_id = $agency_user_agent_id = '';
-$agency_user_id = isset($_GET['id']) ? $_GET['id'] : '';
-if(!empty($agency_user_id)) {
-    $first_name = get_user_meta($agency_user_id, 'first_name', true );
-    $last_name = get_user_meta($agency_user_id, 'last_name', true );
-    $agency_user_agent_id = get_user_meta($agency_user_id, 'fave_author_agent_id', true );
-    $user_meta = get_userdata( $agency_user_id );
-
-    $username = $user_meta->user_login;
-    $user_email = $user_meta->user_email;
-    $action = 'houzez_agency_agent_update';
-    $submit_id = 'houzez_agency_agent_update';
-}
 ?>
 <header class="header-main-wrap dashboard-header-main-wrap">
     <div class="dashboard-header-wrap">
@@ -61,14 +24,6 @@ if(!empty($agency_user_id)) {
 </header><!-- .header-main-wrap -->
 <section class="dashboard-content-wrap">
     <div class="dashboard-content-inner-wrap">
-        
-        <div id="aa_register_message">
-            <?php
-            if(!isset($_GET['id'])){
-                //echo '<div class="alert alert-danger" role="alert"><i class="houzez-icon icon-check-circle-1 mr-1"></i>'.esc_html__('You do not have access to this.', 'houzez').'</div>';
-            }
-            ?>
-        </div>
 
         <div class="dashboard-content-block-wrap">
             <div class="dashboard-content-block">
@@ -78,25 +33,25 @@ if(!empty($agency_user_id)) {
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group">
                                     <label for="aa_username"><?php esc_html_e('Username','houzez');?></label>
-                                    <input type="text" <?php if(!empty($agency_user_id)) { echo 'disabled'; } ?> name="aa_username" id="aa_username"  class="form-control" value="<?php echo esc_attr($username); ?>">
+                                    <input type="text" <?php if(!empty($agency_user_id)) { echo 'disabled'; } ?> name="aa_username" id="aa_username"  class="form-control" value="">
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group">
                                     <label for="aa_email"><?php esc_html_e('Email','houzez');?></label>
-                                    <input type="text" name="aa_email" id="aa_email"  class="form-control" value="<?php echo esc_attr($user_email); ?>">
+                                    <input type="text" name="aa_email" id="aa_email"  class="form-control" value="">
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group">
                                     <label for="aa_firstname"><?php esc_html_e('First Name','houzez');?></label>
-                                    <input type="text" name="aa_firstname" id="aa_firstname" class="form-control" value="<?php echo esc_attr($first_name); ?>">
+                                    <input type="text" name="aa_firstname" id="aa_firstname" class="form-control" value="">
                                 </div>
                             </div>
                             <div class="col-md-12 col-sm-12">
                                 <div class="form-group">
                                     <label for="aa_lastname"><?php esc_html_e('Last Name','houzez');?></label>
-                                    <input type="text" name="aa_lastname" id="aa_lastname" class="form-control" value="<?php echo esc_attr($last_name); ?>">
+                                    <input type="text" name="aa_lastname" id="aa_lastname" class="form-control" value="">
                                 </div>
                             </div>
 

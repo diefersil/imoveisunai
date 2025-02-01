@@ -23,13 +23,13 @@ $logo_id = get_post_meta(get_the_ID(), 'fave_testi_logo', true);
 	    <?php } ?>	
 
 		<div class="testimonial-info">
-			<?php echo $houzez_local['by_text']; ?> <strong><?php echo esc_attr($name); ?></strong><br>
-			<em>
+			<div class="testimonial-name"><?php echo esc_attr($name); ?></div>
+			<div class="testimonial-job">
 				<?php echo esc_attr($position);
 				if(!empty($company)){
 	            echo ', '. esc_attr($company); 
 	            } ?>
-            </em>
+			</div>
 		</div><!-- testimonial-info -->
 	</div><!-- d-flex -->
 </div><!-- testimonial-item -->

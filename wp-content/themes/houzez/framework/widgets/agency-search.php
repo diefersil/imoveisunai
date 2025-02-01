@@ -101,8 +101,7 @@ function houzez_agency_search_widget() {
 
     $houzez_local = houzez_get_localization();
 
-
-    $agency_name = isset ( $_GET['agency_name'] ) ? sanitize_text_field($_GET['agency_name']) : '';
+    $agency_name = isset($_GET['agency_name']) ? wp_kses(sanitize_text_field($_GET['agency_name']), array()) : '';
 
     $purl = get_post_type_archive_link("houzez_agency");
 
@@ -113,7 +112,7 @@ function houzez_agency_search_widget() {
             <form method="get" action="<?php echo esc_url($purl); ?>">
                 <div class="form-group">
                     <div class="search-icon">
-                        <input type="text" class="form-control" value="<?php echo esc_attr($agency_name); ?>" name="agency_name" placeholder="<?php echo $houzez_local['search_agency_name']?>">
+                        <input type="text" class="form-control" value="<?php echo esc_html($agency_name); ?>" name="agency_name" placeholder="<?php echo $houzez_local['search_agency_name']?>">
                     </div><!-- search-icon -->
                 </div>
                 <button type="submit" class="btn btn-search btn-secondary btn-full-width"><?php echo $houzez_local['search_agency_btn']; ?></button>

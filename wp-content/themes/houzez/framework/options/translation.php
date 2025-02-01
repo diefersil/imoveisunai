@@ -143,6 +143,12 @@ Redux::setSection( $houzez_opt_name, array(
             'default' => esc_html__('Select All', 'houzez')
         ),
         array(
+            'id'       => 'cl_items_selected',
+            'type'     => 'text',
+            'title'    => esc_html__('Items Selected', 'houzez'),
+            'default' => esc_html__('items selected', 'houzez')
+        ),
+        array(
             'id'       => 'cl_deselect_all',
             'type'     => 'text',
             'title'    => esc_html__('Deselect All', 'houzez'),

@@ -5,51 +5,18 @@
 				<?php get_template_part('property-details/partials/banner-nav'); ?>
 			</div><!-- container -->
 			<div class="tab-content" id="pills-tabContent">
-				<?php get_template_part('property-details/partials/media-tabs'); ?>
+				<?php 
+				global $top_area;
+				$top_area = 'v1';
+				get_template_part('property-details/partials/media-tabs'); 
+				?>
 			</div><!-- tab-content -->
 		</div><!-- property-banner -->
     </div><!-- container -->
 
     <?php 
 	if( houzez_get_popup_gallery_type() == 'photoswipe' ) {
-	$items_array = houzez_property_images_for_photoswipe($with_featured = true);
-	get_template_part( 'property-details/photoswipe'); ?>
-
-	<script>
-	initPhotoswipeDomForJson(<?php echo json_encode($items_array); ?>);
-	function initPhotoswipeDomForJson(imageData) {
-	    var pswpElement = document.querySelectorAll('.pswp')[0];
-
-	    var items = [],
-	        item;
-
-	    jQuery.each(imageData, function(i, obj) {
-	        item = {
-	            src: obj.src,
-	            w: obj.w,
-	            h: obj.h
-	        };
-
-	        items.push(item);
-	    });
-
-
-	    var options = {
-	      index: 0
-	    };
-
-	    var x = document.querySelectorAll(".houzez-photoswipe-trigger");
-
-	    jQuery('.property-banner-trigger').on("click", function() {
-	    	openGallery();
-	    });
-
-	    function openGallery() {
-	      gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
-	      gallery.init();
-	    }
-	}
-	</script>
-	<?php } ?>
+		get_template_part( 'property-details/photoswipe');
+	} ?>
 
 </div><!-- property-top-wrap -->

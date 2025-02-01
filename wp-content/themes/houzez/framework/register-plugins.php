@@ -62,7 +62,7 @@ function houzez_register_required_plugins() {
 			'slug'     				=> 'houzez-theme-functionality', // The plugin slug (typically the folder name)
 			'source'   				=> 'https://default.houzez.co/plugins/houzez-theme-functionality.zip', // The plugin source
 			'required' 				=> true, // If false, the plugin is only 'recommended' instead of required
-			'version' 				=> '3.2.3', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'version' 				=> '3.4.5', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
 			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
 			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
 			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL
@@ -72,7 +72,7 @@ function houzez_register_required_plugins() {
 			'slug'     				=> 'houzez-login-register', // The plugin slug (typically the folder name)
 			'source'   				=> 'https://default.houzez.co/plugins/houzez-login-register.zip', // The plugin source
 			'required' 				=> true, // If false, the plugin is only 'recommended' instead of required
-			'version' 				=> '3.2.1', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'version' 				=> '3.4.0', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
 			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
 			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
 			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL
@@ -82,7 +82,7 @@ function houzez_register_required_plugins() {
 			'slug'     				=> 'houzez-studio', // The plugin slug (typically the folder name)
 			'source'   				=> 'https://default.houzez.co/plugins/houzez-studio.zip', // The plugin source
 			'required' 				=> true, // If false, the plugin is only 'recommended' instead of required
-			'version' 				=> '1.0.2', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'version' 				=> '1.2.1', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
 			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
 			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
 			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL
@@ -98,7 +98,7 @@ function houzez_register_required_plugins() {
 			'slug'     				=> 'houzez-crm', // The plugin slug (typically the folder name)
 			'source'   				=> 'https://default.houzez.co/plugins/houzez-crm.zip', // The plugin source
 			'required' 				=> false, // If false, the plugin is only 'recommended' instead of required
-			'version' 				=> '1.4.3', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'version' 				=> '1.4.4', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
 			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
 			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
 			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL
@@ -118,12 +118,24 @@ function houzez_register_required_plugins() {
 			'slug'     				=> 'redux-framework', // The plugin slug (typically the folder name)
 			'required' 				=> true, // If false, the plugin is only 'recommended' instead of required
 		),
+		
+		array(
+			'name'     				=> 'MLS On The Fly ®', // The plugin name
+			'slug'     				=> 'mls-on-the-fly', // The plugin slug (typically the folder name)
+			'source'   				=> 'https://update.realtyna.com/wordpress/wp-json/realtyna/v1/download-latest-version?plugin_slug=mls-on-the-fly', // The plugin source
+			'required' 				=> false, // If false, the plugin is only 'recommended' instead of required
+			'version' 				=> '1.5.1.6', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
+			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
+			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL
+		),
+
 		array(
 			'name'     				=> 'Slider Revolution', // The plugin name
 			'slug'     				=> 'revslider', // The plugin slug (typically the folder name)
 			'source'   				=> 'https://default.houzez.co/plugins/revslider.zip', // The plugin source
 			'required' 				=> false, // If false, the plugin is only 'recommended' instead of required
-			'version' 				=> '6.7.12', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
+			'version' 				=> '6.7.20', // E.g. 1.0.0. If set, the active plugin must be this version or higher, otherwise a notice is presented
 			'force_activation' 		=> false, // If true, plugin is activated upon theme activation and cannot be deactivated until theme switch
 			'force_deactivation' 	=> false, // If true, plugin is deactivated upon theme switch, useful for theme-specific plugins
 			'external_url' 			=> '', // If set, overrides default API URL and points to an external URL

@@ -5,7 +5,7 @@ global $post, $listing_view;
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
-if( $sticky_sidebar['property_listings'] != 0 ) { 
+if( isset($sticky_sidebar['property_listings']) && $sticky_sidebar['property_listings'] != 0 ) { 
     $is_sticky = 'houzez_sticky'; 
 }
 

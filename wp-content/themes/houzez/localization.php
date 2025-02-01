@@ -1,4 +1,4 @@
-<?php
+<?php 
 if( !function_exists('houzez_get_localization')) {
 	function houzez_get_localization() {
 

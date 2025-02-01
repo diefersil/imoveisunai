@@ -119,6 +119,16 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
+            'id'       => 'is_show_more',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Show more for description', 'houzez' ),
+            'subtitle'     => esc_html__('Enable/Disable show more for description', 'houzez'),
+            'default'  => 0,
+            'on'       => esc_html__( 'Yes', 'houzez' ),
+            'off'      => esc_html__( 'No', 'houzez' ),
+        ),
+
+        array(
             'id'       => 'prop_details_cols',
             'type'     => 'select',
             'title'    => esc_html__('Details section columns', 'houzez'),

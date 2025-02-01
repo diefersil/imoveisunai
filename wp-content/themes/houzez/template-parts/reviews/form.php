@@ -99,7 +99,7 @@ if( houzez_option('login_for_review', 0) == 1 && !is_user_logged_in() ) {
 				</div>
 			</div><!-- col-sm-12 col-xs-12 -->
 			<div class="col-sm-12 col-xs-12">
-				<button id="submit-review" class="btn btn-secondary btn-sm-full-width">
+				<button id="submit-review" class="houzez-ele-button btn btn-secondary btn-sm-full-width">
 					<?php get_template_part('template-parts/loader'); ?>
 					<?php echo esc_attr($submit_review); ?>
 				</button>

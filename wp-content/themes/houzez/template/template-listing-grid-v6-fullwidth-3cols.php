@@ -22,11 +22,7 @@ $listing_args = houzez_prop_sort ( $listing_args );
 $listings_query = new WP_Query( $listing_args );
 $total_listing_found = $listings_query->found_posts;
 
-$listings_tabs = get_post_meta( $post->ID, 'fave_listings_tabs', true );
-$mb = '';
-if( $listings_tabs != 'enable' ) {
-    $mb = 'mb-2';
-}
+$fave_prop_no = get_post_meta( $post->ID, 'fave_prop_no', true );
 ?>
 <section class="listing-wrap listing-v6">
     <div class="container">
@@ -54,12 +50,7 @@ if( $listings_tabs != 'enable' ) {
                     } 
                 }?>
 
-                <div class="listing-tools-wrap">
-                    <div class="d-flex align-items-center <?php echo esc_attr($mb); ?>">
-                        <?php get_template_part('template-parts/listing/listing-tabs'); ?>    
-                        <?php get_template_part('template-parts/listing/listing-sort-by'); ?>    
-                    </div><!-- d-flex -->
-                </div><!-- listing-tools-wrap -->
+                <?php get_template_part( 'template-parts/listing/listing', 'tools' ); ?>
 
                 <div class="listing-view grid-view card-deck grid-view-3-cols">
                     <?php
@@ -76,7 +67,7 @@ if( $listings_tabs != 'enable' ) {
                     ?> 
                 </div><!-- listing-view -->
 
-                <?php houzez_pagination( $listings_query->max_num_pages ); ?>
+                <?php houzez_pagination( $listings_query->max_num_pages, $total_listing_found, $fave_prop_no ); ?>
 
             </div>
         </div><!-- row -->

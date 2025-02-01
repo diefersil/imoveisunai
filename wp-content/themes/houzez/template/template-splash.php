@@ -88,7 +88,7 @@ if( $background_type == 'image' ) {
     <?php } ?>
         <div class="align-self-center flex-fill">
             <div class="banner-caption">
-                <h2 class="banner-title"><?php echo $splash_welcome_text; ?></h2>
+                <h1 class="banner-title"><?php echo $splash_welcome_text; ?></h1>
                 <p class="banner-subtitle"><?php echo $page_head_subtitle; ?></p>
                 <?php get_template_part('template-parts/search/search-for-banners'); ?>
             </div><!-- banner-caption -->

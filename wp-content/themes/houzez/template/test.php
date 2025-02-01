@@ -6,7 +6,6 @@
  * Date: 16/13/15
  * Time: 3:27 PM
  */
-get_header();
-
+get_header(); 
 
 get_footer(); ?>

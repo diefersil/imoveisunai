@@ -14,17 +14,19 @@ if( empty( $total_ratings ) ) {
 
 <div class="rating-score-wrap flex-grow-1">
 	<div class="d-flex">
-	    <?php if(is_singular( array('houzez_agent', 'houzez_agency') ) && $total_ratings != 0) { ?>
-	        <span class="rating-score-text"><?php echo esc_attr(round($total_ratings, 2)); ?></span>
-	    <?php } else if(is_author() && $total_ratings != 0 ) { ?>
-	    	<span class="rating-score-text"><?php echo esc_attr(round($total_ratings, 2)); ?></span>
-	    <?php } ?>
+
+	    <?php if ( is_singular( array( 'houzez_agent', 'houzez_agency' ) ) && $total_ratings > 0 ) : ?>
+		    <span class="rating-score-text"><?php echo esc_attr( round( (float) $total_ratings, 2 ) ); ?></span>
+		<?php elseif ( is_author() && $total_ratings > 0 ) : ?>
+		    <span class="rating-score-text"><?php echo esc_attr( round( (float) $total_ratings, 2 ) ); ?></span>
+		<?php endif; ?>
+
 
 	    <div class="stars">
 		    <?php echo houzez_get_stars($total_ratings, false); ?>
 		</div>
 	    
-	    <?php if(is_singular( array('houzez_agent', 'houzez_agency') ) || is_author() ) { ?>
+	    <?php if(is_singular( array('houzez_agent', 'houzez_agency', 'fts_builder') ) || is_author() ) { ?>
 	        <a class="all-reviews" href="#review-scroll"><?php echo houzez_option('agency_lb_all_reviews', esc_html__('See all reviews', 'houzez')); ?></a>
 	    <?php } ?>
 	</div>

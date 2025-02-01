@@ -76,8 +76,6 @@ $agent_email = is_email($prop_agent_email);
     <input type="hidden" name="redirect_to" value="<?php echo esc_url(houzez_option('schedule_tour_redirect')); ?>">
     <input type="hidden" name="agent_id" value="<?php echo intval($return_array['agent_id'])?>">
     <input type="hidden" name="agent_type" value="<?php echo esc_attr($return_array['agent_type'])?>">
-
-    <input type="hidden" name="target_email" value="<?php echo antispambot($agent_email); ?>">
     
     <div class="row">
         <div class="col-md-4 col-sm-12">
@@ -132,6 +130,9 @@ $agent_email = is_email($prop_agent_email);
                 <input class="form-control" name="email" placeholder="<?php echo houzez_option('spl_con_email_plac', 'Enter your email address'); ?>" type="email">
             </div>
         </div><!-- col-md-4 col-sm-12 -->
+
+        <?php do_action('houzez_schedule_tour_fields'); ?>
+
         <div class="col-sm-12 col-xs-12">
             <div class="form-group form-group-textarea">
                 <label><?php echo houzez_option('spl_con_message', 'Message'); ?></label>
@@ -156,7 +157,7 @@ $agent_email = is_email($prop_agent_email);
         <?php } ?>
         
         <div class="col-sm-12 col-xs-12">
-            <button class="schedule_contact_form btn btn-secondary btn-sm-full-width">
+            <button class="houzez-ele-button schedule_contact_form btn btn-secondary btn-sm-full-width">
                 <?php get_template_part('template-parts/loader'); ?>
                 <?php echo houzez_option('spl_btn_tour_sch', 'Submit a Tour Request'); ?> 
             </button>

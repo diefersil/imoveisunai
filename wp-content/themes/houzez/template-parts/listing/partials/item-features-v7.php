@@ -1,7 +1,8 @@
 <ul class="item-amenities <?php echo houzez_v1_4_meta_type(); ?>">
 	<?php
 	$listing_data_composer = houzez_option('listing_data_composer');
-	$data_composer = $listing_data_composer['enabled'];
+	// Ensure 'enabled' key exists in the array and is an array itself
+	$data_composer = isset($listing_data_composer['enabled']) && is_array($listing_data_composer['enabled']) ? $listing_data_composer['enabled'] : [];
 
 	$i = 0;
 	if ($data_composer) {

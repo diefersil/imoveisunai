@@ -27,8 +27,10 @@ class HOUZEZ_featured_properties extends WP_Widget {
 	**/
 	public function widget( $args, $instance ) {
 
-		global $before_widget, $after_widget, $before_title, $after_title, $post;
+		global $before_widget, $after_widget, $before_title, $after_title, $post, $image_size;
 		extract( $args );
+
+		$image_size = 'houzez-item-image-1';
 
 		$allowed_html_array = array(
 			'div' => array(

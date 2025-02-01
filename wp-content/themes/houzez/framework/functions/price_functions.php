@@ -914,6 +914,41 @@ if( !function_exists('houzez_listing_price_v5') ) {
     }
 }
 
+/*-----------------------------------------------------------------------------------*/
+// Listing price v5
+/*-----------------------------------------------------------------------------------*/
+if( !function_exists('houzez_project_price_v1') ) {
+    function houzez_project_price_v1() {
+        $output = '';
+        $sale_price     = get_post_meta( get_the_ID(), 'fave_project_price', true );
+        $price_postfix  = get_post_meta( get_the_ID(), 'fave_project_price_postfix', true );
+        $price_prefix  = get_post_meta( get_the_ID(), 'fave_project_price_prefix', true );
+        $price_separator = houzez_option('currency_separator');
+
+        $price_as_text = doubleval( $sale_price );
+        if( !$price_as_text ) {
+            $output .= '<span class="item-price-text">'.$sale_price. '</span>';
+            return $output;
+        }
+
+        if( !empty( $price_prefix ) ) {
+            $price_prefix = '<span class="price-prefix">'.$price_prefix. '</span>';
+        }
+
+        if (!empty( $price_postfix )) {
+            $price_postfix = $price_separator . $price_postfix;
+        }
+        
+        if(empty($second_price)) {
+            $output .= $price_prefix.' '. houzez_get_property_price($sale_price).''.$price_postfix;
+        } else {
+            $output .= $price_prefix.' '. houzez_get_property_price($sale_price);
+        }
+        
+        return $output;
+    }
+}
+
 
 if( !function_exists('houzez_listing_price_map_pins') ) {
     function houzez_listing_price_map_pins()

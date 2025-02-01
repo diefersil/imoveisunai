@@ -10,8 +10,8 @@ $logo_id = get_post_meta(get_the_ID(), 'fave_testi_logo', true);
 <div class="testimonial-item testimonial-item-v1">
 
 	<?php if (!empty($photo_id)) { ?>
-        <div class="testimonial-thumb dfg">
-            <?php echo wp_get_attachment_image($photo_id, 'thumbnail', false, array('class' => 'img-fluid rounded-circle')); ?>
+        <div class="testimonial-thumb">
+            <?php echo wp_get_attachment_image($photo_id, 'thumbnail', false, array('class' => 'img-fluid')); ?>
         </div>
     <?php } ?>
 
@@ -25,12 +25,12 @@ $logo_id = get_post_meta(get_the_ID(), 'fave_testi_logo', true);
 		<?php echo wp_kses_post($text); ?>
 	</div><!-- testimonial-body -->
 	<div class="testimonial-info">
-		<?php echo $houzez_local['by_text']; ?> <strong><?php echo esc_attr($name); ?></strong><br>
-		<em>
+		<div class="testimonial-name"><?php echo esc_attr($name); ?></div>
+		<div class="testimonial-job">
 			<?php echo esc_attr($position);
 			if(!empty($company)){
             echo ', '. esc_attr($company); 
             } ?>
-		</em>
+		</div>
 	</div><!-- testimonial-info -->
 </div><!-- testimonial-item -->

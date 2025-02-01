@@ -1,6 +1,8 @@
 <?php 
-global $post, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
+global $post, $random_token, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
 $listing_agent_info = houzez20_property_contact_form();
+
+$random_token = houzez_random_token();
 
 $defaultButtons = array(
     'enabled' => array(

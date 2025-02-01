@@ -2,7 +2,7 @@
 global $post, $sticky_hidden, $sticky_data, $hidden_data;
 $sticky_hidden = $sticky_data = '';
 $hidden_data = '0';
-if( !is_404() && !is_search() ) {
+if( !is_404() && !is_search() && isset($post) && is_object($post) ) {
     $adv_search_enable = get_post_meta($post->ID, 'fave_adv_search_enable', true);
     $adv_search = get_post_meta($post->ID, 'fave_adv_search', true);
 }

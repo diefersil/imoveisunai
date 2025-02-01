@@ -14,3 +14,5 @@ if( !empty($fave_property_images) ) { ?>
 </div><!-- property-top-wrap -->
 <?php } ?>
 <?php get_template_part('property-details/property-title'); ?>
+
+

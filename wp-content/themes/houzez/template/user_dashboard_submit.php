@@ -519,20 +519,6 @@ if( is_user_logged_in() ) { ?>
 <?php
 } else { // End if user logged-in ?>
 
-<?php 
-do_action( 'houzez_before_header' );
-
-if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) {
-    
-    if( function_exists('fts_header_enabled') && fts_header_enabled() ) {
-        do_action( 'houzez_header_studio' );
-    } else { 
-        do_action( 'houzez_header' );
-    }
-}
-
-do_action( 'houzez_after_header' );
-?>
 <section class="frontend-submission-page dashboard-content-inner-wrap">
     
     <div class="container">
@@ -552,22 +538,6 @@ do_action( 'houzez_after_header' );
         </div><!-- row -->
     </div><!-- container -->
 </section><!-- frontend-submission-page -->
-
-<?php 
-do_action( 'houzez_before_footer' );
-
-if ((!function_exists('elementor_theme_do_location') || !elementor_theme_do_location('footer')) && 
-    (!houzez_is_half_map() || (houzez_is_half_map() && houzez_option('halfmap-footer', 1) == 1))) 
-{
-    
-    if( function_exists('fts_footer_enabled') && fts_footer_enabled() ) {
-        do_action( 'houzez_footer_studio' );
-    } else { 
-        do_action( 'houzez_footer' );
-    }
-}
-do_action( 'houzez_after_footer' );
-?>
 
 <?php
 } // End logged-in else

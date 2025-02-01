@@ -68,15 +68,19 @@ if( houzez_is_admin() || houzez_is_editor() ) {
         $args['author'] = $userID;
     }
 } else if( houzez_is_agency() ) {
-
     $agents = houzez_get_agency_agents($userID);
     
     if( isset( $_GET['user'] ) && $_GET['user'] != '' ) {
-        $args['author'] = intval($_GET['user']);
-
+        $requested_user = intval($_GET['user']);
+        // Only set author if requested user is current user or one of their agents
+        if($requested_user === $userID || in_array($requested_user, $agents)) {
+            $args['author'] = $requested_user;
+        } else {
+            // If requested user is not authorized, show no properties
+            $args['author'] = -1; // This will return no results
+        }
     } else if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'mine' ) {
         $args['author'] = $userID;
-
     } else if( $agents ) {
         if (!in_array($userID, $agents)) {
             $agents[] = $userID;
@@ -85,7 +89,6 @@ if( houzez_is_admin() || houzez_is_editor() ) {
     } else {
         $args['author'] = $userID;
     }
-
 } else {
     $args['author'] = $userID;
 }

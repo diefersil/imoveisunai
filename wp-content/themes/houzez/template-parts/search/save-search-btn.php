@@ -6,7 +6,6 @@ $get_search_uri = explode( '/?', $get_search_uri );
 if(isset($get_search_uri[1]) && $get_search_uri[1] != "") {
     $search_uri = $get_search_uri[1];
 }
-
 if( houzez_option('enable_disable_save_search', 0) ) {
 ?>
 <div class="save-search-form-wrap">

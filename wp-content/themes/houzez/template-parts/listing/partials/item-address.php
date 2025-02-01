@@ -1,6 +1,6 @@
 <?php
 $address_composer = houzez_option('listing_address_composer');
-$enabled_data = isset($address_composer['enabled']) ? $address_composer['enabled'] : 0;
+$enabled_data = isset($address_composer['enabled']) ? $address_composer['enabled'] : [];
 $temp_array = array();
 
 echo '<address class="item-address">';

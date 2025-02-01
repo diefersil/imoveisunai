@@ -3,7 +3,7 @@ get_header();
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
-if( $sticky_sidebar['default_sidebar'] != 0 ) { 
+if( isset($sticky_sidebar['default_sidebar']) &&  $sticky_sidebar['default_sidebar'] != 0 ) { 
     $is_sticky = 'houzez_sticky'; 
 }
 

@@ -1,11 +1,14 @@
 <?php 
-global $post, $top_area; 
+global $post, $top_area, $media_tabs; 
 $fave_property_images = get_post_meta(get_the_ID(), 'fave_property_images', false);
 $tools_position = houzez_option('property_tools_mobile_pos', 'under_banner');
+$media_tabs = houzez_get_media_tabs();
+$tabs_count = count($media_tabs);
+$tabs_count = $tabs_count + 2; //add 2 for mobile
 ?>
 <div class="visible-on-mobile">
     <div class="mobile-top-wrap">
-        <div class="mobile-property-tools clearfix">
+        <div class="mobile-property-tools houzez-media-tabs-<?php esc_attr_e($tabs_count);?> clearfix">
             <?php 
             if( !empty($fave_property_images) ) {
                 get_template_part('property-details/partials/banner-nav'); 

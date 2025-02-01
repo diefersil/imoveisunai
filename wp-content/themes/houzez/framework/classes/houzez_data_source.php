@@ -23,6 +23,10 @@ if(!class_exists('houzez_data_source')) {
                         'offset' => '',
                         'min_price' => '',
                         'max_price' => '',
+                        'min_beds' => '',
+                        'max_beds' => '',
+                        'min_baths' => '',
+                        'max_baths' => '',
                         'properties_by_agents' => '',
                         'properties_by_agencies' => ''
                     ),
@@ -106,10 +110,10 @@ if(!class_exists('houzez_data_source')) {
                 );
             }
 
-            if ( !empty($properties_by_agents) && count( $properties_by_agents ) >= 1 ) {
+            if ( !empty($properties_by_agents) ) {
                 $meta_query[] = array(
                     'key'     => 'fave_agents',
-                    'value'   => $properties_by_agents,
+                    'value'   => self::houzez20_traverse_comma_string($properties_by_agents),
                     'compare' => 'IN',
                 );
                 $meta_query[] = array(
@@ -119,10 +123,10 @@ if(!class_exists('houzez_data_source')) {
                 );
             }
 
-            if ( !empty($properties_by_agencies) && count( $properties_by_agencies ) >= 1 ) {
+            if ( !empty($properties_by_agencies) ) {
                 $meta_query[] = array(
                     'key'     => 'fave_property_agency',
-                    'value'   => $properties_by_agencies,
+                    'value'   => self::houzez20_traverse_comma_string($properties_by_agencies),
                     'compare' => 'IN',
                 );
 
@@ -168,6 +172,96 @@ if(!class_exists('houzez_data_source')) {
                 }
             }
 
+            if ( !empty($min_beds) && !empty($max_beds) ) {
+                $min_beds = intval($min_beds);
+                $max_beds = intval($max_beds);
+
+                if ($min_beds > 0 && $max_beds >= $min_beds) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bedrooms',
+                        'value' => array($min_beds, $max_beds),
+                        'type' => 'NUMERIC',
+                        'compare' => 'BETWEEN',
+                    );
+                }
+            } else if ( !empty($min_beds) ) {
+                $min_beds = intval($min_beds);
+                if ($min_beds > 0) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bedrooms',
+                        'value' => $min_beds,
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    );
+                }
+            } else if ( ! empty($max_beds) ) {
+                $max_beds = intval($max_beds);
+                if ($max_beds > 0) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bedrooms',
+                        'value' => $max_beds,
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    );
+                }
+            }
+
+            if ( !empty($min_baths) && !empty($max_baths) ) {
+                $min_baths = intval($min_baths);
+                $max_baths = intval($max_baths);
+
+                if ($min_baths > 0 && $max_baths >= $min_baths) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bathrooms',
+                        'value' => array($min_baths, $max_baths),
+                        'type' => 'NUMERIC',
+                        'compare' => 'BETWEEN',
+                    );
+                }
+            } else if ( !empty($min_baths) ) {
+                $min_baths = intval($min_baths);
+                if ($min_baths > 0) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bathrooms',
+                        'value' => $min_baths,
+                        'type' => 'NUMERIC',
+                        'compare' => '>=',
+                    );
+                }
+            } else if ( !empty($max_baths) ) {
+                $max_baths = intval($max_baths);
+                if ($max_baths > 0) {
+                    $meta_query[] = array(
+                        'key' => 'fave_property_bathrooms',
+                        'value' => $max_baths,
+                        'type' => 'NUMERIC',
+                        'compare' => '<=',
+                    );
+                }
+            }
+
+            if (!empty($featured_prop)) {
+                if ($featured_prop == "yes") {
+                    $meta_query[] = [
+                        'key' => 'fave_featured',
+                        'value' => '1',
+                        'compare' => '='
+                    ];
+                } else {
+                    $meta_query[] = [
+                        'relation' => 'OR',
+                        [
+                            'key' => 'fave_featured',
+                            'value' => '0',
+                            'compare' => '='
+                        ],
+                        [
+                            'key' => 'fave_featured',
+                            'compare' => 'NOT EXISTS'
+                        ]
+                    ];
+                }
+            }
 
             $property_ids_array = explode(',', $property_ids);
 
@@ -231,17 +325,6 @@ if(!class_exists('houzez_data_source')) {
                 $wp_query_args['orderby'] = 'meta_value DESC rand'; 
             }
 
-            if (!empty($featured_prop)) {
-                
-                if( $featured_prop == "yes" ) {
-                    $wp_query_args['meta_key'] = 'fave_featured';
-                    $wp_query_args['meta_value'] = '1';
-                } else {
-                    $wp_query_args['meta_key'] = 'fave_featured';
-                    $wp_query_args['meta_value'] = '0';
-                }
-            }
-
             if( $post_status == 'publish' ) {
                 $wp_query_args['post_status'] = 'publish';
             } else if( $post_status == 'houzez_sold' ) {
@@ -271,10 +354,12 @@ if(!class_exists('houzez_data_source')) {
 
             $wp_query_args['post_type'] = 'property';
 
+            /*echo '<pre>';
+            print_r($wp_query_args);
+            echo '</pre>';*/
+
             return $wp_query_args;
         }
-
-
 
 
         /************************************************************************************** 
@@ -312,15 +397,19 @@ if(!class_exists('houzez_data_source')) {
         }
 
         public static function houzez20_traverse_comma_string($string) {
-            if(!empty($string)) {
-                $string_array = explode(',', $string);
+            // Check if the input string is non-empty and valid
+            if (!empty($string) && is_string($string)) {
+                // Trim whitespace and split the string by commas
+                $string_array = array_filter(array_map('trim', explode(',', $string)));
                 
-                if(!empty($string_array[0])) {
+                // Return the array if it's not empty, otherwise return an empty string
+                if (!empty($string_array)) {
                     return $string_array;
                 }
             }
             return '';
         }
+
 
         public static function houzez20_author_ids_by_role($role) {
             $ids = get_users(array('role' => $role, 'fields' => 'ID'));

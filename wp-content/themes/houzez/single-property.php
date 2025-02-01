@@ -80,119 +80,125 @@ if( houzez_check_is_elementor() && ( ! function_exists( 'elementor_theme_do_loca
  
 if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'single' ) ) { 
 
-    if( have_posts() ): while( have_posts() ): the_post(); ?>
-        
-        <section class="content-wrap property-wrap property-detail-<?php echo esc_attr($top_area); ?> <?php echo esc_attr($layout_class); ?>">
-            <?php 
-            get_template_part('property-details/navigation'); 
+    if( function_exists('fts_single_listing_enabled') && fts_single_listing_enabled() ) {
+        do_action('houzez_single_listing');
 
-            if($top_area != 'v5' && $top_area != 'v2') {
-                get_template_part('property-details/property-title'); 
-            }
+    } else {     
 
+        if( have_posts() ): while( have_posts() ): the_post(); ?>
+            
+            <section class="content-wrap property-wrap property-detail-<?php echo esc_attr($top_area); ?> <?php echo esc_attr($layout_class); ?>">
+                <?php 
+                get_template_part('property-details/navigation'); 
 
-            if( $loggedin_to_view == 1 && !is_user_logged_in()) {
-
-                get_template_part( 'property-details/partials/login_required');
-
-            } else if( get_post_status($post->ID) == 'expired' ) {
-
-                get_template_part( 'property-details/partials/expired');
-
-            } else {
-
-                if($top_area == 'v1') {
-                    get_template_part('property-details/top-area-v1');
-
-                } elseif($top_area == 'v2') {
-                    get_template_part('property-details/top-area-v2');
-
-                } elseif( ($top_area == 'v3' || $top_area == 'v4') && $property_layout == 'v2' ) {
-                    echo '<div class="container">';
-                    get_template_part('property-details/top-area-v3-4');
-                    echo '</div>';
-
-                } elseif($top_area == 'v5') {
-                    get_template_part('property-details/top-area-v5');
-
-                } elseif($top_area == 'v6') {
-                    get_template_part('property-details/top-area-v6');
-
-                } elseif($top_area == 'v7') {
-                    get_template_part('property-details/top-area-v7');
-
+                if($top_area != 'v5' && $top_area != 'v2') {
+                    get_template_part('property-details/property-title'); 
                 }
-                
-                if( $property_layout == 'v2' ) { ?>
-                
-                <div class="property-view full-width-property-view">
-                    <?php get_template_part('property-details/mobile-view'); ?>
-                    <?php get_template_part( 'property-details/single-property-luxury-homes'); ?>
-                </div>
 
-                <?php if( !empty($global_disclaimer) && $enable_disclaimer ) { ?>
-                <div class="property-disclaimer">
-                    <?php echo $global_disclaimer; ?>
-                </div>
-                <?php } ?>
 
-            <?php } else { ?>
+                if( $loggedin_to_view == 1 && !is_user_logged_in()) {
 
-            <div class="container">
-                <?php
-                if($top_area == 'v4') {
-                    get_template_part('property-details/top-area-v3-4');
-                } 
-                ?>
-                <div class="row">
-                    <div class="<?php echo esc_attr($content_classes); ?>">
-                        <?php
-                        if($top_area == 'v3') {
-                            get_template_part('property-details/top-area-v3-4');
-                        } 
-                        ?>                   
-                        <div class="property-view">
+                    get_template_part( 'property-details/partials/login_required');
 
-                            <?php get_template_part('property-details/mobile-view'); ?>
+                } else if( get_post_status($post->ID) == 'expired' ) {
 
-                            <?php
-                            if( $property_layout == 'tabs' ) {
-                                get_template_part( 'property-details/single-property', 'tabs');
-                            } else if( $property_layout == 'tabs-vertical' ) {
-                                get_template_part( 'property-details/single-property', 'tabs-vertical');
-                            } else {
-                                get_template_part( 'property-details/single-property', 'simple');
-                            }
+                    get_template_part( 'property-details/partials/expired');
 
-                            if( houzez_option('enable_next_prev_prop') ) {
-                                get_template_part('property-details/next-prev');
-                            }
-                            ?>
-                            
-                        </div><!-- property-view -->
-                    </div><!-- bt-content-wrap -->
+                } else {
 
-                    <?php if($is_full_width != 1) { ?>
-                    <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
-                        <?php get_sidebar('property'); ?>
-                    </div><!-- bt-sidebar-wrap -->
+                    if($top_area == 'v1') {
+                        get_template_part('property-details/top-area-v1');
+
+                    } elseif($top_area == 'v2') {
+                        get_template_part('property-details/top-area-v2');
+
+                    } elseif( ($top_area == 'v3' || $top_area == 'v4') && $property_layout == 'v2' ) {
+                        echo '<div class="container">';
+                        get_template_part('property-details/top-area-v3-4');
+                        echo '</div>';
+
+                    } elseif($top_area == 'v5') {
+                        get_template_part('property-details/top-area-v5');
+
+                    } elseif($top_area == 'v6') {
+                        get_template_part('property-details/top-area-v6');
+
+                    } elseif($top_area == 'v7') {
+                        get_template_part('property-details/top-area-v7');
+
+                    }
+                    
+                    if( $property_layout == 'v2' ) { ?>
+                    
+                    <div class="property-view full-width-property-view">
+                        <?php get_template_part('property-details/mobile-view'); ?>
+                        <?php get_template_part( 'property-details/single-property-luxury-homes'); ?>
+                    </div>
+
+                    <?php if( !empty($global_disclaimer) && $enable_disclaimer ) { ?>
+                    <div class="property-disclaimer">
+                        <?php echo $global_disclaimer; ?>
+                    </div>
                     <?php } ?>
-                </div><!-- row -->
 
-                <?php if( !empty($global_disclaimer) && $enable_disclaimer ) { ?>
-                <div class="property-disclaimer">
-                    <?php echo $global_disclaimer; ?>
-                </div>
-                <?php } ?>
+                <?php } else { ?>
 
-            </div><!-- container -->
+                <div class="container">
+                    <?php
+                    if($top_area == 'v4') {
+                        get_template_part('property-details/top-area-v3-4');
+                    } 
+                    ?>
+                    <div class="row">
+                        <div class="<?php echo esc_attr($content_classes); ?>">
+                            <?php
+                            if($top_area == 'v3') {
+                                get_template_part('property-details/top-area-v3-4');
+                            } 
+                            ?>                   
+                            <div class="property-view">
 
-                <?php } 
-            } // end loggedIN?>
+                                <?php get_template_part('property-details/mobile-view'); ?>
 
-        </section><!-- listing-wrap -->    
+                                <?php
+                                if( $property_layout == 'tabs' ) {
+                                    get_template_part( 'property-details/single-property', 'tabs');
+                                } else if( $property_layout == 'tabs-vertical' ) {
+                                    get_template_part( 'property-details/single-property', 'tabs-vertical');
+                                } else {
+                                    get_template_part( 'property-details/single-property', 'simple');
+                                }
 
-    <?php endwhile; endif; 
+                                if( houzez_option('enable_next_prev_prop') ) {
+                                    get_template_part('property-details/next-prev');
+                                }
+                                ?>
+                                
+                            </div><!-- property-view -->
+                        </div><!-- bt-content-wrap -->
+
+                        <?php if($is_full_width != 1) { ?>
+                        <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
+                            <?php get_sidebar('property'); ?>
+                        </div><!-- bt-sidebar-wrap -->
+                        <?php } ?>
+                    </div><!-- row -->
+
+                    <?php if( !empty($global_disclaimer) && $enable_disclaimer ) { ?>
+                    <div class="property-disclaimer">
+                        <?php echo $global_disclaimer; ?>
+                    </div>
+                    <?php } ?>
+
+                </div><!-- container -->
+
+                    <?php } 
+                } // end loggedIN?>
+
+            </section><!-- listing-wrap -->    
+
+        <?php endwhile; endif; 
+    } // <!-- end fts_single_listing_enabled else condition -->
  } // <!-- end elementor location -->
 } ?> <!-- end houzez_check_is_elementor -->
 

@@ -19,7 +19,7 @@ global $wp_version;
 */
 define( 'HOUZEZ_THEME_NAME', 'Houzez' );
 define( 'HOUZEZ_THEME_SLUG', 'houzez' );
-define( 'HOUZEZ_THEME_VERSION', '3.2.4' );
+define( 'HOUZEZ_THEME_VERSION', '3.4.7' );
 define( 'HOUZEZ_FRAMEWORK', get_template_directory() . '/framework/' );
 define( 'HOUZEZ_WIDGETS', get_template_directory() . '/inc/widgets/' );
 define( 'HOUZEZ_INC', get_template_directory() . '/inc/' );
@@ -125,33 +125,6 @@ require_once( HOUZEZ_FRAMEWORK . 'classes/script-loader.php');
 require_once( HOUZEZ_FRAMEWORK . 'classes/houzez-lazy-load.php');
 require_once( HOUZEZ_FRAMEWORK . 'admin/class-admin.php');
 
-
-
-
-/**
- *	---------------------------------------------------------------------
- *	Mobile Detect Filter 
- *	---------------------------------------------------------------------
- */
-if (!function_exists('houzez_mobile_filter')) {
-    function houzez_mobile_filter() {
-        // Assuming HOUZEZ_FRAMEWORK points to the 'vendor' directory where Composer's autoload.php is located.
-        require_once(HOUZEZ_FRAMEWORK . 'mobile-detect/vendor/autoload.php');
-
-        // Directly use the class with its namespace.
-        $MobileDetect = new \Detection\MobileDetect();
-
-        if ($MobileDetect->isMobile() && !$MobileDetect->isTablet()) {
-            add_filter('wp_is_mobile', '__return_true');
-        } else { 
-            add_filter('wp_is_mobile', '__return_false');
-        }
-    }
-    //houzez_mobile_filter();
-}
-
-
-
 /**
  *	---------------------------------------------------------------------
  *	Hooks
@@ -221,6 +194,7 @@ if( houzez_theme_verified() ) {
 		require_once( HOUZEZ_FRAMEWORK . 'metaboxes/posts-metaboxes.php' );
 		require_once( HOUZEZ_FRAMEWORK . 'metaboxes/packages-metaboxes.php' );
 		require_once( HOUZEZ_FRAMEWORK . 'metaboxes/reviews-metaboxes.php' );
+		require_once( HOUZEZ_FRAMEWORK . 'metaboxes/project-metaboxes.php' );
 
 		if( houzez_check_classic_editor () ) {
 			require_once( get_theme_file_path('/framework/metaboxes/listings-templates-metaboxes-classic-editor.php') );
@@ -683,3 +657,28 @@ if( ! function_exists( 'houzez_is_mobile_filter' ) ) {
 	//add_filter( 'wp_is_mobile', 'houzez_is_mobile_filter' );
 }
 
+if( ! function_exists('houzez_update_existing_users_with_manager_role_once') ) {
+	function houzez_update_existing_users_with_manager_role_once() {
+	    // Check if the update has already been done
+	    if (get_option('houzez_manager_role_updated')) {
+	        return; // Exit if already run
+	    }
+
+	    // Fetch all users with the houzez_manager role
+	    $args = [
+	        'role' => 'houzez_manager'
+	    ];
+	    $users = get_users($args);
+
+	    foreach ($users as $user) {
+	        // Ensure each user has the houzez_manager role, which now has updated capabilities
+	        $user->add_role('houzez_manager');
+	    }
+
+	    // Set an option to indicate the update has been run
+	    update_option('houzez_manager_role_updated', true);
+	}
+
+	// Run the function to update users
+	houzez_update_existing_users_with_manager_role_once();
+}

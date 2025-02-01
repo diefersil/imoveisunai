@@ -136,6 +136,8 @@ if($agent_display != 'none') {
 					</div><!-- col-sm-12 col-xs-12 -->
 					<?php } ?>
 
+					<?php do_action('houzez_property_agent_contact_fields'); ?>
+
 					<?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
 					<div class="col-sm-12 col-xs-12">
 						<div class="form-group">
@@ -152,9 +154,7 @@ if($agent_display != 'none') {
 					<?php } ?>
 
 					<div class="col-sm-12 col-xs-12">
-						<?php if ( $return_array['is_single_agent'] == true ) : ?>
-				            <input type="hidden" name="target_email" value="<?php echo antispambot($agent_email); ?>">
-				        <?php endif; ?>
+						
 				        <input type="hidden" name="property_agent_contact_security" value="<?php echo wp_create_nonce('property_agent_contact_nonce'); ?>"/>
 				        <input type="hidden" name="property_permalink" value="<?php echo esc_url(get_permalink($post->ID)); ?>"/>
 				        <input type="hidden" name="property_title" value="<?php echo esc_attr(get_the_title($post->ID)); ?>"/>
@@ -168,7 +168,7 @@ if($agent_display != 'none') {
 
 				        <?php get_template_part('template-parts/google', 'reCaptcha'); ?>
 
-						<button class="houzez_agent_property_form btn btn-secondary btn-sm-full-width">
+						<button class="houzez-ele-button houzez_agent_property_form btn btn-secondary btn-sm-full-width">
 							<?php get_template_part('template-parts/loader'); ?>
 							<?php echo houzez_option('spl_btn_request_info', 'Request Information'); ?>		
 						</button>

@@ -219,12 +219,12 @@ jQuery(document).ready( function($) {
                                 'prop_id': propID,
                                 'security': propNonce
                             },
-                            success: function(data) {
-                                if ( data.success == true ) {
-                                    window.location = data.redirect;
+                            success: function(response) {
+                                if ( response.success == true ) {
+                                    window.location = response.data.redirect;
                                 } else {
-                                    jQuery('#fave_modal').modal('hide');
-                                    alert( data.reason );
+                                    alert( response.data );
+                                    fave_processing_modal_close();
                                 }
                             },
                             error: function(errorThrown) {
@@ -659,11 +659,14 @@ jQuery(document).ready( function($) {
             e.preventDefault();
             var $this = $( this );
             var propid = $this.data( 'property' );
+            var nonce = $this.data('nonce');
+
             $.ajax({
                 url: ajax_url,
                 data: {
                     'action': 'houzez_property_clone',
-                    'propID': propid
+                    'propID': propid,
+                    'security': nonce
                 },
                 method: 'POST',
                 dataType: "JSON",
@@ -672,7 +675,9 @@ jQuery(document).ready( function($) {
                     houzez_processing_modal(processing_text);
                 },
                 success: function( response ) { 
-                    window.location = response.redirect;
+                    if(response.success) {
+                        window.location = response.data.redirect;
+                    }
                 },
                 complete: function(){
                 }
@@ -685,11 +690,14 @@ jQuery(document).ready( function($) {
             e.preventDefault();
             var $this = $( this );
             var propid = $this.data( 'property' );
+            var nonce = $this.data('nonce');
+
             $.ajax({
                 url: ajax_url,
                 data: {
                     'action': 'houzez_property_on_hold',
-                    'propID': propid
+                    'propID': propid,
+                    'security': nonce
                 },
                 method: 'POST',
                 dataType: "JSON",
@@ -761,11 +769,14 @@ jQuery(document).ready( function($) {
             e.preventDefault();
             var $this = $( this );
             var propid = $this.data( 'property' );
+            var propNonce = $this.data('nonce');
+
             $.ajax({
                 url: ajax_url,
                 data: {
                     'action': 'houzez_property_mark_sold',
-                    'propID': propid
+                    'propID': propid,
+                    'security': propNonce
                 },
                 method: 'POST',
                 dataType: "JSON",
@@ -774,7 +785,9 @@ jQuery(document).ready( function($) {
                     houzez_processing_modal(processing_text);
                 },
                 success: function( response ) {
-                    window.location.reload();
+                    if( response.success ) {
+                        window.location.reload();
+                    }
                 },
                 complete: function(){
                 }

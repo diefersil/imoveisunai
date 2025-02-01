@@ -17,6 +17,7 @@ require_once( get_theme_file_path('/framework/options/map.php') );
 require_once( get_theme_file_path('/framework/options/halfmap.php') );
 require_once( get_theme_file_path('/framework/options/listing-options.php') );
 require_once( get_theme_file_path('/framework/options/taxonomies.php') );
+require_once( get_theme_file_path('/framework/options/projects-options.php') );
 require_once( get_theme_file_path('/framework/options/contact-forms.php') );
 require_once( get_theme_file_path('/framework/options/webhooks.php') );
 require_once( get_theme_file_path('/framework/options/reCaptcha.php') );

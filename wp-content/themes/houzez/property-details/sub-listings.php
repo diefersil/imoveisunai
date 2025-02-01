@@ -24,8 +24,8 @@ $listing_agent = houzez_get_property_agent( $post->ID );
 	                	while ($query->have_posts()): $query->the_post(); 
 	                		get_template_part('template-parts/listing/item-v1'); 
 	                	endwhile; 
-	                endif; 
-	                wp_reset_query();
+	                	wp_reset_postdata();
+	                endif;
 	                ?>
 
 				</div><!-- listing-view -->	

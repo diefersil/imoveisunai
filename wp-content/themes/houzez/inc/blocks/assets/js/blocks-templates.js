@@ -92,6 +92,7 @@
 		}
 
 		function importTemplate() {
+
 			$('#houzez-library-modal .elementor-template-library-template-insert').on('click', function () {
 				showLoader();
 
@@ -100,7 +101,7 @@
 						source: 'houzez',
 						edit_mode: true,
 						display: true,
-						template_id: $(this).data('id'),
+						template_id: 'houzez_'+$(this).data('id'),
 						with_page_settings: false
 					},
 					success: function success(data) {

@@ -20,6 +20,18 @@ Redux::setSection( $houzez_opt_name, array(
             'default'  => 'sbor',
         ),
         array(
+            'id'       => 'listing_pagination',
+            'type'     => 'button_set',
+            'title'    => esc_html__( 'Pagination', 'houzez' ),
+            'subtitle' => '',
+            'default'  => '_number',
+            'options' => array(
+                '_number' => esc_html__('Number', 'houzez'), 
+                '_loadmore' => esc_html__('Load More', 'houzez'), 
+                '_infinite' => esc_html__('Infinite Scroll', 'houzez'), 
+            ), 
+        ),
+        array(
             'id'       => 'listing_link_target',
             'type'     => 'button_set',
             'title'    => esc_html__( 'Open listing link to?', 'houzez' ),

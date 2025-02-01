@@ -74,6 +74,7 @@ if( !function_exists('houzez_agent_metaboxes') ) {
         );
 
         $meta_boxes[] = array(
+            'id'        => 'houzez_agents',
             'title'  => esc_html__( 'Agent Information', 'houzez' ),
             'post_types'  => array('houzez_agent'),
             'fields' => array(
@@ -319,6 +320,14 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                     'std' => "",
                     'columns'   => 6
                 ),
+                array(
+                    'id' => "{$houzez_prefix}agent_shortcode",
+                    'name' => "Shortcode",
+                    'placeholder'      => esc_html__('Enter shortcode','houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
                 
                 array(
                     'name'    => esc_html__('Company Logo', 'houzez'),
@@ -332,6 +341,7 @@ if( !function_exists('houzez_agent_metaboxes') ) {
         );
 
         $meta_boxes[] = array(
+            'id'        => 'houzez_agents_agency',
             'title'  => esc_html__( 'Agencies', 'houzez' ),
             'post_types'  => array('houzez_agent'),
             'context' => 'side',

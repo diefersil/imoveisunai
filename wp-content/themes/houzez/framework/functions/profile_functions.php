@@ -46,10 +46,29 @@ if(!function_exists('houzez_get_profile_pic')) {
 if( !function_exists( 'houzez_user_picture_upload' ) ) {
     function houzez_user_picture_upload( ) {
 
-        if (isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
-            $user_id = intval($_REQUEST['user_id']); // Sanitize the input
+        // Ensure the user is authenticated
+        if (!is_user_logged_in()) {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('You must be logged in to change the password.', 'houzez')));
+            die();
+        }
+
+        // Get the current user ID
+        $currentUserID = get_current_user_id();
+
+        // Determine the user ID to update
+        if ((current_user_can('administrator') || current_user_can('houzez_agency')) && isset($_REQUEST['user_id']) && is_numeric($_REQUEST['user_id'])) {
+            $user_id = intval($_REQUEST['user_id']); // Use the posted user_id
         } else {
-            $user_id  = get_current_user_id();
+            $user_id = $currentUserID; // Fallback to the current user's ID
+        }
+
+        // Check if the current user has the 'houzez_agency' role and is trying to change another user's password
+        if (current_user_can('houzez_agency') && $user_id !== $currentUserID) {
+            $agency_id = get_user_meta($user_id, 'fave_agent_agency', true);
+            if ($agency_id != $currentUserID) {
+                echo json_encode(array('success' => false, 'msg' => esc_html__('This agent does not belong to your agency.', 'houzez')));
+                die();
+            }
         }
 
         $verify_nonce = $_REQUEST['verify_nonce'];
@@ -125,26 +144,37 @@ if( !function_exists('houzez_save_user_photo')) {
 /* ------------------------------------------------------------------------------
 * Ajax Update Profile function
 /------------------------------------------------------------------------------ */
-add_action( 'wp_ajax_nopriv_houzez_ajax_update_profile', 'houzez_ajax_update_profile' );
 add_action( 'wp_ajax_houzez_ajax_update_profile', 'houzez_ajax_update_profile' );
 
 if( !function_exists('houzez_ajax_update_profile') ):
 
     function houzez_ajax_update_profile() {
         
-        if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
-            $userID = intval($_POST['user_id']); // Sanitize the input
-            $current_user = get_userdata($userID);
-            if ( ! $current_user ) {
-                echo json_encode( array( 'success' => false, 'msg' => esc_html__('User not found or invalid user.', 'houzez') ) );
+        // Determine the user ID to work with
+        if ((current_user_can('administrator') || current_user_can('houzez_agency')) && isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
+            $userID = intval($_POST['user_id']); // Use the posted user_id
+            $current_user = get_userdata($userID); // Fetch user data
+            
+            if (!$current_user) {
+                echo json_encode(array('success' => false, 'msg' => esc_html__('User not found or invalid user.', 'houzez')));
                 wp_die();
-            } 
+            }
+
+            // If the current user is a 'houzez_agency', ensure the user belongs to the same agency
+            if (current_user_can('houzez_agency')) {
+                $agency_id = get_user_meta($userID, 'fave_agent_agency', true);
+                if ($agency_id != get_current_user_id()) {
+                    echo json_encode(array('success' => false, 'msg' => esc_html__('This user does not belong to your agency.', 'houzez')));
+                    wp_die();
+                }
+            }
 
         } else {
-            $current_user = wp_get_current_user();
-            $userID  = get_current_user_id();
+            $current_user = wp_get_current_user(); // Fallback to the current user
+            $userID = get_current_user_id();
         }
-        
+
+
         check_ajax_referer( 'houzez_profile_ajax_nonce', 'houzez-security-profile' );
 
         $user_company = $userlangs = $latitude = $longitude = $tax_number = $user_location = $license = $user_address = $fax_number = $firstname = $lastname = $title = $about = $userphone = $usermobile = $userskype = $facebook = $tiktok = $telegram = $twitter = $linkedin = $instagram = $pinterest = $profile_pic = $profile_pic_id = $website = $useremail = $service_areas = $specialties = $whatsapp = $line_id = $zillow = $realtor_com = '';
@@ -594,44 +624,66 @@ if( !function_exists('houzez_update_agency_user_agent') ) {
 /* ------------------------------------------------------------------------------
 * Ajax Reset Password function
 /------------------------------------------------------------------------------ */
-add_action( 'wp_ajax_nopriv_houzez_ajax_password_reset', 'houzez_ajax_password_reset' );
-add_action( 'wp_ajax_houzez_ajax_password_reset', 'houzez_ajax_password_reset' );
+add_action('wp_ajax_houzez_ajax_password_reset', 'houzez_ajax_password_reset');
 
-if( !function_exists('houzez_ajax_password_reset') ):
-    function houzez_ajax_password_reset () {
-        
-        if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
-            $userID = intval($_POST['user_id']); // Sanitize the input
-        } else {
-            $userID  = get_current_user_id();
-        }
-
-        $allowed_html   = array();
-
-        $newpass        = wp_kses( $_POST['newpass'], $allowed_html );
-        $confirmpass    = wp_kses( $_POST['confirmpass'], $allowed_html );
-
-        if( $newpass == '' || $confirmpass == '' ) {
-            echo json_encode( array( 'success' => false, 'msg' => esc_html__('New password or confirm password is blank', 'houzez') ) );
-            die();
-        }
-        if( $newpass != $confirmpass ) {
-            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Passwords do not match', 'houzez') ) );
+if (!function_exists('houzez_ajax_password_reset')) {
+    function houzez_ajax_password_reset() {
+        // Ensure the user is authenticated
+        if (!is_user_logged_in()) {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('You must be logged in to change the password.', 'houzez')));
             die();
         }
 
-        check_ajax_referer( 'houzez_pass_ajax_nonce', 'houzez-security-pass' );
+        // Get the current user ID
+        $currentUserID = get_current_user_id();
 
-        $user = get_user_by( 'id', $userID );
-        if( $user ) {
-            wp_set_password( $newpass, $userID );
-            echo json_encode( array( 'success' => true, 'msg' => esc_html__('Password Updated', 'houzez') ) );
+        // Determine the user ID to update
+        if ((current_user_can('administrator') || current_user_can('houzez_agency')) && isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
+            $userID = intval($_POST['user_id']); // Use the posted user_id
         } else {
-            echo json_encode( array( 'success' => false, 'msg' => esc_html__('Something went wrong', 'houzez') ) );
+            $userID = $currentUserID; // Fallback to the current user's ID
         }
+
+        // Check if the current user has the 'houzez_agency' role and is trying to change another user's password
+        if (current_user_can('houzez_agency') && $userID !== $currentUserID) {
+            $agency_id = get_user_meta($userID, 'fave_agent_agency', true);
+            if ($agency_id != $currentUserID) {
+                echo json_encode(array('success' => false, 'msg' => esc_html__('This agent does not belong to your agency.', 'houzez')));
+                die();
+            }
+        }
+
+        // Sanitize and validate password inputs
+        $allowed_html = array();
+        $newpass = isset($_POST['newpass']) ? wp_kses($_POST['newpass'], $allowed_html) : '';
+        $confirmpass = isset($_POST['confirmpass']) ? wp_kses($_POST['confirmpass'], $allowed_html) : '';
+
+        if (empty($newpass) || empty($confirmpass)) {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('New password or confirm password is blank', 'houzez')));
+            die();
+        }
+
+        if ($newpass !== $confirmpass) {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('Passwords do not match', 'houzez')));
+            die();
+        }
+
+        // Verify the nonce to protect against CSRF
+        check_ajax_referer('houzez_pass_ajax_nonce', 'houzez-security-pass');
+
+        // Update the user's password
+        $user = get_user_by('id', $userID);
+        if ($user) {
+            wp_set_password($newpass, $userID);
+            echo json_encode(array('success' => true, 'msg' => esc_html__('Password updated successfully.', 'houzez')));
+        } else {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('Failed to update password. User not found.', 'houzez')));
+        }
+
         die();
     }
-endif; // end houzez_ajax_password_reset
+}
+
 
 /*-----------------------------------------------------------------------------------*/
 /*   Get uploaded file url
@@ -727,14 +779,32 @@ if ( !function_exists( 'houzez_delete_profile_pic' ) ) :
 
     function houzez_delete_profile_pic() {
 
-        if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
-            $user_id = intval($_POST['user_id']); // Sanitize the input
+        // Ensure the user is authenticated
+        if (!is_user_logged_in()) {
+            echo json_encode(array('success' => false, 'msg' => esc_html__('You must be logged in to change the password.', 'houzez')));
+            die();
+        }
+
+        // Get the current user ID
+        $currentUserID = get_current_user_id();
+
+        // Determine the user ID to update
+        if ((current_user_can('administrator') || current_user_can('houzez_agency')) && isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
+            $user_id = intval($_POST['user_id']); // Use the posted user_id
         } else {
-            $user_id  = get_current_user_id();
+            $user_id = $currentUserID; // Fallback to the current user's ID
+        }
+
+        // Check if the current user has the 'houzez_agency' role and is trying to change another user's password
+        if (current_user_can('houzez_agency') && $user_id !== $currentUserID) {
+            $agency_id = get_user_meta($user_id, 'fave_agent_agency', true);
+            if ($agency_id != $currentUserID) {
+                echo json_encode(array('success' => false, 'msg' => esc_html__('This agent does not belong to your agency.', 'houzez')));
+                die();
+            }
         }
 
         $picture_id = isset($_POST['picture_id']) ? $_POST['picture_id'] : '';
-
 
         delete_user_meta( $user_id, 'fave_author_picture_id' );
         delete_user_meta( $user_id, 'fave_author_custom_picture' );
@@ -826,7 +896,6 @@ if ( !function_exists( 'houzez_delete_agency_agent' ) ) :
 
 endif;
 
-add_action( 'wp_ajax_nopriv_houzez_change_user_currency', 'houzez_change_user_currency' );
 add_action( 'wp_ajax_houzez_change_user_currency', 'houzez_change_user_currency' );
 if(!function_exists('houzez_change_user_currency')) {
     function houzez_change_user_currency() {
@@ -1463,7 +1532,7 @@ if( !function_exists('houzez_update_extra_profile_fields') ) {
         /*
          * Image watermark
         --------------------------------------------------------------------------------*/
-        update_user_meta($user_id, 'fave_watermark_image', $_POST['fave_watermark_image']);
+        //update_user_meta($user_id, 'fave_watermark_image', $_POST['fave_watermark_image']);
 
     }
 }
@@ -1536,7 +1605,6 @@ if(!function_exists('houzez_gdrf_data_request')) {
 }
 
 add_action( 'wp_ajax_houzez_gdrf_data_request', 'houzez_gdrf_data_request' );
-add_action( 'wp_ajax_nopriv_houzez_gdrf_data_request', 'houzez_gdrf_data_request' );
 
 
 if( ! function_exists('houzez_get_agency_agents') ) {
@@ -1683,9 +1751,16 @@ if (!function_exists('houzez_get_user')) {
 
 if ( ! function_exists('houzez_can_manage') ) {
     function houzez_can_manage() {
-        if( houzez_is_admin() || houzez_is_agency() ) {
+        if( houzez_is_admin() || houzez_is_editor() ) {
             return true;
-        } 
+        } else if( houzez_is_agency() ) { // if is agency and property id belong to agency agent then return true can manage their own agents
+            $property_id = isset($_GET['edit_property']) ? sanitize_text_field($_GET['edit_property']) : false;
+            $author_id = get_post_field('post_author', $property_id);
+            $agency_id = get_user_meta( $author_id, 'fave_agent_agency', true );
+            if( $agency_id == get_current_user_id() ) {
+                return true;
+            }
+        }
         return false;
     }
 }

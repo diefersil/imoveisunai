@@ -123,6 +123,8 @@ $agency_id = get_the_ID();
 $tax_query = array();
 $meta_query = array();
 
+$post_per_page = houzez_option('num_of_agency_listings', 9);
+
 if ( isset( $_GET['tab'] ) && !empty($_GET['tab']) && $_GET['tab'] != "reviews") {
     $tax_query[] = array(
         'taxonomy' => 'property_status',
@@ -133,7 +135,7 @@ if ( isset( $_GET['tab'] ) && !empty($_GET['tab']) && $_GET['tab'] != "reviews")
 
 $args = array(
     'post_type' => 'property',
-    'posts_per_page' => houzez_option('num_of_agency_listings', 9),
+    'posts_per_page' => $post_per_page,
     'paged' => $paged,
     'post_status' => 'publish',
 );
@@ -280,7 +282,7 @@ if( $agents_template == 'v2' ) {
                             ?> 
                             
                         </div><!-- listing-view -->
-                        <?php houzez_pagination( $agency_qry->max_num_pages ); ?>
+                        <?php houzez_pagination( $agency_qry->max_num_pages, $agency_total_listing, $post_per_page ); ?>
                     </div><!-- tab-pane -->
                     <?php } ?>
 

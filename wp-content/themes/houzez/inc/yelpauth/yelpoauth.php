@@ -49,9 +49,6 @@ function houzez_yelp_query_api( $term, $location ) {
     );
 
     $response = wp_safe_remote_get( $query_url, $args );
-    if ( is_wp_error( $response ) ) {
-        return false;
-    }
 
     if ( ! empty( $response['body'] ) && is_ssl() ) {
         $response['body'] = str_replace( 'http:', 'https:', $response['body'] );

@@ -115,7 +115,7 @@ function houzez_agent_search_widget() {
     $agent_name = isset ( $_GET['agent_name'] ) ? sanitize_text_field($_GET['agent_name']) : '';
 
     $default_city = array();
-    $city = isset($_GET['city']) ? sanitize_text_field($_GET['city']) : $default_city;
+    $city = isset($_GET['city']) ? wp_kses(sanitize_text_field($_GET['agent_name']), array()) : $default_city;
 
     $purl = houzez_get_template_link('template/template-agents.php');
 
@@ -127,18 +127,18 @@ function houzez_agent_search_widget() {
                 <input type="hidden" name="agent-search" value="yes">
                 <div class="form-group">
                     <div class="search-icon">
-                        <input type="text" class="form-control" value="<?php echo $agent_name; ?>" name="agent_name" placeholder="<?php echo $houzez_local['search_agent_name']?>">
+                        <input type="text" class="form-control" value="<?php echo esc_html($agent_name); ?>" name="agent_name" placeholder="<?php echo $houzez_local['search_agent_name']?>">
                     </div><!-- search-icon -->
                 </div>
                 
                 <div class="form-group">
-                    <select name="category[]" class="selectpicker form-control bs-select-hidden" title="<?php echo $houzez_local['all_agent_cats']; ?>" data-live-search="true" data-selected-text-format="count" multiple data-actions-box="true" data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}">
+                    <select name="category[]" class="selectpicker form-control bs-select-hidden" title="<?php echo $houzez_local['all_agent_cats']; ?>" data-live-search="true" data-selected-text-format="count" multiple data-actions-box="true" data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-count-selected-text="{0} <?php echo houzez_option('cl_items_selected', 'items selected'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}">
                                 <?php houzez_get_search_taxonomies('agent_category', $category ); ?>
                             </select><!-- selectpicker -->
                 </div><!-- form-group -->
 
                 <div class="form-group">
-                    <select name="city[]" class="selectpicker form-control bs-select-hidden" title="<?php echo $houzez_local['all_agent_cities']; ?>" data-live-search="true" data-selected-text-format="count" multiple data-actions-box="true" data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}">
+                    <select name="city[]" class="selectpicker form-control bs-select-hidden" title="<?php echo $houzez_local['all_agent_cities']; ?>" data-live-search="true" data-selected-text-format="count" multiple data-actions-box="true" data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-count-selected-text="{0} <?php echo houzez_option('cl_items_selected', 'items selected'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}">
                                 <?php houzez_get_search_taxonomies('agent_city', $city ); ?>
                          
                             </select><!-- selectpicker -->

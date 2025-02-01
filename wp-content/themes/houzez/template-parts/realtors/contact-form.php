@@ -35,9 +35,9 @@ if ( is_singular( 'houzez_agent' ) ) {
     $target_email = $current_author->user_email;
     $name = $current_author->display_name;
     $image_url = $current_author_meta['fave_author_custom_picture'][0] ?? '';
-    $agent_id  = get_the_author_meta( 'ID' );
+    $agent_id  = $current_author->ID;
     $agent_type  = 'author_info';
-    $source_link = get_author_posts_url( get_the_author_meta( 'ID' ));
+    $source_link = get_author_posts_url( $current_author->ID );
 
     $form_shortcode = houzez_option('contact_form_agent_detail');
 }
@@ -83,7 +83,7 @@ if ( is_singular( 'houzez_agent' ) ) {
                         <div class="form_messages"></div>
 
                         <form method="post">
-                            <input type="hidden" id="target_email" name="target_email" value="<?php echo antispambot($target_email); ?>">
+                            
                             <input type="hidden" name="contact_realtor_ajax" id="contact_realtor_ajax" value="<?php echo wp_create_nonce('contact_realtor_nonce'); ?>"/>
                             <input type="hidden" name="action" value="houzez_contact_realtor" />
                             <input type="hidden" name="source_link" value="<?php echo esc_url($source_link)?>">
@@ -112,6 +112,8 @@ if ( is_singular( 'houzez_agent' ) ) {
                                 <textarea class="form-control" name="message" rows="4" placeholder="<?php esc_html_e('Message', 'houzez'); ?>"><?php echo sprintf(esc_html__('Hi %s, I saw your profile on %s and wanted to see if i can get some help', 'houzez'), $name, get_option('blogname')); ?></textarea>
                             </div><!-- form-group -->
                             <?php } ?>
+
+                            <?php do_action('houzez_realtor_contact_form_fields'); ?>
 
                             <?php if( $hide_form_fields['usertype'] != 1 ) { ?>    
                             <div class="form-group">

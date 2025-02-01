@@ -5,6 +5,7 @@ $num_of_review = houzez_option('num_of_review', 5);
 $section_header = isset($ele_settings['section_header']) ? $ele_settings['section_header'] : true;
 $section_title = isset($ele_settings['section_title']) && !empty($ele_settings['section_title']) ? $ele_settings['section_title'] : esc_html__('Leave a Review', 'houzez');
 
+$meta_key = $meta_value = '';
 if( is_singular( 'property' ) ) {
 	$meta_key = 'review_property_id';
 	$meta_value = get_the_ID();
@@ -59,7 +60,7 @@ $total_ratings = get_post_meta(get_the_ID(), 'houzez_total_rating', true);
 		
 		<?php get_template_part('template-parts/reviews/sortby'); ?>
 
-		<a class="btn btn-primary btn-slim" href="#property-review-form"><?php esc_html_e('Leave a Review', 'houzez'); ?></a>
+		<a class="btn hz-btn-lreview btn-primary btn-slim" href="#property-review-form"><?php esc_html_e('Leave a Review', 'houzez'); ?></a>
 	</div>
 
 	<input type="hidden" name="review_paged" id="review_paged" value="1">

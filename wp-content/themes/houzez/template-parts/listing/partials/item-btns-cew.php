@@ -1,5 +1,5 @@
 <?php 
-global $post, $listing_agent_info, $buttonsComposer;
+global $post, $random_token, $listing_agent_info, $buttonsComposer;
 
 $agent_mobile = $listing_agent_info['agent_mobile'] ?? '';
 $agent_whatsapp = $listing_agent_info['agent_whatsapp'] ?? '';
@@ -14,13 +14,13 @@ if ($buttonsComposer) {
 		
 		if( $key == 'call' && $agent_mobile != '' ) { $i ++;
 			?>
-		 	<button type="button" class="btn hz-call-popup-js btn-primary-outlined btn-item" data-model-id="call-action-<?php echo esc_attr($post->ID); ?>">
+		 	<button type="button" class="btn hz-call-popup-js btn-primary-outlined btn-item" data-model-id="call-action-<?php echo esc_attr($post->ID).'-'.$random_token; ?>">
 				<i class="houzez-icon icon-phone-actions-ring"></i> <?php esc_html_e('Call', 'houzez'); ?>
 			</button>
 		 	<?php
 		} elseif ( $key == 'email' && $agent_email != '' ) { $i ++;
 			?>
-			<button type="button" class="btn hz-email-popup-js btn-primary-outlined btn-item" data-model-id="email-popup-<?php echo esc_attr($post->ID); ?>">
+			<button type="button" class="btn hz-email-popup-js btn-primary-outlined btn-item" data-model-id="email-popup-<?php echo esc_attr($post->ID).'-'.$random_token; ?>">
 				<i class="houzez-icon icon-envelope"></i> <?php esc_html_e('Email', 'houzez'); ?>
 			</button>
 			<?php

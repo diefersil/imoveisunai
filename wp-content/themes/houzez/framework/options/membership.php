@@ -139,6 +139,7 @@ Redux::setSection( $houzez_opt_name, array(
                 'PEN'  => 'PEN',
                 'PHP'  => 'PHP',
                 'PLN'  => 'PLN',
+                'GTQ'  => 'GTQ',
                 'GEL'  => 'GEL',
                 'GBP'  => 'GBP',
                 'RON'  => 'RON',

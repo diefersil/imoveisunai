@@ -27,7 +27,7 @@ if( !function_exists('houzez_register_user_with_membership') ) {
         $first_name        = trim( sanitize_text_field( wp_kses( $_POST['first_name'], $allowed_html ) ));
         $last_name         = trim( sanitize_text_field( wp_kses( $_POST['last_name'], $allowed_html ) ));
 
-        $user_roles = array ( 'houzez_agency', 'houzez_agent', 'houzez_buyer', 'houzez_seller', 'houzez_owner', 'houzez_manager' );
+        $user_roles = array ( 'houzez_agency', 'houzez_agent', 'houzez_buyer', 'houzez_seller', 'houzez_owner' );
 
         if( isset( $_POST['user_role'] ) && empty($_POST['user_role']) ) {
             
@@ -1955,7 +1955,8 @@ function houzez_create_paypal_agreement($package_id, $access_token, $plan_id) {
     }
 
     $time               =  time();
-    $date               =  date_i18n( get_option('date_format').' '.get_option('time_format') ); //date('Y-m-d H:i:s',$time);
+    //$date               =  date_i18n( get_option('date_format').' '.get_option('time_format') ); 
+    date('Y-m-d H:i:s',$time);
 
     $packPrice          =  get_post_meta($package_id, 'fave_package_price', true );
     $packName           =  get_the_title($package_id);
@@ -2343,7 +2344,9 @@ if( !function_exists('houzez_property_actions') ):
 
             $listing_data = array(
                 'ID' => $prop_id,
-                'post_status' => 'publish'
+                'post_status' => 'publish',
+                'post_date' => current_time('mysql'), // Update to current local date and time
+                'post_date_gmt' => get_gmt_from_date(current_time('mysql')) // Update to current GMT date and time
             );
             wp_update_post($listing_data);
             update_post_meta($prop_id, 'fave_featured', '0');
@@ -2405,10 +2408,11 @@ if( ! function_exists( 'houzez_update_membership_package' ) ) {
         }
 
 
-        /*$time = time();
-        $date = date('Y-m-d H:i:s',$time);*/
-        $date = date_i18n( get_option('date_format').' '.get_option('time_format') );
+        $time = time();
+        $date = date('Y-m-d H:i:s',$time);
+        $date2 = date_i18n( get_option('date_format').' '.get_option('time_format') );
         update_user_meta( $user_id, 'package_activation', $date );
+        update_user_meta( $user_id, 'package_activation_local', $date2 );
         update_user_meta( $user_id, 'package_id', $package_id );
         update_user_meta( $user_id, 'houzez_membership_id', $package_id);
 
@@ -3087,8 +3091,8 @@ if( !function_exists('houzez_recuring_paypal_package_payment_deprecated') ) {
             $obj->paymentType               =   urlencode('Sale');
             $obj->productDesc               =   urlencode( $houzez_package_name.__(' package on ','houzez').get_bloginfo('name') );
             $time                           =   time();
-            //$date                         =   date('Y-m-d H:i:s',$time);
-            $date                           =   date_i18n( get_option('date_format').' '.get_option('time_format') );
+            $date                           =   date('Y-m-d H:i:s',$time);
+            //$date                           =   date_i18n( get_option('date_format').' '.get_option('time_format') );
             $obj->startDate                 =   urlencode($date);
             $obj->billingPeriod             =   urlencode($billingPeriod);
             $obj->billingFreq               =   urlencode($billingFreq);

@@ -15,11 +15,11 @@ if( $keyword_field == 'prop_title' ) {
 
 $keyword_autocomplete = houzez_option('keyword_autocomplete');
 
-$keyword = isset ( $_GET['keyword'] ) ? $_GET['keyword'] : ''; ?>
+$keyword = isset($_GET['keyword']) ? sanitize_text_field($_GET['keyword']) : ''; ?>
 <div class="form-group">
 	<div class="search-icon">
 		<?php if( $keyword_autocomplete != 1 ) { ?>
-		<input name="keyword" type="text" class="<?php houzez_ajax_search(); ?> houzez-keyword-autocomplete form-control" value="<?php echo esc_attr($keyword); ?>" placeholder="<?php echo esc_attr($keyword_placeholder); ?>">
+		<input name="keyword" type="text" class="<?php houzez_ajax_search(); ?> houzez-keyword-autocomplete form-control" value="<?php echo esc_html($keyword); ?>" placeholder="<?php echo esc_attr($keyword_placeholder); ?>">
 		<div id="auto_complete_ajax" class="auto-complete"></div>
 		<?php } else { ?>
 

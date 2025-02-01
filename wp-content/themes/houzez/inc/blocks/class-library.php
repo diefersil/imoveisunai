@@ -1,4 +1,7 @@
 <?php
+
+use Elementor\Plugin as Elementor;
+
 class Houzez_Library
 {
 	public function __construct()
@@ -12,23 +15,90 @@ class Houzez_Library
 		add_action('elementor/editor/after_enqueue_scripts', array($this, 'enqueue'));
 		add_action('elementor/editor/footer', array($this, 'render'));
 		add_action('elementor/frontend/before_enqueue_styles', array($this, 'inline_styles'));
+		// Register proper AJAX actions for Houzez templates.
+		add_action( 'elementor/ajax/register_actions', array( $this, 'register_ajax_actions' ), 20 );
 	}
 
 	public function inline_styles()
 	{
-?>
+	?>
 		<style>.houzez-library-modal-btn {margin-left: 5px;background: #35AAE1;vertical-align: top;font-size: 0 !important;}.houzez-library-modal-btn:before {content: '';width: 16px;height: 16px;background-image: url('<?php echo get_template_directory_uri() . '/img/studio-icon.png';?>');background-position: center;background-size: contain;background-repeat: no-repeat;}#houzez-library-modal .houzez-elementor-template-library-template-name {text-align: right;flex: 1 0 0%;}</style>
 	<?php
 	}
 
 	public function register_templates_source()
 	{
-		Elementor\Plugin::instance()->templates_manager->register_source('Houzez_Library_Source');
+		Elementor::instance()->templates_manager->register_source('Houzez_Library_Source');
 	}
 
 	public function enqueue()
 	{
 		wp_enqueue_script('houzez-blocks', get_template_directory_uri() . '/inc/blocks/assets/js/blocks-templates.js', array('jquery'), '1.0.0', true);
+	}
+
+	/**
+	 * Override registered Elementor native actions.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $ajax AJAX manager.
+	 */
+	public function register_ajax_actions( $ajax ) {
+		// phpcs:disable
+		if ( ! isset( $_REQUEST['actions'] ) ) {
+			return;
+		}
+
+		$actions = json_decode( stripslashes( $_REQUEST['actions'] ), true );
+
+		$data = false;
+
+		foreach ( $actions as $action_data ) {
+			if ( ! isset( $action_data['get_template_data'] ) ) {
+				$data = $action_data;
+			}
+		}
+
+		if ( ! $data ) {
+			return;
+		}
+
+		if ( ! isset( $data['data'] ) ) {
+			return;
+		}
+
+		$data = $data['data'];
+
+		if ( empty( $data['template_id'] ) ) {
+			return;
+		}
+
+		if ( false === strpos( $data['template_id'], 'houzez_' ) ) {
+			return;
+		}
+
+		// Once found out that current request is for Houzez then replace the native action.
+		$ajax->register_ajax_action( 'get_template_data', array( $this, 'get_template_data' ) );
+		// phpcs:enable
+	}
+
+	/**
+	 * Get template data.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $args Request arguments.
+	 *
+	 * @return array Template data.
+	 */
+	public static function get_template_data( $args ) {
+		$source = Elementor::instance()->templates_manager->get_source( 'houzez' );
+
+		$args['template_id'] = intval( str_replace( 'houzez_', '', $args['template_id'] ) );
+		
+		$data = $source->get_data( $args );
+
+		return $data;
 	}
 
 	public function render()

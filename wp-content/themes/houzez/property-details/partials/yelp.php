@@ -93,6 +93,8 @@ if ( $yelp_dist_unit == 'kilometers' ) {
                     $error .= $response->error->description;
                 }
                 $output .= '<div class="yelp-api-error">' . esc_html( $error ) . '</div>';
+                echo $output;
+                break;
 
             } else {
 

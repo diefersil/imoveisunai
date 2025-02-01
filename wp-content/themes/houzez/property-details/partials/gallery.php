@@ -10,6 +10,7 @@ if ( houzez_site_width() != '1210px' && $top_area != 'v3' ) {
 $properties_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$image_size, $post->ID );
 $gallery_caption = houzez_option('gallery_caption', 0); 
 $property_gallery_popup_type = houzez_get_popup_gallery_type(); 
+$gallery_token = wp_generate_password(5, false, false);
 if( !empty($properties_images) && count($properties_images) ) {
 ?>
 <div class="top-gallery-section">
@@ -21,11 +22,20 @@ if( !empty($properties_images) && count($properties_images) ) {
             <?php
             foreach( $properties_images as $prop_image_id => $prop_image_meta ) {
                 $thumb = houzez_get_image_by_id($prop_image_id, 'houzez-item-image-1');
+
+                $image_url = esc_url( $prop_image_meta['full_url'] );
+                $image_dimensions = houzez_get_image_dimensions_by_url($prop_image_meta['full_url']);
+				$image_width = $image_dimensions['width'];
+				$image_height = $image_dimensions['height'];
+                $thumbnail_url = esc_url( $prop_image_meta['url'] );
+                $image_alt = esc_attr( $prop_image_meta['alt'] );
+                $image_title = esc_attr( $prop_image_meta['title'] );
+                $gallery_token_safe = esc_attr( $gallery_token );
                 ?>
                 
                 <div data-thumb="<?php echo esc_url( $thumb[0] );?>" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
-                    <a href="<?php echo esc_url( $prop_image_meta['full_url'] ); ?>" itemprop="contentUrl" data-size="<?php echo esc_attr($prop_image_meta['width']); ?>x<?php echo esc_attr($prop_image_meta['height']); ?>">
-                        <img class="img-fluid" src="<?php echo esc_url( $prop_image_meta['url'] ); ?>" itemprop="thumbnail" alt="<?php echo esc_attr($prop_image_meta['alt']); ?>" title="<?php esc_attr($prop_image_meta['title']); ?>" />
+                    <a href="<?php echo $image_url; ?>" itemprop="contentUrl" data-gallery-item data-pswp-width="<?php echo esc_attr($image_width); ?>" data-pswp-height="<?php echo esc_attr($image_height); ?>">        
+                        <img class="img-fluid" src="<?php echo $thumbnail_url; ?>" itemprop="thumbnail" alt="<?php echo $image_alt; ?>" title="<?php echo $image_title; ?>" />
                     </a>
                     <?php
                     if( !empty($prop_image_meta['caption']) && $gallery_caption != 0 ) { ?>
@@ -39,7 +49,7 @@ if( !empty($properties_images) && count($properties_images) ) {
     <?php
     } else { ?>
 
-        <div id="property-gallery-js" class="houzez-photoswipe listing-slider cS-hidden">
+        <div id="property-gallery-js" class="listing-slider cS-hidden">
             <?php
             $i = 0;
             foreach( $properties_images as $prop_image_id => $prop_image_meta ) { $i++;

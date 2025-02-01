@@ -40,7 +40,7 @@ $args = array(
 /* Keyword Based Search */
 $keyword = isset($_GET['agency_name']) ? sanitize_text_field(trim($_GET['agency_name'])) : '';
 if (!empty($keyword)) {
-    $args['s'] = $keyword;
+    $args['s'] = esc_html($keyword);
 }
 
 query_posts( $args );
@@ -104,7 +104,7 @@ if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
                     <?php houzez_pagination( $wp_query->max_num_pages ); wp_reset_query(); ?>
 
                 </div><!-- bt-content-wrap -->
-                <div class="col-lg-4 col-md-12 bt-sidebar-wrap left-bt-sidebar-wrap <?php if( $sticky_sidebar['agency_sidebar'] != 0 ){ echo 'houzez_sticky'; }?>">
+                <div class="col-lg-4 col-md-12 bt-sidebar-wrap left-bt-sidebar-wrap <?php if( isset($sticky_sidebar['agency_sidebar']) && $sticky_sidebar['agency_sidebar'] != 0 ){ echo 'houzez_sticky'; }?>">
                     <?php get_sidebar('agencies'); ?>
                 </div><!-- bt-sidebar-wrap -->
             <?php } ?>

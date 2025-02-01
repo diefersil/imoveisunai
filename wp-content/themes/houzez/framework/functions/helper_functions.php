@@ -8,20 +8,33 @@
 /*-----------------------------------------------------------------------------------*/
 // Allowed HTML tags
 /*-----------------------------------------------------------------------------------*/
-if( !function_exists('houzez_allowed_html')) {
+if (!function_exists('houzez_allowed_html')) {
     function houzez_allowed_html() {
-        $allowed_html_array = array(
+        return array(
             'a' => array(
                 'href' => array(),
                 'title' => array(),
-                'target' => array()
+                'target' => array(),
+                'class' => array(),
+                'rel' => array(),
             ),
             'strong' => array(),
+            'b' => array(),
+            'em' => array(),
+            'i' => array(),
             'th' => array(),
             'td' => array(),
-            'span' => array(),
-        ); 
-        return $allowed_html_array;
+            'span' => array(
+                'class' => array(),
+            ),
+            'p' => array(
+                'class' => array(),
+            ),
+            'br' => array(),
+            'ul' => array(),
+            'ol' => array(),
+            'li' => array(),
+        );
     }
 }
 
@@ -31,12 +44,28 @@ if( ! function_exists('houzez_site_width') ) {
     }
 }
 
-if( ! function_exists('fave_option') ) {
-    function fave_option( $opt_name, $default = null ) {
-        $fave_options = get_option('houzez_options');
+if( ! function_exists('houzez_random_token') ) {
+    function houzez_random_token() {
+        $token = wp_generate_password(5, false, false);
+        return $token;
+    }
+}
 
-        $option_val = isset( $fave_options[ $opt_name ] ) ? $fave_options[ $opt_name ] : $default;
-        return $option_val;
+if (!function_exists('fave_option')) {
+    /**
+     * Retrieve a specific option value from the 'houzez_options' settings.
+     *
+     * This function fetches the value of a given option from the 'houzez_options' stored in the database.
+     * If the requested option does not exist, it returns the provided default value.
+     *
+     * @param string $opt_name The name of the option to retrieve.
+     * @param mixed $default The default value to return if the option does not exist.
+     * @return mixed The value of the option or the default value.
+     */
+    function fave_option($opt_name, $default = null) {
+        $fave_options = get_option('houzez_options', []);
+
+        return $fave_options[$opt_name] ?? $default;
     }
 }
 
@@ -52,6 +81,23 @@ if( ! function_exists('houzez_get_listing_link_target') ) {
         $listing_link_target = houzez_option('listing_link_target', '_self');
 
         $link_target = 'target='.$listing_link_target.'';
+
+        return $link_target;
+    }
+}
+
+if( ! function_exists('houzez_project_link_target') ) {
+    function houzez_project_link_target() {
+        
+        echo houzez_get_project_link_target();
+    }
+}
+
+if( ! function_exists('houzez_get_project_link_target') ) {
+    function houzez_get_project_link_target() {
+        $project_link_target = houzez_option('project_link_target', '_self');
+
+        $link_target = 'target='.$project_link_target.'';
 
         return $link_target;
     }
@@ -216,19 +262,34 @@ if( ! function_exists( 'houzez_get_main_wrap_class' ) ) {
 /*------------------------------------------------------------------------------------------------------------
 * Favethemes Studio
 *-----------------------------------------------------------------------------------------------------------*/
-if( ! function_exists( 'houzez_get_elementor_template' ) ) {
-    function houzez_get_elementor_template( $id ) {
-        if ( ! class_exists( 'Elementor\Plugin' ) ) {
-            return;
+if (!function_exists('houzez_get_elementor_template')) {
+    /**
+     * Get Elementor template content by ID.
+     *
+     * @param int $id The template ID.
+     * @return string|null The template content or null if not found.
+     */
+    function houzez_get_elementor_template($id) {
+        // Check if Elementor is active
+        if (!class_exists('\Elementor\Plugin')) {
+            return null;
         }
 
-        if ( empty( $id ) ) {
-            return;
+        // Validate input
+        $id = absint($id);
+        if ($id === 0) {
+            return null;
         }
 
-        $content = \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $id );
-
-        return $content;
+        // Get the template content
+        try {
+            $content = \Elementor\Plugin::instance()->frontend->get_builder_content_for_display($id);
+            return $content ?: null;
+        } catch (\Exception $e) {
+            // Log the error or handle it as needed
+            error_log("Error fetching Elementor template (ID: $id): " . $e->getMessage());
+            return null;
+        }
     }
 }
 
@@ -365,13 +426,19 @@ if ( ! function_exists( 'houzez_elementor_is_preview_page' ) ) {
     }
 }
 
-if( !function_exists('houzez_minify_js') ) {
+if (!function_exists('houzez_minify_js')) {
+    /**
+     * Determine if JavaScript should be minified and return appropriate file suffix.
+     *
+     * @return string The suffix for JavaScript files ('.min' or '').
+     */
     function houzez_minify_js() {
-        $minify_js = houzez_option('minify_js');
-        $js_minify_prefix = '';
-        if ($minify_js != 0) {
-            $js_minify_prefix = '.min';
+        static $js_minify_prefix = null;
+
+        if ($js_minify_prefix === null) {
+            $js_minify_prefix = houzez_option('minify_js', false) ? '.min' : '';
         }
+
         return $js_minify_prefix;
     }
 }
@@ -623,6 +690,51 @@ if( !function_exists('houzez_admin_post_type') ) {
             $post_type = 'post';
 
         return $post_type;
+    }
+}
+
+if( !function_exists('houzez_get_image_dimensions_by_url') ) {
+    function houzez_get_image_dimensions_by_url($image_url) {
+        // First try to get attachment ID from URL
+        $attachment_id = attachment_url_to_postid($image_url);
+        
+        if ($attachment_id) {
+            // If it's a WP attachment, get the full image size
+            $image = wp_get_attachment_image_src($attachment_id, 'full');
+            if ($image) {
+                return array(
+                    'width' => $image[1],
+                    'height' => $image[2]
+                );
+            }
+        }
+
+        // If not an attachment or couldn't get dimensions, try direct file access
+        $upload_dir = wp_upload_dir();
+        $base_url = $upload_dir['baseurl'];
+        $base_dir = $upload_dir['basedir'];
+        
+        // Convert URL to file path
+        $file_path = str_replace($base_url, $base_dir, $image_url);
+        
+        // Clean up the file path
+        $file_path = wp_normalize_path($file_path);
+        
+        if (file_exists($file_path)) {
+            $dimensions = getimagesize($file_path);
+            if ($dimensions) {
+                return array(
+                    'width' => $dimensions[0],
+                    'height' => $dimensions[1]
+                );
+            }
+        }
+
+        // If all else fails, return default dimensions
+        return array(
+            'width' => 1170,
+            'height' => 785
+        );
     }
 }
 
@@ -1805,7 +1917,9 @@ if( !function_exists('houzez_is_dashboard') ) {
             
         ) );
 
-        if ( is_page_template($files) ) {
+        if ( is_page_template('template/user_dashboard_submit.php') && ! is_user_logged_in() ) {
+            return false;
+        } else if ( is_page_template($files) ) {
             return true;
         }
         return false;
@@ -2166,13 +2280,15 @@ if(!function_exists('houzez_area_unit_label')) {
     }
 }
 
-
-if(!function_exists('houzez_traverse_comma_string')) {
+if (!function_exists('houzez_traverse_comma_string')) {
     function houzez_traverse_comma_string($string) {
-        if(!empty($string)) {
-            $string_array = explode(',', $string);
+        // Ensure the string is not empty and is a valid string
+        if (!empty($string) && is_string($string)) {
+            // Split the string by commas, trim whitespace, and filter out empty values
+            $string_array = array_filter(array_map('trim', explode(',', $string)));
             
-            if(!empty($string_array[0])) {
+            // Return the array if it's not empty, otherwise return an empty string
+            if (!empty($string_array)) {
                 return $string_array;
             }
         }
@@ -2280,18 +2396,19 @@ if(!function_exists('houzez_delete_property_attachments_frontend')) {
     }
 }
 
-// retrieves the attachment ID from the file URL
 if( !function_exists('houzez_get_image_id') ) {
     function houzez_get_image_id($image_url) {
 
         if( empty( $image_url ) ) {
             return "";
         }
-        global $wpdb;
-        $attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE guid='%s';", $image_url));
-        return $attachment[0];
+
+        // Use WordPress built-in function
+        return attachment_url_to_postid( $image_url );
     }
 }
+
+
 
 if( !function_exists('houzez_propperty_id_prefix') ) {
     function houzez_propperty_id_prefix( $property_id ) {
@@ -3039,11 +3156,21 @@ if( !function_exists('houzez_number_list') ) {
 if ( ! function_exists( 'houzez_get_attachment_metadata' ) ) {
     function houzez_get_attachment_metadata($attachment_id)
     {
-        $thumbnail_image = get_posts(array('p' => $attachment_id, 'post_type' => 'attachment'));
+        // Ensure the post exists and is an attachment
+        $post_obj = get_post($attachment_id);
 
-        if ($thumbnail_image && isset($thumbnail_image[0])) {
-            return $thumbnail_image[0];
+        if ($post_obj && $post_obj->post_type === 'attachment') {
+            // Check if the current user has permission to view the attachment
+            if (current_user_can('read_post', $attachment_id) || !is_user_logged_in()) {
+                return $post_obj;
+            } else {
+                // Return some form of error or empty data if the user doesn't have access
+                return new WP_Error('no_access', __('You do not have permission to view this attachment.'));
+            }
         }
+
+        // Return null if no attachment is found
+        return null;
     }
 }
 
@@ -3561,14 +3688,41 @@ if( !function_exists('houzez_link_pages_args_prevnext_add') ) {
     add_filter('wp_link_pages_args', 'houzez_link_pages_args_prevnext_add');
 }
 
+if ( ! function_exists( 'houzez_get_pagination_type' ) ) {
+    /**
+     * Retrieves the pagination type based on the current page context.
+     *
+     * @return string The pagination type.
+     */
+    function houzez_get_pagination_type() {
+        global $post;
+        if ( houzez_is_listings_template() || houzez_is_search_result() ) {
+            $pagination_type = get_post_meta( $post->ID, 'fave_pagination_type', true );
+            if( $pagination_type == '_global' || $pagination_type == '' ) {
+                $pagination_type = houzez_option( 'listing_pagination', '_number' );
+            }
+
+        } elseif ( is_singular( 'houzez_agent' ) ) {
+            $pagination_type = houzez_option( 'agent_listing_pagination', '_loadmore' );
+
+        } elseif ( is_singular( 'houzez_agency' ) ) {
+            $pagination_type = houzez_option( 'agency_listing_pagination', '_loadmore' );
+
+        } else {
+            $pagination_type = '_number';
+        }
+
+        return $pagination_type;
+    }
+}
+
 /**
  *   -------------------------------------------------------------
  *   Houzez Pagination
  *   -------------------------------------------------------------
  */
 if( !function_exists( 'houzez_pagination' ) ){
-    function houzez_pagination( $pages = '' ) {
-        
+    function houzez_pagination( ?int $pages = null, ?int $total_listings = null, ?int $listings_per_page = null, ?string $pagi_type = null ) {
         $paged = 1;
         if ( get_query_var( 'paged' ) ) {
             $paged = get_query_var( 'paged' );
@@ -3589,73 +3743,111 @@ if( !function_exists( 'houzez_pagination' ) ){
             }
         }
 
+        $pagination_type = houzez_get_pagination_type();
 
-        if( 1 != $pages ){
+        if( !empty($pagi_type) && $pagi_type != "_global" ) {
+            $pagination_type = $pagi_type;
+        }
 
-            $output = "";
-            $inner = "";
-            $output .= '<div class="pagination-wrap">';
-                $output .= '<nav>';
-                    $output .= '<ul class="pagination justify-content-center">';
-                        
-                        if( $paged > 2 && $paged > $range+1 && $showitems < $pages ) { 
-                            $output .= '<li class="page-item">';
-                                $output .= '<a class="page-link" href="'.get_pagenum_link(1).'" aria-label="Previous">';
-                                    $output .= '<i class="houzez-icon icon-arrow-button-left-1"></i>';
-                                $output .= '</a>';
-                            $output .= '</li>';
-                        }
+        if( $pagination_type == '_infinite' ) {
+            ?>
+            <div id="fave-pagination-loadmore" class="load-more-wrap mb-4">
+                <div id="houzez-infinite-load" class="houzez-infinite-load"  
+                data-page="<?php echo $next; ?>" 
+                data-total="<?php echo intval($total_listings);?>" 
+                data-per-page="<?php echo intval($listings_per_page);?>"
+                data-pagi-type="<?php echo esc_attr($pagination_type);?>"
+                href="<?php echo get_pagenum_link($next); ?>">
+                    <?php get_template_part('template-parts/loader-dots'); ?>   
+                </div>               
+            </div>
 
-                        if( $paged > 1 ) { 
-                            $output .= '<li class="page-item">';
-                                $output .= '<a class="page-link" href="'.get_pagenum_link($prev).'" aria-label="Previous">';
-                                    $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
-                                $output .= '</a>';
-                            $output .= '</li>';
-                        } else {
-                            $output .= '<li class="page-item disabled">';
-                                $output .= '<a class="page-link" aria-label="Previous">';
-                                    $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
-                                $output .= '</a>';
-                            $output .= '</li>';
-                        }
+            <?php
+        } else if( $pagination_type == '_loadmore' ) {
+            ?>
+            <div id="fave-pagination-loadmore" class="load-more-wrap mb-4 fave-load-more">
+                <a class="houzez-infinite-load btn btn-primary-outlined btn-load-more"  
+                data-page="<?php echo $next; ?>" 
+                data-total="<?php echo intval($total_listings);?>" 
+                data-per-page="<?php echo intval($listings_per_page);?>"
+                data-pagi-type="<?php echo esc_attr($pagination_type);?>"
+                href="<?php echo get_pagenum_link($next); ?>">
+                    <?php get_template_part('template-parts/loader'); ?>
+                    <?php esc_html_e('Load More', 'houzez'); ?>   
+                </a>               
+            </div>
 
-                        for ( $i = 1; $i <= $pages; $i++ ) {
-                            if ( 1 != $pages &&( !( $i >= $paged+$range+1 || $i <= $paged-$range-1 ) || $pages <= $showitems ) )
-                            {
-                                if ( $paged == $i ){
-                                    $inner .= '<li class="page-item active"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.' <span class="sr-only"></span></a></li>';
-                                } else {
-                                    $inner .= '<li class="page-item"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
+            <?php
+        } else {
+
+
+            if( 1 != $pages && $pages) {
+
+                $output = "";
+                $inner = "";
+                $output .= '<div class="pagination-wrap">';
+                    $output .= '<nav>';
+                        $output .= '<ul class="pagination justify-content-center">';
+                            
+                            if( $paged > 2 && $paged > $range+1 && $showitems < $pages ) { 
+                                $output .= '<li class="page-item">';
+                                    $output .= '<a class="page-link" href="'.get_pagenum_link(1).'" aria-label="Previous">';
+                                        $output .= '<i class="houzez-icon icon-arrow-button-left-1"></i>';
+                                    $output .= '</a>';
+                                $output .= '</li>';
+                            }
+
+                            if( $paged > 1 ) { 
+                                $output .= '<li class="page-item">';
+                                    $output .= '<a class="page-link" href="'.get_pagenum_link($prev).'" aria-label="Previous">';
+                                        $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
+                                    $output .= '</a>';
+                                $output .= '</li>';
+                            } else {
+                                $output .= '<li class="page-item disabled">';
+                                    $output .= '<a class="page-link" aria-label="Previous">';
+                                        $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
+                                    $output .= '</a>';
+                                $output .= '</li>';
+                            }
+
+                            for ( $i = 1; $i <= $pages; $i++ ) {
+                                if ( 1 != $pages &&( !( $i >= $paged+$range+1 || $i <= $paged-$range-1 ) || $pages <= $showitems ) )
+                                {
+                                    if ( $paged == $i ){
+                                        $inner .= '<li class="page-item active"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.' <span class="sr-only"></span></a></li>';
+                                    } else {
+                                        $inner .= '<li class="page-item"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
+                                    }
                                 }
                             }
-                        }
-                        $output .= $inner;
-                        
+                            $output .= $inner;
+                            
 
-                        if($paged < $pages) {
-                            $output .= '<li class="page-item">';
-                                $output .= '<a class="page-link" href="'.get_pagenum_link($next).'" aria-label="Next">';
-                                    $output .= '<i class="houzez-icon icon-arrow-right-1"></i>';
-                                $output .= '</a>';
-                            $output .= '</li>';
-                        }
+                            if($paged < $pages) {
+                                $output .= '<li class="page-item">';
+                                    $output .= '<a class="page-link" href="'.get_pagenum_link($next).'" aria-label="Next">';
+                                        $output .= '<i class="houzez-icon icon-arrow-right-1"></i>';
+                                    $output .= '</a>';
+                                $output .= '</li>';
+                            }
 
-                        if( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) {
-                            $output .= '<li class="page-item">';
-                                $output .= '<a class="page-link" href="'.get_pagenum_link( $pages ).'" aria-label="Next">';
-                                    $output .= '<i class="houzez-icon icon-arrow-button-right-1"></i>';
-                                $output .= '</a>';
-                            $output .= '</li>';
-                        }
+                            if( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) {
+                                $output .= '<li class="page-item">';
+                                    $output .= '<a class="page-link" href="'.get_pagenum_link( $pages ).'" aria-label="Next">';
+                                        $output .= '<i class="houzez-icon icon-arrow-button-right-1"></i>';
+                                    $output .= '</a>';
+                                $output .= '</li>';
+                            }
 
 
-                    $output .= '</ul>';
-                $output .= '</nav>';
-            $output .= '</div>';
+                        $output .= '</ul>';
+                    $output .= '</nav>';
+                $output .= '</div>';
 
-            echo $output;
+                echo $output;
 
+            }
         }
     }
 }
@@ -3690,7 +3882,7 @@ if( !function_exists( 'houzez_ajax_pagination' ) ){
             }
         }
 
-        if( 1 != $pages ){
+        if( 1 != $pages && $pages){
 
             echo '<div class="pagination-wrap houzez_ajax_pagination">';
             echo '<nav>';
@@ -4672,21 +4864,34 @@ if( !function_exists('houzez_dashboard_invoices_link') ) {
 /*-----------------------------------------------------------------------------------*/
 // Generate Hirarchical terms
 /*-----------------------------------------------------------------------------------*/
-if(!function_exists('houzez_hirarchical_options')){
-    function houzez_hirarchical_options($taxonomy_name, $taxonomy_terms, $searched_term, $prefix = " " ){
+if (!function_exists('houzez_hirarchical_options')) {
+    function houzez_hirarchical_options($taxonomy_name, $taxonomy_terms, $searched_term, $prefix = " ") {
 
         if (!empty($taxonomy_terms) && taxonomy_exists($taxonomy_name)) {
             foreach ($taxonomy_terms as $term) {
 
                 if( $taxonomy_name == 'property_area' ) {
-                    $term_meta= get_option( "_houzez_property_area_$term->term_id");
-                    $parent_city = sanitize_title($term_meta['parent_city']);
+                    $term_meta = get_option("_houzez_property_area_$term->term_id");
 
-                    if ( class_exists( 'sitepress' ) ) {
-                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_area');
-                        $term_meta= get_option( "_houzez_property_area_$term_id_default");
+                    if (is_array($term_meta) && isset($term_meta['parent_city'])) {
                         $parent_city = sanitize_title($term_meta['parent_city']);
-                        $parent_city = get_term_by( 'slug', $parent_city, 'property_city' )->slug;
+                    } else {
+                        $parent_city = ''; // or some default value
+                    }
+
+                    if (class_exists('sitepress')) {
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_area');
+                        $term_meta = get_option("_houzez_property_area_$term_id_default");
+
+                        if (is_array($term_meta) && isset($term_meta['parent_city'])) {
+                            $parent_city = sanitize_title($term_meta['parent_city']);
+                            $parent_city_term = get_term_by('slug', $parent_city, 'property_city');
+                            if ($parent_city_term) {
+                                $parent_city = $parent_city_term->slug;
+                            } else {
+                                $parent_city = ''; // fallback if no term is found
+                            }
+                        }
                     }
 
                     if ($searched_term == $term->slug) {
@@ -4694,17 +4899,28 @@ if(!function_exists('houzez_hirarchical_options')){
                     } else {
                         echo '<option data-ref="' . urldecode($term->slug) . '" data-belong="'.urldecode($parent_city).'" value="' . urldecode($term->slug) . '">' . esc_attr($prefix) . esc_attr($term->name) .'</option>';
                     }
-                    
-                } elseif( $taxonomy_name == 'property_city' ) {
-                    $term_meta= get_option( "_houzez_property_city_$term->term_id");
-                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                    $parent_state = sanitize_title($parent_state);
 
-                    if ( class_exists( 'sitepress' ) ) {
-                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_city');
-                        $term_meta= get_option( "_houzez_property_city_$term_id_default");
+                } elseif ($taxonomy_name == 'property_city') {
+                    $term_meta = get_option("_houzez_property_city_$term->term_id");
+                    $parent_state = '';
+
+                    if (is_array($term_meta) && isset($term_meta['parent_state'])) {
                         $parent_state = sanitize_title($term_meta['parent_state']);
-                        $parent_state = get_term_by( 'slug', $parent_state, 'property_state' )->slug;
+                    }
+
+                    if (class_exists('sitepress')) {
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_city');
+                        $term_meta = get_option("_houzez_property_city_$term_id_default");
+
+                        if (is_array($term_meta) && isset($term_meta['parent_state'])) {
+                            $parent_state = sanitize_title($term_meta['parent_state']);
+                            $parent_state_term = get_term_by('slug', $parent_state, 'property_state');
+                            if ($parent_state_term) {
+                                $parent_state = $parent_state_term->slug;
+                            } else {
+                                $parent_state = ''; // fallback if no term is found
+                            }
+                        }
                     }
 
                     if ($searched_term == $term->slug) {
@@ -4713,16 +4929,27 @@ if(!function_exists('houzez_hirarchical_options')){
                         echo '<option data-ref="' . urldecode($term->slug) . '" data-belong="'.urldecode($parent_state).'" value="' . urldecode($term->slug) . '">' . esc_attr($prefix) . esc_attr($term->name) .'</option>';
                     }
 
-                } elseif( $taxonomy_name == 'property_state' ) {
+                } elseif ($taxonomy_name == 'property_state') {
+                    $term_meta = get_option("_houzez_property_state_$term->term_id");
+                    $parent_country = '';
 
-                    $term_meta = get_option( "_houzez_property_state_$term->term_id");
-                    $parent_country = sanitize_title($term_meta['parent_country']);
-
-                    if ( class_exists( 'sitepress' ) ) {
-                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_state');
-                        $term_meta= get_option( "_houzez_property_state_$term_id_default");
+                    if (is_array($term_meta) && isset($term_meta['parent_country'])) {
                         $parent_country = sanitize_title($term_meta['parent_country']);
-                        $parent_country = get_term_by( 'slug', $parent_country, 'property_country' )->slug;
+                    }
+
+                    if (class_exists('sitepress')) {
+                        $term_id_default = houzez_translate_object_id($term->term_id, 'property_state');
+                        $term_meta = get_option("_houzez_property_state_$term_id_default");
+
+                        if (is_array($term_meta) && isset($term_meta['parent_country'])) {
+                            $parent_country = sanitize_title($term_meta['parent_country']);
+                            $parent_country_term = get_term_by('slug', $parent_country, 'property_country');
+                            if ($parent_country_term) {
+                                $parent_country = $parent_country_term->slug;
+                            } else {
+                                $parent_country = ''; // fallback if no term is found
+                            }
+                        }
                     }
 
                     if ($searched_term == $term->slug) {
@@ -4731,8 +4958,8 @@ if(!function_exists('houzez_hirarchical_options')){
                         echo '<option data-ref="' . urldecode($term->slug) . '" data-belong="'.urldecode($parent_country).'" value="' . urldecode($term->slug) . '">' . esc_attr($prefix) . esc_attr($term->name) .'</option>';
                     }
 
-                } elseif( $taxonomy_name == 'property_country' ) {
-            
+                } elseif ($taxonomy_name == 'property_country') {
+
                     if ($searched_term == $term->slug) {
                         echo '<option data-ref="' . urldecode($term->slug) . '" value="' . urldecode($term->slug) . '" selected="selected">' . esc_attr($prefix) . esc_attr($term->name) . '</option>';
                     } else {
@@ -4748,14 +4975,13 @@ if(!function_exists('houzez_hirarchical_options')){
                     }
                 }
 
-
                 $child_terms = get_terms($taxonomy_name, array(
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 ));
 
                 if (!empty($child_terms)) {
-                    houzez_hirarchical_options( $taxonomy_name, $child_terms, $searched_term, "- ".$prefix );
+                    houzez_hirarchical_options($taxonomy_name, $child_terms, $searched_term, "- ".$prefix);
                 }
             }
         }
@@ -5877,20 +6103,33 @@ if(!function_exists('houzez_get_search_taxonomies')){
                     $parent_state = sanitize_title($parent_state);
  
                     // WPML workaround for compsupp-6550 | Part 1
-                    if ( class_exists( 'sitepress' ) ) {                        
+                    if (class_exists('sitepress')) {
                         // Configs
-                        $default_lang = apply_filters('wpml_default_language', NULL );
-                        $current_lang = apply_filters( 'wpml_current_language', NULL );
+                        $default_lang = apply_filters('wpml_default_language', NULL);
+                        $current_lang = apply_filters('wpml_current_language', NULL);
                         $id = $category->term_id;
-                        $tax_slug = $taxonomy_name;                        
-                         
-                        if ($default_lang != $current_lang ) {
-                            $term_id_default = apply_filters( 'wpml_object_id', $id, $tax_slug, true, $default_lang );
-                            $term_meta= get_option( "_houzez_".$tax_slug."_".$term_id_default);
- 
-                            // Replace with the correct settings
-                            $parent_state = sanitize_title($term_meta['parent_state']);
-                            $parent_state = get_term_by( 'slug', $parent_state, 'property_state' )->slug;
+                        $tax_slug = $taxonomy_name;
+                        
+                        if ($default_lang != $current_lang) {
+                            $term_id_default = apply_filters('wpml_object_id', $id, $tax_slug, true, $default_lang);
+                            $term_meta = get_option("_houzez_" . $tax_slug . "_" . $term_id_default);
+
+                            // Check if $term_meta is an array and contains the 'parent_state' key
+                            if (is_array($term_meta) && isset($term_meta['parent_state'])) {
+                                $parent_state = sanitize_title($term_meta['parent_state']);
+                                $parent_state_term = get_term_by('slug', $parent_state, 'property_state');
+
+                                // Check if the term was found
+                                if ($parent_state_term) {
+                                    $parent_state = $parent_state_term->slug;
+                                } else {
+                                    // Handle the case where the term is not found
+                                    $parent_state = '';
+                                }
+                            } else {
+                                // Handle the case where $term_meta is not an array or 'parent_state' is not set
+                                $parent_state = '';
+                            }
                         }
                     }
  
@@ -5903,24 +6142,35 @@ if(!function_exists('houzez_get_search_taxonomies')){
                     $parent_city = sanitize_title($parent_city);
                      
                     // WPML workaround for compsupp-6550 | Part 2
-                    if ( class_exists( 'sitepress' ) ) {                      
+                    if (class_exists('sitepress')) {
                         // Configs
-                        $default_lang = apply_filters('wpml_default_language', NULL );
-                        $current_lang = apply_filters( 'wpml_current_language', NULL );
+                        $default_lang = apply_filters('wpml_default_language', NULL);
+                        $current_lang = apply_filters('wpml_current_language', NULL);
                         $id = $category->term_id;
-                        $tax_slug = $taxonomy_name;                        
-                         
-                        if ($default_lang != $current_lang ) {
-                            $term_id_default = apply_filters( 'wpml_object_id', $id, $tax_slug, true, $default_lang );
-                            $term_meta= get_option( "_houzez_".$tax_slug."_".$term_id_default);
- 
-                            // Replace with the correct settings
-                            $parent_city = sanitize_title($term_meta['parent_city']);
-                            $parent_city = get_term_by( 'slug', $parent_city, 'property_city' )->slug;
+                        $tax_slug = $taxonomy_name;
+                        
+                        if ($default_lang != $current_lang) {
+                            $term_id_default = apply_filters('wpml_object_id', $id, $tax_slug, true, $default_lang);
+                            $term_meta = get_option("_houzez_" . $tax_slug . "_" . $term_id_default);
+                            
+                            // Check if $term_meta is an array and contains the 'parent_city' key
+                            if (is_array($term_meta) && isset($term_meta['parent_city'])) {
+                                $parent_city = sanitize_title($term_meta['parent_city']);
+                                $parent_city_term = get_term_by('slug', $parent_city, 'property_city');
+                                
+                                // Check if the term was found
+                                if ($parent_city_term) {
+                                    $parent_city = $parent_city_term->slug;
+                                } else {
+                                    // Handle the case where the term is not found
+                                    $parent_city = '';
+                                }
+                            } else {
+                                // Handle the case where $term_meta is not an array or 'parent_city' is not set
+                                $parent_city = '';
+                            }
                         }
-                    }
- 
-                     
+                    }  
  
                     $data_attr = 'data-belong="'.esc_attr($parent_city).'"';
                     $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_city, 'property_city').'"';
@@ -5933,20 +6183,33 @@ if(!function_exists('houzez_get_search_taxonomies')){
                     $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_country, 'property_country').'"';
  
                     // WPML workaround for compsupp-6550 | Part 3
-                    if ( class_exists( 'sitepress' ) ) {                      
+                    if (class_exists('sitepress')) {
                         // Configs
-                        $default_lang = apply_filters('wpml_default_language', NULL );
-                        $current_lang = apply_filters( 'wpml_current_language', NULL );
+                        $default_lang = apply_filters('wpml_default_language', NULL);
+                        $current_lang = apply_filters('wpml_current_language', NULL);
                         $id = $category->term_id;
-                        $tax_slug = $taxonomy_name;                        
-                         
-                        if ($default_lang != $current_lang ) {
-                            $term_id_default = apply_filters( 'wpml_object_id', $id, $tax_slug, true, $default_lang );
-                            $term_meta= get_option( "_houzez_".$tax_slug."_".$term_id_default);
- 
-                            // Replace with the correct settings
-                            $parent_country = sanitize_title($term_meta['parent_country']);
-                            $parent_country = get_term_by( 'slug', $parent_country, 'property_country' )->slug;
+                        $tax_slug = $taxonomy_name;
+                        
+                        if ($default_lang != $current_lang) {
+                            $term_id_default = apply_filters('wpml_object_id', $id, $tax_slug, true, $default_lang);
+                            $term_meta = get_option("_houzez_" . $tax_slug . "_" . $term_id_default);
+
+                            // Check if $term_meta is an array and contains the 'parent_country' key
+                            if (is_array($term_meta) && isset($term_meta['parent_country'])) {
+                                $parent_country = sanitize_title($term_meta['parent_country']);
+                                $parent_country_term = get_term_by('slug', $parent_country, 'property_country');
+
+                                // Check if the term was found
+                                if ($parent_country_term) {
+                                    $parent_country = $parent_country_term->slug;
+                                } else {
+                                    // Handle the case where the term is not found
+                                    $parent_country = '';
+                                }
+                            } else {
+                                // Handle the case where $term_meta is not an array or 'parent_country' is not set
+                                $parent_country = '';
+                            }
                         }
                     }
  

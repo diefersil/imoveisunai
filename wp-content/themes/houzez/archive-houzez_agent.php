@@ -83,7 +83,7 @@ query_posts( $args );
                 <?php houzez_pagination( $wp_query->max_num_pages ); wp_reset_query(); ?>
 
             </div><!-- bt-content-wrap -->
-            <div class="col-lg-4 col-md-12 bt-sidebar-wrap left-bt-sidebar-wrap <?php if( $sticky_sidebar['agent_sidebar'] != 0 ){ echo 'houzez_sticky'; }?>">
+            <div class="col-lg-4 col-md-12 bt-sidebar-wrap left-bt-sidebar-wrap <?php if( isset($sticky_sidebar['agent_sidebar']) && $sticky_sidebar['agent_sidebar'] != 0 ){ echo 'houzez_sticky'; }?>">
                 <?php get_sidebar('houzez_agents'); ?>
             </div><!-- bt-sidebar-wrap -->
         </div><!-- row -->

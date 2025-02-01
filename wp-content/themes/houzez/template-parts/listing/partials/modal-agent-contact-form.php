@@ -1,5 +1,5 @@
 <?php 
-global $post, $listing_agent_info, $current_user; 
+global $post, $random_token, $listing_agent_info, $current_user; 
 $agent_email = $listing_agent_info['agent_email'] ?? '';
 $agent_email = is_email( $agent_email );
 
@@ -19,7 +19,7 @@ if(!houzez_is_admin()) {
 
 if( ! empty( $agent_email ) ) {
 ?>
-<div class="modal fade mobile-property-form" id="email-popup-<?php echo esc_attr($post->ID); ?>">
+<div class="modal fade mobile-property-form" id="email-popup-<?php echo esc_attr($post->ID).'-'.$random_token; ?>">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

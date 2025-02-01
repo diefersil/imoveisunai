@@ -51,7 +51,8 @@ if ( post_password_required() ) {
 		'comment_notes_before' => '',
 		'comment_notes_after' => '',
 		'comment_field' => '<div class="row"><div class="col-sm-12"><div class="form-group"><textarea class="form-control" required rows="4" name="comment" id="comment"></textarea></div></div></div>',
-		'label_submit' => $houzez_local['submit']
+		'label_submit' => $houzez_local['submit'],
+		'submit_button' => '<input style="text-transform:capitalize;" name="submit" type="submit" id="submit" class="submit btn btn-primary" value="%2$s">', // Customize the button class
 	);
 
 	// Show Comment Form

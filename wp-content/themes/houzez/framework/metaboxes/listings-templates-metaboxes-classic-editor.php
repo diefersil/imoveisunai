@@ -322,7 +322,21 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'type' => 'select',
                     'std' => "disable",
                     'options' => array('enable' => esc_html__('Enabled', 'houzez'), 'disable' => esc_html__('Disabled', 'houzez')),
-                    'columns' => 12
+                    'columns' => 6
+                ),
+                array(
+                    'id' => $houzez_prefix."pagination_type",
+                    'name' => esc_html__('Pagination Type', 'houzez'),
+                    'desc' => '',
+                    'type' => 'select',
+                    'std' => "_global",
+                    'options' => array(
+                        '_global' => esc_html__('Global as theme options', 'houzez'),
+                        '_loadmore' => esc_html__('Load More', 'houzez'),
+                        '_infinite' => esc_html__('Infinite Scroll', 'houzez'),
+                        '_number' => esc_html__('Number', 'houzez'),
+                    ),
+                    'columns' => 6
                 ),
                 array(
                     'id' => $houzez_prefix."listings_tab_1",
@@ -398,7 +412,17 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'step'    => 'any',
                     'min'     => 0,
                     'std'     => 0,
-                    'columns' => 6,
+                    'columns' => 3,
+                ),
+
+                array(
+                    'id'      => $houzez_prefix. 'properties_max_beds',
+                    'name'    => esc_html__( 'Maximum Beds', 'houzez' ),
+                    'type'    => 'number',
+                    'step'    => 'any',
+                    'min'     => 0,
+                    'std'     => 0,
+                    'columns' => 3,
                 ),
 
                 array(
@@ -408,7 +432,17 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'step'    => 'any',
                     'min'     => 0,
                     'std'     => 0,
-                    'columns' => 6,
+                    'columns' => 3,
+                ),
+
+                array(
+                    'id'      => $houzez_prefix. 'properties_max_baths',
+                    'name'    => esc_html__( 'Maximum Baths', 'houzez' ),
+                    'type'    => 'number',
+                    'step'    => 'any',
+                    'min'     => 0,
+                    'std'     => 0,
+                    'columns' => 3,
                 ),
             )
         );

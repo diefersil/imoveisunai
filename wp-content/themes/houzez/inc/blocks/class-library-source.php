@@ -25,22 +25,58 @@ class Houzez_Library_Source extends Elementor\TemplateLibrary\Source_Base
 	}
 
 
+	// private function get_template_content( $template_id ) 
+	// {
+	// 	$response = wp_remote_get('https://studio.houzez.co/wp-json/favethemes-blocks/v1/templates?id=' . $template_id);
+
+	// 	// print_r($response);
+	// 	// die();
+	// 	if ( is_wp_error( $response ) || ! is_array( $response )) {
+	// 		return $response;
+	// 	}
+
+	// 	$data = json_decode($response['body'], true);
+
+	// 	if ( json_last_error() !== JSON_ERROR_NONE ) {
+	//         die( __('Error decoding JSON response', 'houzez') );
+	//     }
+		
+	// 	if ( is_object( $data ) && isset($data->error) ) {
+	// 		die(__('Error whilst getting template', 'houzez'));
+	// 	}
+
+	// 	return $data;
+	// }
+
 	private function get_template_content( $template_id ) 
 	{
-		$response = wp_remote_get('https://studio.houzez.co/wp-json/favethemes-blocks/v1/templates?id=' . $template_id);
+		$response = wp_remote_get(
+			'https://studio.houzez.co/wp-json/favethemes-blocks/v1/templates?id=' . $template_id,
+        array(
+            'headers' => array(
+                'User-Agent'      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Accept'          => 'application/json, text/javascript, */*; q=0.01',
+                'Accept-Language' => 'en-US,en;q=0.9',
+                'Referer'         => 'https://houzez.co',
+                'x-api-key'       => 'er454erte35dgfd4564dgdf45646dfgd4564dfg',
+            ),
+            'sslverify' => true,
+        )
+    );
 
-		if ( is_wp_error( $response ) || ! is_array( $response )) {
-			return $response;
-		}
+    if ( is_wp_error( $response ) || ! is_array( $response )) {
+        return $response;
+    }
 
-		$data = json_decode($response['body'], true);
-		
-		if ( is_object( $data ) && isset($data->error) ) {
-			die(__('Error whilst getting template', 'houzez'));
-		}
+    $data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		return $data;
+    if ( json_last_error() !== JSON_ERROR_NONE ) {
+        die( __( 'Error decoding JSON response', 'houzez' ) );
+    }
+
+    return $data;
 	}
+
 
 	public function get_data( array $args, $context = 'display' ) {
 		if ( 'update' === $context ) {

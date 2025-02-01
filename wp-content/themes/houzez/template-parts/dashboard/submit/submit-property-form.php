@@ -80,7 +80,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
 
             <?php
             $layout = houzez_option('property_form_sections');
-            $layout = $layout['enabled'];
+            $layout = isset($layout['enabled']) ? $layout['enabled'] : [];
 
             if ($layout): foreach ($layout as $key=>$value) {
 

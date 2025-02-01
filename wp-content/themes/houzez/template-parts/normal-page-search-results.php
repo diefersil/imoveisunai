@@ -210,7 +210,7 @@ if( $total_records > 1 ) {
                     ?> 
                 </div><!-- listing-view -->
 
-                <?php houzez_pagination( $search_query->max_num_pages ); ?>
+                <?php houzez_pagination( $search_query->max_num_pages, $total_records, $number_of_prop ); ?>
 
             </div><!-- bt-content-wrap -->
 

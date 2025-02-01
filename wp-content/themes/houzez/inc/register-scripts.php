@@ -32,7 +32,7 @@ if( !function_exists('houzez_enqueue_styles') ) {
                 wp_enqueue_style('font-awesome-5-all', HOUZEZ_CSS_DIR_URI . 'font-awesome/css/all.min.css', array(), '5.14.0', 'all');
                 wp_enqueue_style('houzez-icons', HOUZEZ_CSS_DIR_URI . 'icons'.$css_minify_prefix.'.css', array(), HOUZEZ_THEME_VERSION);
 
-                if ( is_singular('property') ) {
+                if ( is_singular('property') || is_singular('fts_builder') ) {
                     wp_enqueue_style('lightslider', HOUZEZ_CSS_DIR_URI . 'lightslider.css', array(), '1.1.3');
                 }
 
@@ -58,11 +58,7 @@ if( !function_exists('houzez_enqueue_styles') ) {
             }
 
             if ( is_singular('property') && houzez_option('property_gallery_popup_type') == 'photoswipe' ) {
-                wp_register_style( 'photoswipe', HOUZEZ_CSS_DIR_URI . 'photoswipe.css', array(), '4.1.3' );
-                wp_register_style( 'photoswipe-default-skin', HOUZEZ_CSS_DIR_URI . 'default-skin/default-skin.css', array(), '4.1.3' );
-                wp_enqueue_style('photoswipe');
-                wp_enqueue_style('photoswipe-default-skin');
-
+                wp_enqueue_style('photoswipe', get_template_directory_uri() . '/js/photoswipe/photoswipe.css', array(), '5.3.7');
             }
 
             wp_enqueue_style('houzez-style', get_stylesheet_uri(), array(), HOUZEZ_THEME_VERSION, 'all');
@@ -166,10 +162,10 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 wp_register_script('lightslider', HOUZEZ_JS_DIR_URI. 'vendors/lightslider.min.js', array('jquery'), '1.1.3', true);
                 
                 if( $property_gallery_popup_type == 'photoswipe' ) {
-                    wp_register_script('photoswipe', HOUZEZ_JS_DIR_URI. 'vendors/photoswipe.min.js', array('jquery'), '4.1.3', true);
-                    wp_register_script('photoswipe-ui-default', HOUZEZ_JS_DIR_URI. 'vendors/photoswipe-ui-default.min.js', array('jquery'), '4.1.3', true);
-                    wp_enqueue_script('photoswipe');
-                    wp_enqueue_script('photoswipe-ui-default');
+                    // Enqueue JavaScript - using UMD versions instead of ESM
+                    wp_enqueue_script('photoswipe', get_template_directory_uri() . '/js/photoswipe/photoswipe.umd.min.js', array('jquery'), '5.3.7', true);
+                    wp_enqueue_script('photoswipe-lightbox', get_template_directory_uri() . '/js/photoswipe/photoswipe-lightbox.umd.min.js', array('jquery', 'photoswipe'), '5.3.7', true);
+                    wp_enqueue_script('houzez-photoswipe-init', get_template_directory_uri() . '/js/photoswipe/photoswipe-init.js', array('jquery', 'photoswipe', 'photoswipe-lightbox'), HOUZEZ_THEME_VERSION, true);
                 }
                 wp_enqueue_script('lightslider');
                 wp_enqueue_script('chart');
@@ -200,6 +196,7 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 || is_page_template('template/user_dashboard_insight.php') 
                 || is_singular('houzez_agent')
                 || is_singular('houzez_agency')
+                || is_singular('fts_builder')
                 || is_author()
             ) {
                 wp_enqueue_script('chart');
@@ -317,6 +314,7 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 'search_position' => houzez_get_header_search_position(),
                 'login_loading' => esc_html__('Sending user info, please wait...', 'houzez'),
                 'not_found' => esc_html__("We didn't find any results", 'houzez'),
+                'listings_not_found' => esc_html__("No more listings found", 'houzez'),
                 'houzez_map_system' => houzez_get_map_system(),
                 'for_rent' => houzez_get_term_slug(houzez_option('search_rent_status'), 'property_status'),
                 'for_rent_price_slider' => houzez_get_term_slug(houzez_option('search_rent_status_for_price_range'), 'property_status'),
@@ -370,6 +368,7 @@ if( !function_exists('houzez_enqueue_scripts') ) {
                 'remove_compare_text' => houzez_option('cl_remove_compare', 'Remove from Compare'),
                 'is_mapbox' => houzez_option('houzez_map_system'),
                 'api_mapbox' => houzez_option('mapbox_api_key'),
+                'listing_pagination' => houzez_option('listing_pagination', '_number'),
                 'is_marker_cluster' => houzez_option('map_cluster_enable'),
                 'g_recaptha_version' => houzez_option( 'recaptha_type', 'v2' ),
                 's_country' => isset($_GET['country']) ? $_GET['country'] : '',
@@ -382,7 +381,7 @@ if( !function_exists('houzez_enqueue_scripts') ) {
         ); // end ajax calls
 
         
-        if(houzez_is_dashboard()) {    
+        if(houzez_is_dashboard() || is_page_template('template/user_dashboard_submit.php') ) {    
 
             if( houzez_option('enable_paid_submission') == 'membership') {
                 $user_package_id = houzez_get_user_package_id($userID);

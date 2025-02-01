@@ -271,6 +271,8 @@ if( !function_exists('houzez_send_emails') ):
         $message = wp_kses_post( wpautop( wptexturize( $message ) ) );
 
         $socials = '';
+        $email_content = '';
+        
         if( !empty($social_1_icon) || !empty($social_2_icon) || !empty($social_3_icon) || !empty($social_4_icon) ) {
             $socials = '<div style="font-size: 0; text-align: center; padding-top: 20px;">';
             $socials .= '<p style="margin:0;margin-bottom: 10px; text-align: center; font-size: 14px; color:#777777;">'.esc_html__('Follow us on', 'houzez').'</p>';
@@ -292,7 +294,7 @@ if( !function_exists('houzez_send_emails') ):
         }
 
         if( $enable_email_header != 0 ) {
-            $email_content = '<div style="text-align: center; background-color: ' . esc_attr($email_head_bg_color) . '; padding: 16px 0;">
+            $email_content .= '<div style="text-align: center; background-color: ' . esc_attr($email_head_bg_color) . '; padding: 16px 0;">
                             <img src="' . esc_url($email_head_logo) . '" alt="logo">
                         </div>';
         }
@@ -694,6 +696,14 @@ if( !function_exists('houzez_send_messages_emails') ):
             $email_messages = $message;
         }
 
+        $notificationArgs = array(
+            "title" => $subject,
+            "message" => $message,
+            "type" => "messages",
+            "to" => $user_email,
+        );
+        do_action('houzez_send_notification', $notificationArgs);
+
         @wp_mail(
             $user_email,
             $subject,
@@ -738,9 +748,17 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
         $sender_phone = isset($_POST['mobile']) ? sanitize_text_field( $_POST['mobile'] ) : '';
         $user_type = isset($_POST['user_type']) ? sanitize_text_field( $_POST['user_type'] ) : '';
         $agent_type = isset($_POST['agent_type']) ? sanitize_text_field( $_POST['agent_type'] ) : '';
+        $agent_id = isset($_POST['agent_id']) ? sanitize_text_field( $_POST['agent_id'] ) : '';
         $user_type = houzez_get_form_user_type($user_type); 
 
-        $target_email = sanitize_email($_POST['target_email']);
+        if($agent_type == 'author_info') {
+            $target_email = get_the_author_meta('user_email', $agent_id);
+        } else if($agent_type == 'agency_info') {
+            $target_email = get_post_meta($agent_id, 'fave_agency_email', true);
+        } else {
+            $target_email = get_post_meta($agent_id, 'fave_agent_email', true);
+        }
+        
         $target_email = is_email($target_email);
         if (!$target_email) {
             echo json_encode(array(
@@ -789,6 +807,8 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
                 wp_die();
             }
         }
+
+        do_action('houzez_realtor_contact_form_submission');
         
 
         houzez_google_recaptcha_callback();
@@ -863,15 +883,25 @@ add_action( 'wp_ajax_nopriv_houzez_ele_contact_form', 'houzez_ele_contact_form' 
 add_action( 'wp_ajax_houzez_ele_contact_form', 'houzez_ele_contact_form' );
 if( !function_exists( 'houzez_ele_contact_form' ) ) {
     function houzez_ele_contact_form() {
-
-        $email_to = sanitize_text_field( $_POST['email_to'] );
-        $email_subject = sanitize_text_field( $_POST['email_subject'] );
-        $email_subject = stripslashes($email_subject);
+        $form_id = isset($_POST['form_id']) ? sanitize_text_field($_POST['form_id']) : '';
+        $form_settings_key = 'houzez_form_' . $form_id;
         
-        $email_to_cc = isset($_POST['email_to_cc']) ? sanitize_text_field( $_POST['email_to_cc']) : ''; 
+        // Get email settings from transient
+        $email_settings = get_option($form_settings_key);
 
+        if (!$email_settings) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => esc_html__('Invalid form submission or session expired', 'houzez')
+            ));
+            wp_die();
+        }
 
-        $form_id = isset($_POST['form_id']) ? sanitize_text_field( $_POST['form_id'] ) : '';
+        $email_to = $email_settings['email_to'];
+        $email_subject = stripslashes($email_settings['email_subject']);
+        $email_to_cc = $email_settings['email_to_cc'];
+        $email_to_bcc = $email_settings['email_to_bcc'];
+
         $full_name = isset($_POST['name']) ? sanitize_text_field( $_POST['name'] ) : '';
         $first_name = isset($_POST['first_name']) ? sanitize_text_field( $_POST['first_name'] ) : '';
         $last_name = isset($_POST['last_name']) ? sanitize_text_field( $_POST['last_name'] ) : '';
@@ -888,10 +918,12 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
         $redirect_to = isset($_POST['redirect_to']) ? esc_url( $_POST['redirect_to'] ) : ''; 
         $google_recaptcha = isset($_POST['google_recaptcha']) ? esc_url( $_POST['google_recaptcha'] ) : ''; 
 
+        $email_to = sanitize_email($email_to);
+        $email_to = is_email($email_to);
         if (!$email_to) {
             echo json_encode(array(
                 'success' => false,
-                'msg' => sprintf( esc_html__('%s Target Email address is not properly configured!', 'houzez'), $target_email )
+                'msg' => sprintf( esc_html__('%s Target Email address is not properly configured!', 'houzez'), $email_to )
             ));
             wp_die();
         }
@@ -980,7 +1012,7 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
              
         }
         
-
+        do_action('houzez_before_contact_form_submission');
 
         $cc_header = '';
         if ( ! empty( $email_to_cc ) ) {
@@ -989,8 +1021,8 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
 
         $email_sent = wp_mail( $email_to, $email_subject, $email_body, $headers . $cc_header );
 
-        if ( ! empty( $_POST['email_to_bcc'] ) ) {
-            $bcc_emails = explode( ',', $_POST['email_to_bcc'] );
+        if ( ! empty( $email_to_bcc ) ) {
+            $bcc_emails = explode( ',', $email_to_bcc );
             foreach ( $bcc_emails as $bcc_email ) {
                 wp_mail( trim( $bcc_email ), $email_subject, $email_body, $headers );
             }
@@ -1050,15 +1082,26 @@ add_action( 'wp_ajax_nopriv_houzez_ele_inquiry_form', 'houzez_ele_inquiry_form' 
 add_action( 'wp_ajax_houzez_ele_inquiry_form', 'houzez_ele_inquiry_form' );
 if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
     function houzez_ele_inquiry_form() {
-
-        $email_to = sanitize_text_field( $_POST['email_to'] );
-        $email_subject = sanitize_text_field( $_POST['email_subject'] );
-        $email_subject = stripslashes($email_subject);
+        $form_id = isset($_POST['form_id']) ? sanitize_text_field($_POST['form_id']) : '';
+        $form_settings_key = 'houzez_form_' . $form_id;
         
-        $email_to_cc = isset($_POST['email_to_cc']) ? sanitize_text_field( $_POST['email_to_cc']) : ''; 
+        // Get email settings
+        $email_settings = get_option($form_settings_key);
+        if (!$email_settings) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => esc_html__('Invalid form submission or session expired', 'houzez')
+            ));
+            wp_die();
+        }
+
+        $email_to = $email_settings['email_to'];
+        $email_subject = stripslashes($email_settings['email_subject']);
+        $email_to_cc = $email_settings['email_to_cc'];
+        $email_to_bcc = $email_settings['email_to_bcc'];
+        
         $enquiry_type = isset($_POST['enquiry_type']) ? sanitize_text_field( $_POST['enquiry_type']) : ''; 
 
-        $form_id = isset($_POST['form_id']) ? sanitize_text_field( $_POST['form_id'] ) : '';
         $meta = isset($_POST['e_meta']) ? $_POST['e_meta'] : '';
         $beds = isset($meta['beds']) ? $meta['beds'] : '';
         $baths = isset($meta['baths']) ? $meta['baths'] : '';
@@ -1080,10 +1123,13 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
         $sender_phone = isset($_POST['mobile']) ? sanitize_text_field( $_POST['mobile'] ) : '';
         $user_type = isset($_POST['user_type']) ? sanitize_text_field( $_POST['user_type'] ) : ''; 
 
+        $email_to = sanitize_email($email_to);
+        $email_to = is_email($email_to);
+
         if (!$email_to) {
             echo json_encode(array(
                 'success' => false,
-                'msg' => sprintf( esc_html__('%s Target Email address is not properly configured!', 'houzez'), $target_email )
+                'msg' => sprintf( esc_html__('%s Target Email address is not properly configured!', 'houzez'), $email_to )
             ));
             wp_die();
         }
@@ -1197,6 +1243,7 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
              
         }
 
+        do_action('houzez_before_inquiry_form_submission');
 
         $cc_header = '';
         if ( ! empty( $email_to_cc ) ) {
@@ -1205,8 +1252,8 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
 
         $email_sent = wp_mail( $email_to, $email_subject, $email_body, $headers . $cc_header );
 
-        if ( ! empty( $_POST['email_to_bcc'] ) ) {
-            $bcc_emails = explode( ',', $_POST['email_to_bcc'] );
+        if ( ! empty( $email_to_bcc ) ) {
+            $bcc_emails = explode( ',', $email_to_bcc );
             foreach ( $bcc_emails as $bcc_email ) {
                 wp_mail( trim( $bcc_email ), $email_subject, $email_body, $headers );
             }
@@ -1269,6 +1316,26 @@ add_action( 'wp_ajax_houzez_property_agent_contact', 'houzez_property_agent_cont
 if( !function_exists('houzez_property_agent_contact') ) {
     function houzez_property_agent_contact() {
 
+        // Get and set the current post ID
+        $property_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
+        if($property_id > 0) {
+            
+            $original_post = $GLOBALS['post'];
+            // Set up the temporary post data
+            $temp_post = get_post($property_id);
+            $GLOBALS['post'] = $temp_post;
+            $return_array = houzez20_property_contact_form();
+            $GLOBALS['post'] = $original_post;
+
+            $is_single_agent = $return_array['is_single_agent'];
+            if ( $is_single_agent == true ) {
+                $target_email = $return_array['agent_email'];
+            } else {
+                $target_email = $_POST['target_email'];
+            }
+
+        }
+        
         $hide_form_fields = houzez_option('hide_prop_contact_form_fields');
         
         $nonce = $_POST['property_agent_contact_security'];
@@ -1288,7 +1355,6 @@ if( !function_exists('houzez_property_agent_contact') ) {
         $user_type = isset($_POST['user_type']) ? sanitize_text_field( $_POST['user_type'] ) : '';
         $user_type = houzez_get_form_user_type($user_type);
 
-        $target_email = $_POST['target_email'];
         if ( !is_array( $target_email ) ) {
             $target_email = is_email($target_email);
         }
@@ -1349,6 +1415,8 @@ if( !function_exists('houzez_property_agent_contact') ) {
                 wp_die();
             }
         }
+
+        do_action('houzez_before_property_agent_form_submission');
     
         houzez_google_recaptcha_callback();
 
@@ -1417,6 +1485,26 @@ add_action( 'wp_ajax_houzez_schedule_send_message', 'houzez_schedule_send_messag
 if( !function_exists('houzez_schedule_send_message') ) {
     function houzez_schedule_send_message() {
 
+        // Get and set the current post ID
+        $property_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
+        if($property_id > 0) {
+            
+            $original_post = $GLOBALS['post'];
+            // Set up the temporary post data
+            $temp_post = get_post($property_id);
+            $GLOBALS['post'] = $temp_post;
+            $return_array = houzez20_property_contact_form();
+            $GLOBALS['post'] = $original_post;
+
+            $is_single_agent = $return_array['is_single_agent'];
+            if ( $is_single_agent == true ) {
+                $target_email = $return_array['agent_email'];
+            } else {
+                $target_email = $_POST['target_email'];
+            }
+
+        }
+        
         $nonce = $_POST['schedule_contact_form_ajax'];
         if (!wp_verify_nonce( $nonce, 'schedule-contact-form-nonce') ) {
             echo json_encode(array(
@@ -1433,7 +1521,6 @@ if( !function_exists('houzez_schedule_send_message') ) {
         $property_id = isset($_POST['property_id']) ? sanitize_text_field( $_POST['property_id'] ) : '';
         $redirect_to = isset($_POST['redirect_to']) ? esc_url( $_POST['redirect_to'] ) : '';
 
-        $target_email = $_POST['target_email'];
         if ( !is_array( $target_email ) ) {
             $target_email = is_email($target_email);
         }
@@ -1519,6 +1606,8 @@ if( !function_exists('houzez_schedule_send_message') ) {
         if( $send_message_copy == '1' ){
             $cc_email = houzez_option( 'send_agent_message_email' );
         }
+
+        do_action('houzez_before_schedule_tour_form_submission');
 
         $args = array(
             'sender_name' => $sender_name, 

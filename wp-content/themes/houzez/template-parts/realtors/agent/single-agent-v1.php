@@ -101,8 +101,10 @@ if(isset($_GET['tab']) || $paged > 0) {
     <?php
 }
 
+$post_per_page = houzez_option('num_of_agent_listings', 10);
+
 $the_query = Houzez_Query::loop_agent_properties();
-$agent_total_listings = Houzez_Query::agent_properties_count();
+$agent_total_listings = $the_query->found_posts;
 
 if( houzez_option('agent_stats', 0) != 0 ) {
  $agent_listing_ids = Houzez_Query::get_agent_properties_ids_by_agent_id(get_the_ID());
@@ -281,7 +283,7 @@ if( houzez_option( 'agent_sidebar', 0 ) == 0 ) {
                                 ?> 
                             </div><!-- listing-view -->
 
-                            <?php houzez_pagination( $the_query->max_num_pages ); ?>
+                            <?php houzez_pagination( $the_query->max_num_pages, $agent_total_listings, $post_per_page ); ?>
                         </section>
                     </div><!-- tab-pane -->
                     <?php } ?>

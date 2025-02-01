@@ -252,6 +252,14 @@ if( !function_exists('houzez_agency_metaboxes') ) {
                     'placeholder'      => esc_html__('Enter your realtor.com profile URL','houzez'),
                     'columns'   => 6
                 ),
+                array(
+                    'id' => "{$houzez_prefix}agency_shortcode",
+                    'name' => "Shortcode",
+                    'placeholder'      => esc_html__('Enter shortcode','houzez'),
+                    'type' => 'text',
+                    'std' => "",
+                    'columns'   => 6
+                ),
 
             )
         );

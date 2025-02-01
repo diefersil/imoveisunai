@@ -1,5 +1,7 @@
 <?php 
-global $post, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
+global $post, $random_token, $ele_thumbnail_size, $image_size, $listing_agent_info, $buttonsComposer; 
+
+$random_token = houzez_random_token();
 
 $defaultButtons = array(
     'enabled' => array(
@@ -27,8 +29,16 @@ $agent_info = $listing_agent_info['agent_info'] ?? '';
 $image_size = 'houzez-item-image-1';
 $thumbnail_size = $ele_thumbnail_size ?? $image_size;
 
+$thumb_id = get_post_thumbnail_id($post->ID);
+
 $image_01 = $image_02 = $alt_text_01 = $alt_text_02 = '';
 $gallery_ids = get_post_meta($post->ID, 'fave_property_images', false);
+
+// Ensure $gallery_ids is a flat array
+$gallery_ids = !empty($gallery_ids) && is_array($gallery_ids) ? array_values($gallery_ids) : [];
+
+// Exclude $thumb_id from $gallery_ids
+$gallery_ids = array_diff($gallery_ids, [$thumb_id]);
 
 if (!empty($gallery_ids)) {
     $images_ids = array_slice($gallery_ids, 0, 2);

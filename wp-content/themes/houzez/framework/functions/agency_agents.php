@@ -122,7 +122,7 @@ if( !function_exists('houzez_agents_search_filter_callback') ) {
             $keyword = trim( $_GET['agent_name'] );
             $keyword = sanitize_text_field($keyword);
             if ( ! empty( $keyword ) ) {
-                $query_args['s'] = $keyword;
+                $query_args['s'] = esc_html($keyword);
             }
         }
 

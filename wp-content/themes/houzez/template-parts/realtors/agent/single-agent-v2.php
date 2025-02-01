@@ -104,6 +104,8 @@ if(isset($_GET['tab']) || $paged > 0) {
     <?php
 }
 
+$post_per_page = houzez_option('num_of_agent_listings', 10);
+
 $the_query = Houzez_Query::loop_agent_properties();
 $agent_total_listings = $the_query->found_posts; 
 
@@ -225,7 +227,7 @@ if( houzez_option( 'agent_listings', 0 ) != 1 && houzez_option( 'agent_review', 
                             endif;
                             ?> 
                         </div><!-- listing-view -->
-                        <?php houzez_pagination( $the_query->max_num_pages ); ?>
+                        <?php houzez_pagination( $the_query->max_num_pages, $agent_total_listings, $post_per_page ); ?>
                     </div><!-- tab-pane -->
                     <?php } ?>
 

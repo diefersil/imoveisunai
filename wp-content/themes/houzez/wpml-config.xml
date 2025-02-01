@@ -49,6 +49,9 @@
 		<custom-field action="copy">fave_featured</custom-field>
 		<custom-field action="translate">fave_loggedintoview</custom-field>
 		<custom-field action="copy">fave_property_images</custom-field>
+		<custom-field action="copy">fave_taxonomy_img</custom-field>
+		<custom-field action="copy">fave_marker_icon</custom-field>
+		<custom-field action="copy">fave_marker_retina_icon</custom-field>
 		<custom-field action="translate">fave_video_url</custom-field>
 		<custom-field action="translate">fave_agent_display_option</custom-field>
 		<custom-field action="translate">fave_agents</custom-field>

@@ -105,11 +105,10 @@ if ( ! function_exists( 'HOUZEZ_advanced_search_loader' ) ) {
 if( !function_exists('houzez_advanced_search_widget') ) {
     function houzez_advanced_search_widget() {
         $search_builder = houzez_search_builder();
-        $layout = $search_builder['enabled'];
+        $layout = isset($search_builder['enabled']) ? $search_builder['enabled'] : [];
         unset($layout['placebo']);
         unset($layout['geolocation']);
         unset($layout['price']);
-
         if(!taxonomy_exists('property_country')) {
             unset($layout['country']);
         }

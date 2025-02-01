@@ -25,14 +25,20 @@ $epc_potential_rating_title = isset($ele_settings['epc_potential_rating']) && !e
 $energy_class_title = isset($ele_settings['energy_class_title']) && !empty($ele_settings['energy_class_title']) ? $ele_settings['energy_class_title'] : houzez_option('spl_energy_cls', 'Energy class');
 ?>
 <ul class="class-energy-list list-unstyled">
+	
+	<?php if( ! empty($energy_class) ) { ?>
 	<li>
 		<strong><?php echo esc_attr($energetic_cls_title); ?>:</strong> 
 		<span><?php echo esc_attr($energy_class); ?></span>
 	</li>
+	<?php } ?>
+
+	<?php if( ! empty($energy_global_index) ) { ?>
 	<li>
 		<strong><?php echo esc_attr($global_energy_index_title); ?>:</strong> 
 		<span><?php echo esc_attr($energy_global_index); ?></span>
 	</li>
+	<?php } ?>
 
 	<?php if(!empty($renewable_energy_index)) { ?>
 	<li>

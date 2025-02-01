@@ -1,153 +1,132 @@
 <?php
 global $houzez_search_data;
 $search_args = $houzez_search_data->query;
-$search_args_decoded = unserialize( base64_decode( $search_args ) );
+$search_args_decoded = unserialize(base64_decode($search_args));
 $search_uri = $houzez_search_data->url;
 $search_page = houzez_get_template_link('template/template-search.php');
-$search_link = $search_page.'/?'.$search_uri;
-$explode_qry = explode('&', $search_uri);
+$search_link = $search_page . '/?' . $search_uri;
 
-$meta_query     = array();
+// Parse the search URI into parameters
+parse_str($search_uri, $search_params);
 
-if ( isset( $search_args_decoded['meta_query'] ) ) :
+// Extract meta query values into cleaner array
+$meta_query = array();
+if (isset($search_args_decoded['meta_query'])) {
+    foreach ($search_args_decoded['meta_query'] as $value) {
+        if (is_array($value) && isset($value['key'])) {
+            $meta_query[] = $value;
+        } elseif (is_array($value)) {
+            array_walk_recursive($value, function($item) use (&$meta_query) {
+                if (is_array($item) && isset($item['key'])) {
+                    $meta_query[] = $item;
+                }
+            });
+        }
+    }
+}
 
-    foreach ( $search_args_decoded['meta_query'] as $key => $value ) :
-
-        if ( is_array( $value ) ) :
-
-            if ( isset( $value['key'] ) ) :
-
-                $meta_query[] = $value;
-
-            else :
-
-                foreach ( $value as $key => $value ) :
-
-                    if ( is_array( $value ) ) :
-
-                        foreach ( $value as $key => $value ) :
-
-                            if ( isset( $value['key'] ) ) :
-
-                                $meta_query[]     = $value;
-
-                            endif;
-
-                        endforeach;
-
-                    endif;
-
-                endforeach;
-
-            endif;
-
-        endif;
-
-    endforeach;
-
-endif;
+// Helper function to format range values
+if (!function_exists('format_range_value')) {
+    function format_range_value($value) {
+        if (is_array($value)) {
+            // Check if array has both index 0 and 1 before accessing
+            $start = isset($value[0]) ? esc_attr($value[0]) : '';
+            $end = isset($value[1]) ? ' - ' . esc_attr($value[1]) : '';
+            return $start . $end;
+        }
+        return esc_attr($value);
+    }
+}
 
 ?>
 <tr>
     <td data-label="<?php esc_html_e('Search Parameters', 'houzez'); ?>">
         <?php 
-
-        if( isset( $search_args_decoded['s'] ) && !empty( $search_args_decoded['s'] ) ) {
-            echo '<strong>' . esc_html__('Keyword', 'houzez') . ':</strong> ' . esc_attr( $search_args_decoded['s'] ). ' / ';
+        // Display keyword if exists
+        if (!empty($search_args_decoded['s'])) {
+            printf('<strong>%s:</strong> %s / ', 
+                esc_html__('Keyword', 'houzez'),
+                esc_attr($search_args_decoded['s'])
+            );
         }
 
-        if( isset( $search_args_decoded['tax_query'] ) ) {
-            foreach ($search_args_decoded['tax_query'] as $key => $val):
-
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_status') {
-                    $status = hz_saved_search_term($val['terms'], 'property_status');
-                    if (!empty($status)) {
-                        echo '<strong>' . esc_html__('Status', 'houzez') . ':</strong> ' . esc_attr( $status ). ' / ';
-                    }
-                }
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_type') {
-                    $types = hz_saved_search_term($val['terms'], 'property_type');
-                    if (!empty($types)) {
-                        echo '<strong>' . esc_html__('Type', 'houzez') . ':</strong> ' . esc_attr( $types ). ' / ';
-                    }
-                }
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_city') {
-                    $cities = hz_saved_search_term($val['terms'], 'property_city');
-                    if (!empty($cities)) {
-                        echo '<strong>' . esc_html__('City', 'houzez') . ':</strong> ' . esc_attr( $cities ). ' / ';
-                    }
-                }
-
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_country') {
-                    $countries = hz_saved_search_term($val['terms'], 'property_country');
-                    if (!empty($countries)) {
-                        echo '<strong>' . esc_html__('Country', 'houzez') . ':</strong> ' . esc_attr( $countries ). ' / ';
-                    }
-                }
-
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_state') {
-                    $state = hz_saved_search_term($val['terms'], 'property_state');
-                    if (!empty($state)) {
-                        echo '<strong>' . esc_html__('State', 'houzez') . ':</strong> ' . esc_attr( $state ). ' / ';
-                    }
-                }
-
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_area') {
-                    $area = hz_saved_search_term($val['terms'], 'property_area');
-                    if (!empty($area)) {
-                        echo '<strong>' . esc_html__('Area', 'houzez') . ':</strong> ' . esc_attr( $area ). ' / ';
-                    }
-                }
-
-                if (isset($val['taxonomy']) && isset($val['terms']) && $val['taxonomy'] == 'property_label') {
-                    $label = hz_saved_search_term($val['terms'], 'property_label');
-                    if (!empty($label)) {
-                        echo '<strong>' . esc_html__('Label', 'houzez') . ':</strong> ' . esc_attr( $area ). ' / ';
-                    }
-                }
-
-            endforeach;
+        // Display location from search URI
+        if (!empty($search_params['search_location'])) {
+            printf('<strong>%s:</strong> %s / ',
+                esc_html__('Location', 'houzez'),
+                urldecode($search_params['search_location'])
+            );
         }
 
-        if( isset( $meta_query ) && sizeof( $meta_query ) !== 0 ) {
-            foreach ( $meta_query as $key => $val ) :
+        // Handle taxonomy queries
+        if (isset($search_args_decoded['tax_query'])) {
+            $taxonomy_labels = array(
+                'property_status' => esc_html__('Status', 'houzez'),
+                'property_type' => esc_html__('Type', 'houzez'),
+                'property_city' => esc_html__('City', 'houzez'),
+                'property_country' => esc_html__('Country', 'houzez'),
+                'property_state' => esc_html__('State', 'houzez'),
+                'property_area' => esc_html__('Area', 'houzez'),
+                'property_label' => esc_html__('Label', 'houzez')
+            );
 
-                if (isset($val['key']) && $val['key'] == 'fave_property_bedrooms') {
-                    
-                    echo '<strong>' . esc_html__('Bedrooms', 'houzez') . ':</strong> ' . esc_attr( $val['value'] ). ' / ';
+            foreach ($search_args_decoded['tax_query'] as $val) {
+                if (isset($val['taxonomy'], $val['terms']) && isset($taxonomy_labels[$val['taxonomy']])) {
+                    $term_value = hz_saved_search_term($val['terms'], $val['taxonomy']);
+                    if (!empty($term_value)) {
+                        printf('<strong>%s:</strong> %s / ',
+                            $taxonomy_labels[$val['taxonomy']],
+                            esc_attr($term_value)
+                        );
+                    }
                 }
-
-                if (isset($val['key']) && $val['key'] == 'fave_property_bathrooms') {
-                    
-                    echo '<strong>' . esc_html__('Bathrooms', 'houzez') . ':</strong> ' . esc_attr( $val['value'] ). ' / ';
-                }
-
-                if (isset($val['key']) && $val['key'] == 'fave_property_price') {
-                    if ( isset( $val['value'] ) && is_array( $val['value'] ) ) :
-                        $user_args['min-price'] = $val['value'][0];
-                        $user_args['max-price'] = $val['value'][1];
-                        echo '<strong>' . esc_html__('Price', 'houzez') . ':</strong> ' . esc_attr( $val['value'][0] ).' - '.esc_attr( $val['value'][1]). ' / ';
-                    else :
-                        $user_args['max-price'] = $val['value'];
-                        echo '<strong>' . esc_html__('Price', 'houzez') . ':</strong> ' . esc_attr( $val['value'] ).' / ';
-                    endif;
-                }
-
-                if (isset($val['key']) && $val['key'] == 'fave_property_size') {
-                    if ( isset( $val['value'] ) && is_array( $val['value'] ) ) :
-                        $user_args['min-area'] = $val['value'][0];
-                        $user_args['max-area'] = $val['value'][1];
-                        echo '<strong>' . esc_html__('Size', 'houzez') . ':</strong> ' . esc_attr( $val['value'][0] ).' - '.esc_attr( $val['value'][1]). ' / ';
-                    else :
-                        $user_args['max-area'] = $val['value'];
-                        echo '<strong>' . esc_html__('Size', 'houzez') . ':</strong> ' . esc_attr( $val['value'] ).' / ';
-                    endif;
-                }
-
-
-            endforeach;
+            }
         }
-         ?>
+
+        // Handle meta queries
+        if (isset($search_args_decoded['meta_query']) && is_array($search_args_decoded['meta_query'])) {
+            $meta_field_labels = array(
+                'fave_property_address' => esc_html__('Address', 'houzez'),
+                'fave_property_bedrooms' => esc_html__('Bedrooms', 'houzez'),
+                'fave_property_bathrooms' => esc_html__('Bathrooms', 'houzez'),
+                'fave_property_rooms' => esc_html__('Rooms', 'houzez'),
+                'fave_property_garage' => esc_html__('Garage', 'houzez'),
+                'fave_property_year' => esc_html__('Year Built', 'houzez'),
+                'fave_property_id' => esc_html__('Property ID', 'houzez'),
+                'fave_property_price' => esc_html__('Price', 'houzez'),
+                'fave_property_size' => esc_html__('Size', 'houzez'),
+                'fave_property_land' => esc_html__('Land Area', 'houzez'),
+                'fave_property_zip' => esc_html__('Zip Code', 'houzez')
+            );
+
+            // Recursively search through meta_query array
+            if (!function_exists('search_meta_values')) {
+                function search_meta_values($array, $meta_field_labels) {
+                    foreach ($array as $key => $value) {
+                        if (is_array($value)) {
+                            if (isset($value['key']) && $value['key'] !== 'houzez_geolocation_lat' && $value['key'] !== 'houzez_geolocation_long') {
+                                // Handle both standard and custom fields
+                                $field_label = isset($meta_field_labels[$value['key']]) ? 
+                                    $meta_field_labels[$value['key']] : 
+                                    ucwords(str_replace(array('fave_', '_'), array('', ' '), $value['key']));
+                                
+                                if (isset($value['value'])) {
+                                    printf('<strong>%s:</strong> %s / ',
+                                        $field_label,
+                                        format_range_value($value['value'])
+                                    );
+                                }
+                            } else {
+                                search_meta_values($value, $meta_field_labels);
+                            }
+                        }
+                    }
+                }
+            }
+
+            search_meta_values($search_args_decoded['meta_query'], $meta_field_labels);
+        }
+        ?>
     </td>
     <td class="property-table-actions" data-label="<?php esc_html_e('Actions', 'houzez'); ?>">
         <div class="dropdown property-action-menu">
@@ -159,5 +138,5 @@ endif;
                 <a data-propertyid='<?php echo intval($houzez_search_data->id); ?>' class="remove-search dropdown-item" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
             </div>
         </div>
-    </td>    
+    </td>
 </tr>

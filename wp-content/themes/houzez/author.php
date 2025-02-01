@@ -4,7 +4,7 @@ global $post, $houzez_local, $paged, $author_id, $agent_total_listings, $agent_l
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
-if( $sticky_sidebar['agent_sidebar'] != 0 ) { 
+if( isset($sticky_sidebar['agent_sidebar']) && $sticky_sidebar['agent_sidebar'] != 0 ) { 
     $is_sticky = 'houzez_sticky'; 
 }
 

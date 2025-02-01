@@ -1,60 +1,17 @@
 <?php
 global $properties_ids;
 
-$taxnonomies = $tax_chart_data = $taxs_list_data = $total_count = $stats_array = array();
+$stats = houzez_get_realtor_tax_stats('property_status', 'fave_property_agency', $properties_ids);
 
-foreach ($properties_ids as $listing_id) {
-	$term = get_the_terms( $listing_id, 'property_status' );
-	
-	if( $term && ! is_wp_error( $term ) ) {
-		$taxnonomies[$term[0]->slug] = $term[0]->name;
-	}
-}
+$taxonomies = $stats['taxonomies'];
+$tax_chart_data = $stats['tax_chart_data'];
+$taxs_list_data = $stats['taxs_list_data'];
+$total_count = $stats['total_count'];
+$total_top_count = $stats['total_top_count'];
+$other_percent = $stats['other_percent'];
+$others = $stats['others'];
 
-$taxnonomies = array_filter($taxnonomies);
-foreach ($taxnonomies as $slug => $name) {
-	$count = houzez_realtor_stats('property_status', 'fave_property_agency', get_the_ID(), $slug);
-	if( !empty($count) ) {
-		$total_count[] = $count;
-		
-	}
-}
-
-/* Later coded */
-$total_listing = array_sum($total_count);
-
-$i = 0;
-foreach ($taxnonomies as $slug => $name) {
-
-	$count = $total_count[$i];
-	if(!empty($count)) {
-		$stats_array[$name] = ($count / $total_listing) * 100;
-	}
-	$i++;
-}
-/* Later coded end */
-
-arsort($stats_array);
-
-$vl = array_values($stats_array);
-$tax_chart_data = array_slice($vl, 0, 3);
-$keys = array_keys($stats_array);
-$taxs_list_data = array_slice($keys, 0, 3);
-
-rsort($total_count);
-$total_count = array_slice($total_count, 0, 3);
-$total_records = count($total_count);
-$total_count = array_sum($total_count);
-
-if(!empty($total_count) && $total_count <= $total_listing ) {
-	$others = $total_listing - $total_count;
-
-	$other_percent = ($others / $total_listing) * 100;
-	if(!empty($other_percent)) {
-		$tax_chart_data[] = $other_percent;
-	}
-}
-if( !empty($taxnonomies) ) { ?>
+if( !empty($taxonomies) ) { ?>
 <div class="agent-profile-chart-wrap">
 	<h2><?php echo houzez_option('agency_lb_property_status', wp_kses(__( '<span>Property</span> Status', 'houzez' ), houzez_allowed_html() )); ?></h2>
 	
@@ -69,7 +26,7 @@ if( !empty($taxnonomies) ) { ?>
 				if(!empty($taxs_list_data) && !empty($total_count)) {
 					foreach ($taxs_list_data as $taxnonomy) { $j++;
 
-						if($j <= $total_records) {
+						if($j <= $total_top_count) {
 
 							$percent = round($tax_chart_data[$k]);
 							if(!empty($percent)) {

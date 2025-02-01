@@ -1,12 +1,14 @@
 <?php
-global $post, $current_user;
+global $post, $current_user, $ele_settings;
 $return_array = houzez20_property_contact_form();
 if(empty($return_array)) {
 	return;
 }
+
+$agent_info = isset($ele_settings['agent_detail']) ? $ele_settings['agent_detail'] : 'yes';
+
 $terms_page_id = houzez_option('terms_condition');
 $terms_page_id = apply_filters( 'wpml_object_id', $terms_page_id, 'page', true );
-
 $hide_form_fields = houzez_option('hide_prop_contact_form_fields');
 $gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
 $agent_display = houzez_get_listing_data('agent_display_option');
@@ -45,11 +47,11 @@ $agent_email = is_email( $return_array['agent_email'] );
 $agent_mobile_num = houzez_option('agent_mobile_num', 1 ); 
 $agent_whatsapp_num = houzez_option('agent_whatsapp_num', 1);
 
-$whatsappBtnClass = "btn-full-width mt-10";
+$whatsappBtnClass = "hz-btn-whatsapp btn-full-width mt-10";
 $messageBtnClass = "btn-full-width mt-10";
 
 if( $agent_mobile_num != 1 && !wp_is_mobile() ) {
-	$whatsappBtnClass = "btn-half-width";
+	$whatsappBtnClass = "hz-btn-whatsapp btn-half-width";
 }
 if( $agent_mobile_num != 1 && $agent_whatsapp_num != 1 && !wp_is_mobile() ) {
 	$messageBtnClass = "btn-half-width";
@@ -62,7 +64,9 @@ if ($agent_email && $agent_display != 'none') {
 	<?php 
 	if(houzez_form_type()) {
 
-		echo $return_array['agent_data'];
+		if( $agent_info == 'yes' ) {
+			echo $return_array['agent_data'];
+		}
 		
 		if(!empty(houzez_option('contact_form_agent_above_image'))) {
 			echo do_shortcode(houzez_option('contact_form_agent_above_image'));
@@ -72,7 +76,10 @@ if ($agent_email && $agent_display != 'none') {
 		<div class="property-form clearfix">
 			<form method="post" action="#">
 				
-				<?php echo $return_array['agent_data']; ?>
+				<?php 
+				if( $agent_info == 'yes' ) {
+					echo $return_array['agent_data']; 
+				}?>
 
 				<?php if( $hide_form_fields['name'] != 1 ) { ?>
 				<div class="form-group">
@@ -119,6 +126,8 @@ if ($agent_email && $agent_display != 'none') {
 				</div><!-- form-group -->
 				<?php } ?>
 
+				<?php do_action('houzez_property_agent_contact_fields'); ?>
+
 				<?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
 				<div class="form-group">
 					<label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
@@ -134,9 +143,6 @@ if ($agent_email && $agent_display != 'none') {
 				</div><!-- form-group -->	
 				<?php } ?>		
 			
-				<?php if ( $return_array['is_single_agent'] == true ) : ?>
-		            <input type="hidden" name="target_email" value="<?php echo antispambot($agent_email); ?>">
-		        <?php endif; ?>
 		        <input type="hidden" name="property_agent_contact_security" value="<?php echo wp_create_nonce('property_agent_contact_nonce'); ?>"/>
 		        <input type="hidden" name="property_permalink" value="<?php echo esc_url(get_permalink($post->ID)); ?>"/>
 		        <input type="hidden" name="property_title" value="<?php echo esc_attr(get_the_title($post->ID)); ?>"/>
@@ -149,14 +155,14 @@ if ($agent_email && $agent_display != 'none') {
 
 		        <?php get_template_part('template-parts/google', 'reCaptcha'); ?>
 		        <div class="form_messages"></div>
-				<button type="button" class="houzez_agent_property_form btn btn-secondary <?php echo esc_attr($send_btn_class); ?>">
+				<button type="button" class="houzez-ele-button houzez_agent_property_form btn btn-secondary <?php echo esc_attr($send_btn_class); ?>">
 					<?php get_template_part('template-parts/loader'); ?>
 					<?php echo houzez_option('spl_btn_send', 'Send Email'); ?>
 					
 				</button>
 				
 				<?php if ( $return_array['is_single_agent'] == true && !empty($agent_number) && $agent_mobile_num && !wp_is_mobile() ) : ?>
-				<a href="tel:<?php echo esc_attr($agent_mobile_call); ?>" class="btn btn-secondary-outlined btn-half-width">
+				<a href="tel:<?php echo esc_attr($agent_mobile_call); ?>" data-property-id="<?php echo intval($post->ID); ?>" data-agent-id="<?php echo intval($return_array['agent_id'])?>" class="btn hz-btn-call btn-secondary-outlined btn-half-width">
 					<!-- <button type="button" class="btn"> -->
 						<span class="hide-on-click"><?php echo houzez_option('spl_btn_call', 'Call'); ?></span>
 						<span class="show-on-click"><?php echo esc_attr($agent_number); ?></span>
@@ -165,7 +171,7 @@ if ($agent_email && $agent_display != 'none') {
 				<?php endif; ?>
 
 				<?php if( $return_array['is_single_agent'] == true && !empty($agent_whatsapp_call) && $agent_whatsapp_num ) { ?>
-				<a target="_blank" href="https://api.whatsapp.com/send?phone=<?php echo esc_attr( $agent_whatsapp_call ); ?>&text=<?php echo houzez_option('spl_con_interested', "Hello, I am interested in").' ['.get_the_title().'] '.get_permalink(); ?> " class="btn btn-secondary-outlined <?php echo esc_attr($whatsappBtnClass); ?>"><i class="houzez-icon icon-messaging-whatsapp mr-1"></i> <?php esc_html_e('WhatsApp', 'houzez'); ?></a>
+				<a target="_blank" href="https://api.whatsapp.com/send?phone=<?php echo esc_attr( $agent_whatsapp_call ); ?>&text=<?php echo houzez_option('spl_con_interested', "Hello, I am interested in").' ['.get_the_title().'] '.get_permalink(); ?>" data-property-id="<?php echo intval($post->ID); ?>" data-agent-id="<?php echo intval($return_array['agent_id'])?>" class="btn btn-secondary-outlined <?php echo esc_attr($whatsappBtnClass); ?>"><i class="houzez-icon icon-messaging-whatsapp mr-1"></i> <?php esc_html_e('WhatsApp', 'houzez'); ?></a>
 				<?php } ?>
 
 				<?php if( $return_array['is_single_agent'] == true && houzez_option('agent_direct_messages', 0) ) { ?>

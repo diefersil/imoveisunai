@@ -75,6 +75,20 @@ if( !function_exists('houzez_featured_listing_expire')) {
     }
 }
 
+if( ! function_exists('houzez_get_image_size_dimensions') ) {
+    function houzez_get_image_size_dimensions($size_name) {
+        // Define image sizes
+        $image_sizes = array(
+            'houzez-item-image-1' => array('width' => 592, 'height' => 444),
+            'houzez-item-image-4' => array('width' => 758, 'height' => 564),
+            'houzez-item-image-6' => array('width' => 584, 'height' => 438),
+        );
+
+        // Return the width and height if size exists, otherwise return default dimensions
+        return isset($image_sizes[$size_name]) ? $image_sizes[$size_name] : array('width' => 592, 'height' => 444);
+    }
+}
+
 if( !function_exists('houzez_get_property_gallery') ) {
     function houzez_get_property_gallery($size = 'thumbnail') {
         global $post;
@@ -82,6 +96,8 @@ if( !function_exists('houzez_get_property_gallery') ) {
         if ( ! houzez_option('disable_property_gallery', 1) ) {
             return;
         }
+
+        $default_size = houzez_get_image_size_dimensions($size);
 
         $gallery_ids = get_post_meta( $post->ID, 'fave_property_images', false );
 
@@ -98,6 +114,9 @@ if( !function_exists('houzez_get_property_gallery') ) {
                 if (isset($thumb_meta['sizes'][$size])) {
                     $temp_array['width'] = $thumb_meta['sizes'][$size]['width'];
                     $temp_array['height'] = $thumb_meta['sizes'][$size]['height'];
+                } else {
+                    $temp_array['width'] = $default_size['width'];
+                    $temp_array['height'] = $default_size['height'];
                 }
 
                 $images[] = $temp_array;
@@ -117,6 +136,9 @@ if( !function_exists('houzez_get_property_gallery') ) {
                     if (isset($img_meta['sizes'][$size])) {
                         $temp_array['width'] = $img_meta['sizes'][$size]['width'];
                         $temp_array['height'] = $img_meta['sizes'][$size]['height'];
+                    } else {
+                        $temp_array['width'] = $default_size['width'];
+                        $temp_array['height'] = $default_size['height'];
                     }
                     $images[] = $temp_array;
                 }
@@ -1701,27 +1723,74 @@ if( !function_exists('houzez20_property_filter_callback') ) {
 
 
         $min_beds = get_post_meta( $page_id, 'fave_properties_min_beds', true );
-        if ( ! empty( $min_beds ) ) {
-            $min_beds = intval( $min_beds );
-            if ( $min_beds > 0 ) {
+        $max_beds = get_post_meta( $page_id, 'fave_properties_max_beds', true );
+        if ( !empty($min_beds) && !empty($max_beds) ) {
+            $min_beds = intval($min_beds);
+            $max_beds = intval($max_beds);
+
+            if ($min_beds > 0 && $max_beds >= $min_beds) {
                 $meta_query[] = array(
-                    'key'     => 'fave_property_bedrooms',
-                    'value'   => $min_beds,
+                    'key' => 'fave_property_bedrooms',
+                    'value' => array($min_beds, $max_beds),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+        } else if ( !empty($min_beds) ) {
+            $min_beds = intval($min_beds);
+            if ($min_beds > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bedrooms',
+                    'value' => $min_beds,
+                    'type' => 'NUMERIC',
                     'compare' => '>=',
-                    'type'    => 'DECIMAL'
+                );
+            }
+        } else if ( ! empty($max_beds) ) {
+            $max_beds = intval($max_beds);
+            if ($max_beds > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bedrooms',
+                    'value' => $max_beds,
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
                 );
             }
         }
 
         $min_baths = get_post_meta( $page_id, 'fave_properties_min_baths', true );
-        if ( ! empty( $min_baths ) ) {
-            $min_baths = intval( $min_baths );
-            if ( $min_baths > 0 ) {
+        $max_baths = get_post_meta( $page_id, 'fave_properties_max_baths', true );
+
+        if ( !empty($min_baths) && !empty($max_baths) ) {
+            $min_baths = intval($min_baths);
+            $max_baths = intval($max_baths);
+
+            if ($min_baths > 0 && $max_baths >= $min_baths) {
                 $meta_query[] = array(
-                    'key'     => 'fave_property_bathrooms',
-                    'value'   => $min_baths,
+                    'key' => 'fave_property_bathrooms',
+                    'value' => array($min_baths, $max_baths),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+        } else if ( !empty($min_baths) ) {
+            $min_baths = intval($min_baths);
+            if ($min_baths > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bathrooms',
+                    'value' => $min_baths,
+                    'type' => 'NUMERIC',
                     'compare' => '>=',
-                    'type'    => 'DECIMAL'
+                );
+            }
+        } else if ( !empty($max_baths) ) {
+            $max_baths = intval($max_baths);
+            if ($max_baths > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bathrooms',
+                    'value' => $max_baths,
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
                 );
             }
         }
@@ -1781,154 +1850,7 @@ if( !function_exists('houzez20_property_filter_callback') ) {
 /*-----------------------------------------------------------------------------------*/
 if( !function_exists('houzez_property_filter') ) {
     function houzez_property_filter( $property_query_args ) {
-        global $paged;
-
-        $page_id = get_the_ID();
-        $what_to_show = get_post_meta( $page_id, 'fave_properties_sort', true );
-        $fave_prop_no = get_post_meta( $page_id, 'fave_prop_no', true );
-        $fave_listings_tabs = get_post_meta( $page_id, 'fave_listings_tabs', true );
-
-        $tax_query = array();
-        $meta_query = array();
-
-
-        if($what_to_show == 'x_featured_first' || $what_to_show == 'x_rand_featured_first') { 
-            $meta_query[] = array(
-                'key' => 'fave_featured',
-                'value' => '0',
-                'compare' => '='
-            );
-        }
-
-        if ( isset( $_GET['tab'] ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_status',
-                'field' => 'slug',
-                'terms' => $_GET['tab']
-            );
-        }
-
-        $states = get_post_meta( $page_id, 'fave_states', false );
-        if ( ! empty( $states ) && is_array( $states ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_state',
-                'field' => 'slug',
-                'terms' => $states
-            );
-        }
-
-        $locations = get_post_meta( $page_id, 'fave_locations', false );
-        if ( ! empty( $locations ) && is_array( $locations ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_city',
-                'field' => 'slug',
-                'terms' => $locations
-            );
-        }
-
-        $types = get_post_meta( $page_id, 'fave_types', false );
-        if ( ! empty( $types ) && is_array( $types ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_type',
-                'field' => 'slug',
-                'terms' => $types
-            );
-        }
-
-        $labels = get_post_meta( $page_id, 'fave_labels', false );
-        if ( ! empty( $labels ) && is_array( $labels ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_label',
-                'field' => 'slug',
-                'terms' => $labels
-            );
-        }
-
-        $fave_areas = get_post_meta( $page_id, 'fave_area', false );
-        if ( ! empty( $fave_areas ) && is_array( $fave_areas ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_area',
-                'field' => 'slug',
-                'terms' => $fave_areas
-            );
-        }
-
-        $features = get_post_meta( $page_id, 'fave_features', false );
-        if ( ! empty( $features ) && is_array( $features ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_feature',
-                'field' => 'slug',
-                'terms' => $features
-            );
-        }
-
-        if( !isset( $_GET['tab'] ) ) {
-            $status = get_post_meta($page_id, 'fave_status', false);
-            if (!empty($status) && is_array($status)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'property_status',
-                    'field' => 'slug',
-                    'terms' => $status
-                );
-            }
-        }
-
-        $min_price = get_post_meta( $page_id, 'fave_min_price', true );
-        $max_price = get_post_meta( $page_id, 'fave_max_price', true );
-
-        // min and max price logic
-        if (!empty($min_price) && !empty($max_price)) {
-            $min_price = doubleval(houzez_clean($min_price));
-            $max_price = doubleval(houzez_clean($max_price));
-
-            if ($min_price >= 0 && $max_price > $min_price) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => array($min_price, $max_price),
-                    'type' => 'NUMERIC',
-                    'compare' => 'BETWEEN',
-                );
-            }
-        } else if (!empty($min_price)) {
-            $min_price = doubleval(houzez_clean($min_price));
-            if ($min_price >= 0) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => $min_price,
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                );
-            }
-        } else if (!empty($max_price)) {
-            $max_price = doubleval(houzez_clean($max_price));
-            if ($max_price >= 0) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => $max_price,
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                );
-            }
-        }
-
-        $meta_count = count($meta_query);
-        if( $meta_count > 1 ) {
-            $meta_query['relation'] = 'AND';
-        }
-        if ($meta_count > 0) {
-            $property_query_args['meta_query'] = $meta_query;
-        }
-
-
-        $tax_count = count( $tax_query );
-        if( $tax_count > 1 ) {
-            $tax_query['relation'] = 'AND';
-        }
-        if( $tax_count > 0 ) {
-            $property_query_args['tax_query'] = $tax_query;
-        }
-        //print_r($property_query_args);
-        return $property_query_args;
+        return $property_query_args;   
     }
 }
 add_filter('houzez_property_filter', 'houzez_property_filter');
@@ -1938,170 +1860,7 @@ add_filter('houzez_property_filter', 'houzez_property_filter');
 /*-----------------------------------------------------------------------------------*/
 if( !function_exists('houzez_featured_property_filter') ) {
     function houzez_featured_property_filter( $property_query_args ) {
-        global $paged;
-
-        $page_id = get_the_ID();
-        $what_to_show = get_post_meta( $page_id, 'fave_properties_sort', true );
-        $fave_featured_prop_no = get_post_meta( $page_id, 'fave_featured_prop_no', true );
-        $fave_listings_tabs = get_post_meta( $page_id, 'fave_listings_tabs', true );
-
-        $tax_query = array();
-        $meta_query = array();
-
-        if ( is_front_page()  ) {
-            $paged = (get_query_var('page')) ? get_query_var('page') : 1;
-        }
-
-        if(!$fave_featured_prop_no){
-            $property_query_args[ 'posts_per_page' ]  = 4;
-        } else {
-            $property_query_args[ 'posts_per_page' ] = $fave_featured_prop_no;
-        }
-
-        if (!empty($paged)) {
-            $property_query_args['paged'] = $paged;
-        } else {
-            $property_query_args['paged'] = 1;
-        }
-
-        $meta_query[] = array(
-            'key' => 'fave_featured',
-            'value' => '1',
-            'compare' => '='
-        );
-
-
-        if($what_to_show == 'x_rand_featured_first') { 
-            $property_query_args['orderby'] = 'rand';
-        }
-
-        if ( isset( $_GET['tab'] ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_status',
-                'field' => 'slug',
-                'terms' => $_GET['tab']
-            );
-        }
-
-        $states = get_post_meta( $page_id, 'fave_states', false );
-        if ( ! empty( $states ) && is_array( $states ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_state',
-                'field' => 'slug',
-                'terms' => $states
-            );
-        }
-
-        $locations = get_post_meta( $page_id, 'fave_locations', false );
-        if ( ! empty( $locations ) && is_array( $locations ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_city',
-                'field' => 'slug',
-                'terms' => $locations
-            );
-        }
-
-        $types = get_post_meta( $page_id, 'fave_types', false );
-        if ( ! empty( $types ) && is_array( $types ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_type',
-                'field' => 'slug',
-                'terms' => $types
-            );
-        }
-
-        $features = get_post_meta( $page_id, 'fave_features', false );
-        if ( ! empty( $features ) && is_array( $features ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_feature',
-                'field' => 'slug',
-                'terms' => $features
-            );
-        }
-
-        if( !isset( $_GET['tab'] ) ) {
-            $status = get_post_meta($page_id, 'fave_status', false);
-            if (!empty($status) && is_array($status)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'property_status',
-                    'field' => 'slug',
-                    'terms' => $status
-                );
-            }
-        }
-
-        $labels = get_post_meta( $page_id, 'fave_labels', false );
-        if ( ! empty( $labels ) && is_array( $labels ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_label',
-                'field' => 'slug',
-                'terms' => $labels
-            );
-        }
-
-        $fave_areas = get_post_meta( $page_id, 'fave_area', false );
-        if ( ! empty( $fave_areas ) && is_array( $fave_areas ) ) {
-            $tax_query[] = array(
-                'taxonomy' => 'property_area',
-                'field' => 'slug',
-                'terms' => $fave_areas
-            );
-        }
-
-        $min_price = get_post_meta( $page_id, 'fave_min_price', false );
-        $max_price = get_post_meta( $page_id, 'fave_max_price', false );
-
-        // min and max price logic
-        if (!empty($min_price) && !empty($max_price)) {
-            $min_price = doubleval(houzez_clean($min_price));
-            $max_price = doubleval(houzez_clean($max_price));
-
-            if ($min_price >= 0 && $max_price > $min_price) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => array($min_price, $max_price),
-                    'type' => 'NUMERIC',
-                    'compare' => 'BETWEEN',
-                );
-            }
-        } else if (!empty($min_price)) {
-            $min_price = doubleval(houzez_clean($min_price));
-            if ($min_price >= 0) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => $min_price,
-                    'type' => 'NUMERIC',
-                    'compare' => '>=',
-                );
-            }
-        } else if (!empty($max_price)) {
-            $max_price = doubleval(houzez_clean($max_price));
-            if ($max_price >= 0) {
-                $meta_query[] = array(
-                    'key' => 'fave_property_price',
-                    'value' => $max_price,
-                    'type' => 'NUMERIC',
-                    'compare' => '<=',
-                );
-            }
-        }
-
-        $meta_count = count($meta_query);
-        if( $meta_count > 1 ) {
-            $meta_query['relation'] = 'AND';
-        }
-        if ($meta_count > 0) {
-            $property_query_args['meta_query'] = $meta_query;
-        }
-
-
-        $tax_count = count( $tax_query );
-        if( $tax_count > 1 ) {
-            $tax_query['relation'] = 'AND';
-        }
-        if( $tax_count > 0 ) {
-            $property_query_args['tax_query'] = $tax_query;
-        }
+        
 
         return $property_query_args;
     }
@@ -2623,12 +2382,12 @@ add_action( 'wp_ajax_houzez_add_to_favorite', 'houzez_favorites' );
 if( !function_exists( 'houzez_favorites' ) ) {
     // a:1:{i:0;i:543;}
     function houzez_favorites () {
-        global $current_user;
-        wp_get_current_user();
-        $userID      =   $current_user->ID;
+        $userID      =   get_current_user_id();
         $fav_option = 'houzez_favorites-'.$userID;
         $property_id = intval( $_POST['listing_id'] );
         $current_prop_fav = get_option( 'houzez_favorites-'.$userID );
+
+        
 
         // Check if empty or not
         if( empty( $current_prop_fav ) ) {
@@ -2636,15 +2395,11 @@ if( !function_exists( 'houzez_favorites' ) ) {
             $prop_fav['1'] = $property_id;
             update_option( $fav_option, $prop_fav );
             $arr = array( 'added' => true, 'response' => esc_html__('Added', 'houzez') );
-            echo json_encode($arr);
-            wp_die();
         } else {
             if(  ! in_array ( $property_id, $current_prop_fav )  ) {
                 $current_prop_fav[] = $property_id;
                 update_option( $fav_option,  $current_prop_fav );
                 $arr = array( 'added' => true, 'response' => esc_html__('Added', 'houzez') );
-                echo json_encode($arr);
-                wp_die();
             } else {
                 $key = array_search( $property_id, $current_prop_fav );
 
@@ -2654,10 +2409,11 @@ if( !function_exists( 'houzez_favorites' ) ) {
 
                 update_option( $fav_option, $current_prop_fav );
                 $arr = array( 'added' => false, 'response' => esc_html__('Removed', 'houzez') );
-                echo json_encode($arr);
-                wp_die();
             }
         }
+
+        echo json_encode($arr);
+        do_action('houzez_track_favorites', $userID, $property_id);
         wp_die();
     }
 }
@@ -3516,6 +3272,8 @@ if( !function_exists('houzez_get_area_size') ) {
         $houzez_base_area = houzez_option('houzez_base_area');
 
         if( !empty( $prop_size ) ) {
+            // Convert string to float
+            $prop_size = (float)$prop_size;
 
             if( isset( $_COOKIE[ "houzez_current_area" ] ) ) {
                 if( $_COOKIE[ "houzez_current_area" ] == 'sq_meter' && $houzez_base_area != 'sq_meter'  ) {
@@ -4574,8 +4332,10 @@ if ( !function_exists( 'houzez_get_agent_info_bottom_v2' ) ) {
 }
 
 if ( !function_exists( 'houzez_get_agent_info_top' ) ) {
-    function houzez_get_agent_info_top($args, $type, $is_single = true)
-    {
+    function houzez_get_agent_info_top($args, $type, $is_single = true) {
+        global $ele_settings;
+        $view_listing_link = isset($ele_settings['view_listing']) ? $ele_settings['view_listing'] : 'yes';
+        
         $view_listing = houzez_option('agent_view_listing');
         $agent_phone_num = houzez_option('agent_phone_num');
 
@@ -4617,7 +4377,7 @@ if ( !function_exists( 'houzez_get_agent_info_top' ) ) {
                         }
 
                         
-                        if($view_listing != 0) {
+                        if($view_listing != 0 && $view_listing_link == 'yes') {
                             $output .= '<li class="agent-link">';
                                 $output .= '<a href="' . $args['link'] . '">' . houzez_option('spl_con_view_listings', 'View listings') . '</a>';
                             $output .= '</li>';
@@ -4635,6 +4395,8 @@ if ( !function_exists( 'houzez_get_agent_info_top' ) ) {
 
 if(!function_exists('houzez20_property_contact_form')) {
     function houzez20_property_contact_form($is_top = true, $luxury = false) {
+        global $post;
+
         $allowed_html_array = array(
             'a' => array(
                 'href' => array(),
@@ -4647,6 +4409,7 @@ if(!function_exists('houzez20_property_contact_form')) {
         $listing_agent_info = array();
 
         $agent_display = houzez_get_listing_data('agent_display_option');
+
         $is_single_agent = true;
 
         if( $agent_display != 'none' ) {
@@ -4832,25 +4595,26 @@ if(!function_exists('houzez20_property_contact_form')) {
 
             } else {
 
-                $prop_agent = get_the_author();
-                $prop_agent_permalink = get_author_posts_url( get_the_author_meta( 'ID' ) );
-                $prop_agent_phone = get_the_author_meta( 'fave_author_phone' );
-                $prop_agent_mobile = get_the_author_meta( 'fave_author_mobile' );
-                $prop_agent_whatsapp = get_the_author_meta( 'fave_author_whatsapp' );
+                $author_id = $post->post_author;
+                $prop_agent = get_the_author_meta( 'display_name', $author_id );
+                $prop_agent_permalink = get_author_posts_url( $author_id );
+                $prop_agent_phone = get_the_author_meta( 'fave_author_phone', $author_id );
+                $prop_agent_mobile = get_the_author_meta( 'fave_author_mobile', $author_id );
+                $prop_agent_whatsapp = get_the_author_meta( 'fave_author_whatsapp', $author_id );
                 $agent_num_call = str_replace(array('(',')',' ','-'),'', $prop_agent_num);
-                $prop_agent_photo_url = get_the_author_meta( 'fave_author_custom_picture' );
+                $prop_agent_photo_url = get_the_author_meta( 'fave_author_custom_picture', $author_id );
 
-                $agent_telegram = get_the_author_meta( 'fave_author_telegram' );
-                $agent_lineapp = get_the_author_meta( 'fave_author_line_id' );
+                $agent_telegram = get_the_author_meta( 'fave_author_telegram', $author_id );
+                $agent_lineapp = get_the_author_meta( 'fave_author_line_id', $author_id );
 
-                $prop_agent_email = get_the_author_meta( 'email' );
-                $linkedin = get_the_author_meta( 'fave_author_linkedin' );
+                $prop_agent_email = get_the_author_meta( 'email', $author_id );
+                $linkedin = get_the_author_meta( 'fave_author_linkedin', $author_id );
 
                 $agent_args = array();
-                $agent_id   = get_the_author_meta( 'ID' );
-                $agent_args[ 'agent_id' ] = get_the_author_meta( 'ID' );
+                $agent_id   = $author_id;
+                $agent_args[ 'agent_id' ] = $author_id;
                 $agent_args[ 'agent_type' ] = $agent_display;
-                $agent_args[ 'agent_skype' ] = get_the_author_meta( 'fave_author_skype' );
+                $agent_args[ 'agent_skype' ] = get_the_author_meta( 'fave_author_skype', $author_id );
                 $agent_args[ 'agent_name' ] = $prop_agent;
                 $agent_args[ 'agent_mobile' ] = $prop_agent_mobile;
                 $agent_args[ 'agent_mobile_call' ] = str_replace(array('(',')',' ','-'),'', $prop_agent_mobile);
@@ -4862,18 +4626,18 @@ if(!function_exists('houzez20_property_contact_form')) {
                 $agent_args[ 'agent_email' ] = $prop_agent_email;
                 $agent_args[ 'link' ] = $prop_agent_permalink;
 
-                $agent_args[ 'agent_position' ] = get_the_author_meta( 'fave_author_title' );
-                $agent_args[ 'agent_company' ] = get_the_author_meta( 'fave_author_company' );
-                $agent_args[ 'agent_service_area' ] = get_the_author_meta( 'fave_author_service_areas' );
-                $agent_args[ 'agent_specialties' ] = get_the_author_meta( 'fave_author_specialties' );
-                $agent_args[ 'agent_tax_no' ] = get_the_author_meta( 'fave_author_tax_no' );
+                $agent_args[ 'agent_position' ] = get_the_author_meta( 'fave_author_title', $author_id );
+                $agent_args[ 'agent_company' ] = get_the_author_meta( 'fave_author_company', $author_id );
+                $agent_args[ 'agent_service_area' ] = get_the_author_meta( 'fave_author_service_areas', $author_id );
+                $agent_args[ 'agent_specialties' ] = get_the_author_meta( 'fave_author_specialties', $author_id );
+                $agent_args[ 'agent_tax_no' ] = get_the_author_meta( 'fave_author_tax_no', $author_id );
 
-                $agent_args[ 'facebook' ] = get_the_author_meta( 'fave_author_facebook' );
-                $agent_args[ 'twitter' ] = get_the_author_meta( 'fave_author_twitter' );
-                $agent_args[ 'linkedin' ] = get_the_author_meta( 'fave_author_linkedin' );
-                $agent_args[ 'googleplus' ] = get_the_author_meta( 'fave_author_googleplus' );
-                $agent_args[ 'youtube' ] = get_the_author_meta( 'fave_author_youtube' );
-                $agent_args[ 'instagram' ] = get_the_author_meta( 'fave_author_instagram' );
+                $agent_args[ 'facebook' ] = get_the_author_meta( 'fave_author_facebook', $author_id );
+                $agent_args[ 'twitter' ] = get_the_author_meta( 'fave_author_twitter', $author_id );
+                $agent_args[ 'linkedin' ] = get_the_author_meta( 'fave_author_linkedin', $author_id );
+                $agent_args[ 'googleplus' ] = get_the_author_meta( 'fave_author_googleplus', $author_id );
+                $agent_args[ 'youtube' ] = get_the_author_meta( 'fave_author_youtube', $author_id );
+                $agent_args[ 'instagram' ] = get_the_author_meta( 'fave_author_instagram', $author_id );
                 $agent_args[ 'telegram' ] = $agent_telegram;
                 $agent_args[ 'lineapp' ] = $agent_lineapp;
 
@@ -4923,104 +4687,129 @@ if(!function_exists('houzez20_property_contact_form')) {
 }
 
 // houzez_property_clone
-add_action( 'wp_ajax_nopriv_houzez_property_clone', 'houzez_property_clone' );
 add_action( 'wp_ajax_houzez_property_clone', 'houzez_property_clone' );
 
 if ( !function_exists( 'houzez_property_clone' ) ) {
     function houzez_property_clone() {
 
-        if ( isset( $_POST['propID'] ) ) {
+        // Check if propID is provided
+        if ( ! isset( $_POST['propID'] ) ) {
+            wp_send_json_error( esc_html__( 'No property ID provided!', 'houzez' ) );
+            wp_die();
+        }
 
-            global $wpdb;
-            if (! isset( $_POST['propID'] ) ) {
-                wp_die('No post to duplicate has been supplied!');
-            }
-            $post_id = absint( $_POST['propID'] );
-            $post = get_post( $post_id );
-            $current_user = wp_get_current_user();
-            $new_post_author = $current_user->ID;
+        // Verify nonce for security
+        if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'clone_property_nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Security check failed!', 'houzez' ) );
+            wp_die();
+        }
 
-            if (isset( $post ) && $post != null) {
+        global $wpdb;
+        $userID = get_current_user_id();
+        $new_post_author = $userID;
+        $post_id = absint( $_POST['propID'] );
 
-                /*
-                 * new post data array
-                 */
-                $args = array(
-                    'comment_status' => $post->comment_status,
-                    'ping_status'    => $post->ping_status,
-                    'post_author'    => $new_post_author,
-                    'post_content'   => $post->post_content,
-                    'post_excerpt'   => $post->post_excerpt,
-                    'post_name'      => $post->post_name,
-                    'post_parent'    => $post->post_parent,
-                    'post_password'  => $post->post_password,
-                    'post_status'    => 'draft',
-                    'post_title'     => $post->post_title,
-                    'post_type'      => $post->post_type,
-                    'to_ping'        => $post->to_ping,
-                    'menu_order'     => $post->menu_order
-                );
+        // Validate post_id
+        if ( ! $post_id || get_post_type( $post_id ) !== 'property' ) {
+            wp_send_json_error( esc_html__( 'Invalid property ID!', 'houzez' ) );
+            wp_die();
+        }
 
-                /*
-                 * insert the post by wp_insert_post() function
-                 */
-                $new_post_id = wp_insert_post( $args );
+        // Get the post author
+        $post_author = get_post_field( 'post_author', $post_id );
 
-                /*
-                 * get all current post terms ad set them to the new post draft
-                 */
-                $taxonomies = get_object_taxonomies($post->post_type); // returns array of taxonomy names for post type, ex array("category", "post_tag");
-                foreach ($taxonomies as $taxonomy) {
-                    $post_terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
-                    wp_set_object_terms($new_post_id, $post_terms, $taxonomy, false);
-                }
+        // Get agency agents associated with the current user
+        $agencyAgentsArray = array();
+        $agencyAgents = houzez_get_agency_agents( $userID );
+        if ( $agencyAgents ) {
+            $agencyAgentsArray = $agencyAgents;
+        }
 
-                /*
-                 * duplicate all post meta just in two SQL queries
-                 */
-                $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id");
-                if (count($post_meta_infos)!=0) {
-                    $sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
-                    foreach ($post_meta_infos as $meta_info) {
-                        $meta_key = $meta_info->meta_key;
-                        $meta_value = addslashes($meta_info->meta_value);
-                        $sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
-                    }
-                    $sql_query.= implode(" UNION ALL ", $sql_query_sel);
-                    $wpdb->query($sql_query);
-                }
+        // Check if the current user has permission to edit the property
+        if (
+            $post_author != $userID &&
+            ! houzez_is_admin() &&
+            ! houzez_is_editor() &&
+            ! in_array( $post_author, $agencyAgentsArray )
+        ) {
+            wp_send_json_error( esc_html__( 'You do not have permission to edit this property!', 'houzez' ) );
+            wp_die();
+        }
 
-                update_post_meta( $new_post_id, 'fave_featured', 0 );
-                update_post_meta( $new_post_id, 'houzez_featured_listing_date', '' );
-                update_post_meta( $new_post_id, 'fave_payment_status', 'not_paid' );
+        $post = get_post( $post_id );
 
-                if( houzez_option('auto_property_id', 0) != 0 ) {
-                    $pattern = houzez_option( 'property_id_pattern' );
-                    $new_id   = preg_replace( '/{ID}/', $new_post_id, $pattern );
-                    update_post_meta($new_post_id, 'fave_property_id', $new_id);
-                }
+        if (isset( $post ) && $post != null) {
 
-                $dashboard_listings = houzez_get_template_link_2('template/user_dashboard_properties.php');
-                $dashboard_listings = add_query_arg( 'cloned', 1, $dashboard_listings );
+            /*
+             * new post data array
+             */
+            $args = array(
+                'comment_status' => $post->comment_status,
+                'ping_status'    => $post->ping_status,
+                'post_author'    => $new_post_author,
+                'post_content'   => $post->post_content,
+                'post_excerpt'   => $post->post_excerpt,
+                'post_name'      => $post->post_name,
+                'post_parent'    => $post->post_parent,
+                'post_password'  => $post->post_password,
+                'post_status'    => 'draft',
+                'post_title'     => $post->post_title,
+                'post_type'      => $post->post_type,
+                'to_ping'        => $post->to_ping,
+                'menu_order'     => $post->menu_order
+            );
 
-                echo json_encode( array(
-                    'success'   => true,
-                    'redirect'  => $dashboard_listings,
-                    'message' => 'Successfully cloned',
-                ));
-                /*
-                 * finally, redirect to the edit post screen for the new draft
-                 */
-                // wp_redirect( admin_url( 'post.php?action=edit&post=' . $new_post_id ) );
-                wp_die();
-            } else {
-                echo json_encode( array(
-                    'success'   => false,
-                    'message' => 'Failed',
-                ));
-                wp_die('Post creation failed, could not find original post: ' . $post_id);
+            /*
+             * insert the post by wp_insert_post() function
+             */
+            $new_post_id = wp_insert_post( $args );
+
+            /*
+             * get all current post terms ad set them to the new post draft
+             */
+            $taxonomies = get_object_taxonomies($post->post_type); // returns array of taxonomy names for post type, ex array("category", "post_tag");
+            foreach ($taxonomies as $taxonomy) {
+                $post_terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
+                wp_set_object_terms($new_post_id, $post_terms, $taxonomy, false);
             }
 
+            /*
+             * duplicate all post meta just in two SQL queries
+             */
+            $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id");
+            if (count($post_meta_infos)!=0) {
+                $sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
+                foreach ($post_meta_infos as $meta_info) {
+                    $meta_key = $meta_info->meta_key;
+                    $meta_value = addslashes($meta_info->meta_value);
+                    $sql_query_sel[]= "SELECT $new_post_id, '$meta_key', '$meta_value'";
+                }
+                $sql_query.= implode(" UNION ALL ", $sql_query_sel);
+                $wpdb->query($sql_query);
+            }
+
+            update_post_meta( $new_post_id, 'fave_featured', 0 );
+            update_post_meta( $new_post_id, 'houzez_featured_listing_date', '' );
+            update_post_meta( $new_post_id, 'fave_payment_status', 'not_paid' );
+
+            if( houzez_option('auto_property_id', 0) != 0 ) {
+                $pattern = houzez_option( 'property_id_pattern' );
+                $new_id   = preg_replace( '/{ID}/', $new_post_id, $pattern );
+                update_post_meta($new_post_id, 'fave_property_id', $new_id);
+            }
+
+            $dashboard_listings = houzez_get_template_link_2('template/user_dashboard_properties.php');
+            $dashboard_listings = add_query_arg( 'cloned', 1, $dashboard_listings );
+
+            wp_send_json_success( array(
+                'redirect' => esc_url( $dashboard_listings ),
+                'message'  => esc_html__( 'Successfully cloned', 'houzez' )
+            ) );
+            wp_die();
+
+        } else {
+            wp_send_json_error( esc_html__( 'Post creation failed, could not find original post:', 'houzez' ) );
+            wp_die();
         }
 
     }
@@ -5032,30 +4821,74 @@ add_action( 'wp_ajax_houzez_property_on_hold', 'houzez_property_on_hold' );
 if ( !function_exists( 'houzez_property_on_hold' ) ) {
     function houzez_property_on_hold() {
 
-        if ( isset( $_POST['propID'] ) ) {
+        // Check if propID is provided
+        if ( ! isset( $_POST['propID'] ) ) {
+            wp_send_json_error( esc_html__( 'No property ID provided!', 'houzez' ) );
+            wp_die();
+        }
 
-            global $wpdb;
-            if (! isset( $_POST['propID'] ) ) {
-                wp_die('No post to put on hold has been supplied!');
-            }
-            $post_id = absint( $_POST['propID'] );
-            
-            $post_status = get_post_status( $post_id );
+        // Verify nonce for security
+        if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'puthold_property_nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Security check failed!', 'houzez' ) );
+            wp_die();
+        }
 
-            if($post_status == 'publish') { 
-                $post = array(
-                    'ID'            => $post_id,
-                    'post_status'   => 'on_hold'
-                );
-            } elseif ($post_status == 'on_hold') {
-                $post = array(
-                    'ID'            => $post_id,
-                    'post_status'   => 'publish'
-                );
-            }
-            $post_id =  wp_update_post($post);
-            
-            return true;
+        global $wpdb;
+        $userID = get_current_user_id();
+        $post_id = absint( $_POST['propID'] );
+
+        // Validate post_id
+        if ( ! $post_id || get_post_type( $post_id ) !== 'property' ) {
+            wp_send_json_error( esc_html__( 'Invalid property ID!', 'houzez' ) );
+            wp_die();
+        }
+
+        // Get the post author
+        $post_author = get_post_field( 'post_author', $post_id );
+
+        // Get agency agents associated with the current user
+        $agencyAgentsArray = array();
+        $agencyAgents = houzez_get_agency_agents( $userID );
+        if ( $agencyAgents ) {
+            $agencyAgentsArray = $agencyAgents;
+        }
+
+        // Check if the current user has permission to edit the property
+        if (
+            $post_author != $userID &&
+            ! houzez_is_admin() &&
+            ! houzez_is_editor() &&
+            ! in_array( $post_author, $agencyAgentsArray )
+        ) {
+            wp_send_json_error( esc_html__( 'You do not have permission to edit this property!', 'houzez' ) );
+            wp_die();
+        }
+
+        $post_status = get_post_status( $post_id );
+
+        if($post_status == 'publish') { 
+            $post = array(
+                'ID'            => $post_id,
+                'post_status'   => 'on_hold'
+            );
+        } elseif ($post_status == 'on_hold') {
+            $post = array(
+                'ID'            => $post_id,
+                'post_status'   => 'publish'
+            );
+        } else {
+            wp_send_json_error( esc_html__( 'Invalid post status!', 'houzez' ) );
+            wp_die();
+        }
+
+        $updated_post_id = wp_update_post( $post );
+
+        if ( is_wp_error( $updated_post_id ) ) {
+            wp_send_json_error( esc_html__( 'Failed to update property status!', 'houzez' ) );
+            wp_die();
+        } else {
+            wp_send_json_success( esc_html__( 'Property status updated successfully!', 'houzez' ) );
+            wp_die();
         }
 
     }
@@ -5064,45 +4897,88 @@ if ( !function_exists( 'houzez_property_on_hold' ) ) {
 // houzez_property_mark_sold
 add_action( 'wp_ajax_houzez_property_mark_sold', 'houzez_property_mark_sold' );
 
-if ( !function_exists( 'houzez_property_mark_sold' ) ) {
+if ( ! function_exists( 'houzez_property_mark_sold' ) ) {
     function houzez_property_mark_sold() {
-
-        if ( isset( $_POST['propID'] ) ) {
-
-            global $wpdb;
-            if (! isset( $_POST['propID'] ) ) {
-                wp_die('No post to mark as sold has been supplied!');
-            }
-            $post_id = absint( $_POST['propID'] );
-            
-            $post_status = get_post_status( $post_id );
-
-            if($post_status == 'publish') { 
-                $post = array(
-                    'ID'            => $post_id,
-                    'post_status'   => 'houzez_sold'
-                );
-
-                $mark_sold_status = houzez_option('mark_sold_status');
-
-                if( $mark_sold_status != '' ) {
-                    $mark_sold_status = intval($mark_sold_status);
-                    wp_set_object_terms( $post_id, $mark_sold_status, 'property_status' );
-                }
-
-            } elseif ($post_status == 'houzez_sold') {
-                $post = array(
-                    'ID'            => $post_id,
-                    'post_status'   => 'publish'
-                );
-            }
-            $post_id =  wp_update_post($post);
-            
-            return true;
+        // Check if propID is provided
+        if ( ! isset( $_POST['propID'] ) ) {
+            wp_send_json_error( esc_html__( 'No property ID provided!', 'houzez' ) );
+            wp_die();
         }
 
+        // Verify nonce for security
+        if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'sold_property_nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Security check failed!', 'houzez' ) );
+            wp_die();
+        }
+
+        global $wpdb;
+        $userID = get_current_user_id();
+        $post_id = absint( $_POST['propID'] );
+
+        // Validate post_id
+        if ( ! $post_id || get_post_type( $post_id ) !== 'property' ) {
+            wp_send_json_error( esc_html__( 'Invalid property ID!', 'houzez' ) );
+            wp_die();
+        }
+
+        // Get the post author
+        $post_author = get_post_field( 'post_author', $post_id );
+
+        // Get agency agents associated with the current user
+        $agencyAgentsArray = array();
+        $agencyAgents = houzez_get_agency_agents( $userID );
+        if ( $agencyAgents ) {
+            $agencyAgentsArray = $agencyAgents;
+        }
+
+        // Check if the current user has permission to edit the property
+        if (
+            $post_author != $userID &&
+            ! houzez_is_admin() &&
+            ! houzez_is_editor() &&
+            ! in_array( $post_author, $agencyAgentsArray )
+        ) {
+            wp_send_json_error( esc_html__( 'You do not have permission to edit this property!', 'houzez' ) );
+            wp_die();
+        }
+
+        $post_status = get_post_status( $post_id );
+
+        // Update post status based on current status
+        if ( $post_status == 'publish' ) {
+            $post = array(
+                'ID'          => $post_id,
+                'post_status' => 'houzez_sold',
+            );
+
+            $mark_sold_status = houzez_option( 'mark_sold_status' );
+
+            if ( $mark_sold_status !== '' ) {
+                $mark_sold_status = intval( $mark_sold_status );
+                wp_set_object_terms( $post_id, $mark_sold_status, 'property_status' );
+            }
+        } elseif ( $post_status == 'houzez_sold' ) {
+            $post = array(
+                'ID'          => $post_id,
+                'post_status' => 'publish',
+            );
+        } else {
+            wp_send_json_error( esc_html__( 'Invalid post status!', 'houzez' ) );
+            wp_die();
+        }
+
+        $updated_post_id = wp_update_post( $post );
+
+        if ( is_wp_error( $updated_post_id ) ) {
+            wp_send_json_error( esc_html__( 'Failed to update property status!', 'houzez' ) );
+            wp_die();
+        } else {
+            wp_send_json_success( esc_html__( 'Property status updated successfully!', 'houzez' ) );
+            wp_die();
+        }
     }
 }
+
 
 /*-----------------------------------------------------------------------------------*/
 /*  Houzez Invoice Print Property
@@ -5308,63 +5184,101 @@ if ( !function_exists( 'houzez_create_invoice_print' ) ) {
 /* --------------------------------------------------------------------------
 * Property delete ajax
 * --------------------------------------------------------------------------- */
+// Add action for AJAX delete property
 add_action( 'wp_ajax_houzez_delete_property', 'houzez_delete_property' );
 
-if ( !function_exists( 'houzez_delete_property' ) ) {
+if ( ! function_exists( 'houzez_delete_property' ) ) {
 
     function houzez_delete_property() {
+        // Ensure the request is a POST request
+        if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+            wp_send_json_error( esc_html__( 'Invalid request method', 'houzez' ) );
+            wp_die();
+        }
+
+        // Verify nonce for security
+        if ( ! isset( $_POST['security'] ) || ! wp_verify_nonce( $_POST['security'], 'delete_my_property_nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Security check failed!', 'houzez' ) );
+            wp_die();
+        }
+
+        // Check if prop_id is provided
+        if ( ! isset( $_POST['prop_id'] ) ) {
+            wp_send_json_error( esc_html__( 'No Property ID found', 'houzez' ) );
+            wp_die();
+        }
+
+        $propID = absint( $_POST['prop_id'] );
+
+        if ( ! $propID ) {
+            wp_send_json_error( esc_html__( 'Invalid Property ID', 'houzez' ) );
+            wp_die();
+        }
+
+        // Check if the post exists and is of the correct post type
+        $post = get_post( $propID );
+        if ( ! $post || $post->post_type !== 'property' ) {
+            wp_send_json_error( esc_html__( 'Property not found', 'houzez' ) );
+            wp_die();
+        }
+
         $userID = get_current_user_id();
 
+        // Get the package user ID
         $packageUserId = $userID;
         $agent_agency_id = houzez_get_agent_agency_id( $userID );
-        if( $agent_agency_id ) {
+        if ( $agent_agency_id ) {
             $packageUserId = $agent_agency_id;
         }
 
+        // Get agency agents associated with the user
         $agencyAgentsArray = array();
         $agencyAgents = houzez_get_agency_agents( $userID );
-        if( $agencyAgents ) {
+        if ( $agencyAgents ) {
             $agencyAgentsArray = $agencyAgents;
         }
 
-        $dashboard_listings = houzez_get_template_link_2('template/user_dashboard_properties.php');
-        $dashboard_listings = add_query_arg( 'deleted', 1, $dashboard_listings );
+        // Get the post author
+        $post_author = $post->post_author;
 
-        $nonce = $_REQUEST['security'];
-        if ( ! wp_verify_nonce( $nonce, 'delete_my_property_nonce' ) ) {
-            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'Security check failed!', 'houzez' ) );
-            echo json_encode( $ajax_response );
-            die;
-        }
+        // Check if the user has permission to delete the property
+        if ( $post_author == $userID || houzez_is_admin() || houzez_is_editor() || in_array( $post_author, $agencyAgentsArray ) ) {
 
-        if ( !isset( $_REQUEST['prop_id'] ) ) {
-            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No Property ID found', 'houzez' ) );
-            echo json_encode( $ajax_response );
-            die;
-        }
-
-        $propID = $_REQUEST['prop_id'];
-        $post_author = get_post_field( 'post_author', $propID );
-
-        if ( $post_author == $userID || houzez_is_admin() || houzez_is_editor() || in_array($post_author, $agencyAgentsArray) ) {
-
-            if( get_post_status($propID) != 'draft' ) {
-                houzez_delete_property_attachments_frontend($propID);
+            // Delete property attachments if post status is not 'draft'
+            if ( get_post_status( $propID ) != 'draft' ) {
+                houzez_delete_property_attachments_frontend( $propID );
             }
-            wp_delete_post( $propID );
-            houzez_plusone_package_listings($packageUserId);
-            $ajax_response = array( 'success' => true , 'redirect' => $dashboard_listings, 'mesg' => esc_html__( 'Property Deleted', 'houzez' ) );
-            echo json_encode( $ajax_response );
-            die;
+
+            // Delete the post
+            $deleted = wp_delete_post( $propID, true ); // true to force delete, bypass trash
+
+            if ( ! $deleted ) {
+                wp_send_json_error( esc_html__( 'Failed to delete property', 'houzez' ) );
+                wp_die();
+            }
+
+            // Increment package listings count
+            houzez_plusone_package_listings( $packageUserId );
+
+            // Build dashboard listings URL
+            $dashboard_listings = houzez_get_template_link_2( 'template/user_dashboard_properties.php' );
+            $dashboard_listings = add_query_arg( 'deleted', 1, $dashboard_listings );
+
+            wp_send_json_success( array(
+                'redirect' => esc_url( $dashboard_listings ),
+                'message'  => esc_html__( 'Property Deleted', 'houzez' )
+            ) );
+            wp_die();
+
         } else {
-            $ajax_response = array( 'success' => false , 'reason' => esc_html__( 'Permission denied', 'houzez' ) );
-            echo json_encode( $ajax_response );
-            die;
+            wp_send_json_error( esc_html__( 'Permission denied', 'houzez' ) );
+            wp_die();
         }
 
     }
 
 }
+
 
 
 /* --------------------------------------------------------------------------
@@ -5381,6 +5295,8 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
         $fake_loop_offset = 0; 
 
         $tax_query = array();
+        $meta_query = array();
+
         $card_version = sanitize_text_field($_POST['card_version']);
         $property_type = houzez_traverse_comma_string($_POST['type']);
         $property_status = houzez_traverse_comma_string($_POST['status']);
@@ -5395,6 +5311,17 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
         $sort_by = $_POST['sort_by'];
         $offset = $_POST['offset'];
         $paged = $_POST['paged'];
+
+        $property_ids = $_POST['property_ids'];
+        $min_price = $_POST['min_price'];
+        $max_price = $_POST['max_price'];
+        $min_beds = $_POST['min_beds'];
+        $max_beds = $_POST['max_beds'];
+        $min_baths = $_POST['min_baths'];
+        $max_baths = $_POST['max_baths'];
+        $properties_by_agents = houzez_traverse_comma_string($_POST['agents']);
+        $properties_by_agencies = houzez_traverse_comma_string($_POST['agencies']);
+        $post_status = $_POST['post_status'];
 
         $wp_query_args = array(
             'ignore_sticky_posts' => 1
@@ -5494,19 +5421,165 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
             $wp_query_args['order'] = 'DESC';
         }
 
-        if (!empty($featured_prop)) {
-            
-            if( $featured_prop == "yes" ) {
-                $wp_query_args['meta_key'] = 'fave_featured';
-                $wp_query_args['meta_value'] = '1';
-            } else {
-                $wp_query_args['meta_key'] = 'fave_featured';
-                $wp_query_args['meta_value'] = '0';
+        if (!empty($min_price) && !empty($max_price)) {
+            $min_price = doubleval(houzez_clean($min_price));
+            $max_price = doubleval(houzez_clean($max_price));
+
+            if ($min_price >= 0 && $max_price > $min_price) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_price',
+                    'value' => array($min_price, $max_price),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+        } else if (!empty($min_price)) {
+            $min_price = doubleval(houzez_clean($min_price));
+            if ($min_price >= 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_price',
+                    'value' => $min_price,
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
+                );
+            }
+        } else if (!empty($max_price)) {
+            $max_price = doubleval(houzez_clean($max_price));
+            if ($max_price >= 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_price',
+                    'value' => $max_price,
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                );
             }
         }
 
-        $tax_count = count( $tax_query );
+        if ( !empty($min_beds) && !empty($max_beds) ) {
+            $min_beds = intval($min_beds);
+            $max_beds = intval($max_beds);
 
+            if ($min_beds > 0 && $max_beds >= $min_beds) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bedrooms',
+                    'value' => array($min_beds, $max_beds),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+        } else if ( !empty($min_beds) ) {
+            $min_beds = intval($min_beds);
+            if ($min_beds > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bedrooms',
+                    'value' => $min_beds,
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
+                );
+            }
+        } else if ( ! empty($max_beds) ) {
+            $max_beds = intval($max_beds);
+            if ($max_beds > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bedrooms',
+                    'value' => $max_beds,
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                );
+            }
+        }
+
+        if ( !empty($min_baths) && !empty($max_baths) ) {
+            $min_baths = intval($min_baths);
+            $max_baths = intval($max_baths);
+
+            if ($min_baths > 0 && $max_baths >= $min_baths) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bathrooms',
+                    'value' => array($min_baths, $max_baths),
+                    'type' => 'NUMERIC',
+                    'compare' => 'BETWEEN',
+                );
+            }
+        } else if ( !empty($min_baths) ) {
+            $min_baths = intval($min_baths);
+            if ($min_baths > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bathrooms',
+                    'value' => $min_baths,
+                    'type' => 'NUMERIC',
+                    'compare' => '>=',
+                );
+            }
+        } else if ( !empty($max_baths) ) {
+            $max_baths = intval($max_baths);
+            if ($max_baths > 0) {
+                $meta_query[] = array(
+                    'key' => 'fave_property_bathrooms',
+                    'value' => $max_baths,
+                    'type' => 'NUMERIC',
+                    'compare' => '<=',
+                );
+            }
+        }
+
+        if ( !empty($properties_by_agents) ) {
+            $meta_query[] = array(
+                'key'     => 'fave_agents',
+                'value'   => $properties_by_agents,
+                'compare' => 'IN',
+            );
+            $meta_query[] = array(
+                'key'     => 'fave_agent_display_option',
+                'value'   => 'agent_info',
+                'compare' => '=',
+            );
+        }
+
+        if ( !empty($properties_by_agencies) ) {
+            $meta_query[] = array(
+                'key'     => 'fave_property_agency',
+                'value'   => $properties_by_agencies,
+                'compare' => 'IN',
+            );
+
+            $meta_query[] = array(
+                'key'     => 'fave_agent_display_option',
+                'value'   => 'agency_info',
+                'compare' => '=',
+            );
+        }
+
+        if (!empty($featured_prop)) {
+            if ($featured_prop == "yes") {
+                $meta_query[] = [
+                    'key' => 'fave_featured',
+                    'value' => '1',
+                    'compare' => '='
+                ];
+            } else {
+                $meta_query[] = [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'fave_featured',
+                        'value' => '0',
+                        'compare' => '='
+                    ],
+                    [
+                        'key' => 'fave_featured',
+                        'compare' => 'NOT EXISTS'
+                    ]
+                ];
+            }
+        }
+
+        $property_ids_array = explode(',', $property_ids);
+
+        if (!empty($property_ids)) {
+            $wp_query_args['post__in'] = $property_ids_array;
+        }
+
+        $tax_count = count( $tax_query );
     
         if( $tax_count > 1 ) {
             $tax_query['relation'] = 'AND';
@@ -5515,7 +5588,21 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
             $wp_query_args['tax_query'] = $tax_query;
         }
 
-        $wp_query_args['post_status'] = 'publish';
+        $meta_count = count($meta_query);
+        if( $meta_count > 1 ) {
+            $meta_query['relation'] = 'AND';
+        }
+        if ($meta_count > 0) {
+            $wp_query_args['meta_query'] = $meta_query;
+        }
+
+        if( $post_status == 'publish' ) {
+            $wp_query_args['post_status'] = 'publish';
+        } else if( $post_status == 'houzez_sold' ) {
+            $wp_query_args['post_status'] = 'houzez_sold';
+        } else {
+            $wp_query_args['post_status'] = array('publish', 'houzez_sold');
+        }
 
         if (empty($posts_limit)) {
             $posts_limit = get_option('posts_per_page');
@@ -5539,20 +5626,28 @@ if ( !function_exists( 'houzez_loadmore_properties' ) ) {
         $wp_query_args['post_type'] = 'property';
         
         $the_query = new WP_Query($wp_query_args);
+            $response = array(
+            'html' => '',
+            'has_more_posts' => false
+        );
 
-        
-        if ($the_query->have_posts()) :
+        if ($the_query->have_posts()) {
+            ob_start();
             while ($the_query->have_posts()) : $the_query->the_post();
-
+                global $post;
+                setup_postdata($post);
                 get_template_part('template-parts/listing/'.$card_version);
-
             endwhile;
             wp_reset_postdata();
-        else:
-            echo 'no_result';
-        endif;
-        
+            $response['html'] = ob_get_clean();
 
+            // Check if there are more posts
+            $response['has_more_posts'] = ($the_query->found_posts > ($the_query->query_vars['paged'] * $the_query->query_vars['posts_per_page']));
+        } else {
+            $response['html'] = 'no_result';
+        }
+
+        wp_send_json($response);
         wp_die();
     }
 }
@@ -5703,7 +5798,7 @@ if(!function_exists('houzez_get_custom_add_listing_field')) {
                     <label for="<?php echo esc_attr($field_name); ?>">
                         <?php echo $field_title.houzez_required_field($field_name); ?>
                     </label>
-                    <input name="<?php echo esc_attr($field_name);?>" <?php houzez_required_field_2($field_name); ?> type="number" min="1" class="form-control" value="<?php
+                    <input name="<?php echo esc_attr($field_name);?>" <?php houzez_required_field_2($field_name); ?> type="number" class="form-control" value="<?php
                     if (houzez_edit_property()) {
                         houzez_field_meta($field_name);
                     } ?>" placeholder="<?php echo esc_attr($placeholder);?>">
@@ -5898,7 +5993,7 @@ if( !function_exists('houzez_listing_model')) {
 
             <?php 
             $address_composer = houzez_option('listing_address_composer');
-            $enabled_data = $address_composer['enabled'];
+            $enabled_data = isset($address_composer['enabled']) ? $address_composer['enabled'] : [];
             $temp_array = array();
 
             if ($enabled_data) {
@@ -6399,7 +6494,7 @@ if ( ! function_exists( 'houzez_properties_ajax_tab_content' ) ) {
         if ( ! empty( $_POST['settings'] ) ) {
             $settings = $_POST['settings']; //houzez_clean_v2( $_POST['settings'] );
             
-            $html = houzez_products_tab( $settings );
+            $html = houzez_listings_tab( $settings );
 
             echo json_encode( $html );
             die();
@@ -6410,9 +6505,9 @@ if ( ! function_exists( 'houzez_properties_ajax_tab_content' ) ) {
     add_action( 'wp_ajax_nopriv_houzez_get_properties_tab_content', 'houzez_properties_ajax_tab_content' );
 }
 
-if( ! function_exists('houzez_products_tab') ) {
+if( ! function_exists('houzez_listings_tab') ) {
 
-    function houzez_products_tab( $settings ) {
+    function houzez_listings_tab( $settings ) {
         
         $grid_style = $settings['grid_style'];
         $check_is_ajax = houzez_check_is_ajax();
@@ -6459,11 +6554,11 @@ if( ! function_exists('houzez_products_tab') ) {
                 }
 
                 if( !empty($settings['properties_by_agents']) ) {
-                    $properties_by_agents = $settings['properties_by_agents'];
+                    $properties_by_agents = implode (",", $settings['properties_by_agents']);
                 }
 
                 if( !empty($settings['properties_by_agencies']) ) {
-                    $properties_by_agencies = $settings['properties_by_agencies'];
+                    $properties_by_agencies = implode (",", $settings['properties_by_agencies']);
                 }
 
 
@@ -6489,6 +6584,11 @@ if( ! function_exists('houzez_products_tab') ) {
                 $args['min_price'] = $settings['min_price'];
                 $args['max_price'] = $settings['max_price'];
 
+                $args['min_beds'] = $settings['min_beds'] ?? '';
+                $args['max_beds'] = $settings['max_beds'] ?? '';
+                $args['min_baths'] = $settings['min_baths'] ?? '';
+                $args['max_baths'] = $settings['max_baths'] ?? '';
+
                 if( $grid_style == 'cards-v1' ) {
                     echo houzez_property_card_v1( $args );
                 } elseif( $grid_style == 'cards-v2' ) {
@@ -6501,6 +6601,8 @@ if( ! function_exists('houzez_products_tab') ) {
                     echo houzez_property_card_v6( $args );
                 } elseif( $grid_style == 'cards-v7' ) {
                     echo houzez_property_card_v7( $args );
+                } elseif( $grid_style == 'cards-v8' ) {
+                    echo houzez_property_card_v8( $args );
                 }
                 ?>
 
@@ -6581,7 +6683,18 @@ if( !function_exists('houzez_feature_output') ) {
             $feature_icon = '<i class="'.$icon_class.' mr-2"></i>';
         }
 
-        if ( is_array($property_features) &&  array_search($term_name, array_column($property_features, 'name')) !== FALSE ) {
+        // Check if the feature is selected by matching both term_id and name
+        $feature_selected = false;
+        if (is_array($property_features)) {
+            foreach ($property_features as $feature) {
+                if ($feature->term_id === $term_id && $feature->name === $term_name) {
+                    $feature_selected = true;
+                    break;
+                }
+            }
+        }
+
+        if ($feature_selected) {
             if( !empty($feature_icon) ) {
                 $return_html = '<li>'.$feature_icon.'<a href="' . esc_url($term_link) . '">' . esc_attr($term_name) . '</a></li>';
             } else {

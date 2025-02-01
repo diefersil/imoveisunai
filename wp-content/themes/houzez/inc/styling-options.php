@@ -112,6 +112,7 @@ if(!function_exists('houzez_custom_styling')) {
         }
 
         .btn,
+        .ele-btn,
         .houzez-search-button,
         .houzez-submit-button,
         .form-control,

@@ -7,8 +7,7 @@
  */
 global $current_user, $hide_add_prop_fields, $required_fields, $is_multi_steps, $prop_meta_data;
 
-wp_get_current_user();
-$userID = $current_user->ID;
+$userID = get_current_user_id();
 $enable_paid_submission = houzez_option('enable_paid_submission');
 $select_packages_link = houzez_get_template_link('template/template-packages.php');
 $remaining_listings = houzez_get_remaining_listings( $userID );
@@ -92,7 +91,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
 
             <?php
             $layout = houzez_option('property_form_sections');
-            $layout = $layout['enabled'];
+            $layout = isset($layout['enabled']) ? $layout['enabled'] : [];
 
             if ($layout): foreach ($layout as $key=>$value) {
 

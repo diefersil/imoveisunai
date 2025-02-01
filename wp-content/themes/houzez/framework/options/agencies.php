@@ -236,12 +236,26 @@ Redux::setSection( $houzez_opt_name, array(
             ),
             'default' => 'default'
         ),
+
+        array(
+            'id'       => 'agency_listing_pagination',
+            'type'     => 'button_set',
+            'title'    => esc_html__( 'Pagination', 'houzez' ),
+            'subtitle' => '',
+            'default'  => '_loadmore',
+            'options' => array(
+                '_number' => esc_html__('Number', 'houzez'), 
+                '_loadmore' => esc_html__('Load More', 'houzez'), 
+                '_infinite' => esc_html__('Infinite Scroll', 'houzez'), 
+            ), 
+        ),
+
         array(
             'id'       => 'agency_stats',
             'type'     => 'switch',
             'title'    => esc_html__( 'Stats', 'houzez' ),
             'subtitle' => esc_html__('Enable or disable the stats on agency detail page', 'houzez'),
-            'default'  => 1,
+            'default'  => 0,
             'on'       => 'Enabled',
             'off'      => 'Disabled',
         ),

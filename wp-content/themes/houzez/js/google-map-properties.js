@@ -809,7 +809,6 @@ jQuery( function($) {
         /*-----------------------------------------------------------------------------------------
         * Auto Complete 
         *-----------------------------------------------------------------------------------------*/
-        
         if($( '.hz-map-field-js' ).length > 0) {
             var geo_country_limit = houzez_vars.geo_country_limit;
             var geocomplete_country = houzez_vars.geocomplete_country;

@@ -36,8 +36,11 @@ function houzez_schedule_checks() {
 
     // Per listings expire
     if( ( $enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing') && $per_listing_expire_unlimited != 0 ) {
-        wp_clear_scheduled_hook('houzez_per_listing_expire_check');
 
+        if (wp_next_scheduled('houzez_per_listing_expire_check')) {
+            wp_clear_scheduled_hook('houzez_per_listing_expire_check');
+        }
+       
         if (!wp_next_scheduled('houzez_per_listing_expire_check')) {
             wp_schedule_event(time(), 'hourly', 'houzez_per_listing_expire_check');
         }
@@ -45,7 +48,9 @@ function houzez_schedule_checks() {
 
     // Schedule Membership check
     if( $enable_paid_submission == 'membership' ) {
-        wp_clear_scheduled_hook('houzez_check_membership_expire');
+        if (wp_next_scheduled('houzez_check_membership_expire')) {
+            wp_clear_scheduled_hook('houzez_check_membership_expire');
+        }
         houzez_setup_daily_membership_check_schedule();
     }
 
@@ -356,7 +361,7 @@ if( !function_exists('houzez_check_saved_search') ) :
                     );
                     $notifArgs = array_merge($notificationArgs, $args);
                     
-                    do_action('send_houzi_notification', $notificationArgs);
+                    do_action('houzez_send_notification', $notificationArgs);
 
                     houzez_emails_filter_replace_2( $user_email, $value_message, $value_subject, $args);
 
