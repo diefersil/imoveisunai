@@ -127,6 +127,6 @@ a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
 
 /*-----------------------------------G Forms---------------------------------------*/
 
-.charleft.ginput_counter.gfield_description.warningTextareaInfo{
+.charleft,.ginput_counter,.gfield_description, .warningTextareaInfo{
   display: none !important;
 }
