@@ -27,7 +27,6 @@ Template: houzez
 
 /*-----------------------------------Home---------------------------------------*/
 
-
 /*Prime Slide*/
 
 .bdt-prime-slider-social-icon{
@@ -124,4 +123,10 @@ a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
 /*.put-on-hold*/
 {
   display:none !important;
+}
+
+/*-----------------------------------G Forms---------------------------------------*/
+
+.gfield_description{
+  display: none !important;
 }
