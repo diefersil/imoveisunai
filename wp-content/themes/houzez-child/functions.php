@@ -48,3 +48,9 @@ function ga(){?>
     gtag('config', 'G-YSCEVGGKC3');
     </script>
 <?php }
+
+add_action('wp_head', 'gadc');
+function gadc(){?>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0370842058394618"
+    crossorigin="anonymous"></script>
+<?php }
