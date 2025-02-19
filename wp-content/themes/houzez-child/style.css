@@ -82,6 +82,11 @@ Template: houzez
   display: none !important;
 }
 
+/*Desativar comentários*/
+.post-comment-form-wrap{
+  display: none !important;
+}
+
 
 /*--------------------------------------------------Imobiliárias-----------------------------------------*/
 /*Find Agent*/
