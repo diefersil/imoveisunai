@@ -87,6 +87,12 @@ Template: houzez
   display: none !important;
 }
 
+/*Desativar comentários icone*/
+.author-meta li:nth-child(even){
+  display: none !important;
+}
+
+
 
 /*--------------------------------------------------Imobiliárias-----------------------------------------*/
 /*Find Agent*/
