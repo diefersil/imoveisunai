@@ -2,10 +2,10 @@
 Contributors: the-rock, pagup, freemius
 Tags: Alt Text, Alt Attribute, Alt tag, Google images, SEO
 Requires at least: 4.1
-Requires PHP: 5.6
-Tested up to: 6.2
-WC tested up to: 7.4.0
-Stable tag: 1.4.7.2
+Requires PHP: 7.4
+Tested up to: 6.7
+WC tested up to: 8.5
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,14 @@ Bialty automatically adds ALT TEXTs to your images from page/article/product tit
 BIALTY operates in automatic mode. Once installed, it will be active on all pages of your site, both retroactively and for future content. You no longer need to worry about your Alt Texts.
 
 **It's also compatible with:** TinyMCE, Page Builder by SiteOrigin, Elementor Page Builder, Gutenberg and more…
+
+**About the PRO feature:**
+
+- Add Post Title or Image Name as Alt Attribute
+- Add alt tag to Woocommerce product pages
+- Add website title as Alt tag
+- Select pages to "blacklist"
+- And more premium features
 
 **SUPPORTED IN 6 LANGUAGES**
 
@@ -105,9 +113,61 @@ Alt text (alternative text), also known as "alt attributes", “alt descriptions
 = Appropriate length? =
 Google seemed to count the first 16 words in the ALT tag and interestingly in the snippet Google uses, it does seem to completely cut off the rest of the ALT and from the 17th word. Having 16 words to work with might prove very useful if you are using ALT tags to describe more complex images. There is potentially plenty of available space to describe images properly for accessibility purposes AND SEO impact.
 
-= How Image Alt Tags and Meta Data Help SEO =
-Optimizing your images for SEO helps crawlers better index your web pages, which in turn can give you a rankings boost because it can make the page more relevant to users. Let’s say a searcher needs plumber repairs for a clogged bathroom drain. Google has to choose between two web pages from different companies, both of which have equal ranking factors. As the crawler reads through the first page, it doesn’t identify any image alt-tags, therefore, it assumes the images (if there are any) do not add page-specific value. On the second page, however, the crawler locates five images, each one with a full description of what the image is showing. All five images’ alt tags supplement the rest of the text on the page. Since Google is all about spitting out the results you’ll most likely jive with, it’s going to go with the article that it thinks is more relevant.
+= How does Bialty work? =
 
+Bialty uses WordPress hooks and filters to modify image alt text in real-time when pages load. Unlike traditional bulk modification plugins, it doesn't make any permanent changes to your database or Media Library. This means you can safely test it on your website, and if you ever disable the plugin, everything returns to its original state.
+
+= Will Bialty slow down my website? =
+
+No, Bialty is designed to be lightweight and efficient. Since it processes one page at a time as visitors load them, rather than modifying your entire database at once, there's no significant impact on server performance or page load times.
+
+= Can Bialty handle large numbers of images? =
+
+Yes! Because Bialty processes images on-the-fly, it can handle any number of images without overloading your server. Whether you have 100 or 100,000 images, Bialty will process them efficiently as each page loads.
+
+= What types of images can Bialty modify? =
+
+Bialty works with images that appear in your post/page content and WooCommerce products, including featured images, product gallery images, and images within product descriptions or post content. Note that Bialty doesn't modify images in headers, footers, sidebars, or other areas outside standard WordPress content areas.
+
+= Can I limit Bialty to work only on WooCommerce products? =
+
+Yes! In the plugin settings, you can choose which post types Bialty should work with. You can enable it exclusively for WooCommerce products by unchecking other post types.
+
+= What alt text options does Bialty offer? =
+
+Bialty provides several pre-defined options for alt text: use post/product title, use Yoast Focus Keyword, use image filename, or custom alt text (set per product/post). You can also choose whether to add alt text only where it's missing or replace all existing alt text.
+
+= Do I need to run a bulk update process when I change settings? =
+
+No! When you change settings in Bialty, they take effect immediately for all pages as they load. There's no need to run any bulk update process or worry about server load.
+
+= What happens if I uninstall Bialty? =
+
+Since Bialty doesn't modify your database, uninstalling it simply returns your alt text to its original state. This makes it completely safe to test on your live site.
+
+= Can I use custom phrases in my alt text? =
+
+Currently, Bialty uses predefined options for alt text. While you can set custom alt text for individual products/posts, automatic addition of custom phrases before or after the main alt text is not yet available. We're considering this feature for future releases.
+
+= Does Bialty work with page builders? =
+
+Yes, Bialty works with major page builders and WordPress themes. As long as the page builder uses standard WordPress methods to display content, Bialty will modify the alt text as expected.
+
+= What about multilingual websites? =
+
+Bialty is compatible with multilingual websites and will apply alt text based on your settings regardless of the language. It works with popular translation plugins like WPML and Polylang.
+
+= Will Bialty affect my SEO? =
+
+Bialty can positively impact your SEO by ensuring all your images have relevant alt text. Since it can use your post titles or Yoast Focus Keywords, the alt text will be naturally optimized for your target keywords while remaining descriptive and useful.
+
+= How can I test if Bialty is working? =
+
+View your page source or inspect an image element, check the alt text before activating Bialty, enable Bialty with your desired settings, then refresh the page and check the alt text again. You should see your chosen alt text format applied to the images.
+
+= My images don't seem to be updating. What should I check? =
+
+If your images aren't updating, verify that you've selected the correct post types in Bialty settings, the images are within the main content area (not in widgets, headers, or custom sections), your theme uses standard WordPress methods to display content, and you're checking a fresh page load (not a cached version).
 
 == Screenshots ==
 
@@ -284,3 +344,29 @@ Optimizing your images for SEO helps crawlers better index your web pages, which
 = 1.4.7.2 =
 * 🐛 FIX: Security issue
 * 🐛 FIX: Issue with getting post id from global $post
+
+= 2.0.0 =
+* 👌 IMPROVE: Complete user interface revamp. Better experience with more features.
+* 👌 IMPROVE: Image size removed from image name for alt tag in-case thumbnail is used.
+* 👌 IMPROVE: Updated freemius to v2.6.2
+
+= 2.0.1 =
+* 🐛 FIX: 500 Internal Server Error while saving options (Pro version)
+
+= 2.0.2 =
+* 🐛 FIX: Post types option issue with free version.
+* 🐛 FIX: @$dom->loadHTML issue if content are returning empty string
+* 👌 IMPROVE: Updated freemius to v2.7.3
+
+= 2.1.0 =
+* 🔥 NEW: Support for All in One SEO (AIOSEO)
+* 🔥 NEW: Support for WooCommerce Related Products with Post title as Alt Tag
+* 👌 IMPROVE: Loading Blacklist posts via ajax search
+* 👌 IMPROVE: Updated freemius to v2.9.0
+
+= 2.1.1 =
+* 🐛 FIX: Posts fetch
+
+= 2.2.0 =
+* 👌 IMPROVE: Frequently Asked Question (FAQ)
+* 🐛 FIX: Security issue

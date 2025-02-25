@@ -98,6 +98,7 @@ class Skin_Slice extends Elementor_Skin_Base {
             </div>
             <?php $this->render_social_link(); ?>
         </div>
+        </div>
         <?php
     }
 
@@ -122,7 +123,7 @@ class Skin_Slice extends Elementor_Skin_Base {
    
 
                     if ( 'yes' === $settings['social_icon_tooltip'] ) {
-                        $tooltip = 'title: ' . wp_kses_post( $link['social_link_title'] ) . '; pos: ' . esc_attr( $position );
+                        $tooltip = 'title: ' . wp_kses_post( strip_tags($link['social_link_title']) ) . '; pos: ' . esc_attr( $position );
                     
                         $this->parent->add_render_attribute( $link_key, 'data-bdt-tooltip', $tooltip, true );
                     }           
@@ -169,12 +170,12 @@ class Skin_Slice extends Elementor_Skin_Base {
         ?>
             <div class="bdt-prime-slider-wrapper">
                 <div class="bdt-prime-slider-content">
-                    <div class="bdt-prime-slider-desc">
+                    <div class="bdt-prime-slider-desc bdt-flex bdt-flex-column">
 
                                 
                         <?php if ($slide_content['title'] && ('yes' == $settings['show_title'])) : ?>
                         <div class="bdt-main-title">
-                            <h4 class="bdt-ps-sub-title" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_sub_title); ?>>
+                            <h4 class="bdt-ps-sub-title bdt-sub-title-tag" data-reveal="reveal-active" <?php echo wp_kses_post($parallax_sub_title); ?>>
                                 <?php echo wp_kses_post(prime_slider_first_word($slide_content['sub_title'])); ?>
                             </h4>
                             <<?php echo esc_attr(Utils::get_valid_html_tag($settings['title_html_tag'])); ?> 

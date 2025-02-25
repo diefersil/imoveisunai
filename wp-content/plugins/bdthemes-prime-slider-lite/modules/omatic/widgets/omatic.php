@@ -44,16 +44,19 @@ class Omatic extends Widget_Base {
 	}
 
 	public function get_style_depends() {
-		return ['prime-slider-font', 'ps-omatic'];
+		return ['swiper', 'prime-slider-font', 'ps-omatic'];
 	}
 	public function get_script_depends() {
-		return ['shutters', 'gl', 'slicer', 'tinder', 'ps-omatic'];
+		return ['swiper', 'shutters', 'gl', 'slicer', 'tinder', 'ps-omatic'];
 	}
 
 	public function get_custom_help_url() {
 		return 'https://youtu.be/ndqeKBM8wfw?si=F3-PLdDn_79QizNM';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -1243,7 +1246,16 @@ class Omatic extends Widget_Base {
 			]
 		);
 
-		$this->add_render_attribute('swiper', 'class', 'swiper-carousel swiper');
+		$direction = is_rtl() ? 'rtl' : 'ltr';
+		$this->add_render_attribute([
+			'swiper' => [
+				'class' => 'swiper-carousel swiper',
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $this->get_title() . ' ' . esc_html__( 'Slider', 'bdthemes-prime-slider' ),
+				'dir' => $direction,
+			],
+		]);
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider-omatic' ); ?>>
@@ -1257,7 +1269,6 @@ class Omatic extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 		?> 
 				</div>
-
 			</div>
 
 			<?php if ($settings['show_navigation_arrows']) : ?>
@@ -1304,6 +1315,8 @@ class Omatic extends Widget_Base {
 					<?php endforeach; ?>
                </div>
 		   </div>
+		   
+		</div>
 
 		<?php
 	}

@@ -55,13 +55,13 @@ class General extends Widget_Base {
 		$reveal_effects = prime_slider_option( 'reveal-effects', 'prime_slider_other_settings', 'off' );
 		if ( 'on' === $reveal_effects ) {
 			if ( true === _is_ps_pro_activated() ) {
-				return [ 'gsap', 'split-text', 'anime', 'revealFx', 'ps-general' ];
+				return [ 'gsap', 'split-text', 'anime', 'revealFx', 'ps-animation-helper' ];
 			} else {
 				return [];
 			}
 		} else {
 			if ( true === _is_ps_pro_activated() ) {
-				return [ 'gsap', 'split-text', 'ps-general' ];
+				return [ 'gsap', 'split-text', 'ps-animation-helper' ];
 			} else {
 				return [];
 			}
@@ -78,6 +78,9 @@ class General extends Widget_Base {
 		$this->add_skin( new Skins\Skin_Meteor( $this ) );
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -257,78 +260,10 @@ class General extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
-			'slider_size_ratio',
-			[ 
-				'label'       => esc_html__( 'Size Ratio', 'bdthemes-prime-slider' ),
-				'type'        => Controls_Manager::IMAGE_DIMENSIONS,
-				'description' => 'Slider ratio to width and height, such as 16:9',
-				'separator'   => 'before',
-				'condition'   => [ 
-					'enable_height!' => 'yes'
-				]
-			]
-		);
-
-		$this->add_control(
-			'slider_min_height',
-			[ 
-				'label'     => esc_html__( 'Minimum Height', 'bdthemes-prime-slider' ),
-				'type'      => Controls_Manager::SLIDER,
-				'range'     => [ 
-					'px' => [ 
-						'min' => 50,
-						'max' => 1024,
-					],
-				],
-				'condition' => [ 
-					'enable_height!' => 'yes'
-				]
-			]
-		);
-
-		$this->add_control(
-			'enable_height',
-			[ 
-				'label'   => esc_html__( 'Enable Responsive Height', 'bdthemes-prime-slider' ) . BDTPS_CORE_PC,
-				'type'    => Controls_Manager::SWITCHER,
-				'classes' => BDTPS_CORE_IS_PC
-			]
-		);
-
-		$this->add_responsive_control(
-			'viewport_height',
-			[ 
-				'label'       => esc_html__( 'Height', 'bdthemes-prime-slider' ),
-				'type'        => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', 'em', 'vh' ],
-				'range'      => [ 
-					'px' => [ 
-						'min' => 100,
-						'max' => 1024,
-					],
-					'em' => [ 
-						'min' => 10,
-						'max' => 100,
-					],
-					'vh' => [ 
-						'min' => 10,
-						'max' => 100,
-					],
-				],
-				'default'     => [ 
-					'unit' => 'vh',
-					'size' => 70,
-				],
-				'condition'   => [ 
-					'enable_height' => 'yes'
-				],
-				'selectors'   => [ 
-					'{{WRAPPER}} .bdt-slideshow .bdt-slideshow-items' => 'min-height: {{SIZE}}{{UNIT}} !important;',
-				],
-				'render_type' => 'template',
-			]
-		);
+		/**
+		 * Slider Height Controls
+		 */
+		$this->register_slider_height_controls();
 
 		$this->add_responsive_control(
 			'content_max_width',
@@ -2522,7 +2457,7 @@ class General extends Widget_Base {
                 $this->add_render_attribute($link_key, 'class', 'bdt-social-animate', true);
 
                 if ( 'yes' === $settings['social_icon_tooltip'] ) {
-					$tooltip = 'title: ' . wp_kses_post( $link['social_link_title'] ) . '; pos: ' . esc_attr( $position );
+					$tooltip = 'title: ' . wp_kses_post( strip_tags( $link['social_link_title'] ) ) . '; pos: ' . esc_attr( $position );
 				
 					$this->add_render_attribute( $link_key, 'data-bdt-tooltip', $tooltip, true );
 				}

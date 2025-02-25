@@ -1,12 +1,42 @@
+import { decodeEntities } from '@wordpress/html-entities';
 import { pingServer } from '@launch/api/DataApi';
 
 /** Removes any hash or qs values from URL - Airtable adds timestamps */
 export const stripUrlParams = (url) => url?.[0]?.url?.split(/[?#]/)?.[0];
 
+function cleanAndBuildUnsplashUrl(url) {
+	const cleanUrl = url
+		.replaceAll('\\u0026', '&')
+		// Remove duplicate question marks in URL by replacing second '?' with '&'
+		.replace(/(\?.*?)\?/, '$1&');
+	let imageUrl = new URL(decodeEntities(cleanUrl));
+
+	const size = 1440;
+	const orientation = imageUrl.searchParams.get('orientation');
+
+	if (orientation === 'portrait') {
+		imageUrl.searchParams.set('h', size);
+		imageUrl.searchParams.delete('w');
+	} else if (orientation === 'landscape' || orientation === 'square') {
+		const widthParam = imageUrl.searchParams.get('w');
+		if (widthParam === null || widthParam === '') {
+			imageUrl.searchParams.set('w', size);
+		}
+	}
+
+	imageUrl.searchParams.delete('orientation');
+	imageUrl.searchParams.delete('ixid');
+	imageUrl.searchParams.delete('ixlib');
+	imageUrl.searchParams.append('q', '1');
+	imageUrl.searchParams.append('auto', 'format,compress');
+	imageUrl.searchParams.append('fm', 'avif');
+	return imageUrl.toString();
+}
+
 export const lowerImageQuality = (html) => {
 	return html.replace(
-		/(https?:\/\/\S+\w=\d+)/gi,
-		'$1&q=10&auto=format,compress&fm=avif',
+		/https:\/\/images\.unsplash\.com\/[^"')]+/g,
+		cleanAndBuildUnsplashUrl,
 	);
 };
 

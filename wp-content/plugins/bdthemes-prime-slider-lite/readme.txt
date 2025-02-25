@@ -1,15 +1,15 @@
 === Prime Slider - Addons For Elementor (Revolution of a slider, Hero Slider, Post Slider and Ecommerce Slider) ===
-Contributors: bdthemes, selimmw, mohammaadfarid, bdkoder, abutalib, maudud, muhammadasik
+Contributors: bdthemes, selimmw, mohammaadfarid, abutalib, maudud, muhammadasik
 Donate link: http://bdthemes.com/
 Tags: wordpress slider, elementor addons, slider, image slider, video slider
 Requires at least: 5.0.0
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 Requires PHP: 7.4.0
-Stable tag: 3.15.23
+Stable tag: 3.17.5
 License: GPL3
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Elementor requires at least: 3.22
-Elementor tested up to: 3.25.10
+Elementor tested up to: 3.27.6
 
 Best Addon for Elementor WordPress Plugin with 55+ Awesome slider designs that you can use for your modern website with Elementor website builder.
 
@@ -129,6 +129,7 @@ More free widgets and extensions are coming soon...
 * [Reveal](https://primeslider.pro/demo/reveal/) - A slider with active reveal transitions designed to boost user engagement and attention.
 * [Woo HotSpot](https://primeslider.pro/demo/woohotspot/) - WooCommerce-focused slider designed to make product discovery easier for customers.
 * [Titanic](https://primeslider.pro/demo/titanic/) - Titanic slider offers stunning, large-scale content slides for impactful presentations.
+* [Pandora](https://primeslider.pro/demo/pandora/) - A sleek, dynamic slider with fluid transitions and a modern design.
 
 = Remote Control 👇 =
 
@@ -222,9 +223,89 @@ https://youtu.be/XjFiW5rFrac
 
 == Changelog ==
 
+= 3.17.5 [20th February 2025] =
+
+* Fixed: Skin zinest thumbs issue fixed in blog widget
+* Updated: Advanced animation js optimized
+
+= 3.17.4 [19th February 2025] =
+
+* Fixed: Swiper slider cls issue fixed
+* Fixed: Content inline issue fixed in isolate widget
+
+= 3.17.3 [12th February 2025] =
+
+* Fixed: Dashboard notice dismiss icon conflict issue fixed ( Thanks to pixelwars )
+* Added: [Showcase Page](https://primeslider.pro/demo/) added - View all widgets here.
+
+= 3.17.2 [5th February 2025] =
+
+* Updated: Dashboard widgets searching system improved
+
+= 3.17.1 [28th January 2025] =
+
+* Added: aria-roledescription=carousel added to slider widget wrapper
+* Fixed: Advanced animation error fixed
+
+= 3.17.0 [22th January 2025] =
+
+* Added: Lightbox play button position, size & spacing option added in isolate widget
+* Added: Element offset, size & max width controls added in woocommerce widget
+* Fixed: Navigation, category, add to cart & social link background issue fixed in woocommerce widget
+* Fixed: Item showing issue fixed in fiestar widget
+* Fixed: Skin folio meta dynamic issue fixed in blog widget
+* Fixed: Modal image issue fixed in woocircle widget
+
+= 3.16.6 [14th January 2025] =
+
+* Added: Title text stroke control added in multiscroll widget
+* Added: Content margin added in pagepiling widget
+* Fixed: Missing div tag issue fixed in omatic widget
+* Updated: Content max width issue fixed in pagepiling widget
+
+= 3.16.5 [2nd January 2025] =
+
+* Added: Slide fill color option added in isolate widget
+* Fixed: Skin slice sub title color issue fixed in isolate widget
+
+= 3.16.4 [29th December 2024] =
+
+* Added: Slide image controls added in isolate widget
+* Added: Navigation arrows offset option added in isolate widget
+* Added: Dots size, position & spacing added in isolate widget
+* Added: Skin slice scroll down controls added in isolate widget
+* Fixed: Button, arrows & scroll down hover radius issue fixed in isolate widget
+
+= 3.16.3 [24th December 2024] =
+
+* Fixed: Swiper loading issue fixed in Elysium Slider widget
+* Updated: Security improved
+
+= 3.16.2 [23th December 2024] =
+
+* Added: Thumbs size option added in flogia widget
+* Added: Content max width & margin added in blog widget
+* Fixed: Container width issue fixed in flogia widget
+* Fixed: Swiper loading issue fixed in Fiester Slider widget (Thanks to Nathan)
+
+= 3.16.1 [19th December 2024] =
+
+* Fixed: Swiper loading issue fixed
+* Fixed: Navigation RTL issue fixed in tango widget
+
+= 3.16.0 [17th December 2024] =
+
+* Added: Optimized Markup feature compatibility added
+* Added: Upgrade Swiper Library compatibility added
+* Added: Responsive height option added in blog widget
+* Added: Meta item gap & wrapper spacing controls added in skin folio blog widget
+* Fixed: Scroll down & meta style controls issue fixed in blog widget
+* Fixed: Skins div tag missing issue fixed in blog widget
+* Fixed: Css filter issue fixed in dragon widget
+
 = 3.15.23 [30th November 2024] =
 
-* Updated: General widget and skins controls improved 
+* Updated: General widget and skins controls improved
 
 = 3.15.22 [23th November 2024] =
 

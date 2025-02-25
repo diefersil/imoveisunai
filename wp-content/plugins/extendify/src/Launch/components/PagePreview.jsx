@@ -12,14 +12,17 @@ import { forwardRef } from '@wordpress/element';
 import { pageNames } from '@shared/lib/pages';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+import themeJSON from '@launch/_data/theme-processed.json';
 import { usePreviewIframe } from '@launch/hooks/usePreviewIframe';
+import { getFontOverrides } from '@launch/lib/preview-helpers';
 import { hexTomatrixValues, lowerImageQuality } from '@launch/lib/util';
-import themeJSON from '../_data/theme-processed.json';
 
-export const PagePreview = forwardRef(({ style }, ref) => {
+export const PagePreview = forwardRef(({ style, siteTitle, loading }, ref) => {
 	const previewContainer = useRef(null);
 	const blockRef = useRef(null);
 	const [ready, setReady] = useState(false);
+	const variation = style?.variation;
+	const theme = variation?.settings?.color?.palette?.theme;
 
 	const onLoad = useCallback(
 		(frame) => {
@@ -28,26 +31,48 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 			// This is a brute force check that the styles are there
 			let lastRun = performance.now();
 			let counter = 0;
+
+			const variationStyles = themeJSON[variation?.title];
+			const { customFontLinks, fontOverrides } = getFontOverrides(variation);
+			const primaryColor = theme?.find(({ slug }) => slug === 'primary')?.color;
+			const [r, g, b] = hexTomatrixValues(primaryColor);
+
 			const checkOnStyles = () => {
 				if (counter >= 150) return;
 				const now = performance.now();
 				if (now - lastRun < 100) return requestAnimationFrame(checkOnStyles);
 				lastRun = now;
-				frame?.contentDocument?.querySelector('[href*=load-styles]')?.remove();
+				const content = frame?.contentDocument;
+				if (content) {
+					content.querySelector('[href*=load-styles]')?.remove();
+					const siteTitleElement =
+						content.querySelectorAll('[href*=site-title]');
+					siteTitleElement?.forEach(
+						(element) => (element.textContent = siteTitle),
+					);
+				}
+
+				// Add custom font links if not already present
+				if (
+					customFontLinks &&
+					!frame.contentDocument?.querySelector('[id^="ext-custom-font"]')
+				) {
+					frame.contentDocument?.head?.insertAdjacentHTML(
+						'beforeend',
+						customFontLinks,
+					);
+				}
+
 				if (!frame.contentDocument?.getElementById('ext-tj')) {
-					const primaryColor =
-						style?.variation?.settings?.color?.palette?.theme?.find(
-							({ slug }) => slug === 'primary',
-						)?.color;
-					const [r, g, b] = hexTomatrixValues(primaryColor);
 					frame.contentDocument?.body?.insertAdjacentHTML(
 						'beforeend',
 						`<style id="ext-tj">
 							.wp-block-missing { display: none !important }
-							[class*=wp-duotone-] img[src^="data"] {
+							img.custom-logo, [class*=wp-duotone-] img[src^="data"] {
 								filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="solid-color"><feColorMatrix color-interpolation-filters="sRGB" type="matrix" values="0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} 0 0 0 1 0"/></filter></svg>#solid-color') !important;
 							}
-							${themeJSON[style?.variation?.title]}
+							${variationStyles}
+							${fontOverrides}
 						</style>`,
 					);
 				}
@@ -61,13 +86,26 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 					inner?.contentDocument
 						?.querySelector('body')
 						?.classList.add('editor-styles-wrapper');
+
+					// Add custom font links to inner frames if not already present
+					if (
+						customFontLinks &&
+						!inner.contentDocument?.querySelector('[id^="ext-custom-font"]')
+					) {
+						inner.contentDocument?.head?.insertAdjacentHTML(
+							'beforeend',
+							customFontLinks,
+						);
+					}
+
 					if (inner && !inner.contentDocument?.getElementById('ext-tj')) {
 						inner.contentDocument?.body?.insertAdjacentHTML(
 							'beforeend',
 							`<style id="ext-tj">
 								body { background-color: transparent !important; }
 								body, body * { box-sizing: border-box !important; }
-								${themeJSON[style?.variation?.title]}
+								${variationStyles}
+								${fontOverrides}
 							</style>`,
 						);
 					}
@@ -78,7 +116,7 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 			};
 			checkOnStyles();
 		},
-		[style?.variation],
+		[variation, theme, siteTitle],
 	);
 
 	const { ready: showPreview } = usePreviewIframe({
@@ -108,16 +146,16 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 			.replace(
 				// <!-- wp:navigation --> <!-- /wp:navigation -->
 				/<!-- wp:navigation[.\S\s]*?\/wp:navigation -->/g,
-				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav" style="word-spacing: 1.25rem;">${links.join(' ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				// <!-- wp:navigation /-->
 				/<!-- wp:navigation.*\/-->/g,
-				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav">${links.join(' | ')}</p ><!-- /wp:paragraph -->`,
+				`<!-- wp:paragraph {"className":"tmp-nav"} --><p class="tmp-nav" style="word-spacing: 1.25rem;">${links.join(' ')}</p ><!-- /wp:paragraph -->`,
 			)
 			.replace(
 				/<!-- wp:site-logo.*\/-->/g,
-				'<!-- wp:paragraph {"className":"custom-logo"} --><img alt="" class="custom-logo" style="height: 40px;" src="https://assets.extendify.com/demo-content/logos/extendify-demo-logo.png"><!-- /wp:paragraph -->',
+				'<!-- wp:paragraph {"className":"custom-logo"} --><p class="custom-logo" style="display:flex; align-items: center;"><img alt="" class="custom-logo" style="height: 32px;" src="https://assets.extendify.com/demo-content/logos/extendify-demo-logo.png"></p ><!-- /wp:paragraph -->',
 			);
 		return rawHandler({ HTML: lowerImageQuality(code) });
 	}, [style]);
@@ -128,10 +166,12 @@ export const PagePreview = forwardRef(({ style }, ref) => {
 		return () => clearTimeout(timer);
 	}, [blocks]);
 
+	const isLoading = !showPreview && loading;
+
 	return (
 		<>
 			<AnimatePresence>
-				{showPreview || (
+				{(isLoading || !showPreview) && (
 					<motion.div
 						initial={{ opacity: 0.7 }}
 						animate={{ opacity: 1 }}

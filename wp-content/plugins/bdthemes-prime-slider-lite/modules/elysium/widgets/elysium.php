@@ -43,19 +43,19 @@ class Elysium extends Widget_Base {
 	}
 
 	public function get_style_depends() {
-		return ['prime-slider-font', 'ps-elysium'];
+		return ['swiper', 'prime-slider-font', 'ps-elysium'];
 	}
 
 	public function get_script_depends() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 		if ('on' === $reveal_effects) {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['anime', 'revealFx', 'ps-elysium'];
+				return ['swiper', 'anime', 'revealFx', 'ps-elysium'];
 			} else {
-				return ['ps-elysium'];
+				return ['swiper', 'ps-elysium'];
 			}
 		} else {
-			return ['ps-elysium'];
+			return ['swiper', 'ps-elysium'];
 		}
 	}
  
@@ -63,6 +63,9 @@ class Elysium extends Widget_Base {
 		return 'https://youtu.be/S3c1G6AFGi0';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -265,11 +268,6 @@ class Elysium extends Widget_Base {
 		 * Autoplay Controls
 		 */
 		$this->register_autoplay_controls();
-
-		/**
-		 * Centered Slides Controls
-		 */
-		$this->register_centered_slides_controls();
 
 		/**
 		 * Grab Cursor Controls
@@ -761,7 +759,7 @@ class Elysium extends Widget_Base {
 							"pauseOnHover"   => ("yes" == $settings["pauseonhover"]) ? true : false,
 							"slidesPerView"  => isset($settings["columns_mobile"]) ? (int)$settings["columns_mobile"] : 1,
 							"spaceBetween"   => !empty($settings["item_gap_mobile"]["size"]) ? (int)$settings["item_gap_mobile"]["size"] : 0,
-							"centeredSlides" => ($settings["centered_slides"] === "yes") ? true : true,
+							"centeredSlides" => true,
 							"grabCursor"     => ($settings["grab_cursor"] === "yes") ? true : false,
 							"effect"         => 'slide',
                             "parallax"       => true,
@@ -792,15 +790,25 @@ class Elysium extends Widget_Base {
 					]
 				]
 			]
-		);
-		
+		);		
 
 		$this->add_render_attribute( 'prime-slider', 'class', 'bdt-prime-slider' );
+
+		$direction = is_rtl() ? 'rtl' : 'ltr';
+		$this->add_render_attribute([
+			'swiper' => [
+				'class' => 'bdt-slider-continer',
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $this->get_title() . ' ' . esc_html__( 'Slider', 'bdthemes-prime-slider' ),
+				'dir' => $direction,
+			],
+		]);
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider' ); ?>>
 		<div <?php $this->print_render_attribute_string( 'prime-slider-elysium' ); ?>>
-			<div class="bdt-slider-continer">
+			<div <?php $this->print_render_attribute_string( 'swiper' ); ?>>
 				<div class="swiper-wrapper">
 		<?php
 	}

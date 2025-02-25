@@ -1,12 +1,21 @@
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
 import { pageNames } from '@shared/lib/pages';
 import { getLinkSuggestions } from '@launch/api/DataApi';
-import { updatePage } from '@launch/api/WPApi';
+import {
+	getActivePlugins,
+	getOption,
+	getPageById,
+	updatePage,
+} from '@launch/api/WPApi';
+import { wasInstalled } from '@launch/lib/util';
 
-const buttonRegex = /href="(#extendify-[\w|-]+)"/gi;
+const { homeUrl } = window.extSharedData;
+const buttonRegex = /href="(#extendify-[\w-]+)"/gi;
 const pagesWithButtons = (p) => p?.content?.raw?.match(buttonRegex);
 
-export const updateButtonLinks = async (wpPages) => {
+export const updateButtonLinks = async (wpPages, pluginPages) => {
+	// Fetch active plugins after installing plugins
+	let { data: activePlugins } = await getActivePlugins();
 	const contactPageSlug = wpPages.find(({ originalSlug }) =>
 		originalSlug.startsWith('contact'),
 	)?.slug;
@@ -29,8 +38,20 @@ export const updateButtonLinks = async (wpPages) => {
 
 	// Collect the page slugs to share with the server
 	const availablePages = wpPages
+		.concat(pluginPages)
 		.filter(({ slug }) => !slug.startsWith('home'))
 		.map(({ slug }) => `/${slug}`);
+
+	// Add plugin related pages only if plugin is active
+	if (wasInstalled(activePlugins, 'woocommerce')) {
+		const shopPage = await getPageById(
+			await getOption('woocommerce_shop_page_id'),
+		);
+
+		if (shopPage) {
+			availablePages.push(`/${shopPage.slug}`);
+		}
+	}
 
 	// Fetch the links from the server. If a request fails, ignore it.
 	const suggestedLinks = (
@@ -67,11 +88,11 @@ export const updateButtonLinks = async (wpPages) => {
 							// if the link points to the current page or '/'
 							// we should link to the contact page (or default to '/')
 							if ([p.slug, `/${p.slug}`, '/'].includes(link))
-								return `/${contactPageSlug ?? ''}`;
+								return `"${homeUrl}/${contactPageSlug ?? ''}"`;
 
 							// The server once sent back slugs without the /
 							// so we need to check
-							return link.startsWith('/') ? link : `/${link}`;
+							return `"${homeUrl}/${link.replace(/^\//, '')}"`;
 						})
 					: p.content.raw.replace(new RegExp(buttonRegex, 'g'), (match) => {
 							return match ? 'href="#"' : '';
@@ -95,30 +116,73 @@ export const updateButtonLinks = async (wpPages) => {
 	);
 };
 
-export const updateSinglePageLinksToContactSection = (wpPages, pages) => {
-	// Find if there's a contact pattern in the single page's patterns
-	const hasContactPattern = pages?.[0]?.patterns.find((p) =>
-		p?.patternTypes?.[0]?.startsWith('contact'),
-	);
+export const updateSinglePageLinksToSections = async (wpPages, pages) => {
+	let homePageContent = wpPages?.[0]?.content?.raw;
+	if (!homePageContent) return wpPages;
 
-	// If no contact pattern is found, return the original wpPages
-	if (!hasContactPattern) return wpPages;
+	// get all the patterns that we have in the home page
+	const patternTypes = pages?.[0]?.patterns
+		?.map((pattern) => pattern?.patternTypes?.[0])
+		?.filter((patternType) => patternType !== 'hero-header')
+		?.map((patternType) => {
+			const { slug } =
+				Object.values(pageNames).find(({ alias }) =>
+					alias.includes(patternType),
+				) || {};
+			return slug;
+		})
+		?.filter(Boolean)
+		?.flat();
 
-	// Get the translated slug
-	const { slug } =
-		Object.values(pageNames).find(({ alias }) =>
-			alias.includes(hasContactPattern.patternTypes[0]),
-		) || {};
+	const createdPages =
+		pages
+			?.filter((page) => page.slug !== 'home')
+			?.map((page) => page.slug)
+			?.filter(Boolean) ?? [];
 
-	// Map through each WordPress page and update its content
-	return wpPages.map((page) => {
-		// Update each page by replacing the buttons urls with the new slug
-		return updatePage({
-			id: page.id,
-			content: page.content.raw.replaceAll(
-				/"#extendify-[a-zA-Z0-9_-]+"/g,
-				`"#${slug}"`,
-			),
-		});
+	// get the active plugins
+	const { data: activePlugins } = await getActivePlugins();
+	const pluginPages = [];
+
+	// check if woocommerce is active, if so we add it to the list of pages
+	if (wasInstalled(activePlugins, 'woocommerce')) {
+		const { slug } = await getPageById(
+			await getOption('woocommerce_shop_page_id'),
+		);
+
+		pluginPages.push(slug);
+	}
+
+	// check if events calendar is active, if so we add it to the list of pages
+	if (wasInstalled(activePlugins, 'the-events-calendar')) {
+		pluginPages.push('events');
+	}
+
+	// get the suggested links from the AI and send both the patterns and the plugin pages.
+	const { suggestedLinks } =
+		(await getLinkSuggestions(
+			homePageContent,
+			patternTypes.concat(pluginPages),
+		)) || {};
+
+	// replace the links
+	homePageContent = Object.keys(suggestedLinks).reduce((content, key) => {
+		const slug = suggestedLinks[key];
+
+		if (!slug) return content;
+
+		const newLink = pluginPages.concat(createdPages).includes(slug)
+			? `"${homeUrl}/${slug}"`
+			: `"${homeUrl}/#${slug}"`;
+
+		return content.replaceAll(`"${key}"`, newLink);
+	}, homePageContent);
+
+	// Update the first page by replacing the buttons urls with the new slug
+	wpPages[0] = updatePage({
+		id: wpPages[0].id,
+		content: homePageContent,
 	});
+
+	return wpPages;
 };

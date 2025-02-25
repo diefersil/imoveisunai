@@ -27,7 +27,7 @@ if ( ! class_exists( 'Redux_Extension_Social_Profiles' ) ) {
 		 *
 		 * @var string
 		 */
-		public static string $version = '4.3.17';
+		public static $version = '4.3.17';
 
 		/**
 		 * Extension friendly name.
@@ -280,6 +280,6 @@ if ( ! class_exists( 'Redux_Extension_Social_Profiles' ) ) {
 			);
 		}
 	}
-}
 
-class_alias( 'Redux_Extension_Social_Profiles', 'ReduxFramework_Extension_social_profiles' );
+	class_alias( Redux_Extension_Social_Profiles::class, 'ReduxFramework_Extension_social_profiles' );
+}
