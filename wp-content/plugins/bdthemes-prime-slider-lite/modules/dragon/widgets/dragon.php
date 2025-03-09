@@ -47,13 +47,13 @@ class dragon extends Widget_Base {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 		if ('on' === $reveal_effects) {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-dragon'];
+				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-animation-helper'];
 			} else {
 				return [];
 			}
 		} else {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'ps-dragon'];
+				return ['gsap', 'split-text', 'ps-animation-helper'];
 			} else {
 				return [];
 			}
@@ -64,6 +64,9 @@ class dragon extends Widget_Base {
 		return 'https://youtu.be/eL0a9f7VEtc';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -352,7 +355,7 @@ class dragon extends Widget_Base {
 			Group_Control_Css_Filter::get_type(),
 			[
 				'name' => 'css_filters',
-				'selector' => '{{WRAPPER}} .bdt-prime-slider-dragon .bdt-ps-dragon-bg img',
+				'selector' => '{{WRAPPER}} .bdt-prime-slider-dragon .bdt-ps-dragon-slide-image .bdt-ps-slide-img',
 				'separator' => 'before'
 			]
 		);

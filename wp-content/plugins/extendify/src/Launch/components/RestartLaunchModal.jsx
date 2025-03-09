@@ -13,6 +13,7 @@ export const RestartLaunchModal = ({ setPage }) => {
 		window.extOnbData.resetSiteInformation.navigationsIds ?? [];
 	const templatePartsIds =
 		window.extOnbData.resetSiteInformation.templatePartsIds ?? [];
+	const globalStylesPostID = window.extSharedData.globalStylesPostID;
 
 	const { resetState } = useUserSelectionStore();
 	const [open, setOpen] = useState(false);
@@ -33,6 +34,20 @@ export const RestartLaunchModal = ({ setPage }) => {
 			} catch (responseError) {
 				console.warn(
 					`delete pages failed to delete a page (id: ${pageId}) with the following error`,
+					responseError,
+				);
+			}
+		}
+		// They could be posts
+		for (const pageId of oldPages) {
+			try {
+				await apiFetch({
+					path: `/wp/v2/posts/${pageId}`,
+					method: 'DELETE',
+				});
+			} catch (responseError) {
+				console.warn(
+					`delete posts failed to delete a page (id: ${pageId}) with the following error`,
 					responseError,
 				);
 			}
@@ -66,7 +81,28 @@ export const RestartLaunchModal = ({ setPage }) => {
 			}
 		}
 
+		// Reset global styles
+		try {
+			await apiFetch({
+				path: `/wp/v2/global-styles/${globalStylesPostID}`,
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					settings: {},
+					styles: {},
+				}),
+			});
+		} catch (styleResetError) {
+			console.warn(
+				'Failed to reset global styles with the following error:',
+				styleResetError,
+			);
+		}
+
 		setOpen(false);
+		window.location.reload();
 	};
 
 	useEffect(() => {
@@ -103,22 +139,25 @@ export const RestartLaunchModal = ({ setPage }) => {
 								<Dialog.Title className="m-0 flex items-center py-6 pl-8 pr-7 text-2xl font-bold text-gray-900">
 									{__('Start over?', 'extendify-local')}
 								</Dialog.Title>
-								<div className="relative max-w-screen-sm px-8 py-0 text-left text-base font-normal rtl:text-right">
-									{__(
-										'Go through the onboarding process again to create a new site.',
-										'extendify-local',
-									)}
-									<br />
-									<strong>
-										{sprintf(
-											// translators: %3$s is the number of old pages
-											__(
-												'%s pages created in the prior onboarding session will be deleted.',
-												'extendify-local',
-											),
-											oldPages.length,
+								<div className="relative max-w-screen-sm px-8 py-0 text-left font-normal rtl:text-right">
+									<p className="m-0 mb-2 p-0 text-base">
+										{__(
+											'Go through the onboarding process again to create a new site.',
+											'extendify-local',
 										)}
-									</strong>
+									</p>
+									<p className="m-0 mb-2 p-0 text-base">
+										<strong>
+											{sprintf(
+												// translators: %3$s is the number of old pages
+												__(
+													'%s pages/posts created in the prior onboarding session will be deleted.',
+													'extendify-local',
+												),
+												oldPages.length,
+											)}
+										</strong>
+									</p>
 								</div>
 								<div className="flex justify-end gap-2 px-8 py-8 text-base">
 									<NavigationButton

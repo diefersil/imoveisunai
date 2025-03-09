@@ -27,7 +27,7 @@ if ( ! class_exists( 'Redux_Extension_Repeater' ) ) {
 		 *
 		 * @var string
 		 */
-		public static string $version = '4.3.13';
+		public static $version = '4.3.13';
 
 		/**
 		 * Extension friendly name.
@@ -52,6 +52,6 @@ if ( ! class_exists( 'Redux_Extension_Repeater' ) ) {
 			$this->add_field( 'repeater' );
 		}
 	}
-}
 
-class_alias( 'Redux_Extension_Repeater', 'ReduxFramework_Extension_repeater' );
+	class_alias( Redux_Extension_Repeater::class, 'ReduxFramework_Extension_repeater' );
+}

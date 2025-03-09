@@ -1,5 +1,5 @@
+import { AI_HOST } from '@constants';
 import { useAIConsentStore } from '@shared/state/ai-consent';
-import { AI_HOST } from '../../constants';
 
 // Additional data to send with requests
 const allowList = [
@@ -10,6 +10,7 @@ const allowList = [
 	'devbuild',
 	'isBlockTheme',
 	'userId',
+	'siteProfile',
 ];
 
 const { showAIConsent, userGaveConsent } = useAIConsentStore.getState();

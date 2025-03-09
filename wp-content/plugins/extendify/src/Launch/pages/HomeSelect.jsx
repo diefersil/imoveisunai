@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { deepMerge } from '@shared/lib/utils';
 import classNames from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getHomeTemplates } from '@launch/api/DataApi';
 import { getThemeVariations } from '@launch/api/WPApi';
 import { LoadingIndicator } from '@launch/components/LoadingIndicator';
 import { SmallPreview } from '@launch/components/SmallPreview';
 import { Title } from '@launch/components/Title';
 import { useFetch } from '@launch/hooks/useFetch';
+import { useHomeLayouts } from '@launch/hooks/useHomeLayouts';
 import { useIsMountedLayout } from '@launch/hooks/useIsMounted';
 import { PageLayout } from '@launch/layouts/PageLayout';
 import { pageState } from '@launch/state/factory';
@@ -15,29 +16,19 @@ import { usePagesSelectionStore } from '@launch/state/pages-selections';
 import { useUserSelectionStore } from '@launch/state/user-selections';
 import { Checkmark } from '@launch/svg';
 
-export const fetcher = getHomeTemplates;
-export const fetchData = () => {
-	const { siteType, siteStructure } = useUserSelectionStore?.getState() || {};
-	return {
-		key: 'home-pages-list',
-		siteType,
-		siteStructure,
-	};
-};
-
 export const state = pageState('Layout', () => ({
 	ready: false,
 	canSkip: false,
-	validation: null,
+	useNav: true,
 	onRemove: () => {},
 }));
 
 export const HomeSelect = () => {
-	const { loading, data: homeTemplate } = useFetch(fetchData, fetcher);
+	const { loading, homeLayouts } = useHomeLayouts();
 
 	return (
 		<PageLayout>
-			<div className="grow overflow-y-scroll px-6 py-8 md:p-12 3xl:p-16">
+			<div className="grow overflow-y-auto px-6 py-8 md:p-12 3xl:p-16">
 				<Title
 					title={__('Pick a design for your website', 'extendify-local')}
 					description={__('You can personalize this later.', 'extendify-local')}
@@ -46,7 +37,7 @@ export const HomeSelect = () => {
 					{loading ? (
 						<LoadingIndicator />
 					) : (
-						<DesignSelector homeTemplate={homeTemplate} />
+						<DesignSelector homeLayouts={homeLayouts} />
 					)}
 				</div>
 			</div>
@@ -54,12 +45,12 @@ export const HomeSelect = () => {
 	);
 };
 
-const DesignSelector = ({ homeTemplate }) => {
+const DesignSelector = ({ homeLayouts }) => {
 	const { data: variations } = useFetch('variations', getThemeVariations);
 	const isMounted = useIsMountedLayout();
 	const [styles, setStyles] = useState([]);
 	const { setStyle, style: currentStyle } = usePagesSelectionStore();
-	const { setVariation, variation } = useUserSelectionStore();
+	const { siteInformation, setVariation, variation } = useUserSelectionStore();
 
 	const onSelect = useCallback(
 		(style) => {
@@ -76,20 +67,58 @@ const DesignSelector = ({ homeTemplate }) => {
 	}, [variation]);
 
 	useEffect(() => {
-		if (!homeTemplate || !variations) return;
+		if (!homeLayouts || !variations) return;
 		if (styles.length) return;
 		setStyle(null);
 		setVariation(null);
 		(async () => {
-			const slicedEntries = Array.from(homeTemplate.entries());
+			const slicedEntries = Array.from(homeLayouts.entries());
 			for (const [index, style] of slicedEntries) {
 				if (!isMounted.current) return;
+
+				const { fonts, colorPalette } = style.siteStyle;
+
+				// Select the variation matching the color palette suggested
+				// by the AI. If none matches, return a random variation.
+				let variation =
+					variations.find(({ slug }) => slug === colorPalette) ??
+					variations[index % variations.length];
+
+				// If a variation matched color palette, replace the fonts with
+				// those suggested by the AI.
+				if (variation.slug === colorPalette && fonts) {
+					variation = deepMerge(variation, {
+						styles: {
+							elements: {
+								heading: {
+									typography: {
+										fontFamily: `var(--wp--preset--font-family--${fonts.heading.slug})`,
+									},
+								},
+							},
+							typography: {
+								fontFamily: `var(--wp--preset--font-family--${fonts.body.slug})`,
+							},
+						},
+						settings: {
+							typography: {
+								fontFamilies: {
+									// If font doesn't have a host, it means it's already installed
+									// with the theme. We only need to add the ones that are not.
+									custom: [fonts.heading, fonts.body].filter(
+										(font) => !!font.host,
+									),
+								},
+							},
+						},
+					});
+				}
 
 				setStyles((styles) => [
 					...styles,
 					{
 						...style,
-						variation: variations[index % variations.length],
+						variation,
 					},
 				]);
 
@@ -99,7 +128,7 @@ const DesignSelector = ({ homeTemplate }) => {
 			}
 		})();
 	}, [
-		homeTemplate,
+		homeLayouts,
 		isMounted,
 		variations,
 		styles.length,
@@ -140,6 +169,7 @@ const DesignSelector = ({ homeTemplate }) => {
 							style={{ aspectRatio: '1.55' }}>
 							<SmallPreview
 								style={style}
+								siteTitle={siteInformation.title}
 								onSelect={onSelect}
 								selected={currentStyle?.id === style.id}
 							/>
@@ -152,7 +182,7 @@ const DesignSelector = ({ homeTemplate }) => {
 					</span>
 				</div>
 			))}
-			{homeTemplate?.slice(styles?.length).map((_, i) => (
+			{homeLayouts?.slice(styles?.length).map((_, i) => (
 				<AnimatePresence key={i}>
 					<motion.div
 						initial={{ opacity: 1 }}

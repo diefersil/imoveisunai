@@ -59,13 +59,13 @@ class Blog extends Widget_Base {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
         if ('on' === $reveal_effects) {
             if ( true === _is_ps_pro_activated() ) {
-                return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-blog'];
+                return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-animation-helper'];
             } else {
                 return [];
             }
         } else {
             if ( true === _is_ps_pro_activated() ) {
-                return ['gsap', 'split-text', 'ps-blog'];
+                return ['gsap', 'split-text', 'ps-animation-helper'];
             } else {
                 return [];
             }
@@ -82,7 +82,10 @@ class Blog extends Widget_Base {
         $this->add_skin(new Skins\Skin_Folio($this));
     }
 
-    protected function is_dynamic_content(): bool {
+    public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
+	protected function is_dynamic_content(): bool {
 		return false;
 	}
 
@@ -99,6 +102,33 @@ class Blog extends Widget_Base {
 		 * Slider Height Controls
 		 */
 		$this->register_slider_height_controls();
+
+        $this->add_responsive_control(
+            'content_max_width',
+            [
+                'label'     => esc_html__('Content Max Width', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'type'      => Controls_Manager::SLIDER,
+                'size_units' => ['px', '%'],
+                'range'     => [
+                    'px' => [
+                        'min'  => 100,
+                        'max'  => 2000,
+                        'step' => 1,
+                    ],
+                    '%'  => [
+                        'min'  => 10,
+                        'max'  => 100,
+                        'step' => 1,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-blog .bdt-ps-blog-container' => 'max-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-zinest .bdt-ps-zinest-container' => 'max-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-coral .bdt-slideshow-content-wrapper' => 'max-width: {{SIZE}}{{UNIT}} !important;',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-container' => 'max-width: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
 
         /**
 		 * Thumbnail Size Controls
@@ -582,6 +612,21 @@ class Blog extends Widget_Base {
             ]
         );
 
+        $this->add_responsive_control(
+            'content_margin',
+            [
+                'label'      => esc_html__('Content Margin', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', 'em', '%'],
+                'selectors'  => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-blog .bdt-ps-blog-container' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-zinest .bdt-ps-zinest-container' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-coral .bdt-slideshow-content-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-container' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
         $this->start_controls_tabs('slider_item_style');
 
         $this->start_controls_tab(
@@ -655,7 +700,7 @@ class Blog extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider .bdt-prime-slider-desc .bdt-main-title' => 'width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider .bdt-prime-slider-desc .bdt-main-title' => 'max-width: {{SIZE}}{{UNIT}};',
                 ],
                 'condition' => [
                     'show_title' => ['yes'],
@@ -1221,6 +1266,7 @@ class Blog extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .bdt-prime-slider .bdt-scroll-down span'       => 'color: {{VALUE}};',
                     '{{WRAPPER}} .bdt-prime-slider .bdt-scroll-down span svg *' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-coral .bdt-scroll-down .bdt-scroll-icon' => 'border-color: {{VALUE}};',
                 ],
             ]
         );
@@ -1233,7 +1279,6 @@ class Blog extends Widget_Base {
                 'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-scroll-down span',
             ]
         );
-        //margin bottom controls
         $this->add_responsive_control(
             'scroll_button_space_between',
             [
@@ -1248,7 +1293,6 @@ class Blog extends Widget_Base {
         );
 
         $this->end_controls_tab();
-
         $this->start_controls_tab(
             'tab_scroll_button_hover',
             [
@@ -1264,14 +1308,13 @@ class Blog extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .bdt-prime-slider .bdt-scroll-down:hover span'       => 'color: {{VALUE}};',
                     '{{WRAPPER}} .bdt-prime-slider .bdt-scroll-down:hover span svg *' => 'fill: {{VALUE}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-coral .bdt-scroll-down:hover .bdt-scroll-icon' => 'border-color: {{VALUE}};',
                 ],
             ]
         );
 
         $this->end_controls_tab();
-
         $this->end_controls_tabs();
-
         $this->end_controls_section();
 
         $this->start_controls_section(
@@ -1449,6 +1492,62 @@ class Blog extends Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'meta_content_heading',
+            [
+                'label'     => __('Meta Content', 'bdthemes-prime-slider'),
+                'type'      => Controls_Manager::HEADING,
+            ]
+        );
+
+        $this->add_control(
+            'folio_glassmorphism_effect',
+            [
+                'label' => esc_html__('Glassmorphism', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
+                'type'  => Controls_Manager::SWITCHER,
+                'description' => sprintf(__('This feature will not work in the Firefox browser untill you enable browser compatibility so please %1s look here %2s', 'bdthemes-prime-slider'), '<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter#Browser_compatibility" target="_blank">', '</a>'),
+                'classes'   => BDTPS_CORE_IS_PC,
+                'condition' => [
+                    '_skin' => 'folio',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'folio_glassmorphism_blur_level',
+            [
+                'label'       => __('Blur Level', 'bdthemes-prime-slider'),
+                'type'        => Controls_Manager::SLIDER,
+                'range'       => [
+                    'px' => [
+                        'min'  => 0,
+                        'step' => 1,
+                        'max'  => 50,
+                    ]
+                ],
+                'default'     => [
+                    'size' => 5
+                ],
+                'selectors'   => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-wrap' => 'backdrop-filter: blur({{SIZE}}px); -webkit-backdrop-filter: blur({{SIZE}}px);'
+                ],
+                'condition' => [
+                    'folio_glassmorphism_effect' => 'yes',
+                ]
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Background::get_type(),
+            [
+                'name'      => 'meta_content_background',
+                'selector'  => '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-wrap',
+                'condition' => [
+                    '_skin' => 'folio',
+                ],
+            ]
+        );
+
         $this->start_controls_tabs('meta_style_tabs');
 
         $this->start_controls_tab(
@@ -1475,7 +1574,7 @@ class Blog extends Widget_Base {
             [
                 'name'     => 'meta_icon_background',
                 'label'    => __('Background', 'bdthemes-prime-slider'),
-                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon',
+                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon, {{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author',
             ]
         );
 
@@ -1483,7 +1582,7 @@ class Blog extends Widget_Base {
             Group_Control_Border::get_type(),
             [
                 'name'     => 'meta_icon_border',
-                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon',
+                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon, {{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author',
             ]
         );
 
@@ -1494,7 +1593,7 @@ class Blog extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => ['px', '%'],
                 'selectors'  => [
-                    '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon, {{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -1503,7 +1602,7 @@ class Blog extends Widget_Base {
             Group_Control_Box_Shadow::get_type(),
             [
                 'name'     => 'meta_icon_box_shadow',
-                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon',
+                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon, {{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author',
             ]
         );
 
@@ -1513,7 +1612,8 @@ class Blog extends Widget_Base {
                 'label'     => esc_html__('Size', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::SLIDER,
                 'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon, .bdt-prime-slider-skin-folio .bdt-post-slider-author img' => 'height: {{SIZE}}{{UNIT}}; width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon' => 'height: {{SIZE}}{{UNIT}}; width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author img' => 'height: {{SIZE}}{{UNIT}}; width: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -1521,10 +1621,39 @@ class Blog extends Widget_Base {
         $this->add_responsive_control(
             'meta_icon_spacing',
             [
-                'label'     => esc_html__('Spacing', 'bdthemes-prime-slider'),
+                'label'     => esc_html__('Icon Spacing', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::SLIDER,
                 'selectors' => [
                     '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-icon' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-post-slider-author' => 'margin-right: {{SIZE}}{{UNIT}} !important;',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'meta_item_gap',
+            [
+                'label'     => esc_html__('Item Gap', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'type'      => Controls_Manager::SLIDER,
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-wrap' => 'gap: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    '_skin' => 'folio',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'meta_wrap_spacing',
+            [
+                'label'     => esc_html__('Wrapper Spacing', 'bdthemes-prime-slider') . BDTPS_CORE_NC,
+                'type'      => Controls_Manager::SLIDER,
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-content' => 'padding: 0 {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-wrap' => 'padding: 0 {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    '_skin' => 'folio',
                 ],
             ]
         );
@@ -1549,19 +1678,31 @@ class Blog extends Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'admin_meta_title_color',
+            [
+                'label'     => __('Admin Text Color', 'bdthemes-prime-slider'),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-prime-slider-meta *' => 'color: {{VALUE}}',
+                ],
+                'condition' => [
+                    '_skin' => 'folio',
+                ],
+            ]
+        );
+
         $this->add_group_control(
             Group_Control_Typography::get_type(),
             [
                 'name'     => 'meta_text_typography',
                 'label'    => esc_html__('Typography', 'bdthemes-prime-slider'),
-                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-text *',
+                'selector' => '{{WRAPPER}} .bdt-prime-slider .bdt-ps-meta .bdt-meta-text *, {{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-prime-slider-meta *',
             ]
         );
 
         $this->end_controls_tab();
-
         $this->end_controls_tabs();
-
         $this->end_controls_section();
 
         $this->start_controls_section(
@@ -1738,31 +1879,6 @@ class Blog extends Widget_Base {
         $this->end_controls_tab();
 
         $this->end_controls_tabs();
-
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_style_admin_meta',
-            [
-                'label'     => esc_html__('Admin Meta', 'bdthemes-prime-slider'),
-                'tab'       => Controls_Manager::TAB_STYLE,
-                'condition' => [
-                    'show_admin_info' => 'yes',
-                    '_skin'           => 'folio',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'admin_meta_title_color',
-            [
-                'label'     => __('Color', 'bdthemes-prime-slider'),
-                'type'      => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-prime-slider-meta *' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
 
         $this->end_controls_section();
 
@@ -1959,72 +2075,7 @@ class Blog extends Widget_Base {
         );
 
         $this->end_controls_tab();
-
         $this->end_controls_tabs();
-
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_style_addition',
-            [
-                'label'      => __('Additional', 'bdthemes-prime-slider'),
-                'tab'        => Controls_Manager::TAB_STYLE,
-                'condition' => [
-                    '_skin' => 'folio',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'meta_content_heading',
-            [
-                'label'     => __('Meta Content', 'bdthemes-prime-slider'),
-                'type'      => Controls_Manager::HEADING,
-            ]
-        );
-
-        $this->add_control(
-            'folio_glassmorphism_effect',
-            [
-                'label' => esc_html__('Glassmorphism', 'bdthemes-prime-slider') . BDTPS_CORE_PC,
-                'type'  => Controls_Manager::SWITCHER,
-                'description' => sprintf(__('This feature will not work in the Firefox browser untill you enable browser compatibility so please %1s look here %2s', 'bdthemes-prime-slider'), '<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter#Browser_compatibility" target="_blank">', '</a>'),
-                'classes'   => BDTPS_CORE_IS_PC
-            ]
-        );
-
-        $this->add_control(
-            'folio_glassmorphism_blur_level',
-            [
-                'label'       => __('Blur Level', 'bdthemes-prime-slider'),
-                'type'        => Controls_Manager::SLIDER,
-                'range'       => [
-                    'px' => [
-                        'min'  => 0,
-                        'step' => 1,
-                        'max'  => 50,
-                    ]
-                ],
-                'default'     => [
-                    'size' => 5
-                ],
-                'selectors'   => [
-                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-content' => 'backdrop-filter: blur({{SIZE}}px); -webkit-backdrop-filter: blur({{SIZE}}px);'
-                ],
-                'condition' => [
-                    'folio_glassmorphism_effect' => 'yes',
-                ]
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Background::get_type(),
-            [
-                'name'      => 'meta_content_background',
-                'selector'  => '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-ps-meta-content',
-            ]
-        );
-
         $this->end_controls_section();
     }
 

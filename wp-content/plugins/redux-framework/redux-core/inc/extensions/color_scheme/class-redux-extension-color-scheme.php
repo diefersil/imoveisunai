@@ -26,7 +26,7 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 		 *
 		 * @var string
 		 */
-		public static string $version = '4.4.10';
+		public static $version = '4.4.10';
 
 		/**
 		 * Extension friendly name.
@@ -784,6 +784,6 @@ if ( ! class_exists( 'Redux_Extension_Color_Scheme' ) ) {
 			return $data;
 		}
 	}
-}
 
-class_alias( 'Redux_Extension_Color_Scheme', 'ReduxFramework_Extension_Color_Scheme' );
+	class_alias( Redux_Extension_Color_Scheme::class, 'ReduxFramework_Extension_Color_Scheme' );
+}

@@ -43,16 +43,19 @@ class Sniper extends Widget_Base {
 	}
 
 	public function get_style_depends() {
-		return ['ps-sniper'];
+		return ['swiper', 'ps-sniper'];
 	}
 	public function get_script_depends() {
-		return ['shutters', 'gl', 'slicer', 'tinder', 'ps-sniper'];
+		return ['swiper', 'shutters', 'gl', 'slicer', 'tinder', 'ps-sniper'];
 	}
 
 	public function get_custom_help_url() {
 		return 'https://youtu.be/KZstgwk-pog?si=k0t9Gj7POSuEzDIi';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -706,8 +709,17 @@ class Sniper extends Widget_Base {
 				]
 			]
 		);
-
-		$this->add_render_attribute('swiper', 'class', 'bdt-main-slider swiper');
+		
+		$direction = is_rtl() ? 'rtl' : 'ltr';
+		$this->add_render_attribute([
+			'swiper' => [
+				'class' => 'bdt-main-slider swiper',
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $this->get_title() . ' ' . esc_html__( 'Slider', 'bdthemes-prime-slider' ),
+				'dir' => $direction,
+			],
+		]);
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider-sniper' ); ?>>

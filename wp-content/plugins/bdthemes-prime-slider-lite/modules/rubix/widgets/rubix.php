@@ -48,19 +48,19 @@ class Rubix extends Widget_Base {
 	}
 
 	public function get_style_depends() {
-		return [ 'ps-rubix', 'prime-slider-font' ];
+		return [ 'swiper', 'ps-rubix', 'prime-slider-font' ];
 	}
 
 	public function get_script_depends() {
 		$reveal_effects = prime_slider_option( 'reveal-effects', 'prime_slider_other_settings', 'off' );
 		if ( 'on' === $reveal_effects ) {
 			if ( true === _is_ps_pro_activated() ) {
-				return [ 'anime', 'revealFx', 'ps-rubix' ];
+				return [ 'swiper', 'anime', 'revealFx', 'ps-rubix' ];
 			} else {
-				return [ 'ps-rubix' ];
+				return [ 'swiper', 'ps-rubix' ];
 			}
 		} else {
-			return [ 'ps-rubix' ];
+			return [ 'swiper', 'ps-rubix' ];
 		}
 	}
 
@@ -68,6 +68,9 @@ class Rubix extends Widget_Base {
 		return 'https://youtu.be/mEPQjmjhCkY';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}
@@ -1530,7 +1533,16 @@ class Rubix extends Widget_Base {
 			]
 		);
 
-		$this->add_render_attribute( 'swiper', 'class', 'bdt-main-slider swiper' );
+		$direction = is_rtl() ? 'rtl' : 'ltr';
+		$this->add_render_attribute([
+			'swiper' => [
+				'class' => 'bdt-main-slider swiper',
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $this->get_title() . ' ' . esc_html__( 'Slider', 'bdthemes-prime-slider' ),
+				'dir' => $direction,
+			],
+		]);
 
 		?>
 		<div <?php $this->print_render_attribute_string( 'prime-slider' ); ?>>

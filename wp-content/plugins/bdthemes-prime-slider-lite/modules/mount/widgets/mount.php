@@ -50,13 +50,13 @@ class Mount extends Widget_Base {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 		if ('on' === $reveal_effects) {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-mount'];
+				return ['gsap', 'split-text', 'anime', 'revealFx', 'ps-animation-helper'];
 			} else {
 				return [];
 			}
 		} else {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['gsap', 'split-text', 'ps-mount'];
+				return ['gsap', 'split-text', 'ps-animation-helper'];
 			} else {
 				return [];
 			}
@@ -67,6 +67,9 @@ class Mount extends Widget_Base {
 		return 'https://youtu.be/DGIlfM61T0E';
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
 	protected function is_dynamic_content(): bool {
 		return false;
 	}

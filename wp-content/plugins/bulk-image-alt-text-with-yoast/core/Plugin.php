@@ -17,7 +17,7 @@ class Plugin
     public static function view($file, $data = [])
     {
         extract($data);
-        require static::path("admin/views/{$file}.view.php");
+        require realpath(plugin_dir_path( __DIR__ ) . "admin/views/{$file}.view.php");
     }
     
     public static function domain()

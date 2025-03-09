@@ -28,7 +28,7 @@ if ( ! class_exists( 'Redux_Extension_Icon_Select' ) ) {
 		 *
 		 * @var string
 		 */
-		public static string $version = '4.4.2';
+		public static $version = '4.4.2';
 
 		/**
 		 * Extension friendly name.
@@ -125,6 +125,6 @@ if ( ! class_exists( 'Redux_Extension_Icon_Select' ) ) {
 			wp_send_json_success( array( 'content' => $content ) );
 		}
 	}
-}
 
-class_alias( 'Redux_Extension_Icon_Select', 'ReduxFramework_extension_icon_select' );
+	class_alias( Redux_Extension_Icon_Select::class, 'ReduxFramework_extension_icon_select' );
+}

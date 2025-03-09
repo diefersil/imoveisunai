@@ -49,19 +49,19 @@ class Fiestar extends Widget_Base {
     }
 
     public function get_style_depends() {
-        return ['ps-fiestar', 'prime-slider-font'];
+        return ['swiper', 'ps-fiestar', 'prime-slider-font'];
     }
 
     public function get_script_depends() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
 		if ('on' === $reveal_effects) {
 			if ( true === _is_ps_pro_activated() ) {
-				return ['anime', 'revealFx', 'ps-fiestar'];
+				return ['swiper', 'anime', 'revealFx', 'ps-fiestar'];
 			} else {
-				return ['ps-fiestar'];
+				return ['swiper', 'ps-fiestar'];
 			}
 		} else {
-            return ['ps-fiestar'];
+            return ['swiper', 'ps-fiestar'];
 		}
 	}
 
@@ -69,7 +69,10 @@ class Fiestar extends Widget_Base {
         return 'https://youtu.be/8neRnv80lMU';
     }
 
-    protected function is_dynamic_content(): bool {
+    public function has_widget_inner_wrapper(): bool {
+        return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+    }
+	protected function is_dynamic_content(): bool {
 		return false;
 	}
 
@@ -951,11 +954,22 @@ class Fiestar extends Widget_Base {
         );
 
         $this->add_render_attribute( 'prime-slider', 'class', 'bdt-prime-slider' );
+        
+        $direction = is_rtl() ? 'rtl' : 'ltr';
+		$this->add_render_attribute([
+			'swiper' => [
+				'class' => 'bdt-center-slider',
+				'role' => 'region',
+				'aria-roledescription' => 'carousel',
+				'aria-label' => $this->get_title() . ' ' . esc_html__( 'Slider', 'bdthemes-prime-slider' ),
+				'dir' => $direction,
+			],
+		]);
 
         ?>
         <div <?php $this->print_render_attribute_string( 'prime-slider' ); ?>>
             <div <?php $this->print_render_attribute_string('prime-slider-fiestar'); ?>>
-                <div class="bdt-center-slider">
+                <div <?php $this->print_render_attribute_string( 'swiper' ); ?>>
                     <div class="swiper-wrapper">
                     <?php
                 }
