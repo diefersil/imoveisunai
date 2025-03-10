@@ -54,3 +54,8 @@ function gadc(){?>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0370842058394618"
     crossorigin="anonymous"></script>
 <?php }
+
+add_action('wp_head', 'hiltop_ads');
+function hiltop_ads(){?>
+    <meta name="352f73b99be1013e8252dcd9c84b82303813a2af" content="352f73b99be1013e8252dcd9c84b82303813a2af" />
+<?php }
