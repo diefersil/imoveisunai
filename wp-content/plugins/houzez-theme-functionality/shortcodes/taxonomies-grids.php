@@ -19,6 +19,8 @@ if( !function_exists('houzez_taxonomies_grids') ) {
 			'property_state' => '',
 			'property_country' => '',
 			'houzez_cards_columns' => '',
+			'houzez_cards_columns_tablet' => '',
+			'houzez_cards_columns_mobile' => '',
 			'property_city' => '',
 			'property_label' => '',
 			'thumb_size' => ''
@@ -73,54 +75,56 @@ if( !function_exists('houzez_taxonomies_grids') ) {
 		));
 
 		$img_url = 'https://place-hold.it/800x800';
-		$img_width = '800';
-		$img_height = '800';
 		?>
 
-		<div class="taxonomy-grids-module taxonomy-grids-module-v5 taxonomy-grids-module-v5-<?php echo esc_attr($houzez_cards_columns);?>">
-			<?php
-			if ( !is_wp_error( $taxonomy ) ) {
+		<div class="taxonomy-grids-module taxonomy-grids-module-v5">
+			<div class="taxonomy-grids-module-grid houzez-desktop-layout-<?php echo esc_attr($houzez_cards_columns); ?> houzez-tablet-layout-<?php echo esc_attr($houzez_cards_columns_tablet); ?> houzez-mobile-layout-<?php echo esc_attr($houzez_cards_columns_mobile); ?>">
+				<?php
+				if ( !is_wp_error( $taxonomy ) ) {
 
-				foreach ($taxonomy as $term) {
+					foreach ($taxonomy as $term) {
 
-				$attach_id = get_term_meta($term->term_id, 'fave_taxonomy_img', true);
+					$attach_id = get_term_meta($term->term_id, 'fave_taxonomy_img', true);
 
-				$attachment = wp_get_attachment_image_src( $attach_id, $thumb_size );
+					$attachment = wp_get_attachment_image_src( $attach_id, $thumb_size );
 
-				if( ! empty($attachment)) {
-					$img_url = $attachment['0'];
-                    $img_width = $attachment['1'];
-                    $img_height = $attachment['2'];
-				}
-				
-				$taxonomy_custom_link = get_term_meta($term->term_id, 'fave_prop_taxonomy_custom_link', true);
-				if( !empty($taxonomy_custom_link) ) {
-					$term_link = $taxonomy_custom_link;
-				} else {
-					$term_link = get_term_link($term, $tax_name);
-				}
-				?>
-				<div class="taxonomy-item" style="background-image: url(<?php echo esc_url($img_url); ?>);">
-					<a class="taxonomy-link hover-effect-flat" href="<?php echo esc_url($term_link);?>">
-						<div class="taxonomy-text-wrap">
-							<div class="taxonomy-title"><?php echo esc_attr($term->name); ?></div>
-							<?php if( $houzez_hide_count != 1 ) { ?>
-							<div class="taxonomy-subtitle">
-								<?php echo esc_attr($term->count); ?> 
-								<?php
-								if ($term->count < 2) {
-									echo houzez_option('cl_property', 'Property');
-								} else {
-									echo houzez_option('cl_properties', 'Properties');
-								}
-								?>
-							</div>
-							<?php } ?>
-						</div><!-- taxonomy-text-wrap -->
-					</a>
-				</div>
-			<?php } 
-			}?>
+					if( ! empty($attachment)) {
+						$img_url = $attachment['0'];
+						$img_width = $attachment['1'];
+						$img_height = $attachment['2'];
+					}
+					
+					$taxonomy_custom_link = get_term_meta($term->term_id, 'fave_prop_taxonomy_custom_link', true);
+					if( !empty($taxonomy_custom_link) ) {
+						$term_link = $taxonomy_custom_link;
+					} else {
+						$term_link = get_term_link($term, $tax_name);
+					}
+					?>
+					<div class="taxonomy-item-wrap h-100">
+						<div class="taxonomy-item" style="background-image: url(<?php echo esc_url($img_url); ?>);">
+							<a class="taxonomy-link hover-effect-flat" href="<?php echo esc_url($term_link);?>">
+								<div class="taxonomy-text-wrap d-flex flex-column justify-content-end align-items-start h-100 w-100">
+									<div class="taxonomy-title"><?php echo esc_attr($term->name); ?></div>
+									<?php if( $houzez_hide_count != 1 ) { ?>
+									<div class="taxonomy-subtitle">
+										<?php echo esc_attr($term->count); ?> 
+										<?php
+										if ($term->count < 2) {
+											echo houzez_option('cl_property', 'Property');
+										} else {
+											echo houzez_option('cl_properties', 'Properties');
+										}
+										?>
+									</div>
+									<?php } ?>
+								</div><!-- taxonomy-text-wrap -->
+							</a>
+						</div>
+					</div>
+				<?php } 
+				}?>
+			</div>
 		</div>
 		
 		<?php

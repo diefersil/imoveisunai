@@ -1,5 +1,5 @@
 <?php if( has_tag() ) { ?>
-<div class="post-footer-wrap">
+<div class="post-footer-wrap border-top">
 	<div class="post-tag-wrap">
 	    <strong><?php esc_html_e( 'Tags', 'houzez' ); ?></strong><br>
 	    <?php

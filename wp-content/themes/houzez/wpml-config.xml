@@ -23,6 +23,10 @@
 		<taxonomy translate="1">agent_city</taxonomy>
 	</taxonomies>
 	<custom-fields>
+		<custom-field action="translate">fts_included_options</custom-field>
+		<custom-field action="translate">fts_excluded_options</custom-field>
+		<custom-field action="translate">fts_template_type</custom-field>
+		<custom-field action="translate">fts_block_hook</custom-field>
 		<custom-field action="translate">fave_currency</custom-field>
 		<custom-field action="translate">fave_property_price</custom-field>
 		<custom-field action="translate">fave_property_sec_price</custom-field>
@@ -36,6 +40,7 @@
 		<custom-field action="translate">fave_property_land_postfix</custom-field>
 		<custom-field action="translate">fave_property_bedrooms</custom-field>
 		<custom-field action="translate">fave_property_bathrooms</custom-field>
+		<custom-field action="translate">fave_property_rooms</custom-field>
 		<custom-field action="translate">fave_property_garage</custom-field>
 		<custom-field action="translate">fave_property_garage_size</custom-field>
 		<custom-field action="translate">fave_property_year</custom-field>
@@ -53,9 +58,9 @@
 		<custom-field action="copy">fave_marker_icon</custom-field>
 		<custom-field action="copy">fave_marker_retina_icon</custom-field>
 		<custom-field action="translate">fave_video_url</custom-field>
-		<custom-field action="translate">fave_agent_display_option</custom-field>
-		<custom-field action="translate">fave_agents</custom-field>
-		<custom-field action="translate">fave_property_agency</custom-field>
+		<custom-field action="copy">fave_agent_display_option</custom-field>
+		<custom-field action="copy">fave_agents</custom-field>
+		<custom-field action="copy">fave_property_agency</custom-field>
 		<custom-field action="translate">fave_virtual_tour</custom-field>
 		<custom-field action="translate">fave_prop_homeslider</custom-field>
 		<custom-field action="translate">fave_prop_homeslider</custom-field>
@@ -157,18 +162,29 @@
 	</custom-fields>
 	<elementor-widgets>
 		<widget name="Houzez_elementor_grid_builder">
-			<conditions>
-				<condition key="widgetType">Houzez_elementor_grid_builder</condition>
-			</conditions>
-			<fields>
-				<field type="Grid Builder: Title" editor_type="LINE">grid_title</field>
-				<field type="Grid Builder: Sub Title" editor_type="LINE">grid_subtitle</field>
-				<field type="Grid Builder: More Details Text" editor_type="LINE">more_text</field>
-				<field type="Grid Builder: Property Text" editor_type="LINE">property_text</field>
-				<field type="Grid Builder: Properties Text" editor_type="LINE">properties_text</field>
-				<field type="Grid Builder: More Link" editor_type="LINK">more_link</field>
-			</fields>
-		</widget>
+	      <fields>
+	        <field>image>url</field>
+	        <field>image>alt</field>
+	        <field>grid_title</field>
+	        <field>grid_subtitle</field>
+	        <field>more_text</field>
+	        <field type="LINK">more_link>url</field>
+	        <field>more_text_d</field>
+	        <field>properties_text</field>
+	        <field>property_text</field>
+	      </fields>
+	    </widget>
+	    <widget name="houzez_custom_carousel">
+	      <fields>
+	        <field>carousel_title</field>
+	        <field>carousel_tagline</field>
+	      </fields>
+	      <fields-in-item items_of="slides">
+	        <field>content</field>
+	        <field>title</field>
+	        <field>read_more_text</field>
+	      </fields-in-item>
+	    </widget>
 		<widget name="houzez_elementor_price_table">
 			<conditions>
 				<condition key="widgetType">houzez_elementor_price_table</condition>
@@ -453,6 +469,9 @@
 				<field type="Contact Form: GDPR Validation Message" editor_type="LINE">gdpr_validate</field>
 				<field type="Contact Form: GDPR Agreement Text" editor_type="AREA">gdpr_text</field>
 				<field type="Contact Form: Redirect Link" editor_type="LINK">redirect_to</field>
+				<field type="Contact Form: Submit button label" editor_type="LINE">button_text</field>
+				<field type="Contact Form: Email To" editor_type="LINE">email_to</field>
+				<field type="Contact Form: Email Subject" editor_type="LINE">email_subject</field>
 			</fields>
 			<fields-in-item items_of="form_fields">
 				<field type="Contact Form: Field Label" editor_type="LINE">field_label</field>
@@ -567,8 +586,6 @@
 			<key name="srh_max_price" />
 			<key name="srh_price" />
 			<key name="srh_price_range" />
-			<key name="srh_from" />
-			<key name="srh_to" />
 			<key name="srh_prop_id" />
 			<key name="srh_countries" />
 			<key name="srh_states" />
@@ -627,6 +644,7 @@
 			<key name="spl_prop_status" />
 			<key name="spl_prop_size" />
 			<key name="spl_land" />
+			<key name="spl_area_size" />
 			<key name="spl_bedroom" />
 			<key name="spl_bedrooms" />
 			<key name="spl_bathroom" />
@@ -652,6 +670,7 @@
 			<key name="spl_con_message" />
 			<key name="spl_con_message_plac" />
 			<key name="spl_con_interested" />
+			<key name="spl_con_usertype" />
 			<key name="spl_con_select" />
 			<key name="spl_con_buyer" />
 			<key name="spl_con_tennant" />
@@ -863,6 +882,9 @@
 			<key name="cl_subl_ids" />
 			<key name="cl_subl_ids_plac" />
 			<key name="cl_subl_ids_tooltip" />
+			<key name="dsh_overview" />
+			<key name="dsh_crm" />
+			<key name="dsh_dashboard" />
 			<key name="dsh_board" />
 			<key name="dsh_home" />
 			<key name="dsh_activities" />
@@ -872,11 +894,13 @@
 			<key name="dsh_insight" />
 			<key name="dsh_props" />
 			<key name="dsh_all" />
+			<key name="dsh_mine" />
 			<key name="dsh_published" />
 			<key name="dsh_pending" />
 			<key name="dsh_expired" />
 			<key name="dsh_draft" />
 			<key name="dsh_hold" />
+			<key name="dsh_sold" />
 			<key name="dsh_disapproved" />
 			<key name="dsh_create_listing" />
 			<key name="dsh_favorite" />
@@ -904,7 +928,9 @@
 			<key name="splash_callus_text" />
 			<key name="404-title" />
 			<key name="404-des" />
+			<key name="read_more_text" />
 			<key name="copy_rights" />
+			<key name="verification_message"/>
 			<key name="thankyou_wire_title" />
 			<key name="thankyou_wire_des" />
 			<key name="thankyou_title" />
@@ -926,8 +952,8 @@
 			<key name="houzez_new_user_register" />
 			<key name="houzez_subject_admin_new_user_register" />
 			<key name="houzez_admin_new_user_register" />
-			<key name="houzez_subject_user_register_verification" />
-			<key name="houzez_user_register_verification" />
+			<key name="houzez_subject_user_register_approval" />
+			<key name="houzez_user_register_approval" />
 			<key name="houzez_subject_new_wire_transfer" />
 			<key name="houzez_new_wire_transfer" />
 			<key name="houzez_subject_admin_new_wire_transfer" />
@@ -973,7 +999,6 @@
 			<key name="search_rent_status_for_price_range" />
 			<key name="search_rent_status" />
 			<key name="gdpr-label" />
-			<key name="cal_where" />
 			<key name="schedule_tour_where" />
 			<key name="mark_sold_status" />
 			<key name="gdpr-agreement-content" />

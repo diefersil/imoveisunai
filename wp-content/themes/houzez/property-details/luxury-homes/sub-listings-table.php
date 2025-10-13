@@ -4,24 +4,25 @@ $multi_units  = houzez_get_listing_data('multi_units');
 if (!empty($multi_units)) {
 ?>
 <div class="fw-property-sub-listings-wrap fw-property-section-wrap" id="property-sub-listings-wrap">
-	<div class="block-wrap">
-		<div class="block-title-wrap">
-			<h2><?php echo houzez_option('sps_sub_listings', 'Sub Listings'); ?></h2>
-		</div><!-- block-title-wrap -->
-		<div class="block-content-wrap">
-			<table class="sub-listings-table table-lined responsive-table">
-				<thead>
-					<tr>
-						<th><?php esc_html_e('Title', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Property Type', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Price', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Beds', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Baths', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Property Size', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Availability Date', 'houzez'); ?></th>
-					</tr>
-				</thead>
-				<tbody>
+	<div class="container">
+		<div class="block-wrap">
+			<div class="block-title-wrap">
+				<h2><?php echo houzez_option('sps_sub_listings', 'Sub Listings'); ?></h2>
+			</div><!-- block-title-wrap -->
+			<div class="block-content-wrap">
+				<table class="sub-listings-table table-lined responsive-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e('Title', 'houzez'); ?></th>
+							<th><?php esc_html_e('Property Type', 'houzez'); ?></th>
+							<th><?php esc_html_e('Price', 'houzez'); ?></th>
+							<th><?php esc_html_e('Beds', 'houzez'); ?></th>
+							<th><?php esc_html_e('Baths', 'houzez'); ?></th>
+							<th><?php esc_html_e('Property Size', 'houzez'); ?></th>
+							<th><?php esc_html_e('Availability Date', 'houzez'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
 
 					<?php 
 					$mu_price_postfix = '';
@@ -45,10 +46,10 @@ if (!empty($multi_units)) {
 							<td data-label="<?php esc_html_e('Availability Date', 'houzez'); ?>"><?php echo esc_attr( $mu['fave_mu_availability_date'] ); ?></td>
 						</tr>
 					<?php endforeach; ?>
-					
-				</tbody>
-			</table>
-		</div><!-- block-content-wrap -->
-	</div><!-- block-wrap -->
+					</tbody>
+				</table>
+			</div><!-- block-content-wrap -->
+		</div><!-- block-wrap -->
+	</div><!-- container -->
 </div><!-- property-address-wrap -->
 <?php } ?>

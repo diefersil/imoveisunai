@@ -14,10 +14,10 @@ Redux::setSection( $houzez_opt_name, array(
             'subtitle' => esc_html__('Choose sidebar position for listing templates', 'houzez'),
             'desc' => '',
             'options'  => array(
-                'sbor'   => esc_html__( 'Sidebar on Right ', 'houzez' ),
-                'wrap-order-first' => esc_html__( 'Sidebar on Left', 'houzez' ),
+                'right-sidebar' => esc_html__( 'Sidebar on Right ', 'houzez' ),
+                'left-sidebar' => esc_html__( 'Sidebar on Left', 'houzez' ),
             ),
-            'default'  => 'sbor',
+            'default'  => 'right-sidebar',
         ),
         array(
             'id'       => 'listing_pagination',
@@ -30,6 +30,15 @@ Redux::setSection( $houzez_opt_name, array(
                 '_loadmore' => esc_html__('Load More', 'houzez'), 
                 '_infinite' => esc_html__('Infinite Scroll', 'houzez'), 
             ), 
+        ),
+        array(
+            'id'       => 'listing_show_all_listings_on_map',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Show All Listings on Map', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable to show all listings on page header map if header map enabled when add listings template', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
         ),
         array(
             'id'       => 'listing_link_target',
@@ -218,7 +227,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'      => 'listing_buttons_composer',
             'type'    => 'sorter',
             'title'   => 'Listing v4 & v7 Buttons',
-            'subtitle'    => esc_html__( 'Maximum 4 options allowed. For listings list v4 only top 3 options will show.', 'houzez' ),
+            'subtitle'    => esc_html__( 'Maximum 3 options allowed. For listings list v4 only top 3 options will show.', 'houzez' ),
             'desc'    => esc_html__( 'Drag and drop layout manager, to quickly organize.
 ', 'houzez' ),
             'options' => array(
@@ -281,6 +290,7 @@ Redux::setSection( $houzez_opt_name, array(
             'default'  => 0,
             'on'       => esc_html__( 'Yes', 'houzez' ),
             'off'      => esc_html__( 'No', 'houzez' ),
+            'required' => array('disable_property_gallery', '=', '1'),
         ),
 
         array(
@@ -294,8 +304,18 @@ Redux::setSection( $houzez_opt_name, array(
                 'on_hover' => esc_html__('Show Gallery on Hover', 'houzez'),
              ), 
             'required' => array('disable_property_gallery', '=', '1'),
-            'default' => 'on_hover'
-        ) 
+            'default' => 'houzez-show-gallery'
+        ),
+        array(
+            'id'       => 'gallery_images_limit',
+            'type'     => 'text',
+            'title'    => esc_html__('Number of Gallery Images', 'houzez'),
+            'subtitle' => esc_html__('Enter the number of images to show in gallery. Use -1 to show all images', 'houzez'),
+            'default'  => 10,
+            'validate' => array( 'numeric' ),
+            'required' => array('disable_property_gallery', '=', '1'),
+        ),
+        
     )
 ));
 
@@ -308,7 +328,7 @@ $default_fields [] = array(
     'subtitle' => '',
     'options'  => array(
         'houzez-default'   => esc_html__( 'Houzez Default Icons', 'houzez' ),
-        'font-awesome'   => esc_html__( 'Fontawesome Icons v5', 'houzez' ),
+        'font-awesome'   => esc_html__( 'Font Awesome Icons v6.7.2', 'houzez' ),
         'custom'   => esc_html__( 'Custom Image Icons', 'houzez' ),
     ),
     'default'  => 'houzez-default',

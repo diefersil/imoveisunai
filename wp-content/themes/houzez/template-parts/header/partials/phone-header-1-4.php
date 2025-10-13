@@ -1,7 +1,13 @@
-<?php 
-$header = houzez_option('header_style'); 
-if( !empty(houzez_option('hd1_4_phone')) && houzez_option('hd1_4_phone_enable', 0) && ( $header == 1 || $header == 4 ) ) { ?>
-<li class="btn-phone-number">
-	<a href="tel:<?php echo houzez_option('hd1_4_phone'); ?>"><i class="houzez-icon icon-phone-actions-ring mr-1"></i> <?php echo houzez_option('hd1_4_phone'); ?></a>
+<?php
+$header = houzez_option('header_style');
+$phone_number = houzez_option('hd1_4_phone');
+$phone_enabled = houzez_option('hd1_4_phone_enable', 0);
+
+if (!empty($phone_number) && $phone_enabled && ($header == 1 || $header == 4)) { ?> 
+<li class="btn-phone-number" role="none">
+	<a href="tel:<?php echo esc_attr($phone_number); ?>" role="menuitem">
+		<i class="houzez-icon icon-phone-actions-ring me-1" aria-hidden="true"></i>
+		<span><?php echo esc_html($phone_number); ?></span>
+	</a>
 </li>
 <?php } ?>

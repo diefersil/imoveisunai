@@ -44,9 +44,9 @@ if(houzez_option('price_range_mobile')) {
 <section id="overlay-search-advanced-module" class="overlay-search-advanced-module <?php echo esc_attr($search_class); ?>">
 	<div class="search-title">
 		<?php esc_html_e('Search', 'houzez'); ?>
-		<button type="button" class="btn overlay-search-module-close"><i class="houzez-icon icon-close"></i></button>
+		<button type="button" class="btn overlay-search-module-close"><i class="houzez-icon icon-close hz-navigation-close"></i></button>
 	</div>
-	<form class="houzez-search-form-js <?php echo esc_attr($ajax_url_update); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
+	<form id="mobile-search-form" class="houzez-search-form-js <?php echo esc_attr($ajax_url_update); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
 
 		<?php do_action('houzez_search_hidden_fields'); ?>
 		
@@ -94,7 +94,7 @@ if(houzez_option('price_range_mobile')) {
 				} else {
 
 					echo '<div class="'.esc_attr($field_class).'">';
-						houzez_get_custom_search_field($key);
+						Houzez_Property_Search::get_custom_search_field($key);
 					echo '</div>';
 					
 				}
@@ -105,8 +105,8 @@ if(houzez_option('price_range_mobile')) {
 		<div class="col-12">
 			<?php get_template_part('template-parts/search/fields/currency'); ?>
 		</div>
-		<div class="col-12">
-			<?php get_template_part('template-parts/search/fields/price-range'); ?>
+		<div class="col-12 mb-4">
+			<?php get_template_part('template-parts/search/fields/price', 'range', array('unique_id' => 'price_range_mobile')); ?>
 		</div>
 		<?php } ?>
 
@@ -121,6 +121,9 @@ if(houzez_option('price_range_mobile')) {
 		</div>
 		<div class="col-12">
 			<?php get_template_part('template-parts/search/fields/save-search-btn-mobile'); ?>
+		</div>
+		<div class="col-12">
+			<?php get_template_part('template-parts/search/fields/reset-btn'); ?>
 		</div>
 	
 	</div><!-- row -->

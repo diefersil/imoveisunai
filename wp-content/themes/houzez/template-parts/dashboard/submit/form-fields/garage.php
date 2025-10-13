@@ -1,8 +1,8 @@
-<div class="form-group">
-	<label for="prop_garage">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_garage">
 		<?php echo houzez_option('cl_garage', 'Garages').houzez_required_field('garages'); ?>
 	</label>
-	<input class="form-control" id="prop_garage" <?php houzez_required_field_2('garages'); ?> name="prop_garage" value="<?php
+	<input class="form-control" id="property_garage" <?php houzez_required_field_2('garages'); ?> name="property_garage" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_garage');
     }

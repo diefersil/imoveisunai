@@ -1,5 +1,5 @@
 <?php
-namespace Houzez\Elementor\Widgets\HeaderFooter;
+namespace Elementor;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
@@ -70,7 +70,20 @@ class Houzez_Lang_Switcher extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'houzez-elements', 'houzez-header-footer' ];
+        // Check if the current post type is 'fts_builder'
+        if (get_post_type() === 'fts_builder') {
+            // Get the template type of the current post
+            $template_type = htb_get_template_type(get_the_ID());
+
+            // Check if the template type is 'tmp_header' or 'tmp_footer'
+            if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+                // Return the specific category for header and footer builders
+                return ['houzez-header-footer-builder'];
+            }
+        }
+        
+        // Return the default categories
+        return ['houzez-elements', 'houzez-header-footer'];
     }
 
     /**
@@ -221,12 +234,12 @@ class Houzez_Lang_Switcher extends Widget_Base {
         }
 		?>
 		<div class="houzez-lang-ele">
-            <a class="btn dropdown-toggle" href="#" role="button" id="languageDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="btn dropdown-toggle" href="#" role="button" id="languageDropdown" data-bs-toggle="dropdown" aria-bs-haspopup="true" aria-bs-expanded="false">
                 <i class="houzez-icon houzez-icon-earth-1"></i> 
                 <?php //echo $flag; ?>
                 <?php echo $current_lang; ?>
             </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageDropdown">
+            <div class="dropdown-menu dropdown-menu-right" aria-bs-labelledby="languageDropdown">
                 <?php
                 if ( $languages && function_exists( 'pll_the_languages' ) ) { 
                     

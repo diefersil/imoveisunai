@@ -49,8 +49,8 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 ?>
 <div class="advanced-search search-expandable-wrap">
 	<div class="container">
-		<div class="search-expandable-label" data-toggle="collapse" href="#search-expandable-collapse">
-			<?php echo houzez_option('srh_dock_title', 'Advanced Search'); ?> <i class="houzez-icon icon-arrow-down-1 float-right"></i>
+		<div class="search-expandable-label" data-bs-toggle="collapse" href="#search-expandable-collapse">
+			<?php echo houzez_option('srh_dock_title', 'Advanced Search'); ?> <i class="houzez-icon icon-arrow-down-1 float-end"></i>
 		</div><!-- search-expandable-label -->
 	</div><!-- container -->
 	<div class="container">
@@ -60,7 +60,7 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 					<div class="row">
 						<div class="col-lg-9 col-md-12">
 							<div class="advanced-search-v1 <?php echo esc_attr($is_geolocation); ?>">
-								<div class="d-flex">
+								<div class="d-flex flex-wrap gap-2">
 									<?php
 									$i = 0;
 									if ($layout) {
@@ -102,7 +102,7 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 											} else {
 
 												echo '<div class="'.$common_class.' '.$class_flex_grow.'">';
-													houzez_get_custom_search_field($key);
+													Houzez_Property_Search::get_custom_search_field($key);
 												echo '</div>';
 												
 											}
@@ -126,13 +126,13 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 							</div><!-- advanced-search-v1 -->
 						</div>	
 						<div class="col-lg-3 col-md-12">
-							<div class="flex-search search-expandable-search-button">
+							<div class="flex-search search-expandable-search-button mb-2 p-0">
 								<?php get_template_part('template-parts/search/fields/submit-button'); ?>
 							</div><!-- flex-search -->
 							<?php if( houzez_option('dock_search_other_features') ) { ?>
-							<div class="flex-search search-expandable-search-button">					
-								<button class="btn advanced-search-btn btn-full-width" type="button" data-toggle="collapse" href="#features-list">
-									<i class="houzez-icon icon-cog mr-1"></i> <?php echo houzez_option('srh_btn_more', 'More Options'); ?> 
+							<div class="flex-search p-0">					
+								<button class="btn advanced-search-btn w-100" type="button" data-bs-toggle="collapse" href="#features-list">
+									<i class="houzez-icon icon-cog me-1"></i> <?php echo houzez_option('srh_btn_more', 'More Options'); ?> 
 								</button>
 							</div><!-- flex-search -->
 							<?php } ?>

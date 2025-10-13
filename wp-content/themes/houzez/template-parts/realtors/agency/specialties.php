@@ -5,6 +5,6 @@ $agency_specialties = get_post_meta( get_the_ID(), 'fave_agency_specialties', tr
 if( !empty( $agency_specialties ) ) { ?>
 	<li>
 		<strong><?php echo $houzez_local['specialties_label']; ?>:</strong> 
-		<?php echo esc_attr( $agency_specialties ); ?>
+		<span itemprop="knowsAbout"><?php echo esc_attr( $agency_specialties ); ?></span>
 	</li>
 <?php } ?>

@@ -14,6 +14,7 @@ class Module extends Module_Base {
 		parent::__construct();
 
 		add_action( 'elementor/frontend/after_register_styles', [ $this, 'register_styles' ] );
+		add_action( 'elementor/preview/enqueue_styles', [ $this, 'enqueue_preview_styles' ] );
 	}
 
 	public function get_widgets() {
@@ -53,5 +54,23 @@ class Module extends Module_Base {
 			[ 'elementor-frontend' ],
 			$has_custom_breakpoints ? null : ELEMENTOR_PRO_VERSION
 		);
+
+		wp_register_style(
+			'e-transitions',
+			$this->get_css_assets_url( 'transitions', 'assets/css/conditionals/', true ),
+			[],
+			ELEMENTOR_PRO_VERSION
+		);
+
+		wp_register_style(
+			'e-ribbon',
+			$this->get_css_assets_url( 'ribbon', 'assets/css/conditionals/', true ),
+			[],
+			ELEMENTOR_PRO_VERSION
+		);
+	}
+
+	public function enqueue_preview_styles() {
+		wp_enqueue_style( 'e-ribbon' );
 	}
 }

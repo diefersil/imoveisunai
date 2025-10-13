@@ -10,7 +10,7 @@ if ( !is_user_logged_in() ) {
     wp_redirect(  home_url() );
 }
 
-global $wpdb, $houzez_local;
+global $wpdb, $houzez_local, $houzez_search_data;
 
 $userID = get_current_user_id();
 
@@ -22,65 +22,51 @@ $sql = $wpdb->prepare(
 
 $results = $wpdb->get_results($sql, OBJECT);
 
-get_header(); ?>
+get_header('dashboard'); ?>
 
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_saved_searches', 'Saved Searches'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
 
-            <?php
-            if ( sizeof( $results ) !== 0 ) : ?>
+    <div class="dashboard-content">
+        <div class="heading d-flex align-items-center justify-content-between">
+            <div class="heading-text">
+                <h2><?php echo houzez_option('dsh_saved_searches', 'Saved Searches'); ?></h2> 
+            </div>
+        </div>
 
-                <table class="dashboard-table table-lined responsive-table">
-                    <thead>
-                        <tr>
-                            <th><?php echo esc_html__('Search Parameters', 'houzez'); ?></th>
-                            <th class="action-col"><?php echo esc_html__('Actions', 'houzez'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    <?php
-                    foreach ( $results as $houzez_search_data ) :
-
-                        get_template_part( 'template-parts/dashboard/saved-search-item' );
-
-                    endforeach;
+        <?php
+        if ( sizeof( $results ) !== 0 ) : ?>
+        <div class="houzez-data-content mt-4"> 
+        <div class="houzez-data-table">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle m-0">
+                <thead>
+                    <tr>
+                    <th><?php echo esc_html__('Search Parameters', 'houzez'); ?></th>
+                    <th><?php echo esc_html__('Actions', 'houzez'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    foreach ($results as $houzez_search_data) {
+                        get_template_part('template-parts/dashboard/saved-search-item');
+                    }
                     ?>
-
-                    </tbody>
+                </tbody>
                 </table>
+            </div>
+            </div>
+        </div> 
+        <?php else : ?>
+        <div class="stats-box">
+            <?php echo esc_html__('You don\'t have any saved search listed.', 'houzez'); ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
 
-            <?php
-            else :
-
-                echo '<div class="dashboard-content-block">
-                        '.esc_html__("You don't have any saved search.", 'houzez').'
-                    </div>';
-
-            endif;
-
-            ?>
-            
-
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
-
-    
-<?php get_footer(); ?>
+<?php get_footer('dashboard'); ?>

@@ -57,7 +57,7 @@ if ($layout): foreach ($layout as $key=>$value) {
 
         case 'review':
             if( houzez_option( 'property_reviews' ) ) {
-                get_template_part('property-details/reviews');
+                get_template_part('property-details/luxury-homes/reviews');
             }
             break;
 

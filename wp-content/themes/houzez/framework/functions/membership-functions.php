@@ -109,6 +109,8 @@ if( !function_exists('houzez_register_user_with_membership') ) {
             $user_pass = wp_generate_password( $length=12, $include_standard_special_chars=false );
         }
 
+        do_action('houzez_before_register');
+
         $user_id = wp_create_user( $username, $user_pass, $email );
 
 
@@ -117,9 +119,16 @@ if( !function_exists('houzez_register_user_with_membership') ) {
         if( $user_id ) {
             update_user_meta( $user_id, 'first_name', $first_name );
             update_user_meta( $user_id, 'last_name', $last_name );
-            wp_update_user( array( 'ID' => $user_id, 'role' => $user_role ) );
+
+
+            // assign role
+            $user = new WP_User( $user_id );
+            $user->set_role( $user_role );
 
             houzez_wp_new_user_notification( $user_id, $user_pass, $phone_number );
+
+            do_action('houzez_after_register', $user_id);
+
             $user_as_agent = houzez_option('user_as_agent');
             if( $user_as_agent == 'yes' ) {
                 if ($user_role == 'houzez_agent' || $user_role == 'author') {
@@ -781,146 +790,6 @@ if( !function_exists('houzez_2checkout_payment') ) {
     }
 }
 
-/* -----------------------------------------------------------------------------------------------------------
-*  Stripe Form for membership - deprecated since v2.3.9
--------------------------------------------------------------------------------------------------------------*/
-if( !function_exists('houzez_stripe_payment_membership') ) {
-    function houzez_stripe_payment_membership( $pack_id, $pack_price, $title ) {
-
-        require_once( get_template_directory() . '/framework/stripe-php/init.php' );
-        $stripe_secret_key = houzez_option('stripe_secret_key');
-        $stripe_publishable_key = houzez_option('stripe_publishable_key');
-
-        $current_user = wp_get_current_user();
-
-        $userID = $current_user->ID;
-        $user_login = $current_user->user_login;
-        $user_email = get_the_author_meta('user_email', $userID);
-
-        $stripe = array(
-            "secret_key" => $stripe_secret_key,
-            "publishable_key" => $stripe_publishable_key
-        );
-
-        \Stripe\Stripe::setApiKey($stripe['secret_key']);
-
-        $submission_currency = houzez_option('currency_paid_submission');
-
-        if( $submission_currency == 'JPY') {
-            $package_price_for_stripe = $pack_price;
-        } else if( $submission_currency == 'BHD' || $submission_currency == 'KWD' ) {
-            $package_price_for_stripe = round($pack_price * 100) * 10;
-        } else {
-            $package_price_for_stripe = $pack_price * 100;
-        }
-
-        print '
-            <div class="houzez_stripe_membership " id="'.  sanitize_title($title).'">
-                <script src="https://checkout.stripe.com/checkout.js" id="stripe_script"
-                class="stripe-button"
-                data-key="'. $stripe_publishable_key.'"
-                data-amount="'.$package_price_for_stripe.'"
-                data-email="'.$user_email.'"
-                data-currency="'.$submission_currency.'"
-                data-zip-code="true"
-                data-locale="'.get_locale().'"
-                data-billing-address="true"
-                data-label="'.__('Pay with Credit Card','houzez').'"
-                data-description="'.$title.' '.__('Package Payment','houzez').'">
-                </script>
-            </div>
-            <input type="hidden" id="pack_id" name="pack_id" value="' . $pack_id . '">
-            <input type="hidden" name="userID" value="' . $userID . '">
-            <input type="hidden" id="pay_ammout" name="pay_ammout" value="' . $package_price_for_stripe . '">';
-    }
-}
-/* -----------------------------------------------------------------------------------------------------------
-*  Stripe Form Per Listing - Deprecated since v2.3.9
--------------------------------------------------------------------------------------------------------------*/
-if( !function_exists('houzez_stripe_payment_perlisting') ) {
-    function houzez_stripe_payment_perlisting( $postID, $price_submission, $price_featured_submission ) {
-
-        require_once( get_template_directory() . '/framework/stripe-php/init.php' );
-        $stripe_secret_key = houzez_option('stripe_secret_key');
-        $stripe_publishable_key = houzez_option('stripe_publishable_key');
-
-        $stripe = array(
-            "secret_key" => $stripe_secret_key,
-            "publishable_key" => $stripe_publishable_key
-        );
-
-        \Stripe\Stripe::setApiKey($stripe['secret_key']);
-        $processor_link = houzez_get_template_link('template/template-stripe-charge.php');
-        $submission_currency = houzez_option('currency_paid_submission');
-        $current_user = wp_get_current_user();
-        $userID = $current_user->ID;
-        $user_email = $current_user->user_email;
-
-        $price_submission_total = $price_submission + $price_featured_submission;
-
-        if ($submission_currency == 'JPY') {
-            $price_submission_total = $price_submission_total;
-        } else if( $submission_currency == 'BHD' || $submission_currency == 'KWD' ) {
-            $package_price_for_stripe = round($price_submission_total * 100) * 10;
-        } else {
-            $price_submission_total = $price_submission_total * 100;
-        }
-
-        if( isset($_GET['upgrade_id']) && $_GET['upgrade_id'] != '' ) {
-            if( $submission_currency == 'JPY') {
-                $price_submission = $price_featured_submission;
-            } else if( $submission_currency == 'BHD' || $submission_currency == 'KWD' ) {
-                $package_price_for_stripe = round($price_featured_submission * 100) * 10;
-            } else {
-                $price_submission = $price_featured_submission * 100;
-            }
-        } else {
-            if( $submission_currency == 'JPY') {
-                $price_submission = $price_submission;
-            } else if( $submission_currency == 'BHD' || $submission_currency == 'KWD' ) {
-                $price_submission = round($price_submission * 100) * 10;
-            } else {
-                $price_submission = $price_submission * 100;
-            }
-        }
-
-        print '
-        <div class="houzez_stripe_simple">
-            <script src="https://checkout.stripe.com/checkout.js"
-            class="stripe-button"
-            data-key="' . $stripe_publishable_key . '"
-            data-amount="' . $price_submission . '"
-            data-email="' . $user_email . '"
-            data-zip-code="true"
-            data-billing-address="true"
-            data-locale="'.get_locale().'"
-            data-currency="' . $submission_currency . '"
-            data-label="' . esc_html__('Pay with Credit Card', 'houzez') . '"
-            data-description="' . esc_html__('Submission Payment', 'houzez') . '">
-            </script>
-        </div>
-        <input type="hidden" id="propID" name="propID" value="' . $postID . '">
-        <input type="hidden" id="submission_pay" name="submission_pay" value="1">
-        <input type="hidden" name="userID" value="' . $userID . '">
-        <input type="hidden" id="pay_ammout" name="pay_ammout" value="' . $price_submission . '">
-
-        <div class="houzez_stripe_simple_featured">
-            <script src="https://checkout.stripe.com/checkout.js"
-            class="stripe-button"
-            data-key="' . $stripe_publishable_key . '"
-            data-amount="' . $price_submission_total . '"
-            data-email="' . $user_email . '"
-            data-zip-code="true"
-            data-billing-address="true"
-            data-locale="'.get_locale().'"
-            data-currency="' . $submission_currency . '"
-            data-label="' . esc_html__('Pay with Credit Card', 'houzez') . '"
-            data-description="' . esc_html__('Submission & Featured Payment', 'houzez') . '">
-            </script>
-        </div>';
-    }
-}
-
 
 if( ! function_exists( 'houzez_stripe_product_exists' ) ) {
     function houzez_stripe_product_exists( $product_id ) {
@@ -1051,144 +920,6 @@ if( ! function_exists( 'houzez_stripe_create_plan' ) ) {
     }
 }
 
-/*-----------------------------------------------------------------------------------*/
-// Property Stripe payment for package
-/*-----------------------------------------------------------------------------------*/
-add_action('wp_ajax_houzez_stripe_package_payment_original_12_june_2024', 'houzez_stripe_package_payment_original_12_june_2024');
-if( ! function_exists( 'houzez_stripe_package_payment_original_12_june_2024' ) ) {
-    function houzez_stripe_package_payment_original_12_june_2024() {
-        require_once( get_template_directory() . '/framework/stripe-php/init.php' );
-        $stripe_secret_key = houzez_option('stripe_secret_key');
-        $stripe_publishable_key = houzez_option('stripe_publishable_key');
-
-        $stripe = array(
-            "secret_key" => $stripe_secret_key,
-            "publishable_key" => $stripe_publishable_key
-        );
-
-        \Stripe\Stripe::setApiKey($stripe['secret_key']);
-
-        $currency    = houzez_option('currency_paid_submission');
-        $blogInfo    = get_bloginfo('name');
-        $userID      = get_current_user_id();
-        $package_id  = intval($_POST['package_id']);
-
-        $planId = get_post_meta( $package_id, 'fave_package_stripe_id', true );
-        $tax_rate_id = get_post_meta( $package_id, 'fave_stripe_taxId', true );
-        $is_stripe_recurring   = sanitize_text_field( wp_unslash( $_POST['is_stripe_recurring'] ) );
-
-        $return_link  =  houzez_get_template_link('template/template-stripe-charge.php');
-        $cancelled_link  =  houzez_get_template_link('template/template-payment.php');
-        $product_title     = get_the_title( $package_id );
-        $product_image_url = get_the_post_thumbnail_url( $package_id, 'large' );
-
-        $api_error = '';
-
-        try {
-
-            if( $is_stripe_recurring == "true" && ! empty( $planId ) ) {
-
-                $data = [
-                    'success_url' => $return_link . '?houzez_stripe_recurring=1&is_houzez_membership=1&mode=package&pack_id='.esc_attr($package_id).'&success=1&session_id={CHECKOUT_SESSION_ID}',
-                    'cancel_url' => $cancelled_link . '?selected_package=' .$package_id. '&cancel=1',
-                    'payment_method_types' => [
-                      'card',
-                    ],
-                    'subscription_data' => [
-                        'items' => [[
-                            'plan' => $planId,
-                        ]],
-                        'metadata' => [
-                            'payment_type' => 'subscription_fee',
-                            'userID' => get_current_user_id(),
-                            'package_id' => esc_attr($package_id)
-                        ],
-                    ],
-                    'locale' => 'auto',
-                    "metadata" => [
-                        'payment_type' => 'subscription_fee',
-                        'userID' => get_current_user_id(),
-                        'package_id' => esc_attr($package_id)
-                    ],
-                ];
-
-                if($tax_rate_id != null && !empty(trim($tax_rate_id))){
-                    $data['subscription_data']['default_tax_rates'] = [$tax_rate_id];
-                }
-
-                $checkout_session = \Stripe\Checkout\Session::create($data);
-
-            } else {
-
-                $amount  = get_post_meta( $package_id, 'fave_package_price', true );
-
-                if( in_array( $currency, houzez_stripe_zero_decimal_currencies() ) ) {
-                    $amount = $amount;
-                } else if( in_array( $currency, houzez_stripe_3digits_currencies() ) ) {
-                    $amount = round($amount * 100) * 10;
-                } else {
-                    $amount = round( $amount * 100, 2 );
-                }
-
-                $product_data = array( 'name' => esc_html( $product_title ) );
-                if ( ! empty( $product_image_url ) ) {
-                    $product_data['images'] = array( esc_url( $product_image_url ) );
-                }
-
-                $data = array(
-                    'payment_method_types' => array( 'card' ),
-                    'line_items' => array(
-                        array(
-                            'price_data' => array(
-                                'currency'     => $currency,
-                                'unit_amount'  => $amount,
-                                'product_data' => $product_data,
-                            ),
-                            'quantity'   => 1,
-                        ),
-                    ),
-                    'locale' => 'auto',
-                    "metadata" => [
-                        'user_id'     => get_current_user_id(),
-                        "package_id"  => $package_id,
-                        "title"       => get_the_title($package_id),
-                    ],
-                    'mode'        => 'payment',
-                    'success_url' => $return_link . '?is_houzez_membership=0&mode=simple_package&pack_id='.esc_attr($package_id).'&success=1&session_id={CHECKOUT_SESSION_ID}',
-                    'cancel_url' => $cancelled_link . '?selected_package=' .$package_id. '&cancel=1',
-                );
-
-                if($tax_rate_id != null && !empty(trim($tax_rate_id))){
-                    $data['line_items'][0]['tax_rates'] = [$tax_rate_id];
-                }
-
-                $checkout_session = \Stripe\Checkout\Session::create($data);
-                
-
-            }
-        } catch(Exception $e) {  
-            $api_error = $e->getMessage();  
-        } 
-
-        if( empty($api_error) && $checkout_session ) { 
-            $response = array( 
-                'status' => true, 
-                'message' => esc_html__('Checkout Session created successfully!', 'houzez'), 
-                'sessionId' => $checkout_session['id'],
-                'paymeny_link' => $checkout_session->url
-            ); 
-        }else{ 
-            $response = array( 
-                'status' => false, 
-                'message' => esc_html__('Checkout Session creation failed!', 'houzez').' '.$api_error
-            ); 
-        } 
-        update_user_meta( get_current_user_id(), 'houzez_stripe_temp_session_id', $checkout_session->id );
-        echo json_encode($response);
-        wp_die();
-
-    }
-}
 
 /*-----------------------------------------------------------------------------------*/
 // Property Stripe payment for package - Modified 12 June 2024
@@ -1394,13 +1125,32 @@ if( !function_exists('houzez_property_stripe_payment') ) {
         $submission_currency         =   esc_html( $currency );
         $payment_description        =   esc_html__('Listing payment on ','houzez').$blogInfo;
 
+        // Get tax percentages
+        $tax_percentage_per_listing = floatval(houzez_option('tax_percentage_per_listing'));
+        $tax_percentage_featured = floatval(houzez_option('tax_percentage_featured'));
+        
+        // Calculate taxes
+        $tax_per_listing = 0;
+        $tax_featured = 0;
+        
+        if( !empty($tax_percentage_per_listing) && !empty($price_per_submission) ) {
+            $tax_per_listing = ($tax_percentage_per_listing / 100) * $price_per_submission;
+            $tax_per_listing = round($tax_per_listing, 2);
+        }
+        
+        if( !empty($tax_percentage_featured) && !empty($price_featured_submission) ) {
+            $tax_featured = ($tax_percentage_featured / 100) * $price_featured_submission;
+            $tax_featured = round($tax_featured, 2);
+        }
+
         $with_featured = 0;
         $is_upgrade = 0;
 
         if( $is_prop_featured == 0 ) {
-            $total_price =  number_format( $price_per_submission, 2, '.','' );
+            $total_price = $price_per_submission + $tax_per_listing;
+            $total_price =  number_format( $total_price, 2, '.','' );
         } else {
-            $total_price = $price_per_submission + $price_featured_submission;
+            $total_price = $price_per_submission + $tax_per_listing + $price_featured_submission + $tax_featured;
             $total_price = number_format( $total_price, 2, '.','' );
             $payment_description = __('Submission & Featured Payment on ','houzez').$blogInfo;
             $with_featured = 1;
@@ -1408,7 +1158,8 @@ if( !function_exists('houzez_property_stripe_payment') ) {
         }
 
         if ( $is_prop_upgrade == 1 ) {
-            $total_price     =  number_format($price_featured_submission, 2, '.','');
+            $total_price = $price_featured_submission + $tax_featured;
+            $total_price =  number_format($total_price, 2, '.','');
             $payment_description =   esc_html__('Upgrade to featured listing on ','houzez').$blogInfo;
             $is_upgrade = 1;
         }
@@ -1632,7 +1383,6 @@ if( !function_exists('houzez_property_paypal_payment') ) {
     }
 }
 
-add_action( 'wp_ajax_nopriv_houzez_paypal_package_payment', 'houzez_paypal_package_payment' );
 add_action( 'wp_ajax_houzez_paypal_package_payment', 'houzez_paypal_package_payment' );
 
 if( !function_exists('houzez_paypal_package_payment') ) {
@@ -1744,7 +1494,6 @@ if( !function_exists('houzez_paypal_package_payment') ) {
 /* -----------------------------------------------------------------------------------------------------------
 *  Recurring paypal payment Rest API
 -------------------------------------------------------------------------------------------------------------*/
-add_action( 'wp_ajax_nopriv_houzez_recuring_paypal_package_payment', 'houzez_recuring_paypal_package_payment' );
 add_action( 'wp_ajax_houzez_recuring_paypal_package_payment', 'houzez_recuring_paypal_package_payment' );
 
 if( !function_exists('houzez_recuring_paypal_package_payment') ) {
@@ -2249,114 +1998,246 @@ endif; // end
 /* -----------------------------------------------------------------------------------------------------------
  *  Houzez property actions
  -------------------------------------------------------------------------------------------------------------*/
+// add_action( 'wp_ajax_houzez_property_actions', 'houzez_property_actions' );
+
+// if( !function_exists('houzez_property_actions') ):
+//     function  houzez_property_actions(){
+//         $userID = get_current_user_id();
+
+//         $packageUserId = $userID;
+//         $agent_agency_id = houzez_get_agent_agency_id( $userID );
+//         if( $agent_agency_id ) {
+//             $packageUserId = $agent_agency_id;
+//         }
+
+
+//         $prop_id = intval( $_POST['propid'] );
+//         $type = $_POST['type'];
+
+//         if( $type == 'set_featured' ) {
+//             update_post_meta( $prop_id, 'fave_featured', 1 );
+//         } else if ( $type == 'remove_featured' ) {
+//             update_post_meta( $prop_id, 'fave_featured', 0 );
+
+//         } else if ( $type == 'approve' ) {
+
+//             $listing_status = get_post_status($prop_id); // get listing status before publish.
+
+//             $listing_data = array(
+//                 'ID' => $prop_id,
+//                 'post_status' => 'publish'
+//             );
+//             wp_update_post($listing_data);
+
+//             $author_id  = get_post_field ('post_author', $prop_id);
+//             $user       = get_user_by('id', $author_id );
+//             $user_email = $user->user_email;
+
+//             $args = array(
+//                 'listing_title' => get_the_title($prop_id),
+//                 'listing_url' => get_permalink($prop_id)
+//             );
+//             houzez_email_type( $user_email,'listing_approved', $args );
+
+//             if( $listing_status == 'disapproved' && houzez_get_remaining_listings($author_id) > 0 ) {
+//                 houzez_update_package_listings($author_id);
+//             }
+
+//         } else if ( $type == 'disapprove' ) {
+
+//             $listing_data = array(
+//                 'ID' => $prop_id,
+//                 'post_status' => 'disapproved'
+//             );
+//             wp_update_post($listing_data);
+
+//             $author_id  = get_post_field ('post_author', $prop_id);
+//             $user       = get_user_by('id', $author_id );
+//             $user_email = $user->user_email;
+
+//             $args = array(
+//                 'listing_title' => get_the_title($prop_id),
+//                 'listing_url' => get_permalink($prop_id)
+//             );
+//             houzez_email_type( $user_email,'listing_disapproved', $args );
+
+//             $package_id = get_the_author_meta('package_id', $author_id );
+//             $user_package_listings = get_the_author_meta('package_listings', $author_id );
+//             $packagelistings = get_post_meta($package_id, 'fave_package_listings', true);
+
+//             if( $user_package_listings < $packagelistings ) {
+//                 update_user_meta( $author_id, 'package_listings', $user_package_listings+1 );
+//             }
+
+//         } else if ( $type == 'expire' ) {
+
+//             $listing_data = array(
+//                 'ID' => $prop_id,
+//                 'post_status' => 'expired'
+//             );
+//             wp_update_post($listing_data);
+
+//             houzez_listing_expire_meta($prop_id);
+
+//             $author_id   = get_post_field ('post_author', $prop_id);
+//             $user        = get_user_by('id', $author_id );
+//             $user_email  = $user->user_email;
+
+//             $args = array(
+//                 'listing_title' => get_the_title($prop_id),
+//                 'listing_url' => get_permalink($prop_id)
+//             );
+//             houzez_email_type( $user_email,'listing_expired', $args );
+
+//         } else if ( $type == 'publish' ) {
+
+//             $listing_data = array(
+//                 'ID' => $prop_id,
+//                 'post_status' => 'publish',
+//                 'post_date' => current_time('mysql'), // Update to current local date and time
+//                 'post_date_gmt' => get_gmt_from_date(current_time('mysql')) // Update to current GMT date and time
+//             );
+//             wp_update_post($listing_data);
+//             update_post_meta($prop_id, 'fave_featured', '0');
+//         }
+
+//         echo json_encode(array('success' => true, 'msg' => ''));
+//         wp_die();
+
+//     }
+// endif; // end
+
 add_action( 'wp_ajax_houzez_property_actions', 'houzez_property_actions' );
+if( !function_exists('houzez_property_actions') ) {
+    function houzez_property_actions() {
+        //check_ajax_referer( 'houzez_property_actions_nonce', 'nonce' );
 
-if( !function_exists('houzez_property_actions') ):
-    function  houzez_property_actions(){
-        $userID = get_current_user_id();
+        $user_id = get_current_user_id();
+        $prop_id = isset( $_POST['propid'] ) ? intval( $_POST['propid'] ) : 0;
+        $type    = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
 
-        $packageUserId = $userID;
-        $agent_agency_id = houzez_get_agent_agency_id( $userID );
-        if( $agent_agency_id ) {
-            $packageUserId = $agent_agency_id;
+        if ( ! $prop_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid property ID.', 'houzez' ) ) );
         }
 
-
-        $prop_id = intval( $_POST['propid'] );
-        $type = $_POST['type'];
-
-        if( $type == 'set_featured' ) {
-            update_post_meta( $prop_id, 'fave_featured', 1 );
-        } else if ( $type == 'remove_featured' ) {
-            update_post_meta( $prop_id, 'fave_featured', 0 );
-
-        } else if ( $type == 'approve' ) {
-
-            $listing_status = get_post_status($prop_id); // get listing status before publish.
-
-            $listing_data = array(
-                'ID' => $prop_id,
-                'post_status' => 'publish'
-            );
-            wp_update_post($listing_data);
-
-            $author_id  = get_post_field ('post_author', $prop_id);
-            $user       = get_user_by('id', $author_id );
-            $user_email = $user->user_email;
-
-            $args = array(
-                'listing_title' => get_the_title($prop_id),
-                'listing_url' => get_permalink($prop_id)
-            );
-            houzez_email_type( $user_email,'listing_approved', $args );
-
-            if( $listing_status == 'disapproved' && houzez_get_remaining_listings($author_id) > 0 ) {
-                houzez_update_package_listings($author_id);
-            }
-
-        } else if ( $type == 'disapprove' ) {
-
-            $listing_data = array(
-                'ID' => $prop_id,
-                'post_status' => 'disapproved'
-            );
-            wp_update_post($listing_data);
-
-            $author_id  = get_post_field ('post_author', $prop_id);
-            $user       = get_user_by('id', $author_id );
-            $user_email = $user->user_email;
-
-            $args = array(
-                'listing_title' => get_the_title($prop_id),
-                'listing_url' => get_permalink($prop_id)
-            );
-            houzez_email_type( $user_email,'listing_disapproved', $args );
-
-            $package_id = get_the_author_meta('package_id', $author_id );
-            $user_package_listings = get_the_author_meta('package_listings', $author_id );
-            $packagelistings = get_post_meta($package_id, 'fave_package_listings', true);
-
-            if( $user_package_listings < $packagelistings ) {
-                update_user_meta( $author_id, 'package_listings', $user_package_listings+1 );
-            }
-
-        } else if ( $type == 'expire' ) {
-
-            $listing_data = array(
-                'ID' => $prop_id,
-                'post_status' => 'expired'
-            );
-            wp_update_post($listing_data);
-
-            houzez_listing_expire_meta($prop_id);
-
-            $author_id   = get_post_field ('post_author', $prop_id);
-            $user        = get_user_by('id', $author_id );
-            $user_email  = $user->user_email;
-
-            $args = array(
-                'listing_title' => get_the_title($prop_id),
-                'listing_url' => get_permalink($prop_id)
-            );
-            houzez_email_type( $user_email,'listing_expired', $args );
-
-        } else if ( $type == 'publish' ) {
-
-            $listing_data = array(
-                'ID' => $prop_id,
-                'post_status' => 'publish',
-                'post_date' => current_time('mysql'), // Update to current local date and time
-                'post_date_gmt' => get_gmt_from_date(current_time('mysql')) // Update to current GMT date and time
-            );
-            wp_update_post($listing_data);
-            update_post_meta($prop_id, 'fave_featured', '0');
+        if ( ! current_user_can( 'edit_post', $prop_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'houzez' ) ) );
         }
 
-        echo json_encode(array('success' => true, 'msg' => ''));
-        wp_die();
-
+        $result = houzez_process_property_action( $prop_id, $type, $user_id );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+        } else {
+            wp_send_json_success( $result );
+        }
     }
-endif; // end
+}
+
+
+
+ /**
+ * Process a property action.
+ *
+ * @param int    $prop_id The property ID.
+ * @param string $type    The action type.
+ * @param int    $user_id The current user ID.
+ *
+ * @return array|WP_Error Result array on success, WP_Error on failure.
+ */
+ if( ! function_exists('houzez_process_property_action') ) {
+    function houzez_process_property_action( $prop_id, $type, $user_id ) {
+        // Retrieve property details
+        $author_id     = get_post_field( 'post_author', $prop_id );
+        $listing_title = get_the_title( $prop_id );
+        $listing_url   = get_permalink( $prop_id );
+
+        switch ( $type ) {
+
+            case 'set_featured':
+                update_post_meta( $prop_id, 'fave_featured', 1 );
+                break;
+
+            case 'remove_featured':
+                update_post_meta( $prop_id, 'fave_featured', 0 );
+                break;
+
+            case 'approve':
+                // Store current status to check later
+                $listing_status = get_post_status( $prop_id );
+
+                // Publish the property
+                wp_update_post( array(
+                    'ID'          => $prop_id,
+                    'post_status' => 'publish',
+                ) );
+
+                // Send approval email
+                $args = array(
+                    'listing_title' => $listing_title,
+                    'listing_url'   => $listing_url,
+                );
+                houzez_email_type( get_userdata( $author_id )->user_email, 'listing_approved', $args );
+
+                // If previously disapproved and user has available listings, update package
+                if ( 'disapproved' === $listing_status && houzez_get_remaining_listings( $author_id ) > 0 ) {
+                    houzez_update_package_listings( $author_id );
+                }
+                break;
+
+            case 'disapprove':
+                wp_update_post( array(
+                    'ID'          => $prop_id,
+                    'post_status' => 'disapproved',
+                ) );
+
+                $args = array(
+                    'listing_title' => $listing_title,
+                    'listing_url'   => $listing_url,
+                );
+                houzez_email_type( get_userdata( $author_id )->user_email, 'listing_disapproved', $args );
+
+                // Adjust package listings if below package limit
+                $package_id            = get_the_author_meta( 'package_id', $author_id );
+                $user_package_listings = (int) get_the_author_meta( 'package_listings', $author_id );
+                $packagelistings       = (int) get_post_meta( $package_id, 'fave_package_listings', true );
+                if ( $user_package_listings < $packagelistings ) {
+                    update_user_meta( $author_id, 'package_listings', $user_package_listings + 1 );
+                }
+                break;
+
+            case 'expire':
+                wp_update_post( array(
+                    'ID'          => $prop_id,
+                    'post_status' => 'expired',
+                ) );
+
+                houzez_listing_expire_meta( $prop_id );
+
+                $args = array(
+                    'listing_title' => $listing_title,
+                    'listing_url'   => $listing_url,
+                );
+                houzez_email_type( get_userdata( $author_id )->user_email, 'listing_expired', $args );
+                break;
+
+            case 'publish':
+                wp_update_post( array(
+                    'ID'             => $prop_id,
+                    'post_status'    => 'publish',
+                    'post_date'      => current_time( 'mysql' ),
+                    'post_date_gmt'  => get_gmt_from_date( current_time( 'mysql' ) ),
+                ) );
+                update_post_meta( $prop_id, 'fave_featured', 0 );
+                break;
+
+            default:
+                return new WP_Error( 'invalid_action', __( 'Invalid action type.', 'houzez' ) );
+        }
+
+        return array( 'success' => true, 'message' => __( 'Action completed successfully.', 'houzez' ) );
+    }
+}
+
 
 if( ! function_exists( 'houzez_update_membership_package' ) ) {
     function houzez_update_membership_package( $user_id, $package_id ) {
@@ -2697,21 +2578,25 @@ if( !function_exists('houzez_get_user_current_package') ) {
             $expired_date = strtotime($pack_date. ' + '.$pack_billing_frequency.' '.$pack_billing_period);
             $expired_date = date_i18n( get_option('date_format').' '.get_option('time_format'),  $expired_date );
            
-            echo '<li>'.esc_html__( 'Your Current Package', 'houzez' ).'<strong>'.esc_attr( $pack_title ).'</strong></li>';
-
+            echo '<div class="membership-inner d-flex align-items-center justify-content-between mb-4">';
+            echo '<h5>'.esc_html__( 'Your Current Package', 'houzez' ).'</h5>';
+            echo '<span class="dashboard-label bg-info">'.esc_attr( $pack_title ).'</span>';
+            echo '</div>';
+            
+            echo '<ul class="list-group list-group-flush">';
+            
             if( $pack_unmilited_listings == 1 ) {
-                echo '<li>'.esc_html__('Listings Included: ','houzez').'<strong>'.esc_html__('unlimited listings ','houzez').'</strong></li>';
-                echo '<li>'.esc_html__('Listings Remaining: ','houzez').'<strong>'.esc_html__('unlimited listings ','houzez').'</strong></li>';
+                echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Listings Included: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_html__('Unlimited','houzez').'</span></li>';
+                echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Listings Remaining: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_html__('Unlimited','houzez').'</span></li>';
             } else {
-                echo '<li>'.esc_html__('Listings Included: ','houzez').'<strong>'.esc_attr( $pack_listings ).'</strong></li>';
-                echo '<li>'.esc_html__('Listings Remaining: ','houzez').'<strong>'.esc_attr( $remaining_listings ).'</strong></li>';
+                echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Listings Included: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_attr( $pack_listings ).'</span></li>';
+                echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Listings Remaining: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_attr( $remaining_listings ).'</span></li>';
             }
-
-            echo '<li>'.esc_html__('Featured Included: ','houzez').'<strong>'.esc_attr( $pack_featured_listings ).'</strong></li>';
-            echo '<li>'.esc_html__('Featured Remaining: ','houzez').'<strong>'.esc_attr( $pack_featured_remaining_listings ).'</strong></li>';
-            echo '<li>'.esc_html__('Ends On','houzez').'<strong>';
-            echo ' '.esc_attr( $expired_date );
-            echo '</strong></li>';
+            
+            echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Featured Included: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_attr( $pack_featured_listings ).'</span></li>';
+            echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Featured Remaining: ','houzez').'<span class="badge bg-info rounded-pill">'.esc_attr( $pack_featured_remaining_listings ).'</span></li>';
+            echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.esc_html__('Ends On','houzez').' <span>'.esc_attr( $expired_date ).'</span></li>';
+            echo '</ul>';
 
         }
     }
@@ -2746,6 +2631,24 @@ if( !function_exists('houzez_direct_pay_per_listing') ) {
         $where_currency            = esc_html( houzez_option('currency_position') );
         $wire_payment_instruction  = houzez_option('direct_payment_instruction');
         $paymentMethod = 'Direct Bank Transfer';
+        
+        // Get tax percentages
+        $tax_percentage_per_listing = floatval(houzez_option('tax_percentage_per_listing'));
+        $tax_percentage_featured = floatval(houzez_option('tax_percentage_featured'));
+        
+        // Calculate taxes
+        $tax_per_listing = 0;
+        $tax_featured = 0;
+        
+        if( !empty($tax_percentage_per_listing) && !empty($price_submission) ) {
+            $tax_per_listing = ($tax_percentage_per_listing / 100) * $price_submission;
+            $tax_per_listing = round($tax_per_listing, 2);
+        }
+        
+        if( !empty($tax_percentage_featured) && !empty($price_featured_submission) ) {
+            $tax_featured = ($tax_percentage_featured / 100) * $price_featured_submission;
+            $tax_featured = round($tax_featured, 2);
+        }
 
         $total_price = 0;
         $time = time();
@@ -2753,13 +2656,13 @@ if( !function_exists('houzez_direct_pay_per_listing') ) {
 
         if($is_featured == 1 ) {
             $invoiceID = houzez_generate_invoice( 'Publish Listing with Featured', 'one_time', $listing_id, $date, $userID, 1, 0, '', $paymentMethod );
-            $total_price = $price_submission + $price_featured_submission;
+            $total_price = $price_submission + $tax_per_listing + $price_featured_submission + $tax_featured;
         } else if( $is_upgrade == 1 ) {
             $invoiceID = houzez_generate_invoice( 'Upgrade to Featured', 'one_time', $listing_id, $date, $userID, 0, 1, '', $paymentMethod );
-            $total_price = $price_featured_submission;
+            $total_price = $price_featured_submission + $tax_featured;
         } else {
             $invoiceID = houzez_generate_invoice( 'Listing', 'one_time', $listing_id, $date, $userID, 0, 0, '', $paymentMethod );
-            $total_price = $price_submission;
+            $total_price = $price_submission + $tax_per_listing;
 
         }
 
@@ -2811,7 +2714,6 @@ if( !function_exists('houzez_direct_pay_per_listing') ) {
 /* -----------------------------------------------------------------------------------------------------------
  *  Wire Transfer Activate Purchase Listing
  -------------------------------------------------------------------------------------------------------------*/
-add_action( 'wp_ajax_nopriv_houzez_activate_purchase_listing', 'houzez_activate_purchase_listing' );
 add_action( 'wp_ajax_houzez_activate_purchase_listing', 'houzez_activate_purchase_listing' );
 
 if( !function_exists('houzez_activate_purchase_listing') ):
@@ -2838,6 +2740,8 @@ if( !function_exists('houzez_activate_purchase_listing') ):
                 'ID'            => $itemID,
                 'post_status'   => 'publish'
             );
+
+            $post_args['post_date'] = current_time( 'mysql' );
             $postID =  wp_update_post( $post_args );
 
         } elseif ( $purchase_type == 2 ) {
@@ -3575,6 +3479,7 @@ if( !function_exists('houzez_cancel_user_membership') ):
 
         $args = array(
             'post_type'   => 'property',
+            'posts_per_page' => -1,
             'post_status' => 'any'
         );
 

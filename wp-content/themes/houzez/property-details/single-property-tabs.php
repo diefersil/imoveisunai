@@ -20,13 +20,12 @@ $floor_plans = get_post_meta( $post->ID, 'floor_plans', true );
 $video_url = get_post_meta( $post->ID, 'fave_video_url', true );
 $virtual_tour = get_post_meta( $post->ID, 'fave_virtual_tour', true );
 
-$tab_end = '</div>';
 $li_start = '<li class="nav-item">';
 $li_end = '</li>';
 ?>
 
 <!--start detail content tabber-->
-<div class="listing-tabs horizontal-listing-tabs">
+<div class="listing-tabs horizontal-listing-tabs" role="tablist">
     <ul class="nav nav-tabs nav-justified">
         <?php
         $i = 0;
@@ -38,21 +37,21 @@ $li_end = '</li>';
 
                 case 'description':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-description" data-toggle="tab">'.houzez_option('sps_description', 'Description').'</a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-description" type="button" role="tab" aria-controls="property-description" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_description', 'Description').'</button>';
                     echo $li_end;
                     $i++;
                     break;
 
                 case 'address':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-address" data-toggle="tab">'.houzez_option('sps_address', 'Address').'</a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-address" type="button" role="tab" aria-controls="property-address" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_address', 'Address').'</button>';
                     echo $li_end;
                     $i++;
                     break;
 
                 case 'details':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-details" data-toggle="tab">'.houzez_option('sps_details', 'Details').'</a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-details" type="button" role="tab" aria-controls="property-details" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_details', 'Details').'</button>';
                     echo $li_end;
                     $i++;
                     break;
@@ -63,7 +62,7 @@ $li_end = '</li>';
 
                     if( ! empty($property_features) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-features" data-toggle="tab">'.houzez_option('sps_features', 'Features').'</a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-features" type="button" role="tab" aria-controls="property-features" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_features', 'Features').'</button>';
                         echo $li_end;
                         $i++;
                     }
@@ -72,7 +71,7 @@ $li_end = '</li>';
                 case 'floor_plans':
                     if( isset($floor_plans[0]['fave_plan_title']) && !empty( $floor_plans[0]['fave_plan_title'] ) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-floor-plans" data-toggle="tab">'.houzez_option('sps_floor_plans', 'Floor Plans').'</a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-floor-plans" type="button" role="tab" aria-controls="property-floor-plans" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_floor_plans', 'Floor Plans').'</button>';
                         echo $li_end;
                         $i++;
                     }
@@ -82,7 +81,7 @@ $li_end = '</li>';
 
                     if( !empty($video_url ) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-video" data-toggle="tab">'.houzez_option('sps_video', 'Video').'</a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-video" type="button" role="tab" aria-controls="property-video" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_video', 'Video').'</button>';
                         echo $li_end;
                         $i++;
                     }
@@ -92,7 +91,7 @@ $li_end = '</li>';
 
                     if( !empty($virtual_tour) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-virtual-tour" data-toggle="tab">'.houzez_option('sps_virtual_tour', '360° Virtual Tour').'</a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-virtual-tour" type="button" role="tab" aria-controls="property-virtual-tour" aria-selected="'.($i == 0 ? 'true' : 'false').'">'.houzez_option('sps_virtual_tour', '360° Virtual Tour').'</button>';
                         echo $li_end;
                         $i++;
                     }
@@ -118,35 +117,35 @@ $li_end = '</li>';
             switch($key) {
 
                 case 'description':
-                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-description" role="tabpanel">';
+                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-description" role="tabpanel" aria-labelledby="property-description-tab">';
                         get_template_part('property-details/description'); 
                     echo '</div>';
                     $j++;
                     break;
 
                 case 'address':
-                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-address" role="tabpanel">';
+                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-address" role="tabpanel" aria-labelledby="property-address-tab">';
                         get_template_part('property-details/address');
                     echo '</div>';
                     $j++;
                     break;
 
                 case 'details':
-                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-details" role="tabpanel">';
+                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-details" role="tabpanel" aria-labelledby="property-details-tab">';
                         get_template_part('property-details/detail');
                     echo '</div>';
                     $j++;
                     break;
 
                 case 'features':
-                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-features" role="tabpanel">';
+                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-features" role="tabpanel" aria-labelledby="property-features-tab">';
                         get_template_part('property-details/features');
                     echo '</div>';
                     $j++;
                     break;
 
                 case 'floor_plans':
-                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-floor-plans" role="tabpanel">';
+                    echo '<div class="tab-pane fade '.$tab_active.'" id="property-floor-plans" role="tabpanel" aria-labelledby="property-floor-plans-tab">';
                         get_template_part('property-details/floor-plans');
                     echo '</div>';
                     $j++;
@@ -155,7 +154,7 @@ $li_end = '</li>';
                 case 'video':
 
                     if( !empty($video_url ) ) {
-                        echo '<div class="tab-pane fade '.$tab_active.'" id="property-video" role="tabpanel">';
+                        echo '<div class="tab-pane fade '.$tab_active.'" id="property-video" role="tabpanel" aria-labelledby="property-video-tab">';
                             get_template_part('property-details/video');
                         echo '</div>';
                         $j++;
@@ -164,7 +163,7 @@ $li_end = '</li>';
 
                 case 'virtual_tour':
                     if( !empty($virtual_tour) ) {
-                        echo '<div class="tab-pane fade '.$tab_active.'" id="property-virtual-tour" role="tabpanel">';
+                        echo '<div class="tab-pane fade '.$tab_active.'" id="property-virtual-tour" role="tabpanel" aria-labelledby="property-virtual-tour-tab">';
                             get_template_part('property-details/virtual-tour');
                         echo '</div>';
                         $j++;

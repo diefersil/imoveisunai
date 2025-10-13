@@ -4,7 +4,7 @@ $energy_class = houzez_get_listing_data('energy_class');
 
 if(!empty($energy_class)) {
 ?>
-<div class="property-energy-class-wrap property-section-wrap" id="property-energy-class-wrap">
+<div class="property-energy-class-wrap property-section-wrap" id="property-energy-class-wrap" role="region">
 	<div class="block-wrap">
 		<div class="block-title-wrap">
 			<h2><?php echo houzez_option('sps_energy_class', 'Energy Class'); ?></h2>

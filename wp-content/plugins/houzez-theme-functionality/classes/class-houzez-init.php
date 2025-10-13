@@ -97,25 +97,9 @@ class Houzez {
         // Shourcodes
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/section-title.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/space.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/search.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v1.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v2.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v3.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v4.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v5.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v6.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v7.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-cards-v8.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-by-id.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-by-ids.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/recent-viewed-properties.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v1.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v2.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v3.php');
+        
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/properties.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v5.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v6.php');
-        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/property-carousel-v7.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/properties-grids.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/grids.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/taxonomies-cards.php');
@@ -127,6 +111,7 @@ class Houzez {
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/agents-grid.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/testimonials.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/testimonials-v2.php');
+        require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/testimonials-v3.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/partners.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/blog-posts.php');
         require_once( HOUZEZ_PLUGIN_PATH . '/shortcodes/blog-posts-carousel.php');
@@ -286,6 +271,7 @@ class Houzez {
     public function init() {
 
         Houzez_Post_Type_Property::init();
+        //Houzez_Post_Type_Project::init();
 
         if(houzez_check_post_types_plugin('houzez_agencies_post')) {
             Houzez_Post_Type_Agency::init();
@@ -362,6 +348,7 @@ class Houzez {
             'import_text' => esc_html__('Import', 'houzez-theme-functionality'),
             'map_fields_text'  => esc_html__('Please map at least one field.', 'houzez-theme-functionality'),
             'error_import'  => esc_html__('Error in Importing Data.', 'houzez-theme-functionality'),
+            'import_nonce' => wp_create_nonce('houzez_import_nonce'),
         );
         wp_localize_script( 'houzez-admin-custom', 'Houzez_admin_vars', $locals ); 
     }
@@ -376,6 +363,7 @@ class Houzez {
     {
         $files = apply_filters( 'houzez_class_loader', array(
             HOUZEZ_PLUGIN_PATH . '/classes/class-property-post-type.php',
+            //HOUZEZ_PLUGIN_PATH . '/classes/class-project-post-type.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-agency-post-type.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-agent-post-type.php',
             HOUZEZ_PLUGIN_PATH . '/classes/class-reviews-post-type.php',
@@ -410,6 +398,7 @@ class Houzez {
 
     public static function houzez_function_loader() {
         $files = apply_filters( 'houzez_function_loader', array(
+            HOUZEZ_PLUGIN_PATH . '/functions/helpers.php',
             HOUZEZ_PLUGIN_PATH . '/functions/functions-rewrite.php',
             HOUZEZ_PLUGIN_PATH . '/functions/functions-options.php',
             HOUZEZ_PLUGIN_PATH . '/functions/functions.php',
@@ -640,8 +629,8 @@ class Houzez {
            id bigint(20) NOT NULL AUTO_INCREMENT,
            auther_id bigint(20) NOT NULL,
            query longtext NOT NULL,
-           email longtext DEFAULT '' NOT NULL,
-           url longtext DEFAULT '' NOT NULL,
+           email longtext NULL,
+           url longtext NULL,
            time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
            UNIQUE KEY id (id)
        ) $charset_collate;";
@@ -670,8 +659,8 @@ class Houzez {
            id bigint(20) NOT NULL AUTO_INCREMENT,
            created_by bigint(20) NOT NULL,
            thread_id bigint(20) NOT NULL,
-           message longtext DEFAULT '' NOT NULL,
-           attachments longtext DEFAULT '' NOT NULL,
+           message longtext NOT NULL,
+           attachments longtext NULL,
            receiver_delete mediumint(9) NOT NULL DEFAULT '0',
            sender_delete mediumint(9) NOT NULL DEFAULT '0',
            time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,

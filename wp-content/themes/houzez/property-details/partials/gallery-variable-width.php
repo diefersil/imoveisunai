@@ -1,63 +1,53 @@
 <?php
-global $post;
-$size = 'houzez-variable-gallery';
-$properties_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
+global $post, $property_gallery_popup_type;
+$images_ids = get_post_meta($post->ID, 'fave_property_images', false);
 $gallery_caption = houzez_option('gallery_caption', 0); 
-$property_gallery_popup_type = houzez_get_popup_gallery_type(); 
-$gallery_token = wp_generate_password(5, false, false);
 $output = '';
 
-if( !empty($properties_images) && count($properties_images)) {
+// Get the dynamically assigned image size for this layout
+$image_size = houzez_get_image_size_for('property_detail_v5');
+
+$builtin_gallery_class = ' houzez-trigger-popup-slider-js';
+$dataModal = 'href="#" data-bs-toggle="modal" data-bs-target="#property-lightbox"';
+
+if( !empty($images_ids) && count($images_ids)) {
 ?>
-<div class="top-gallery-section top-gallery-variable-width-section">
+<div class="top-gallery-section top-gallery-variable-width-section" role="region">
 	
-	<?php 
-    if( $property_gallery_popup_type == "photoswipe" ) { ?>
+	<div class="listing-slider-variable-width houzez-all-slider-wrap">
+		<?php
+		$j = 0;
+		foreach( $images_ids as $image_id ) { $j++;
+			$image_data = wp_get_attachment_image_src($image_id, $image_size);
 
-    	<div id="houzez-photoswipe-gallery-<?php echo esc_attr($gallery_token); ?>" class="listing-slider-variable-width houzez-photoswipe houzez-all-slider-wrap" itemscope itemtype="http://schema.org/ImageGallery">
-			<?php
-	        foreach( $properties_images as $prop_image_id => $prop_image_meta ) {
+			// Skip this iteration if image_data is false
+			if(!$image_data) {
+				continue;
+			}
 
-				$image_dimensions = houzez_get_image_dimensions_by_url($prop_image_meta['full_url']);
-				$width = $image_dimensions['width'];
-				$height = $image_dimensions['height'];
-	  			
-				$output .= '<div itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">';
-				$output .= '<a data-gallery-item href="'.esc_attr( $prop_image_meta['full_url'] ).'" itemprop="contentUrl" data-pswp-width="'.esc_attr($width).'" data-pswp-height="'.esc_attr($height).'">';
-				$output .= '<img class="img-responsive" data-lazy="'.esc_attr( $prop_image_meta['url'] ).'" src="'.esc_attr( $prop_image_meta['url'] ).'" alt="'.esc_attr($prop_image_meta['alt']).'" title="'.esc_attr($prop_image_meta['title']).'">';
-				$output .= '</a>';
+			$image_url = $image_data[0] ?? '';
+			$image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+			$image_title = get_the_title($image_id);
+			$image_caption = wp_get_attachment_caption($image_id);
 
-				if( !empty($prop_image_meta['caption']) && $gallery_caption != 0 ) {
-					$output .= '<span class="hz-image-caption">'.esc_attr($prop_image_meta['caption']).'</span>';
-				}
+			if( $property_gallery_popup_type == 'photoswipe' ) {
+				$full_image= wp_get_attachment_image_src($image_id, 'full');
+				$full_image_url = $full_image[0] ?? '';
+				$dataModal = 'href="#" data-src="'.esc_url($full_image_url).'" data-fancybox="gallery-variable-width"';
+				$builtin_gallery_class = '';
+			}
+			echo '<div>
+				<a href="#" data-slider-no="'.esc_attr($j).'" class="'.$builtin_gallery_class.'" '.$dataModal.'>
+					<img class="img-responsive img-fluid" data-lazy="'.esc_attr( $image_url ).'" src="'.esc_attr( $image_url ).'" alt="'.esc_attr($image_alt).'" title="'.esc_attr($image_title).'">
+				</a>';
 
-				$output .= '</div>';  
-	        }
-	        echo $output; 
-	        ?>
-		</div>
+				if( !empty($image_caption) && $gallery_caption != 0 ) {
+						echo '<span class="hz-image-caption">'.esc_attr($image_caption).'</span>';
+					}
 
-		<?php get_template_part( 'property-details/photoswipe'); ?>
-
-    <?php } else { ?>	
-		<div class="listing-slider-variable-width houzez-all-slider-wrap">
-			<?php
-			$j = 0;
-	        foreach( $properties_images as $prop_image_id => $prop_image_meta ) { $j++;
-	  			
-				echo '<div>
-						<a rel="gallery-1" href="#" data-slider-no="'.esc_attr($j).'" class="houzez-trigger-popup-slider-js swipebox" data-toggle="modal" data-target="#property-lightbox">
-							<img class="img-responsive" data-lazy="'.esc_attr( $prop_image_meta['url'] ).'" src="'.esc_attr( $prop_image_meta['url'] ).'" alt="'.esc_attr($prop_image_meta['alt']).'" title="'.esc_attr($prop_image_meta['title']).'">
-						</a>';
-
-						if( !empty($prop_image_meta['caption']) && $gallery_caption != 0 ) {
-			               echo '<span class="hz-image-caption">'.esc_attr($prop_image_meta['caption']).'</span>';
-			            }
-
-					echo '</div>';
-	        }
-	        ?>
-		</div>
-	<?php } ?>
+				echo '</div>';
+		}?>
+	</div>
+    
 </div><!-- top-gallery-section -->
 <?php } ?>

@@ -1,11 +1,11 @@
-=== Cookie Notice & Consent Banner for GDPR & CCPA Compliance ===
+=== Cookie Notice & Consent Banner for GDPR & CCPA Compliance ===
 Author URI: https://gdprinfo.eu
 Plugin URI: https://gdprinfo.eu
 Author: GRPR
 Contributors: artemari, kaganvmz
 Tags: Cookie, GDPR, CCPA, Compliance, Cookie Consent, Cookie Notice, Cookie banner, Privacy, Cookie Compliance, Law, Compliant
 Requires at least: 5.0
-Tested up to: 6.7.2
+Tested up to: 6.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,23 +17,43 @@ Easily Customizable to Fit Your Design.
 
 == Features ==
 
-* Fit banner to website design by using Wordpress customizer
-* Block unnecessary cookies like required by most privacy laws
+* Fit banner to website design by using Wordpress customizer
+* Block unnecessary cookies like required by most privacy laws
 * Remember user consent for future visits
 * Many features to come stay tuned!
 
 The plugin is useful in preparing your site for data protection and privacy regulations:
 
-* GDPR: The General Data Protection Regulation (European Union) DSGVO, RGPD, ОРЗД, ONOOÚ, Persondataforordningen, RGPD, AVG, Rodo
+* GDPR: The General Data Protection Regulation (European Union) DSGVO, RGPD, ОРЗД, ONOOÚ, Persondataforordningen, RGPD, AVG, Rodo, ePrivacy Directive, ePrivacy Regulation
 * CCPA: The California Consumer Privacy Act (California, United States)
 * PIPEDA: The Personal Information Protection and Electronic Documents Act (Canada)
+* DPA: Data Protection Act (2018) (United Kingdom)
+* PECR: Privacy and Electronic Communications Regulations (United Kingdom)
 * AAP: Australia’s Privacy Principles (Australia)
 * LGPD: The Brazilian General Data Protection Law (Brazil)
 * PDPA: Personal Data Protection Act (Argentina, Malaysia)
 * APPI: Act on the Protection of Personal Information (Japan)
 * PDPL: Personal Data Protection Law (Bahrain)
+* POPIA: Protection of Personal Information Act (South Africa)
+* Law 25: Act Respecting the Protection of Personal Information (Canada Quebec)
+* FADP: Federal Act on Data Protection (Switzerland)
+* PIPL: Personal Information Protection Law (China)
+* 152-FZ: Federal Law on Personal Data (Russia)
+* DPDPA: Digital Personal Data Protection Act (India)
+* LFPDPPP: Federal Law on Protection of Personal Data (Mexico)	
 
 == Changelog ==
+
+= 1.7.12 - 26. AUGUST 2025 =
+* Security: Fixed XSS vulnerability in revoke_consent shortcode text attribute
+* Security: Added proper input sanitization and output escaping for shortcode parameters
+
+= 1.7.10 - 23. APRIL 2025 =
+* Fix: Minor changes
+
+= 1.7.9 - 3. APRIL 2025 =
+* Fix: Minor changes
+
 = 1.7.8 - 4. MAR 2025 =
 * Fix: Undefined array key 2 in file when user role is author or editor
 

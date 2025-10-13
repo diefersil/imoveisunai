@@ -13,11 +13,12 @@ export default {
 	},
 	link: 'post-new.php?post_type=page',
 	type: 'internalLink',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: () => {
 		if (themeSlug === 'extendable') return true;
 		if (launchCompleted) return true;
 		return false;
 	},
-	backgroundImage: 'https://assets.extendify.com/assist-tasks/add-page.webp',
+	backgroundImage:
+		'https://images.extendify-cdn.com/assist-tasks/add-page.webp',
 };

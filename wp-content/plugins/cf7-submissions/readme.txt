@@ -2,10 +2,10 @@
 Contributors: pluggable, codexpert, mukto90
 Donate link: https://pluggable.io/plugin/cf7-submissions
 Tags: contact form, contact form 7, contact form 7 submissions, contact form 7 entries, contact form 7 messages
-Requires at least: 4.4
-Tested up to: 6.7
-Stable tag: 0.18
-Requires PHP: 7.0
+Requires at least: 6.0
+Tested up to: 6.8.1
+Stable tag: 0.26
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,24 @@ If you delete a submission, all input data along with the attachment files will 
 4. Contact form
 
 == Changelog ==
+
+= v0.26 - 2025-06-03 =
+- [fix] Plugin search issue fixed
+
+= v0.24 — 2024-05-11 =
+- Compatibility tested with WordPress v6.8.1
+
+= v0.23 — 2024-04-20 =
+- Plugin search result issue fixed
+
+= v0.22 — 2024-04-17 =
+- Compatibility tested with WordPress v6.8
+
+= v0.20 — 2024-03-11 =
+- Compatibility tested with WordPress v6.7.2
+
+= v0.19 — 2024-03-11 =
+- Fixed notice related to `_load_textdomain_just_in_time` message
 
 = v0.18 — 2024-11-28 =
 - Compatibility tested with WordPress v6.7.1

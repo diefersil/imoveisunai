@@ -2,8 +2,8 @@
 /*
 Plugin Name: Houzez CRM
 Plugin URI:  http://themeforest.net/user/favethemes
-Description: Add insights for favethemes themes
-Version:     1.4.3
+Description: Add insights for favethemes themes 
+Version:     1.5.0
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 */
@@ -51,8 +51,6 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
             $this->define_constants();
 
             $this->initialize_admin_menu();
-
-            $this->include_files();
 
             $this->init_hooks();
 
@@ -109,7 +107,7 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
                 $houzez_date_language = houzez_option('houzez_date_language');
                 $houzez_date_language = esc_html($houzez_date_language);
 
-                if (function_exists('icl_translate')) {
+                if (function_exists('icl_translate') && defined('ICL_LANGUAGE_CODE')) {
                     $houzez_date_language = ICL_LANGUAGE_CODE;
                 }
                 wp_enqueue_script( 'houzez-crm-script', HOUZEZ_CRM_URL . 'js/script.js', 'jquery', $this->version, true );
@@ -128,6 +126,8 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
                     'houzez_date_language' => $houzez_date_language,
                     'delete_confirmation' => esc_html__('Are you sure you want to delete?', 'houzez-crm'),
                     'email_confirmation' => esc_html__('Are you sure you want to send email?', 'houzez-crm'),
+                    'delete_activity_nonce' => wp_create_nonce('delete_activity_nonce'),
+                    'get_lead_nonce' => wp_create_nonce('get_lead_nonce'),
                 );
                 wp_localize_script( 'houzez-crm-script', 'Houzez_crm_vars', $locals ); 
             }
@@ -170,6 +170,7 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
          */
         public function init_hooks() {
             add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
+            add_action( 'init', array( $this, 'include_files' ), 0 );
             register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
             register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivate' ) );
         }
@@ -206,23 +207,6 @@ if ( ! class_exists( 'Houzez_CRM' ) ) :
                     if ( ! @is_writeable($uploads_dir_import) )
                     {
                         $error = 'The uploads folder is not currently writeable and will need to be before properties can be imported. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
-                    }
-                }
-
-                $uploads_dir_export = $uploads_dir['basedir'] . '/houzez-crm/';
-                
-                if ( ! @file_exists($uploads_dir_export) )
-                {
-                    if ( ! @mkdir($uploads_dir_export) )
-                    {
-                        $error = 'Unable to create subdirectory in uploads folder for use by Houzez CRM plugin. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
-                    }
-                }
-                else
-                {
-                    if ( ! @is_writeable($uploads_dir_export) )
-                    {
-                        $error = 'The uploads folder is not currently writeable and will need to be before properties can be exported. Please ensure the <a href="http://codex.wordpress.org/Changing_File_Permissions" target="_blank" title="WordPress Codex - Changing File Permissions">correct permissions</a> are set.';
                     }
                 }
             }

@@ -1,28 +1,28 @@
-<div class="agent-list-wrap">
-	<div class="d-flex">
-		<div class="agent-list-image">
-			<a href="<?php the_permalink(); ?>">
-				<?php get_template_part('template-parts/realtors/agency/image'); ?>
-			</a>
-		</div>
-
-		<div class="agent-list-content flex-grow-1">
-			<div class="d-flex xxs-column">
-				<h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-				
-				<?php 
-                if( houzez_option( 'agency_review', 0 ) != 0 ) {
-                    get_template_part('template-parts/realtors/rating'); 
-                }?>
-			</div>
-			
+<div class="agent-list-wrap mb-3 p-4" itemscope itemtype="http://schema.org/RealEstateOrganization">
+	<div class="row g-4">
+		<div class="col-md-4">
+			<figure class="agent-list-image m-0">
+				<a href="<?php the_permalink(); ?>" itemprop="url">
+					<?php get_template_part('template-parts/realtors/agency/image'); ?>
+				</a><!-- hover-effect -->
+			</figure><!-- agent-list-image -->
+		</div><!-- col-md-4 -->
+		<div class="col-md-8">
+			<div class="agent-list-content">
+				<header class="d-flex align-items-center justify-content-between gap-2 mb-1">
+					<h2 class="mb-0 d-flex align-items-center gap-2">
+						<?php get_template_part('template-parts/realtors/agency/verified'); ?>
+						<a href="<?php the_permalink(); ?>" itemprop="name"><?php the_title(); ?></a> 
+					</h2>
+					<?php get_template_part('template-parts/realtors/rating'); ?>
+				</header><!-- d-flex -->
+			</div><!-- d-flex -->
 			<?php 
 			if( houzez_option('agency_address', 1) ) {
 				get_template_part('template-parts/realtors/agency/address'); 
 			}?>
-
-			<ul class="agent-list-contact list-unstyled">
-				
+			
+			<dl class="agent-list-contact list-unstyled list-lined">
 				<?php
 				if( houzez_option('agency_phone', 1) ) {
 					get_template_part('template-parts/realtors/agency/office-phone');
@@ -40,20 +40,16 @@
 					get_template_part('template-parts/realtors/agency/email'); 
 				}
 				?>
-			</ul>
-
-			<div class="d-flex sm-column"> 
-				<div class="agent-social-media flex-grow-1">
+			</dl><!-- agent-list-contact -->
+			<footer class="d-flex align-items-center justify-content-between">
+				<nav class="agent-social-media" itemscope itemtype="http://schema.org/Person">
 					<?php 
 					if( houzez_option('agency_social', 1) ) {
 						get_template_part('template-parts/realtors/agency/social'); 
 					}?>
-				</div>
-				<a class="agent-list-link" href="<?php the_permalink(); ?>">
-					<strong><?php echo houzez_option( 'agency_view_listings', esc_html__('View Listings', 'houzez') ); ?></strong>
-				</a>
-			</div>
-
-		</div>
-	</div>
-</div>
+				</nav>
+				<a class="agent-list-link no-wrap" href="<?php the_permalink(); ?>"><strong><?php echo houzez_option( 'agency_view_listings', esc_html__('View My Listings', 'houzez') ); ?></strong></a>
+			</footer><!-- d-flex -->
+		</div><!-- col-md-8 -->
+	</div><!-- row -->
+</div><!-- agent-list-wrap -->

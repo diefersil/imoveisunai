@@ -34,60 +34,75 @@ if( isset( $_GET['selected_package'] ) ) {
     }
 
     ?>
-    <div class="membership-package-order-detail-wrap">
-        <div class="dashboard-content-block">
-            <h3><?php esc_html_e( 'Membership Package', 'houzez' ); ?></h3>
+    <div class="membership-package-order-detail-wrap block-wrap">
+        <div class="block-title-wrap border-none mb-0 pb-3">
+            <h2><?php esc_html_e( 'Membership Package', 'houzez' ); ?></h2>
+        </div>
+        <div class="block-content-wrap">
             <div class="membership-package-order-detail">
-
-                <ul class="list-unstyled mebership-list-info">
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e( 'Package Name', 'houzez' ); ?> 
+                <ul class="list-unstyled mebership-list-info d-flex flex-column">
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e( 'Package Name', 'houzez' ); ?>
+                        </span>
                         <strong><?php echo get_the_title( $selected_package_id ); ?></strong>
                     </li>
 
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e('Price', 'houzez'); ?> 
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e('Price', 'houzez'); ?>
+                        </span>
                         <strong><?php echo esc_attr( $package_price ); ?></strong>
                     </li>
 
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e( 'Time Period', 'houzez' ); ?>
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e( 'Time Period', 'houzez' ); ?>
+                        </span>
                         <strong><?php echo esc_attr( $pack_billing_frquency ).' '.HOUZEZ_billing_period( $pack_billing_period ); ?></strong>
                     </li>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e( 'Listing Included', 'houzez' ); ?>
+                    
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e( 'Listing Included', 'houzez' ); ?>
+                        </span>
                         <?php if( $pack_unlimited_listings == 1 ) { ?>
                             <strong><?php esc_html_e( 'Unlimited', 'houzez' ); ?></strong>
                         <?php } else { ?>
                             <strong><?php echo esc_attr( $pack_listings ); ?></strong>
                         <?php } ?>
                     </li>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e( 'Featured Listing Included', 'houzez' ); ?>  
+                    
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e( 'Featured Listing Included', 'houzez' ); ?>
+                        </span>
                         <strong><?php echo esc_attr( $pack_featured_listings ); ?></strong>
                     </li>
 
                     <?php if($pack_tax != "") { ?>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 mr-2 primary-text"></i> 
-                        <?php esc_html_e('Taxes', 'houzez'); ?> 
+                    <li class="border-bottom py-3 d-flex align-items-center justify-content-between">
+                        <span>
+                            <i class="houzez-icon icon-check-circle-1 me-2 primary-text"></i> 
+                            <?php esc_html_e('Taxes', 'houzez'); ?>
+                        </span>
                         <strong><?php echo esc_attr($pack_tax); ?>%</strong>
                     </li>
                     <?php } ?>
 
-                    <li class="total-price">
-                        <?php esc_html_e( 'Total Price', 'houzez' ); ?> 
+                    <li class="pt-3 d-flex align-items-center justify-content-between">
+                        <strong><?php esc_html_e( 'Total Price', 'houzez' ); ?></strong>
                         <strong><?php echo esc_attr($package_total_price); ?></strong>
                     </li>
                 </ul>
             </div><!-- membership-package-order-detail -->    
         </div>
-        <div class="text-center">
+        <div class="text-center mt-3">
             <a href="<?php echo esc_url( $select_packages_link ); ?>"><?php esc_html_e( 'Change Package', 'houzez' ); ?></a>
         </div>
     </div><!-- membership-package-order-detail-wrap -->

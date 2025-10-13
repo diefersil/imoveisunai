@@ -19,45 +19,45 @@ if ( post_password_required() ) {
 ?>
 
 <div class="post-comment-form-wrap">
- 
+    <h2><?php echo $houzez_local['join_discussion']; ?></h2>
     <div class="comments-form-wrap">
     <?php
-	//Custom Fields
-	$fields =  array(
-		'author'=> '<div class="row">
-						<div class="col-sm-6">
-							<div class="form-group">
-								<div class="input-user input-icon">
-									<input name="author" required class="form-control" id="author" value="" placeholder="'.$houzez_local['your_name'].'" type="text">
-								</div>
-							</div>
-						</div>',
+    //Custom Fields
+    $fields =  array(
+        'author'=> '<div class="row">
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <div class="input-user input-icon">
+                                    <input name="author" required class="form-control" id="author" value="" placeholder="'.$houzez_local['your_name'].'" type="text">
+                                </div>
+                            </div>
+                        </div>',
 
-		'email' => '<div class="col-sm-6">
-						<div class="form-group">
-							<div class="input-email input-icon">
-								<input type="email" class="form-control" required name="email" id="email" placeholder="'.$houzez_local['your_email'].'">
-							</div>
-						</div>
-					</div>',
+        'email' => '<div class="col-sm-6">
+                        <div class="mb-3">
+                            <div class="input-email input-icon">
+                                <input type="email" class="form-control" required name="email" id="email" placeholder="'.$houzez_local['your_email'].'">
+                            </div>
+                        </div>
+                    </div>',
 
-		'url' 	=> '</div>',
-	);
+        'url'   => '</div>',
+    );
 
-	//Comment Form Args
-	$comments_args = array(
-		'fields' => $fields,
-		'title_reply'=> $houzez_local['join_discussion'],
-		'comment_notes_before' => '',
-		'comment_notes_after' => '',
-		'comment_field' => '<div class="row"><div class="col-sm-12"><div class="form-group"><textarea class="form-control" required rows="4" name="comment" id="comment"></textarea></div></div></div>',
-		'label_submit' => $houzez_local['submit'],
-		'submit_button' => '<input style="text-transform:capitalize;" name="submit" type="submit" id="submit" class="submit btn btn-primary" value="%2$s">', // Customize the button class
-	);
+    //Comment Form Args
+    $comments_args = array(
+        'fields' => $fields,
+        'title_reply'=> '',
+        'comment_notes_before' => '',
+        'comment_notes_after' => '',
+        'comment_field' => '<div class="row"><div class="col-sm-12"><div class="mb-3"><textarea class="form-control" required rows="4" name="comment" id="comment"></textarea></div></div></div>',
+        'label_submit' => $houzez_local['submit'],
+        'submit_button' => '<div class="col-sm-12"><button name="submit" type="submit" id="submit" class="btn btn-primary">%4$s</button></div>', 
+    );
 
-	// Show Comment Form
-	comment_form($comments_args);
-	?>
+    // Show Comment Form
+    comment_form($comments_args);
+    ?>
     </div>
 </div>
 

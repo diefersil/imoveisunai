@@ -1,10 +1,31 @@
 <?php
 global $post;
 $size = 'full';
-$properties_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
+$properties_images = array();
+$image_ids = get_post_meta($post->ID, 'fave_property_images', false);
+if (!empty($image_ids)) {
+    foreach ($image_ids as $image_id) {
+		// Skip if attachment doesn't exist
+		if ( ! get_post_status( $image_id ) ) {
+			continue;
+		}
+        $image_url = wp_get_attachment_image_url($image_id, $size);
+        $image_meta = wp_get_attachment_metadata($image_id);
+        $alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+        $title = get_the_title($image_id);
+        $caption = wp_get_attachment_caption($image_id);
+        $properties_images[$image_id] = array(
+            'full_url' => $image_url,
+            'alt' => $alt,
+            'title' => $title,
+            'caption' => $caption,
+            'width' => isset($image_meta['width']) ? $image_meta['width'] : '',
+            'height' => isset($image_meta['height']) ? $image_meta['height'] : ''
+        );
+    }
+}
 $userID      =   get_current_user_id();
-$fav_option = 'houzez_favorites-'.$userID;
-$fav_option = get_option( $fav_option );
+$fav_option = get_user_meta( $userID, 'houzez_favorites', true );
 $lightbox_logo = houzez_option( 'lightbox_logo', false, 'url' );
 $lightbox_agent_cotnact = houzez_option('agent_form_gallery');
 $lightbox_caption = houzez_option('lightbox_caption', 0); 
@@ -24,47 +45,26 @@ if( $key != false || $key != '' ) {
 ?>
 <div class="property-lightbox">
 	<div class="modal fade" id="property-lightbox" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<div class="d-flex align-items-center">
-
+					<div class="d-flex align-items-center justify-content-between w-100">
 						<?php if( !empty( $lightbox_logo ) ) { ?>
 						<div class="lightbox-logo">
 							<img class="img-fluid" src="<?php echo esc_url( $lightbox_logo ); ?>" alt="<?php the_title(); ?>">
 						</div><!-- lightbox-logo -->
 						<?php } ?>
-
-						<div class="lightbox-title flex-grow-1">
-							
-						</div><!-- lightbox-title  -->
 						<div class="lightbox-tools">
 							<ul class="list-inline">
-								<?php if( houzez_option('prop_detail_favorite') != 0 ) { ?>
-								<li class="list-inline-item btn-favorite">
-									<a class="add-favorite-js" data-listid="<?php echo intval($post->ID)?>" href="#"><i class="houzez-icon icon-love-it mr-2 <?php echo esc_attr($icon); ?>"></i> <span class="display-none"><?php esc_html_e('Favorite', 'houzez'); ?></span></a>
-								</li>
-								<?php } ?>
-
-								<?php if( houzez_option('prop_detail_share') != 0 ) { ?>
-								<li class="list-inline-item btn-share">
-									<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="houzez-icon icon-share mr-2"></i> <span><?php esc_html_e('Share', 'houzez'); ?></span></a>
-									<div class="dropdown-menu dropdown-menu-right item-tool-dropdown-menu">
-										<?php get_template_part('property-details/partials/share'); ?>
-									</div>
-								</li>
-								<?php } ?>
 								<?php if( houzez_option('agent_form_gallery') ){ ?>
-								<li class="list-inline-item btn-email">
+								<li class="list-inline-item btn-email d-md-none">
 									<a href="#"><i class="houzez-icon icon-envelope"></i></a>
 								</li>
 								<?php } ?>
 							</ul>
 						</div><!-- lightbox-tools -->
 					</div><!-- d-flex -->
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
+					<button type="button" class="btn-close btn-close-white mx-2" data-bs-dismiss="modal"></button>
 				</div><!-- modal-header -->
 
 				<div class="modal-body clearfix">
@@ -77,14 +77,14 @@ if( $key != false || $key != '' ) {
 						</a>
 						<?php } ?>
 						
-						<?php  if( !empty($properties_images) && count($properties_images)) { ?>
-						<div class="lightbox-gallery">
-						    <div id="lightbox-slider-js" class="lightbox-slider">
+						<?php if( !empty($properties_images) && count($properties_images)) { ?>
+						<div class="lightbox-gallery" role="region">
+						    <div id="lightbox-slider-js" class="lightbox-slider" role="list">
 						        
 						        <?php
 						        foreach( $properties_images as $prop_image_id => $prop_image_meta ) {
 						       		$output = '';
-						            $output .= '<div>';
+						            $output .= '<div role="listitem">';
 								        $output .= '<img class="img-fluid" src="'.esc_url( $prop_image_meta['full_url'] ).'" alt="'.esc_attr($prop_image_meta['alt']).'" title="'.esc_attr($prop_image_meta['title']).'">';
 
 								        if( !empty($prop_image_meta['caption']) && $lightbox_caption != 0 ) {
@@ -101,8 +101,12 @@ if( $key != false || $key != '' ) {
 						</div><!-- lightbox-gallery -->
 						<?php } else { 
 			                $featured_image_url = houzez_get_image_url('full');
-			                echo '<div>
-			                    <img class="img-fluid" src="'.esc_url($featured_image_url[0]).'">
+			                echo '<div class="lightbox-gallery" role="region">
+			                    <div id="lightbox-slider-js" class="lightbox-slider" role="list">
+			                        <div role="listitem">
+			                            <img class="img-fluid" src="'.esc_url($featured_image_url[0]).'">
+			                        </div>
+			                    </div>
 			                </div>';
 			            } ?>
 
@@ -115,9 +119,6 @@ if( $key != false || $key != '' ) {
 					</div><!-- lightbox-form-wrap -->
 					<?php } ?>
 				</div><!-- modal-body -->
-				<div class="modal-footer">
-					
-				</div><!-- modal-footer -->
 			</div><!-- modal-content -->
 		</div><!-- modal-dialog -->
 	</div><!-- modal -->

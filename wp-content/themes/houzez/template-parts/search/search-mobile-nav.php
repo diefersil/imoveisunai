@@ -1,15 +1,12 @@
 <?php 
-global $post, $sticky_hidden, $sticky_data, $hidden_data;
-$sticky_hidden = $sticky_data = '';
+global $post, $sticky_hidden, $mobile_sticky_data, $hidden_data;
 $hidden_data = '0';
 if( !is_404() && !is_search() && isset($post) && is_object($post) ) {
     $adv_search_enable = get_post_meta($post->ID, 'fave_adv_search_enable', true);
     $adv_search = get_post_meta($post->ID, 'fave_adv_search', true);
 }
-$search_sticky = houzez_option('mobile-search-sticky');
-$sticky_data = $search_sticky;
 ?>
-<section class="advanced-search advanced-search-nav mobile-search-nav" data-sticky='<?php echo esc_attr( $sticky_data ); ?>'>
+<section class="advanced-search advanced-search-nav mobile-search-nav mobile-search-trigger" data-sticky='<?php echo esc_attr( $mobile_sticky_data ); ?>'>
 	<div class="container">
 		<div class="advanced-search-v1">
 			<div class="d-flex">
@@ -24,3 +21,5 @@ $sticky_data = $search_sticky;
 		</div><!-- advanced-search-v1 -->
 	</div><!-- container -->
 </section><!-- advanced-search -->
+
+<?php get_template_part('template-parts/search/mobile-search');  ?>

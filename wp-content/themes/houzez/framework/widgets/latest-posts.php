@@ -69,15 +69,16 @@ class houzez_latest_posts extends WP_Widget {
 				<?php if( $qy_latest->have_posts() ): 
 					while( $qy_latest->have_posts() ): $qy_latest->the_post(); $i++; ?>
 
-						<div class="blog-post-item-widget">
-							<div class="d-flex">
+						<div class="blog-post-item-widget mt-4" role="article">
+							<div class="d-flex gap-3">
 								<div class="blog-post-image-widget">
-									<a href="<?php the_permalink(); ?>">
-		                                <?php the_post_thumbnail(array(70, 70), array('class' => 'img-fluid'));?>
-		                            </a>
+									<a href="<?php the_permalink(); ?>" role="link">
+										<?php the_post_thumbnail(array(150, 150), array('class' => 'img-fluid', 'alt' => get_the_title())); ?>
+									</a>
 								</div><!-- blog-post-image-widget -->
 								<div class="blog-post-content-widget">
-									<h4><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h4>
+									<h4><a href="<?php the_permalink(); ?>" role="link"><?php the_title(); ?></a></h4>
+									<p><?php echo wp_trim_words(get_the_excerpt(), 10); ?></p>
 								</div><!-- blog-post-content-widget -->
 							</div><!-- d-flex -->
 						</div><!-- blog-post-item-widget -->

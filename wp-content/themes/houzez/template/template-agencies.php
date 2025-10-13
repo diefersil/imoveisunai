@@ -11,8 +11,9 @@ get_header();
 
 $agencies_layout = houzez_option('agencies-template-layout', 'v1');
 
-if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
-    $agencies_layout = esc_html($_GET['agencies-layout']);
+$valid_layouts = array('v1', 'v2', 'v3');
+if( isset( $_GET['agencies-layout'] ) && in_array($_GET['agencies-layout'], $valid_layouts, true) ) {
+    $agencies_layout = $_GET['agencies-layout'];
 }
 
 get_template_part('template-parts/realtors/agency/layout', $agencies_layout);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The App details file
  */
@@ -12,9 +13,9 @@ use Extendify\Shared\Services\Sanitizer;
 /**
  * Controller for handling various app data
  */
+
 class Config
 {
-
     /**
      * Plugin slug
      *
@@ -46,16 +47,9 @@ class Config
     /**
      * Partner Id
      *
-     * @var string
+     * @var string|null
      */
-    public static $partnerId = 'no-partner';
-
-    /**
-     * Whether there is a partner
-     *
-     * @var boolean
-     */
-    public static $hasPartner = false;
+    public static $partnerId = null;
 
     /**
      * Whether to load Launch
@@ -93,63 +87,103 @@ class Config
     public static $launchCompleted = false;
 
     /**
+     * Enabled preview features.
+     *
+     * @var array
+     */
+    public static $previewFeatures = [];
+
+    public static $enablePreviewFeatures = false;
+
+    /**
      * Process the readme file to get version and name
      *
      * @return void
      */
     public function __construct()
     {
+        self::$partnerId = defined('EXTENDIFY_PARTNER_ID') ? constant('EXTENDIFY_PARTNER_ID') : null;
+        $partnerData = PartnerData::getPartnerData();
+
         // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
         $readme = file_get_contents(EXTENDIFY_PATH . 'readme.txt');
 
         preg_match('/Stable tag: ([0-9.:]+)/', $readme, $matches);
         self::$version = $matches[1];
 
-        self::$assetManifest = wp_json_file_decode(EXTENDIFY_PATH . 'public/build/manifest.json', ['associative' => true]);
+        self::$assetManifest = wp_json_file_decode(
+            EXTENDIFY_PATH . 'public/build/manifest.json',
+            ['associative' => true]
+        );
 
         if (!get_option('extendify_first_installed_version')) {
             update_option('extendify_first_installed_version', Sanitizer::sanitizeText(self::$version));
         }
 
-        // Here for backwards compatibility.
-        if (isset($GLOBALS['extendify_sdk_partner']) && $GLOBALS['extendify_sdk_partner']) {
-            self::$partnerId = $GLOBALS['extendify_sdk_partner'];
-        }
-
-        // Always use the partner ID if set as a constant.
-        if (defined('EXTENDIFY_PARTNER_ID')) {
-            self::$partnerId = constant('EXTENDIFY_PARTNER_ID');
-        }
-
-        if (self::$partnerId && self::$partnerId !== 'no-partner') {
-            self::$hasPartner = true;
-        }
+        // Set up the Preview features
+        // phpcs:ignore WordPress.Security.NonceVerification
+        self::handlePreviewUrlOptIn($_GET);
 
         // An easy way to check if we are in dev mode is to look for a dev specific file.
         $isDev = is_readable(EXTENDIFY_PATH . '.devbuild');
 
         self::$environment = $isDev ? 'DEVELOPMENT' : 'PRODUCTION';
         self::$launchCompleted = (bool) get_option('extendify_onboarding_completed', false);
-        self::$showLaunch = $this->showLaunch();
+        self::$showLaunch = $isDev ? true : ((bool) ($partnerData['showLaunch'] ?? false));
     }
 
     /**
-     * Conditionally load Extendify Launch.
+     * Retrieves the value of a preview setting.
      *
-     * @return boolean
+     * This method first checks if the preview setting exists as a static property of the class.
+     * If it does, it returns the value of that property. Otherwise, it looks for the
+     * preview setting in the saved setting and returns its value if found.
+     *
+     * @param string $previewKey The key of the preview setting to retrieve.
+     *
+     * @return boolean The value of the setting if found or false if not found.
      */
-    private function showLaunch()
+    public static function preview(string $previewKey)
     {
-        // Always show it for dev mode.
         if (self::$environment === 'DEVELOPMENT') {
             return true;
         }
 
-        // Currently we require a flag to be set.
-        if (!defined('EXTENDIFY_SHOW_ONBOARDING')) {
-            return false;
+        if (property_exists(self::class, $previewKey)) {
+            return self::$previewFeatures[$previewKey];
         }
 
-        return constant('EXTENDIFY_SHOW_ONBOARDING') === true;
+        $previewFeatures = get_option('extendify_enable_preview_features_v1', []);
+        return (bool) ($previewFeatures[$previewKey] ?? false);
+    }
+
+
+    /**
+     * Processes preview features from URL parameters and enables them.
+     *
+     * This method checks for 'extendify-preview' parameters in the GET request
+     * and enables the specified preview features. It supports both single feature
+     * format (extendify-preview=feature1) and array format (extendify-preview[]=feature1).
+     * All specified features are enabled and saved to the database.
+     *
+     * @param array $getParams The GET parameters that may contain 'extendify-preview' settings.
+     *
+     * @return void
+     */
+    protected static function handlePreviewUrlOptIn(array $getParams = [])
+    {
+        if (!isset($getParams['extendify-preview'])) {
+            return;
+        }
+
+        $previewParam = $getParams['extendify-preview'];
+        $features = is_array($previewParam) ? $previewParam : [$previewParam];
+        self::$previewFeatures = get_option('extendify_enable_preview_features_v1', []);
+
+        foreach ($features as $feature) {
+            self::$previewFeatures[$feature] = true;
+        }
+
+        update_option('extendify_enable_preview_features_v1', Sanitizer::sanitizeArray(self::$previewFeatures));
     }
 }

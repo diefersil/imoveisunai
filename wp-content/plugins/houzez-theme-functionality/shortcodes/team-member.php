@@ -1,105 +1,102 @@
 <?php
-/*-----------------------------------------------------------------------------------*/
-/*  Module 1
-/*-----------------------------------------------------------------------------------*/
 if( !function_exists('houzez_team') ) {
-    function houzez_team($atts, $content = null)
-    {
-        extract(shortcode_atts(array(
-            'team_image' => '',
-            'team_name' => '',
-            'team_position' => '',
-            'team_description' => '',
-            'team_link' => '',
-            'team_social_facebook' => '',
-            'team_social_twitter' => '',
-            'team_social_linkedin' => '',
-            'team_social_pinterest' => '',
-            'team_social_googleplus' => '',
-            'team_social_facebook_target' => '',
-            'team_social_twitter_target' => '',
-            'team_social_linkedin_target' => '',
-            'team_social_pinterest_target' => '',
-            'team_social_googleplus_target' => ''
-        ), $atts));
+    function houzez_team($atts, $content = null) {
 
+        // Shortcode attributes with default values
+        $atts = shortcode_atts(array(
+            'team_image'                 => '',
+            'team_name'                  => '',
+            'team_position'              => '',
+            'team_description'           => '',
+            'team_link'                  => '',
+            'team_social_facebook'       => '',
+            'team_social_twitter'        => '',
+            'team_social_linkedin'       => '',
+            'team_social_pinterest'      => '',
+            'team_social_facebook_target' => '_blank',
+            'team_social_twitter_target' => '_blank',
+            'team_social_linkedin_target' => '_blank',
+            'team_social_pinterest_target'=> '_blank',
+        ), $atts);
+
+        // Buffer the output
         ob_start();
 
-    
-        if( !empty($team_image) ) {
+        if( !empty($atts['team_image']) ) {
 
-            $social = '';
+            // Social media links
+            $social_links = [
+                'facebook'  => ['url' => $atts['team_social_facebook'], 'icon' => 'icon-social-media-facebook', 'target' => $atts['team_social_facebook_target']],
+                'twitter'   => ['url' => $atts['team_social_twitter'], 'icon' => 'icon-x-logo-twitter-logo-2', 'target' => $atts['team_social_twitter_target']],
+                'linkedin'  => ['url' => $atts['team_social_linkedin'], 'icon' => 'icon-professional-network-linkedin', 'target' => $atts['team_social_linkedin_target']],
+                'pinterest' => ['url' => $atts['team_social_pinterest'], 'icon' => 'icon-social-pinterest', 'target' => $atts['team_social_pinterest_target']],
+            ];
 
-            if( !empty($team_social_facebook) ) {
-                $social .= '<li class="list-inline-item">
-                        <a target="'.esc_attr($team_social_facebook_target).'" href="'.esc_url($team_social_facebook).'" class="btn-facebook"><i class="houzez-icon icon-social-media-facebook"></i></a>
+            $social_html = '';
+
+            // Generate social media icons
+            foreach ($social_links as $network => $data) {
+                if (!empty($data['url'])) {
+                    $social_html .= '<li class="list-inline-item">
+                        <a target="' . esc_attr($data['target']) . '" href="' . esc_url($data['url']) . '" class="btn-' . esc_attr($network) . '">
+                            <i class="houzez-icon ' . esc_attr($data['icon']) . '"></i>
+                        </a>
                     </li>';
+                }
             }
+            ?>
 
-            if( !empty($team_social_twitter) ) {
-                $social .= '<li class="list-inline-item"><a target="'.esc_attr($team_social_twitter_target).'" href="'.esc_url($team_social_twitter).'" class="btn-twitter"><i class="houzez-icon icon-social-media-twitter"></i></a></li>';
-            }
+            <div class="team-module hover-effect text-center">
 
-            if( !empty($team_social_linkedin) ) {
-                $social .= '<li class="list-inline-item"><a target="'.esc_attr($team_social_linkedin_target).'" href="'.esc_url($team_social_linkedin).'" class="btn-linkedin"><i class="houzez-icon icon-professional-network-linkedin"></i></a></li>';
-            }
-            if( !empty($team_social_pinterest) ) {
-                $social .= '<li class="list-inline-item"><a target="'.esc_attr($team_social_pinterest_target).'" href="'.esc_url($team_social_pinterest).'" class="btn-pinterest"><i class="houzez-icon icon-social-pinterest"></i></a></li>';
-            }
-            if( !empty($team_social_googleplus) ) {
-                $social .= '<li class="list-inline-item"><a target="'.esc_attr($team_social_googleplus_target).'" href="'.esc_url($team_social_googleplus).'" class="btn-google-plus"><i class="houzez-icon icon-social-media-google-plus-1"></i></a></li>';
-            }
-
-        ?>
-
-            <div class="team-module hover-effect">
-
-                <?php if( !empty($team_link)) { ?>
-                <a href="<?php echo esc_url($team_link); ?>" class="team-mobile-link"></a>
+                <?php if( !empty($atts['team_link'])) { ?>
+                <a href="<?php echo esc_url($atts['team_link']); ?>" class="team-mobile-link top-0 start-0 w-100 h-100"></a>
                 <?php } ?>
-                <?php echo wp_get_attachment_image( $team_image, 'full', array('class' => 'img-fluid') ); ?>
+                
+                <?php echo wp_get_attachment_image( $atts['team_image'], 'full', false, array('class' => 'img-fluid') ); ?>
 
-                <div class="team-content-wrap team-content-wrap-before">
-                    <div class="team-content">
+                <!-- Team Content Before Hover -->
+                <div class="team-content-wrap team-content-wrap-before top-0 start-0 w-100 h-100">
+                    <div class="team-content bottom-0 start-0 w-100 p-4">
                         <div class="team-name">
-                            <strong><?php echo esc_attr($team_name); ?></strong>
+                            <strong><?php echo esc_html($atts['team_name']); ?></strong>
                         </div><!-- team-name -->
                         <div class="team-title">
-                            <?php echo esc_attr($team_position); ?>
-                        </div><!-- team-name -->
-   
+                            <?php echo esc_html($atts['team_position']); ?>
+                        </div><!-- team-title -->
                     </div><!-- team-content -->
                 </div><!-- team-content-wrap -->
-                <div class="team-content-wrap team-content-wrap-after">
-                    <div class="team-content">
+
+                <!-- Team Content After Hover -->
+                <div class="team-content-wrap team-content-wrap-after top-0 start-0 w-100 h-100">
+                    <div class="team-content bottom-0 start-0 w-100 p-4">
                         <div class="team-name">
-                            <strong><?php echo esc_attr($team_name); ?></strong>
+                            <strong><?php echo esc_html($atts['team_name']); ?></strong>
                         </div><!-- team-name -->
                         <div class="team-title">
-                            <?php echo esc_attr($team_position); ?>
-                        </div><!-- team-name -->
-                        <div class="team-description">
-                            <?php echo ($team_description); ?>
+                            <?php echo esc_html($atts['team_position']); ?>
+                        </div><!-- team-title -->
+                        <div class="team-description my-3">
+                            <?php echo wp_kses_post($atts['team_description']); ?>
                         </div><!-- team-description -->
 
-                        <?php if( !empty($team_social_facebook) || !empty($team_social_twitter) || !empty($team_social_linkedin) || !empty($team_social_pinterest) || !empty($team_social_googleplus) ) { ?>
+                        <?php if(!empty($social_html)) { ?>
                             <div class="team-social-wrap">
-                                <ul class="team-social list-unstyled list-inline">
-                                    <?php echo $social; ?>
+                                <ul class="team-social list-unstyled list-inline p-0 m-0">
+                                    <?php echo $social_html; ?>
                                 </ul>
                             </div><!-- team-social-wrap -->    
                         <?php } ?>    
                     </div><!-- team-content -->
                 </div><!-- team-content-wrap -->
-            </div><!-- taxonomy-grids-module -->
+
+            </div><!-- team-module -->
+
             <?php
         }
-        $result = ob_get_contents();
-        ob_end_clean();
-        return $result;
 
+        // Capture and return output buffer
+        return ob_get_clean();
     }
 
     add_shortcode('houzez-team', 'houzez_team');
 }
-?>

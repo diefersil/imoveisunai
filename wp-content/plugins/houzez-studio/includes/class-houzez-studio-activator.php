@@ -32,7 +32,7 @@ class Houzez_Studio_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		update_option('houzez_studio_plugin_active', true);
 	}
 
 }

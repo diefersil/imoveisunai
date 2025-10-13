@@ -1,5 +1,5 @@
-<div class="form-group">
-	<label for="property_id">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_id">
 		<?php echo houzez_option('cl_prop_id', 'Property ID').houzez_required_field( 'prop_id' ); ?>
 	</label>
 

@@ -1,8 +1,10 @@
 <?php
 namespace Elementor;
 use Elementor\Controls_Manager;
-use Elementor\Core\Schemes;
 use Elementor\Group_Control_Typography;
+use Elementor\Widget_Base;
+use Elementor\Plugin;
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -24,7 +26,20 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 	}
 
 	public function get_categories() {
-		return [ 'houzez-elements', 'houzez-header-footer' ];
+		// Check if the current post type is 'fts_builder'
+	    if (get_post_type() === 'fts_builder') {
+	        // Get the template type of the current post
+	        $template_type = htb_get_template_type(get_the_ID());
+
+	        // Check if the template type is 'tmp_header' or 'tmp_footer'
+	        if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+	            // Return the specific category for header and footer builders
+	            return ['houzez-header-footer-builder'];
+	        }
+	    }
+	    
+	    // Return the default categories
+	    return ['houzez-elements', 'houzez-header-footer'];
 	}
 
 	public function get_keywords() {
@@ -101,7 +116,6 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'btn_typography',
-				'scheme' => Schemes\Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} .btn-create-listing',
 			]
 		);
@@ -258,11 +272,9 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 		}
 
 		if( houzez_check_role() ){ ?>
-
         <a class="btn btn-create-listing" href="<?php echo esc_url($dashboard_add_listing); ?>" <?php echo $link_nofollow; ?> <?php echo $link_target; ?>>
             <?php echo houzez_option('dsh_create_listing', 'Create a Listing'); ?>
         </a>
-
         <?php }
 	}
 

@@ -13,91 +13,124 @@ $property_status = houzez_taxonomy_simple('property_status');
 $property_type = houzez_taxonomy_simple('property_type');
 $garage_size = houzez_get_listing_data('property_garage_size');
 $additional_features = get_post_meta( get_the_ID(), 'additional_features', true);
+$columns = houzez_option('prop_details_cols', '2');
+
+// Set column class based on the number of columns
+$column_class = 'col-md-6'; // default
+if($columns == 'list-1-cols') {
+    $column_class = 'col-md-12';
+} elseif($columns == 'list-3-cols') {
+    $column_class = 'col-xl-4 col-lg-6 col-md-6 col-sm-12';
+}
 ?>
 <div class="detail-wrap">
-	<ul class="<?php echo houzez_option('prop_details_cols', 'list-2-cols'); ?> list-unstyled">
+    <ul class="row list-lined list-unstyled" role="list">
 		<?php
         if( !empty( $prop_id ) && $hide_fields['prop_id'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_prop_id', 'Property ID').':</strong> 
-	                <span>'.houzez_propperty_id_prefix($prop_id).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_prop_id', 'Property ID').'</strong> 
+	                    <span>'.houzez_propperty_id_prefix($prop_id).'</span>
+                    </div>
                 </li>';
         }
 
         if( $prop_price != "" && $hide_fields['sale_rent_price'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_price', 'Price'). ':</strong> 
-	                <span>'.houzez_listing_price().'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_price', 'Price'). '</strong> 
+	                    <span>'.houzez_listing_price().'</span>
+                    </div>
                 </li>';
         }
 
         if( !empty( $prop_size ) && $hide_fields['area_size'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_prop_size', 'Property Size'). ':</strong> 
-	                <span>'.houzez_property_size( 'after' ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_prop_size', 'Property Size'). '</strong> 
+	                    <span>'.houzez_property_size( 'after' ).'</span>
+                    </div>
                 </li>';
         }
 
         if( !empty( $land_area ) && $hide_fields['land_area'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_land', 'Land Area'). ':</strong> 
-	                <span>'.houzez_property_land_area( 'after' ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_land', 'Land Area'). '</strong> 
+	                    <span>'.houzez_property_land_area( 'after' ).'</span>
+                    </div>
                 </li>';
         }
         if( $bedrooms != "" && $hide_fields['bedrooms'] != 1 ) {
             $bedrooms_label = ($bedrooms > 1 ) ? houzez_option('spl_bedrooms', 'Bedrooms') : houzez_option('spl_bedroom', 'Bedroom');
 
-            echo '<li>
-	                <strong>'.esc_attr($bedrooms_label).':</strong> 
-	                <span>'.esc_attr( $bedrooms ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.esc_attr($bedrooms_label).'</strong> 
+	                    <span>'.esc_attr( $bedrooms ).'</span>
+                    </div>
                 </li>';
         }
         if( $rooms != "" && ( isset($hide_fields['rooms']) && $hide_fields['rooms'] != 1 ) ) {
             $rooms_label = ($rooms > 1 ) ? houzez_option('spl_rooms', 'Rooms') : houzez_option('spl_room', 'Room');
 
-            echo '<li>
-                    <strong>'.esc_attr($rooms_label).':</strong> 
-                    <span>'.esc_attr( $rooms ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+                        <strong>'.esc_attr($rooms_label).'</strong> 
+                        <span>'.esc_attr( $rooms ).'</span>
+                    </div>
                 </li>';
         }
         if( $bathrooms != "" && $hide_fields['bathrooms'] != 1 ) {
 
             $bath_label = ($bathrooms > 1 ) ? houzez_option('spl_bathrooms', 'Bathrooms') : houzez_option('spl_bathroom', 'Bathroom');
-            echo '<li>
-	                <strong>'.esc_attr($bath_label).':</strong> 
-	                <span>'.esc_attr( $bathrooms ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.esc_attr($bath_label).'</strong> 
+	                    <span>'.esc_attr( $bathrooms ).'</span>
+                    </div>
                 </li>';
         }
         if( $garage != "" && $hide_fields['garages'] != 1 ) {
 
             $garage_label = ($garage > 1 ) ? houzez_option('spl_garages', 'Garages') : houzez_option('spl_garage', 'Garage');
-            echo '<li>
-	                <strong>'.esc_attr($garage_label).':</strong> 
-	                <span>'.esc_attr( $garage ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.esc_attr($garage_label).'</strong> 
+	                    <span>'.esc_attr( $garage ).'</span>
+                    </div>
                 </li>';
         }
         if( !empty( $garage_size ) && $hide_fields['garages'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_garage_size', 'Garage Size').':</strong> 
-	                <span>'.esc_attr( $garage_size ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_garage_size', 'Garage Size').'</strong> 
+	                    <span>'.esc_attr( $garage_size ).'</span>
+                    </div>
                 </li>';
         }
         if( !empty( $year_built ) && $hide_fields['year_built'] != 1 ) {
-            echo '<li>
-	                <strong>'.houzez_option('spl_year_built', 'Year Built').':</strong> 
-	                <span>'.esc_attr( $year_built ).'</span>
+            echo '<li class="'.$column_class.'">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_year_built', 'Year Built').'</strong> 
+	                    <span>'.esc_attr( $year_built ).'</span>
+                    </div>
                 </li>';
         }
         if( !empty( $property_type ) && ($hide_fields['prop_type']) != 1 ) {
-            echo '<li class="prop_type">
-	                <strong>'.houzez_option('spl_prop_type', 'Property Type').':</strong> 
-	                <span>'.esc_attr( $property_type ).'</span>
+            echo '<li class="'.$column_class.' prop_type">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_prop_type', 'Property Type').'</strong> 
+	                    <span>'.esc_attr( $property_type ).'</span>
+                    </div>
                 </li>';
         }
         if( !empty( $property_status ) && ($hide_fields['prop_status']) != 1 ) {
-            echo '<li class="prop_status">
-	                <strong>'.houzez_option('spl_prop_status', 'Property Status').':</strong> 
-	                <span>'.esc_attr( $property_status ).'</span>
+            echo '<li class="'.$column_class.' prop_status">
+                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+	                    <strong>'.houzez_option('spl_prop_status', 'Property Status').'</strong> 
+	                    <span>'.esc_attr( $property_status ).'</span>
+                    </div>
                 </li>';
         }
 
@@ -130,12 +163,22 @@ $additional_features = get_post_meta( get_the_ID(), 'additional_features', true)
                     if( $field_type == "url" ) {
 
                         if(!empty($data_value) && $hide_fields[$field_id] != 1) {
-                            echo '<li class="'.esc_attr($field_id).'"><strong>'.esc_attr($field_title).':</strong> <span><a href="'.esc_url($data_value).'" target="_blank">'.esc_attr( $data_value ).'</a></span></li>';
+                            echo '<li class="'.$column_class.' '.esc_attr($field_id).'">
+                                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+                                        <strong>'.esc_attr($field_title).'</strong> 
+                                        <span><a href="'.esc_url($data_value).'" target="_blank">'.esc_attr( $data_value ).'</a></span>
+                                    </div>
+                                  </li>';
                         } 
 
                     } else {
                         if(!empty($data_value) && $hide_fields[$field_id] != 1) {
-                            echo '<li class="'.esc_attr($field_id).'"><strong>'.esc_attr($field_title).':</strong> <span>'.esc_attr( $data_value ).'</span></li>';
+                            echo '<li class="'.$column_class.' '.esc_attr($field_id).'">
+                                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+                                        <strong>'.esc_attr($field_title).'</strong> 
+                                        <span>'.esc_attr( $data_value ).'</span>
+                                    </div>
+                                  </li>';
                         }    
                     }
                     
@@ -150,7 +193,7 @@ $additional_features = get_post_meta( get_the_ID(), 'additional_features', true)
 	<div class="block-title-wrap">
 		<h3><?php echo houzez_option('sps_additional_details', 'Additional details'); ?></h3>
 	</div><!-- block-title-wrap -->
-	<ul class="list-2-cols list-unstyled">
+	<ul class="row list-lined list-unstyled" role="list">
 		<?php
         foreach( $additional_features as $ad_del ):
 
@@ -158,7 +201,11 @@ $additional_features = get_post_meta( get_the_ID(), 'additional_features', true)
             $feature_value = isset( $ad_del['fave_additional_feature_value'] ) ? $ad_del['fave_additional_feature_value'] : '';
 
             if( $feature_value != "" ) { 
-                echo '<li><strong>'.esc_attr( $feature_title ).':</strong> <span>'.esc_attr( $feature_value ).'</span></li>';
+                echo '<li class="'.$column_class.'">
+					<div class="list-lined-item w-100 d-flex justify-content-between py-2">
+						<strong>'.esc_attr( $feature_title ).'</strong> <span>'.esc_attr( $feature_value ).'</span>
+					</div>
+				</li>';
             }
         endforeach;
         ?>

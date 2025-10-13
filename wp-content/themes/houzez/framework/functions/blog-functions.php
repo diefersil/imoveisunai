@@ -27,9 +27,9 @@ if ( ! function_exists( 'houzez_comments_callback' ) ) {
                 </div><!-- post-comment-thumb -->
                 <div class="post-comment-content">
                     <strong><?php comment_author(); ?></strong><br>
-                    <time datetime="2017-05-15T16:30">
-                        <i class="houzez-icon icon-calendar-3 mr-1"></i> <?php echo get_comment_date(); ?>
-                        <i class="houzez-icon icon-time-clock-circle mr-1 ml-2"></i> <?php echo get_comment_time(); ?>
+                    <time class="d-flex align-items-center" datetime="2017-05-15T16:30">
+                        <i class="houzez-icon icon-calendar-3 me-1"></i> <?php echo get_comment_date(); ?>
+                        <i class="houzez-icon icon-time-clock-circle me-1 ms-2"></i> <?php echo get_comment_time(); ?>
                     </time>
                     <?php if ( $comment->comment_approved == '0' ) : ?>
                     <em><?php esc_html_e( 'Your comment is awaiting moderation.', 'houzez' ); ?></em>

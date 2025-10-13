@@ -104,6 +104,10 @@ class Widget_Accordion extends Widget_Base {
 		return ! Plugin::$instance->experiments->is_feature_active( 'nested-elements', true );
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Register accordion widget controls.
 	 *
@@ -300,8 +304,8 @@ class Widget_Accordion extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .elementor-accordion-item' => 'border-color: {{VALUE}};',
-					'{{WRAPPER}} .elementor-accordion-item .elementor-tab-content' => 'border-top-color: {{VALUE}};',
-					'{{WRAPPER}} .elementor-accordion-item .elementor-tab-title.elementor-active' => 'border-bottom-color: {{VALUE}};',
+					'{{WRAPPER}} .elementor-accordion-item .elementor-tab-content' => 'border-block-start-color: {{VALUE}};',
+					'{{WRAPPER}} .elementor-accordion-item .elementor-tab-title.elementor-active' => 'border-block-end-color: {{VALUE}};',
 				],
 			]
 		);
@@ -471,8 +475,7 @@ class Widget_Accordion extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .elementor-accordion-icon.elementor-accordion-icon-left' => 'margin-right: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .elementor-accordion-icon.elementor-accordion-icon-right' => 'margin-left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementor-accordion-icon' => 'margin-inline-end: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);

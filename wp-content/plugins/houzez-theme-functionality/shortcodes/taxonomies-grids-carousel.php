@@ -126,24 +126,26 @@ if( !function_exists('houzez_taxonomies_grids_carousel') ) {
 					$term_link = get_term_link($term, $tax_name);
 				}
 				?>
-				<div class="taxonomy-item" style="background-image: url(<?php echo esc_url($img_url); ?>);">
-					<a class="taxonomy-link hover-effect-flat" href="<?php echo esc_url($term_link);?>">
-						<div class="taxonomy-text-wrap">
-							<div class="taxonomy-title"><?php echo esc_attr($term->name); ?></div>
-							<?php if( $houzez_hide_count != 1 ) { ?>
-							<div class="taxonomy-subtitle">
-								<?php echo esc_attr($term->count); ?> 
-								<?php
-								if ($term->count < 2) {
-									echo houzez_option('cl_property', 'Property');
-								} else {
-									echo houzez_option('cl_properties', 'Properties');
-								}
-								?>
-							</div>
-							<?php } ?>
-						</div><!-- taxonomy-text-wrap -->
-					</a>
+				<div class="taxonomy-item-wrap h-100">
+					<div class="taxonomy-item" style="background-image: url(<?php echo esc_url($img_url); ?>);">
+						<a class="taxonomy-link hover-effect-flat" href="<?php echo esc_url($term_link);?>">
+							<div class="taxonomy-text-wrap d-flex flex-column justify-content-end align-items-start h-100 w-100">
+								<div class="taxonomy-title"><?php echo esc_attr($term->name); ?></div>
+								<?php if( $houzez_hide_count != 1 ) { ?>
+								<div class="taxonomy-subtitle">
+									<?php echo esc_attr($term->count); ?> 
+									<?php
+									if ($term->count < 2) {
+										echo houzez_option('cl_property', 'Property');
+									} else {
+										echo houzez_option('cl_properties', 'Properties');
+									}
+									?>
+								</div>
+								<?php } ?>
+							</div><!-- taxonomy-text-wrap -->
+						</a>
+					</div>
 				</div>
 			<?php } 
 			}?>

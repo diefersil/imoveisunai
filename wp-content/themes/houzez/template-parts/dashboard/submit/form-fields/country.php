@@ -6,8 +6,8 @@ if (houzez_edit_property()) {
 	$country = houzez_get_post_term_slug($property_data->ID, 'property_country');
 }
 ?>
-<div class="form-group">
-	<label><?php echo houzez_option('cl_country', 'Country').houzez_required_field('country'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="country"><?php echo houzez_option('cl_country', 'Country').houzez_required_field('country'); ?></label>
 	<?php
 	if(houzez_option('location_dropdowns') == 'yes') { ?>
 		<select name="country" id="country" data-live-search-normalize="true" data-country="<?php echo urldecode($country); ?>" data-target="houzezSecondList" <?php houzez_required_field_2('country'); ?> class="houzezSelectFilter houzezFirstList selectpicker form-control bs-select-hidden" data-size="5" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}" data-live-search="true">

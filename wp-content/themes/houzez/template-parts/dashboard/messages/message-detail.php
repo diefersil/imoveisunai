@@ -12,7 +12,7 @@ $current_user_id =  get_current_user_id();
 $table = $wpdb->prefix . 'houzez_threads';
 $thread_id = $_REQUEST['thread_id'];
 
-$user_status = '<span class="text-danger"><i class="houzez-icon icon-single-neutral-circle mr-1"></i>'.esc_html__('Offline', 'houzez').'</span>';
+$user_status = '<span class="text-danger"><i class="houzez-icon icon-single-neutral-circle me-1"></i>'.esc_html__('Offline', 'houzez').'</span>';
 
 if ( isset( $_GET['seen'] ) && $_GET['seen'] == 1 ) {
 	houzez_update_message_status( $current_user_id, $thread_id );
@@ -55,127 +55,121 @@ if ( empty( $user_custom_picture )) {
 }
 
 if ( houzez_is_user_online( $thread_author ) ) {
-	$user_status = '<span class="text-success ml-2"><i class="houzez-icon icon-single-neutral-circle mr-1"></i>'.esc_html__('Online', 'houzez').'</span>';
+	$user_status = '<span class="text-success me-2"><i class="houzez-icon icon-single-neutral-circle me-1"></i>'.esc_html__('Online', 'houzez').'</span>';
 }
 ?>
 
 <?php if ( isset( $_GET['success'] ) && $_GET['success'] == true ) { ?>
 <div class="alert alert-success alert-dismissible" role="alert">
-	<button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	<?php esc_html_e( 'The message has been sent.', 'houzez' ); ?>
 </div>
 <?php } ?>
 
 <?php if ( isset( $_GET['success'] ) && $_GET['success'] == false ) { ?>
 <div class="alert alert-error alert-dismissible" role="alert">
-	<button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 	<?php esc_html_e( 'Oopps some thing getting wrong, please try again!', 'houzez' ); ?>
 </div>
 <?php } ?>
 
 <?php if( $houzez_thread ) { ?>
-<div class="dashboard-content-block">
-    <div class="message-top-wrap">
-        <div class="d-flex">
-            <div class="message-reply-user mr-3">
-                <img class="rounded-circle mt-1" src="<?php echo esc_url( $user_custom_picture ); ?>" alt="<?php echo $thread_author_display_name; ?>" width="40" height="40">
-            </div><!-- message-reply-user -->
-            <div class="message-reply-user">
-                <span class="mr-2"><?php echo ucfirst( $thread_author_display_name ); ?> 
-                    <?php echo $user_status; ?>
-                    <br>
-                    <strong><?php echo get_the_title( $houzez_thread->property_id ); ?></strong>
-                </span>
-            </div><!-- message-reply-user -->
-        </div><!-- d-flex -->
-    </div><!-- message-top-wrap -->
-</div><!-- dashboard-content-block -->
+<div class="heading d-flex align-items-center justify-content-between">
+  <div class="heading-text">
+    <h2><?php esc_html_e( 'Messages', 'houzez' ); ?></h2> 
+  </div>
+</div>
 
-<div class="dashboard-content-block">
-    
-    <div class="message-reply-wrap">
-        <div class="d-flex">
-            
-            <div class="message-reply-user mr-3">
-                <?php
-				$current_user_picture =  get_the_author_meta( 'fave_author_custom_picture' , $current_user_id );
+<div class="block-wrap">
+  <div class="d-flex align-items-center gap-4">
+    <div class="customer-image">
+      <img class="rounded-circle" src="<?php echo esc_url( $user_custom_picture ); ?>" alt="<?php echo $thread_author_display_name; ?>" width="40" height="40">
+    </div>
+    <div class="message-reply-user">
+      <span class="fw-bold"><?php echo ucfirst( $thread_author_display_name ); ?></span><br>
+      <?php echo $user_status; ?>
+      <br>
+      <strong><?php echo get_the_title( $houzez_thread->property_id ); ?></strong>
+    </div>
+  </div>
+</div>
 
-				if ( empty( $current_user_picture )) {
-					$current_user_picture = get_template_directory_uri().'/img/profile-avatar.png';
-				}
-				?>
-				<img src="<?php echo $current_user_picture; ?>" width="40" height="40" class="rounded-circle mt-1" alt="<?php the_author_meta( 'display_name', $current_user_id ) ?>">
-            </div><!-- message-reply-user -->
+<div class="houzez-data-content">
+  <div class="customer-replay-box">
+    <div class="block-wrap mb-0 pb-0">
+      <div class="d-flex align-items-start gap-3">
+        <div class="message-reply-user me-3">
+          <?php
+          $current_user_picture =  get_the_author_meta( 'fave_author_custom_picture' , $current_user_id );
 
-            <div class="message-reply-message flex-grow-1">
-                <form class="form-msg" method="post">
-                	<input type="hidden" name="start_thread_message_form_ajax"
-					   value="<?php echo wp_create_nonce('start-thread-message-form-nonce'); ?>"/>
-					<input type="hidden" name="thread_id" value="<?php echo intval($thread_id); ?>"/>
-					<input type="hidden" name="action" value="houzez_thread_message">
+          if ( empty( $current_user_picture )) {
+            $current_user_picture = get_template_directory_uri().'/img/profile-avatar.png';
+          }
+          ?>
+          <img src="<?php echo $current_user_picture; ?>" width="40" height="40" class="rounded-circle mt-1" alt="<?php the_author_meta( 'display_name', $current_user_id ) ?>">
+        </div><!-- message-reply-user -->
+        <div class="message-reply-message flex-grow-1">
+          <form class="form-msg" method="post">
+            <input type="hidden" name="start_thread_message_form_ajax"
+                value="<?php echo wp_create_nonce('start-thread-message-form-nonce'); ?>"/>
+            <input type="hidden" name="thread_id" value="<?php echo intval($thread_id); ?>"/>
+            <input type="hidden" name="action" value="houzez_thread_message">
 
-	                <div class="form-group">
-	                    <label><?php esc_html_e( 'Reply Message', 'houzez' ); ?></label>
-	                    <textarea class="form-control" name="message" rows="5" placeholder="<?php esc_html_e( 'Type your message here...', 'houzez' ); ?>"></textarea>
-	                </div>
+            <div class="mb-3">
+              <label class="form-label"><?php esc_html_e( 'Reply Message', 'houzez' ); ?></label>
+              <textarea class="form-control" name="message" rows="5" placeholder="<?php esc_html_e( 'Type your message here...', 'houzez' ); ?>" style="height: 100px;"></textarea>
+            </div>
 
-	                <button class="start_thread_message_form btn btn-primary">
-	                	<?php get_template_part('template-parts/loader'); ?>
-	                	<?php esc_html_e('Send Message', 'houzez'); ?>		
-	                </button>
-	                
-	                <!-- <button class="btn btn-light-grey-outlined pull-right"><i class="houzez-icon icon-attachment mr-2"></i> <?php esc_html_e('Attachment', 'houzez'); ?></button> -->
+            <button class="start_thread_message_form btn btn-primary">
+              <?php get_template_part('template-parts/loader'); ?>
+              <?php esc_html_e('Send Message', 'houzez'); ?>		
+            </button>
+          
+          </form>
+        </div><!-- message-reply-message -->
+      </div>
+    </div>
 
-	            </form>
-            </div><!-- message-reply-message -->
+    <div class="block-wrap">
+      <ul class="list-unstyled">
+        <?php foreach ( $houzez_messages AS $message ) { 
 
-        </div>
-    </div><!-- message-reply-wrap -->
+        $message_class = 'msg-me';
+        $message_author = $message->created_by;
+        $message_author_name = ucfirst( $thread_author_display_name );
+        $message_author_picture =  get_the_author_meta( 'fave_author_custom_picture' , $message_author );
 
-    <div class="message-list-wrap">
-        <ul class="list-unstyled message-list">
-            
-        	<?php foreach ( $houzez_messages AS $message ) { 
+        if ( $message_author == $current_user_id ) {
+          $message_author_name = esc_html__( 'Me', 'houzez' );
+          $message_class = '';
+        }
 
-			$message_class = 'msg-me';
-			$message_author = $message->created_by;
-			$message_author_name = ucfirst( $thread_author_display_name );
-			$message_author_picture =  get_the_author_meta( 'fave_author_custom_picture' , $message_author );
+        if ( empty( $message_author_picture )) {
+          $message_author_picture = get_template_directory_uri().'/img/profile-avatar.png';
+        }
 
-			if ( $message_author == $current_user_id ) {
-				$message_author_name = esc_html__( 'Me', 'houzez' );
-				$message_class = '';
-			}
-
-			if ( empty( $message_author_picture )) {
-				$message_author_picture = get_template_directory_uri().'/img/profile-avatar.png';
-			}
-
-			?>
-            <li class="message-list-item <?php echo esc_attr($message_class); ?>">
-                <div class="d-flex">
-                    <div class="message-reply-user mr-3">
-                        <img class="rounded-circle mt-1" src="<?php echo esc_url($message_author_picture); ?>" width="40" height="40" alt="<?php echo esc_attr($message_author_name); ?>">
-                    </div><!-- message-reply-user -->
-                    <div class="message-reply-message flex-grow-1">
-                        <p><strong><?php echo esc_attr($message_author_name); ?></strong><br>
-                            <time><span class="mr-3"><i class="houzez-icon icon-time-clock-circle mr-1"></i>  <?php echo date_i18n( get_option('time_format'), strtotime( $message->time ) ); ?> <i class="houzez-icon icon-attachment ml-3 mr-1"></i> <?php echo date_i18n( get_option('date_format'), strtotime( $message->time ) ); ?> </span></time>
-                        </p>
-                        
-                        <?php echo $message->message; ?>
-                    </div><!-- message-reply-message -->
-                </div>
-            </li>
-            
-            <?php } ?>
-        </ul>
-
-    </div><!-- message-reply-wrap -->
-</div><!-- dashboard-content-block -->
+        ?>
+        <li class="d-flex align-items-start gap-3 mb-4 <?php echo esc_attr($message_class); ?>">
+          <div class="message-reply-user me-3">
+            <img class="rounded-circle mt-1" src="<?php echo esc_url($message_author_picture); ?>" width="40" height="40" alt="<?php echo esc_attr($message_author_name); ?>">
+          </div><!-- message-reply-user -->
+          <div class="message-reply-message flex-grow-1">
+            <div class="mb-1">
+              <strong><?php echo esc_attr($message_author_name); ?></strong><br>
+              <time class="small"><span class="me-3"><i class="houzez-icon icon-time-clock-circle me-1"></i> <?php echo date_i18n( get_option('time_format'), strtotime( $message->time ) ); ?> <i class="houzez-icon icon-attachment ms-3 me-1"></i> <?php echo date_i18n( get_option('date_format'), strtotime( $message->time ) ); ?> </span></time>
+            </div>
+            <?php echo $message->message; ?>
+          </div><!-- message-reply-message -->
+        </li>
+        <?php } ?>
+      </ul>
+    </div>
+  </div>
+</div>
 <?php } else { ?>
-	<div class="dashboard-content-block">
-	    <div class="message-top-wrap">
-	    	<?php esc_html_e("You Don't have permission to access this message.", 'houzez'); ?>
-	    </div>
-	</div>
+<div class="dashboard-content-block">
+  <div class="message-top-wrap">
+    <?php esc_html_e("You Don't have permission to access this message.", 'houzez'); ?>
+  </div>
+</div>
 <?php } ?>

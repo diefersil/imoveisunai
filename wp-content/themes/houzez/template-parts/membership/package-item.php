@@ -88,24 +88,24 @@ while( $fave_qry->have_posts() ): $fave_qry->the_post(); $i++;
 
     ?>
     <div class="<?php echo esc_attr( $pkg_classes ); ?>">
-        <div class="price-table-module <?php echo esc_attr( $is_popular ); ?>">
+        <div class="price-table-module pt-4 text-center <?php echo esc_attr( $is_popular ); ?>">
             <div class="price-table-title">
                 <?php the_title(); ?>
             </div><!-- price-table-title -->
-            <div class="price-table-price-wrap">
+            <div class="price-table-price-wrap py-4">
                 <div class="d-flex align-items-start justify-content-center">
                     <?php echo $package_price; ?>
                 </div><!-- d-flex -->
             </div><!-- price-table-price-wrap -->
-            <div class="price-table-description">
-                <ul class="list-unstyled">
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
+            <div class="price-table-description border-bottom">
+                <ul class="list-unstyled d-flex flex-column justify-content-center mb-0">
+                    <li class="border-top py-3">
+                        <i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> 
                         <?php echo $houzez_local['time_period']; ?>: 
                         <strong><?php echo esc_attr( $pack_billing_frquency ).' '.HOUZEZ_billing_period( $pack_billing_period ); ?></strong>
                     </li>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
+                    <li class="border-top py-3">
+                        <i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> 
                         <?php echo houzez_option('cl_properties', 'Properties'); ?>: 
                         <?php if( $pack_unlimited_listings == 1 ) { ?>
                             <strong><?php echo $houzez_local['unlimited_listings']; ?></strong>
@@ -113,37 +113,37 @@ while( $fave_qry->have_posts() ): $fave_qry->the_post(); $i++;
                             <strong><?php echo esc_attr( $pack_listings ); ?></strong>
                         <?php } ?>
                     </li>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
+                    <li class="border-top py-3">
+                        <i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> 
                         <?php echo $houzez_local['featured_listings']; ?>: 
                         <strong><?php echo esc_attr( $pack_featured_listings ); ?></strong>
                     </li>
 
                     <?php if($fave_package_images != "") { ?>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
+                    <li class="border-top py-3">
+                        <i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> 
                         <?php echo esc_html_e('Images', 'houzez'); ?>: 
                         <strong><?php echo esc_attr( $fave_package_images ); ?></strong>
                     </li>
                     <?php } ?>
 
                     <?php if($pack_package_tax != "") { ?>
-                    <li>
-                        <i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> 
+                    <li class="border-top py-3">
+                        <i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> 
                         <?php esc_html_e('Taxes', 'houzez'); ?>: 
                         <strong><?php echo esc_attr( $pack_package_tax ).'%'; ?></strong>
                     </li>
                     <?php } ?>
                 </ul>
             </div><!-- price-table-description -->
-            <div class="price-table-button">
+            <div class="price-table-button p-4">
                 <?php if( houzez_is_woocommerce() && $pack_price > 0) { ?>
                     <a class="houzez-woocommerce-package btn btn-primary" data-packid="<?php echo get_the_ID(); ?>" href="#">
-                        <i class="houzez-icon icon-check-circle-1 mr-1"></i> <?php echo $houzez_local['get_started']; ?>
+                        <i class="houzez-icon icon-check-circle-1 me-1"></i> <?php echo $houzez_local['get_started']; ?>
                     </a>
                 <?php } else { ?>
                     <a class="btn btn-primary" href="<?php echo esc_url($payment_process_link); ?>">
-                        <i class="houzez-icon icon-check-circle-1 mr-1"></i> <?php echo $houzez_local['get_started']; ?>
+                        <i class="houzez-icon icon-check-circle-1 me-1"></i> <?php echo $houzez_local['get_started']; ?>
                     </a>
                 <?php } ?>
             </div><!-- price-table-button -->

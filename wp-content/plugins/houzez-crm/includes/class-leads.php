@@ -17,47 +17,72 @@ if ( ! class_exists( 'Houzez_Leads' ) ) {
 		}
 
 		public function delete_leads_csv_file() {
-			// Check if file_name is set in POST request
-			if (isset($_POST['file_name'])) {
-			    $file_name = $_POST['file_name'];
+		    // Verify nonce for security
+		    if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'delete_leads_csv_file_nonce')) {
+		        wp_send_json_error('Nonce verification failed.');
+		        return;
+		    }
 
-			    // Security check: validate file_name here
+		    // Check if file_name is set in POST request
+		    if (isset($_POST['file_name'])) {
+		        $file_name = sanitize_file_name($_POST['file_name']);
 
-			    $current_user_id = get_current_user_id();
+		        // Get the current user ID
+		        $current_user_id = get_current_user_id();
 
-			    // Retrieve the existing array of files
-			    $uploaded_files = get_user_meta($current_user_id, 'houzez_crm_leads_uploaded_csvs', true);
+		        // Retrieve the existing array of files for the current user
+		        $uploaded_files = get_user_meta($current_user_id, 'houzez_crm_leads_uploaded_csvs', true);
 
-			    // Get the custom upload directory
-			    $upload_dir = wp_upload_dir();
-			    $custom_upload_dir = $upload_dir['basedir'] . '/houzez-crm';
-			    $file_path = $custom_upload_dir . '/' . $file_name; // Full path to the file
+		        // Get the custom upload directory
+		        $upload_dir = wp_upload_dir();
+		        $custom_upload_dir = $upload_dir['basedir'] . '/houzez-crm';
+		        $file_path = $custom_upload_dir . '/' . $file_name; // Full path to the file
 
-			    if (!empty($uploaded_files) && is_array($uploaded_files)) {
-			        foreach ($uploaded_files as $key => $file_data) {
-			            if ($file_data['name'] == $file_name) {
-			                // Delete the file record from the database
-			                unset($uploaded_files[$key]);
-			                update_user_meta($current_user_id, 'houzez_crm_leads_uploaded_csvs', array_values($uploaded_files));
-			                break;
-			            }
-			        }
-			    }
+		        // Ensure the file path is within the houzez-crm directory and prevent path traversal
+		        if (strpos(realpath($file_path), realpath($custom_upload_dir)) === 0) {
+		            // Ensure the file is in the user's uploaded files
+		            if (!empty($uploaded_files) && is_array($uploaded_files)) {
+		                $file_belongs_to_user = false;
 
-			    // Check if the file exists and delete the file from the file system
-			    if (file_exists($file_path)) {
-			        unlink($file_path);
-			    }
+		                foreach ($uploaded_files as $key => $file_data) {
+		                    if ($file_data['name'] == $file_name) {
+		                        $file_belongs_to_user = true;
 
-			    wp_send_json_success('deleted');
-			}
+		                        // Delete the file record from the database
+		                        unset($uploaded_files[$key]);
+		                        update_user_meta($current_user_id, 'houzez_crm_leads_uploaded_csvs', array_values($uploaded_files));
+		                        break;
+		                    }
+		                }
 
+		                // Only delete the file if it belongs to the user and the path is valid
+		                if ($file_belongs_to_user && file_exists($file_path)) {
+		                    unlink($file_path);
+		                    wp_send_json_success('File deleted successfully.');
+		                } else {
+		                    wp_send_json_error('File does not belong to you or does not exist.');
+		                }
+		            } else {
+		                wp_send_json_error('No files found for this user.');
+		            }
+		        } else {
+		            wp_send_json_error('Invalid file path.');
+		        }
+		    } else {
+		        wp_send_json_error('No file specified.');
+		    }
 		}
+
+
+
 
 		public function crm_upload_csv_handler() {
 
 		    // Check if the user has the capability to upload files
-		    if (!current_user_can('upload_files')) {
+		    $current_user = wp_get_current_user();
+		    $allowed_roles = array('houzez_agent', 'houzez_agency');
+		    
+		    if (!current_user_can('upload_files') && !array_intersect($allowed_roles, $current_user->roles)) {
 		    	$permissions = esc_html__('You do not have permission to upload files.', 'houzez-crm');
 		        wp_send_json_error($permissions);
 		        wp_die();
@@ -469,6 +494,28 @@ if ( ! class_exists( 'Houzez_Leads' ) ) {
 		    global $wpdb;
 		    $table_name = $wpdb->prefix . 'houzez_crm_leads';
 		    
+		    // Verify nonce for security
+		    if ( !isset( $_POST['security'] ) || !wp_verify_nonce( $_POST['security'], 'get_lead_nonce' ) ) {
+		        echo json_encode( 
+		            array( 
+		                'success' => false, 
+		                'msg' => esc_html__('Security check failed!', 'houzez-crm') 
+		            ) 
+		        );
+		        wp_die();
+		    }
+		    
+		    // Check user capabilities - require at least 'edit_posts' capability
+		    if ( !current_user_can('edit_posts') ) {
+		        echo json_encode( 
+		            array( 
+		                'success' => false, 
+		                'msg' => esc_html__('You do not have permission to access this resource.', 'houzez-crm') 
+		            ) 
+		        );
+		        wp_die();
+		    }
+		    
 		    $lead_id = '';
 		    if ( isset( $_POST['lead_id'] ) ) {
 		        $lead_id = intval( $_POST['lead_id'] );
@@ -483,8 +530,17 @@ if ( ! class_exists( 'Houzez_Leads' ) ) {
 		        );
 		        wp_die();
 		    }
-
-		    $sql = $wpdb->prepare("SELECT * FROM {$table_name} WHERE lead_id = %d", $lead_id);
+		    
+		    $current_user_id = get_current_user_id();
+		    
+		    // Build query with ownership check unless user is admin
+		    if ( current_user_can('manage_options') ) {
+		        // Admin can access all leads
+		        $sql = $wpdb->prepare("SELECT * FROM {$table_name} WHERE lead_id = %d", $lead_id);
+		    } else {
+		        // Regular users can only access their own leads
+		        $sql = $wpdb->prepare("SELECT * FROM {$table_name} WHERE lead_id = %d AND user_id = %d", $lead_id, $current_user_id);
+		    }
 
 		    $result = $wpdb->get_row( $sql, OBJECT );
 
@@ -496,8 +552,15 @@ if ( ! class_exists( 'Houzez_Leads' ) ) {
 		            ) 
 		        );
 		        wp_die();
+		    } else {
+		        echo json_encode( 
+		            array( 
+		                'success' => false, 
+		                'msg' => esc_html__('Lead not found or you do not have permission to access it.', 'houzez-crm') 
+		            ) 
+		        );
+		        wp_die();
 		    }
-		    return '';
 		}
 
 
@@ -554,6 +617,14 @@ if ( ! class_exists( 'Houzez_Leads' ) ) {
 			if ( isset( $_POST['user_type'] ) ) {
 				$user_type = sanitize_text_field( $_POST['user_type'] );
 				$user_type = houzez_crm_get_form_user_type($user_type);
+				
+				// Remove slashes and properly decode HTML entities
+				$user_type = stripslashes($user_type);
+				$user_type = str_replace('&nbsp;', '', $user_type);
+				$user_type = html_entity_decode($user_type, ENT_QUOTES);
+				
+				// Ensure no additional slashes are added when saving
+				$user_type = wp_unslash($user_type);
 			}
 
 			$email = '';

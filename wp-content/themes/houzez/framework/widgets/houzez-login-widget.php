@@ -57,32 +57,40 @@ class houzez_login_widget extends WP_Widget {
 
         if( is_user_logged_in() ) { ?>
 
-            <div class="widget-body">
-                <div class="media">
-                    <div class="media-left">
-                        <div class="thumb">
-                            <img src="<?php echo esc_url( $user_custom_picture ); ?>" alt="Image" width="64">
-                        </div>
+            <div class="widget-body" role="region">
+                <div class="logged-in-wrap">
+                    <div class="d-flex align-items-center">
+                        <img class="me-3 rounded-circle" src="<?php echo esc_url( $user_custom_picture ); ?>" alt="<?php echo esc_attr( sprintf( __( 'Profile picture of %s', 'houzez' ), $current_user->display_name ) ); ?>">
+                        <div>
+                            <span role="heading" aria-level="4"><?php echo esc_attr( $current_user->display_name ); ?></span><br>
+                            <a href="<?php echo wp_logout_url( home_url('/') ); ?>" role="button"><?php esc_html_e( 'Log out', 'houzez' ); ?></a>
+                        </div>    
                     </div>
-                    <div class="media-body v-align-middle">
-                        <p><?php echo esc_attr( $current_user->display_name ); ?></p>
-                        <a href="<?php echo wp_logout_url( home_url('/') ); ?>"> <i class="fa fa-unlock"></i> <?php esc_html_e( 'Log out', 'houzez' ); ?> </a>
-                    </div>
-                </div>
+                </div>        
             </div>
 
         <?php } else { ?>
 
-                <div class="widget-body">
-                    <ul class="login-tabs">
-                        <li class="active"><?php esc_html_e( 'Login', 'houzez' ); ?></li>
-                        <li><?php esc_html_e( 'Register', 'houzez' ); ?></li>
-                    </ul>
-                    <div class="modal-body login-block">
-                        <?php get_template_part('template-parts/login-register'); ?>
+            <div class="widget-body" role="tablist">
+                <div class="login-register-tabs pb-2">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#widget-login-form-tab" role="tab" aria-selected="true" aria-controls="widget-login-form-tab"><?php esc_html_e( 'Login', 'houzez' ); ?></a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#widget-register-form-tab" role="tab" aria-selected="false" aria-controls="widget-register-form-tab"><?php esc_html_e( 'Register', 'houzez' ); ?></a>
+                        </li>
+                    </ul>    
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="widget-login-form-tab" role="tabpanel">
+                        <?php get_template_part('template-parts/login-register/login-form'); ?>
+                    </div>
+                    <div class="tab-pane fade" id="widget-register-form-tab" role="tabpanel">
+                        <?php get_template_part('template-parts/login-register/register-form'); ?>
                     </div>
                 </div>
-
+            </div>
 
             <?php
         }

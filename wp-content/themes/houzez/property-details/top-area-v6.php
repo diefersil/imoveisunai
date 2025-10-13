@@ -1,90 +1,110 @@
 <?php
-global $post;
+global $post,$featured_image_url, $total_images, $property_gallery_popup_type;
 
-$size = 'full';
-
-$listing_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
+// Get the dynamically assigned image size for this layout
+$image_size = houzez_get_image_size_for('property_detail_v6');
+$images_ids = get_post_meta($post->ID, 'fave_property_images', false);
 $i = 0; $j = 0;
-$total_images = count($listing_images);
+$total_images = count($images_ids);
 $property_gallery_popup_type = houzez_get_popup_gallery_type();
 $gallery_token = wp_generate_password(5, false, false);
 
-$photoswipe_gallery_class = '';
-$builtin_gallery_class = 'houzez-trigger-popup-slider-js';
-$dataModal = 'href="#" data-toggle="modal" data-target="#property-lightbox"';
-if( $property_gallery_popup_type == 'photoswipe' ) {
-	$photoswipe_gallery_class = 'houzez-photoswipe';
-	$dataModal = '';
-	$builtin_gallery_class = '';
+
+$featured_image_id = get_post_thumbnail_id($post->ID);
+$featured_image = wp_get_attachment_image_src( $featured_image_id, $image_size, true );
+$featured_image_url = $featured_image[0] ?? '';
+
+$property_gallery_popup_type = houzez_get_popup_gallery_type(); 
+if( ! has_post_thumbnail( $post->ID ) || get_the_post_thumbnail($post->ID) == "" ) {
+	$featured_image_url = houzez_get_image_placeholder_url($image_size);
 }
+
+$builtin_gallery_class = ' houzez-trigger-popup-slider-js';
+$dataModal = 'href="#" data-bs-toggle="modal" data-bs-target="#property-lightbox"';
 $layout = houzez_option('property_blocks');
 $layout = $layout['enabled'];
 ?>
-<div class="property-top-wrap">
-    <div class="property-banner">
-		<div class="visible-on-mobile">
-			<div class="tab-content" id="pills-tabContent">
-				<?php get_template_part('property-details/partials/media-tabs'); ?>
-			</div><!-- tab-content -->
-		</div><!-- visible-on-mobile -->
+<div class="property-banner" role="region">
+	<div class="d-block d-md-none" role="region">
+		<?php get_template_part('property-details/partials/gallery-v6'); ?>
+	</div><!-- visible-on-mobile -->
 
-		<div class="container hidden-on-mobile">
-			<div id="houzez-photoswipe-gallery-<?php echo esc_attr($gallery_token); ?>" class="row <?php echo esc_attr($photoswipe_gallery_class);?>">
-				<?php
-				if(!empty($listing_images)) {
-					foreach( $listing_images as $image ) { $i++; 
+	<div class="container d-none d-md-block" role="region">
+		<div class="hs-gallery-v4-grid pb-4">
+			<?php
+			if(!empty($images_ids)) {
+				foreach( $images_ids as $image ) { 
+					// Skip if attachment doesn't exist
+					if ( ! get_post_status( $image ) ) {
+						continue;
+					}
+					$i++; 
 
-						if( $property_gallery_popup_type == 'photoswipe' ) {
-							$image_dimensions = houzez_get_image_dimensions_by_url($image['full_url']);
-							$width = $image_dimensions['width'];
-							$height = $image_dimensions['height'];
-							$dataModal = 'href="'.esc_url($image['full_url']).'" data-gallery-item data-pswp-width="'.esc_attr($width).'" data-pswp-height="'.esc_attr($height).'"';
-						}
-					
-						if($i == 1) {
-						?>
-						<div class="col-md-8">
-							<a data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" class="<?php echo esc_attr($builtin_gallery_class); ?> img-wrap-1" <?php echo $dataModal; ?>>
-								<img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
-							</a>
-						</div><!-- col-md-8 -->
-						<?php } elseif($i == 2 || $i == 3) { ?>
+					$image_id = $image;
+					$image_data = wp_get_attachment_image_src( $image_id, $image_size );
+					$image_data_url = $image_data[0] ?? '';
 
-						<?php if($i == 2) { ?>
-						<div class="col-md-4">
+					if( $property_gallery_popup_type == 'photoswipe' ) {
+						$full_image = wp_get_attachment_image_src( $image_id, 'full' );
+						$full_image_url = $full_image[0] ?? '';
+						$dataModal = 'href="#" data-src="'.esc_url($full_image_url).'" data-houzez-fancybox data-fancybox="gallery"';
+						$builtin_gallery_class = '';
+					}
+				
+					if($i == 1) {
+					?>
+					<div class="hs-gallery-v4-grid-item hs-gallery-v4-grid-item-01">
+						<a data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" class="img-wrap-1<?php echo esc_attr($builtin_gallery_class); ?>" <?php echo $dataModal; ?>>
+							<img class="img-fluid" src="<?php echo esc_url($image_data_url); ?>" alt="<?php echo esc_attr($image_data[1]); ?>">
+						</a>
+					</div><!-- col-md-8 -->
+					<?php } elseif($i == 2 || $i == 3) { ?>
+
+					<?php if($i == 2) { ?>
+					<div class="hs-gallery-v4-grid-item hs-gallery-v4-grid-item-02">
+						
 						<?php } ?>
-							<a data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" <?php echo $dataModal; ?> class="<?php echo esc_attr($builtin_gallery_class); ?> swipebox img-wrap-<?php echo esc_attr($i); ?>">
+							<a data-slider-no="<?php echo esc_attr($i); ?>" data-image="<?php echo esc_attr($j); ?>" <?php echo $dataModal; ?> class="<?php echo esc_attr($builtin_gallery_class); ?> img-wrap-<?php echo esc_attr($i); ?>">
 								<?php if($total_images > 3 && $i == 3) { ?>
-								<div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun mr-1"></i> <?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
+								<div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun me-1" aria-hidden="true"></i> <?php echo $total_images-3; ?> <?php echo esc_html__('More', 'houzez'); ?></div>
 								<?php } ?>
 
-								<img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+								<img class="img-fluid" src="<?php echo esc_url($image_data_url); ?>" alt="<?php echo esc_attr($image_data[1]); ?>">
 							</a>
 						<?php if( ($i == 3 && $total_images == 3) || ( $i == 2 && $total_images == 2 ) || ( $i == 1 && $total_images == 1 ) || $i == 3 ) { ?>
-						</div><!-- col-md-4 -->
-						<?php } ?>
-						<?php } else { ?>
-							<a class="img-wrap-1 gallery-hidden" <?php echo $dataModal; ?>>
-								<img class="img-fluid" src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
-							</a>
-						<?php
-						}
-						$j++;
+						
+					</div><!-- col-md-4 -->
+					<?php } ?>
+					<?php } else { ?>
+						<a class="img-wrap-1 gallery-hidden" <?php echo $dataModal; ?>>
+							<img class="img-fluid" src="<?php echo esc_url($image_data_url); ?>" alt="<?php echo esc_attr($image_data[1]); ?>">
+						</a>
+					<?php
 					}
-				}?>
-				
-				<?php 
-				if( ! array_key_exists( 'overview-v2', $layout ) ) { ?>
-				<div class="col-md-12">
-					<div class="block-wrap">
-						<div class="d-flex property-overview-data">
-							<?php get_template_part('property-details/partials/overview-data'); ?>
-						</div><!-- d-flex -->
-					</div><!-- block-wrap -->
-				</div><!-- col-md-12 -->
-				<?php } ?>
-			</div><!-- row -->
-		</div><!-- hidden-on-mobile -->
-	</div><!-- property-banner -->
+					$j++;
+				}
+			}?>
+		</div><!-- hs-gallery-v4-grid -->
 
-</div><!-- property-top-wrap -->
+		<?php 
+		if( ! array_key_exists( 'overview-v2', $layout ) ) { 
+			$args = array(
+				'overview' => 'v3',
+			);	
+		?>
+		<div class="row pb-4">
+			<div class="col-md-12">
+				<div class="block-wrap m-0 p-0 border-0">
+					<div class="d-flex property-overview-data text-center" role="list">
+						<?php 
+						set_query_var('args', $args);
+						get_template_part('property-details/partials/overview-data-v3'); 
+						?>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php } ?>
+	</div><!-- hidden-on-mobile -->
+</div><!-- property-banner -->
+

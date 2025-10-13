@@ -10,9 +10,7 @@ if( $houzez_walkscore != 0 && $houzez_walkscore_api != '' ) {
 			<h2><?php echo houzez_option('sps_walkscore', 'Walk Score'); ?></h2>
 		</div><!-- block-title-wrap -->
 		<div class="block-content-wrap">
-
 			<?php houzez_walkscore($post->ID); ?>
-
 		</div><!-- block-content-wrap -->
 	</div><!-- block-wrap -->
 </div><!-- property-walkscore-wrap -->

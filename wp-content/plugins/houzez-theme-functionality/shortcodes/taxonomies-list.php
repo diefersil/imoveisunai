@@ -61,6 +61,12 @@ if( !function_exists('houzez_taxonomies_list') ) {
 			$custom_link_for = 'fave_prop_taxonomy_custom_link';
 		}
 
+		if( $count_position == 'separated' ) {
+			$count_position = 'ms-auto';
+		} else {
+			$count_position = 'ms-2';
+		}
+
 		$tax_name = $houzez_cards_from;
 		$taxonomy = get_terms(array(
 			'hide_empty' => $houzez_hide_empty,
@@ -75,11 +81,11 @@ if( !function_exists('houzez_taxonomies_list') ) {
 
 		<div class="taxonomy-list-module">
 
-			<div class="taxonomy-item-list taxonomy-item-list-count-<?php echo esc_attr($count_position);?>">
+			<div class="taxonomy-item-list">
 				<?php if( $list_title != "" ) { ?>
 				<h3><?php echo esc_html( $list_title )?></h3>
 				<?php } ?>
-				<ul>
+				<ul class="list-unstyled d-flex flex-column">
 				<?php
 				if ( !is_wp_error( $taxonomy ) ) {
 
@@ -94,7 +100,7 @@ if( !function_exists('houzez_taxonomies_list') ) {
 					}
 					?>
 					
-					<li>
+					<li class="d-flex align-items-center">
 						<?php if( !$icon == '' ) { ?>
 
 							<span class="hz-list-icon">
@@ -104,12 +110,12 @@ if( !function_exists('houzez_taxonomies_list') ) {
 						<?php
 						} else { ?>
 						<span class="hz-list-icon">
-							<i class="houzez-icon icon-arrow-right-1"></i>
+							<i class="houzez-icon icon-arrow-right-1 me-1"></i>
 						</span>
 						<?php } ?>
 						<a href="<?php echo esc_url($term_link); ?>"><?php echo esc_html($term->name); ?></a> 
 						<?php if( $houzez_hide_count != 1 ) { ?>
-						<span class="count">(<?php esc_attr_e( $term->count );?>)</span>
+						<span class="count <?php echo esc_attr($count_position);?>">(<?php esc_attr_e( $term->count );?>)</span>
 						<?php } ?>
 					</li>
 

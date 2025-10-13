@@ -55,21 +55,21 @@ class houzez_contact_us extends WP_Widget {
 			<div class="widget-body">
 				<div class="widget-content">
 					<p><?php echo wp_kses_post( $about_text ); ?></p>
-					<ul class="list-unstyled contact-list">
+					<ul class="list-unstyled contact-list d-flex flex-column gap-2" role="list">
 						<?php if( !empty($address) ) { ?>
-	                    <li><i class="houzez-icon icon-pin mr-1"></i> <?php echo esc_attr( $address ); ?></li>
+	                    <li role="listitem"><i class="houzez-icon icon-pin me-1" aria-hidden="true"></i> <span><?php echo esc_attr( $address ); ?></span></li>
 	                    <?php } ?>
 
 	                    <?php if( !empty($phoneCall) ) { ?>
-	                    <li><i class="houzez-icon icon-phone mr-1"></i> <a href="tel:<?php echo esc_attr($phoneCall);?>"><?php echo esc_attr( $phoneNumber ); ?></a></li>
+	                    <li role="listitem"><i class="houzez-icon icon-phone me-1" aria-hidden="true"></i> <span><a href="tel:<?php echo esc_attr($phoneCall);?>"><?php echo esc_attr( $phoneNumber ); ?></a></span></li>
 	                    <?php } ?>
 
 						<?php if( !empty($fax) ) { ?>
-							<li><i class="houzez-icon icon-answer-machine mr-1"></i> <?php echo esc_attr( $fax ); ?></li>
+							<li role="listitem"><i class="houzez-icon icon-answer-machine me-1" aria-hidden="true"></i> <span><?php echo esc_attr( $fax ); ?></span></li>
 						<?php } ?>
 
 	                    <?php if( !empty($email) ) { ?>
-	                    <li><i class="houzez-icon icon-envelope mr-1"></i> <a href="mailto:<?php echo esc_attr( $email ); ?>"><?php echo esc_attr( $email ); ?></a></li>
+	                    <li role="listitem"><i class="houzez-icon icon-envelope me-1" aria-hidden="true"></i> <a href="mailto:<?php echo esc_attr( $email ); ?>" aria-label="<?php echo esc_attr( sprintf( __('Email us at %s', 'houzez'), $email ) ); ?>"><?php echo esc_attr( $email ); ?></a></li>
 	                    <?php } ?>
 					</ul>
 				</div><!-- widget-content -->

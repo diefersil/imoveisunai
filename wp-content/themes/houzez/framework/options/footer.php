@@ -200,14 +200,6 @@ Redux::setSection( $houzez_opt_name, array(
             'desc' => esc_html__( 'Enter the Telegram username', 'houzez' ),
             'default'  => false,
         ),
-        array(
-            'id'       => 'fs-skype',
-            'type'     => 'text',
-            'required' => array( 'social-footer', '=', '1' ),
-            'title'    => esc_html__( 'Skype', 'houzez' ),
-            'desc' => esc_html__( 'Enter the Skype username', 'houzez' ),
-            'default'  => false,
-        ),
 
         array(
             'id'     => 'ftb_section_end',

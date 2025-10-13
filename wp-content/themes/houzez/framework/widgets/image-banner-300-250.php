@@ -58,7 +58,7 @@ class houzez_Image_Banner_300_250 extends WP_Widget {
 		            </a>
 				</div><!-- widget-content -->
 			</div><!-- widget-body -->
-            
+        
 	    <?php 
 		echo wp_kses( $after_widget, $allowed_html_array );
 		

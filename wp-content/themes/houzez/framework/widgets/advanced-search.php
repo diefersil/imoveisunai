@@ -131,7 +131,7 @@ if( !function_exists('houzez_advanced_search_widget') ) {
     ?>
     
         <div class="advanced-search-widget">
-            <form class="houzez-search-form-js" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
+            <form class="houzez-search-form-js d-flex flex-column gap-2" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
                 <?php
                 $i = 0;
                 if ($layout) {
@@ -142,7 +142,7 @@ if( !function_exists('houzez_advanced_search_widget') ) {
                             get_template_part('template-parts/search/fields/'.$key);
                             
                         } else {
-                            houzez_get_custom_search_field($key);
+                            Houzez_Property_Search::get_custom_search_field($key);
                         }
                     }
                 }
@@ -152,7 +152,21 @@ if( !function_exists('houzez_advanced_search_widget') ) {
                 }
 
                 if(houzez_is_other_featuers_search()) {
-                    get_template_part('template-parts/search/other-features');
+                ?>
+                <div class="features-list-wrap pt-3 pb-3" role="region">
+                    <a class="btn-features-list d-flex align-items-center" data-bs-toggle="collapse" href="#features-list" role="button" aria-expanded="false" aria-controls="features-list">
+                        <i class="houzez-icon icon-add-square me-2" aria-hidden="true"></i>
+                        <span id="features-heading"><?php echo houzez_option('srh_other_features', 'Other Features'); ?></span>
+                    </a>
+                    <div class="collapse" id="features-list" role="group">
+                        <div class="container-fluid p-0">
+                            <div class="features-list row g-1 row-cols-1 pt-4" role="list">
+                                <?php get_template_part('template-parts/search/fields/feature-field'); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php
                 }
 
                 get_template_part('template-parts/search/fields/submit-button'); ?>

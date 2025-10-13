@@ -93,6 +93,7 @@ if( !function_exists('houzez_get_localization')) {
 			'start_date'		=> esc_html__( 'Start date', 'houzez' ),
 			'end_date'			=> esc_html__( 'End date', 'houzez' ),
 			'invoice_type'		=> esc_html__( 'Type', 'houzez' ),
+			'invoice_details'	=> esc_html__( 'Invoice Details', 'houzez' ),
 			'invoice_listing'	=> esc_html__( 'Listing', 'houzez' ),
 			'invoice_package'	=> esc_html__( 'Package', 'houzez' ),
 			'invoice_feat_list'		=> esc_html__( 'Listing with Featured', 'houzez' ),

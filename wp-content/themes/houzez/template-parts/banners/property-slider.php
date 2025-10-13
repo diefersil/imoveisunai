@@ -12,7 +12,7 @@ if(houzez_option('adv_search_which_header_show')['header_ps'] != 0) {
 }
 ?>
 <section class="top-banner-wrap <?php echo esc_attr($is_dock_search); ?> <?php houzez_banner_fullscreen(); ?> property-slider-wrap">
-	<div class="property-slider houzez-all-slider-wrap" data-autoplay="<?php echo esc_attr(houzez_option('banner_slider_autoplay', 1)); ?>" data-loop="<?php echo esc_attr(houzez_option('banner_slider_loop', 1)); ?>" data-speed="<?php echo esc_attr(houzez_option('banner_slider_autoplayspeed', '4000')); ?>">
+	<div class="property-slider property-banner-slider houzez-all-slider-wrap">
 		<?php 
 		if( $slider->have_posts() ): 
 			while( $slider->have_posts() ): $slider->the_post();

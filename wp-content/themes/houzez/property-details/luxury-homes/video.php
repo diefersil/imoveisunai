@@ -9,10 +9,10 @@ if( !empty( $prop_video_url ) ) {
 
     endif;
 ?>
-<div class="fw-property-video-wrap fw-property-section-wrap" id="property-video-wrap">
-	<div class="block-video-wrap">
-		<!-- Copy & Pasted from YouTube -->
-		<?php $embed_code = wp_oembed_get($prop_video_url); echo $embed_code; ?>
+
+<div class="fw-property-video-wrap fw-property-section-wrap" id="property-video-wrap" role="region">
+	<div class="block-video-wrap ratio ratio-16x9">
+	<?php $embed_code = wp_oembed_get($prop_video_url); echo $embed_code; ?>
 	</div>
 </div><!-- fw-property-video-wrap -->
 <?php } ?>

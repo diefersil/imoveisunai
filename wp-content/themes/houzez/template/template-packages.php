@@ -27,11 +27,11 @@ if(houzez_check_is_elementor()) {
         ?>
         <section class="frontend-submission-page">
             <div class="container">
-                <div class="dashboard-content-block-wrap">
+                <div class="dashboard-content-block-wrap my-5">
                     <div class="row row-no-padding">
                         <?php get_template_part('template-parts/membership/package-item'); ?>
                     </div>
-                </div><!-- dashboard-content-block-wrap -->
+                </div><!-- block-content-wrap -->
             </div><!-- container -->
         </section><!-- frontend-submission-page -->
         <?php
@@ -41,7 +41,7 @@ if(houzez_check_is_elementor()) {
 
     <section class="frontend-submission-page">
         <div class="container">
-            <div class="dashboard-content-block-wrap">
+            <div class="block-content-wrap my-5">
                 <?php
                 if( have_posts() ):
                     while( have_posts() ): the_post();
@@ -58,7 +58,7 @@ if(houzez_check_is_elementor()) {
                     echo '<div>';
                 }
                 ?>
-            </div><!-- dashboard-content-block-wrap -->
+            </div><!-- block-content-wrap -->
             
         </div><!-- container -->
     </section>

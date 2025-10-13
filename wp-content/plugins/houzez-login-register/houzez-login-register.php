@@ -2,8 +2,8 @@
 /*
 Plugin Name: Houzez Login Register
 Plugin URI:  http://themeforest.net/user/favethemes
-Description: Adds login register functionality for houzez theme
-Version:     3.2.1
+Description: Adds login register functionality for houzez theme 
+Version:     4.0.4
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 License:     GPL2
@@ -35,6 +35,7 @@ class Houzez_login_register {
          * Plugin Path
          */
         define( 'HOUZEZ_LOGIN_FUNC_PATH', plugin_dir_path( __FILE__ ) );
+        define( 'HOUZEZ_LOGIN_INCLUDES_PATH', plugin_dir_path( __FILE__ ) . 'includes/' );
 
         define( 'HOUZEZ_LOGIN_PLUGIN_URL',               plugin_dir_url( __FILE__ )); // Plugin directory URL
         define( 'HOUZEZ_LOGIN_PLUGIN_DIR',               plugin_dir_path( __FILE__ ) ); // Plugin directory path
@@ -53,10 +54,12 @@ class Houzez_login_register {
     function houzez_login_inc_files() {
 
         //Login Register
-        require_once( HOUZEZ_LOGIN_FUNC_PATH . 'functions/login_register.php');
-        require_once( HOUZEZ_LOGIN_FUNC_PATH . 'functions/social_login.php');
-        require_once( HOUZEZ_LOGIN_FUNC_PATH . 'functions/roles.php');
-        require_once( HOUZEZ_LOGIN_FUNC_PATH . 'functions/roles-functions.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'helper.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'login_register.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'social_login.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'roles.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'roles-functions.php');
+        require_once( HOUZEZ_LOGIN_INCLUDES_PATH . 'class-user-approval.php');
 
     }
 

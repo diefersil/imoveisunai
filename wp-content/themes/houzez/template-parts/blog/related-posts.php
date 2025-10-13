@@ -16,7 +16,7 @@ if( $related_posts ) {
 ?>
 <div class="related-posts-wrap">
 	<h2><?php esc_html_e( 'Related posts', 'houzez' ); ?></h2>
-	<div class="row">
+	<div class="row g-3">
 		<?php foreach( $related_posts as $post ): setup_postdata( $post ); ?>
         <div class="col-md-4">
             <?php get_template_part('content-grid-1'); ?>

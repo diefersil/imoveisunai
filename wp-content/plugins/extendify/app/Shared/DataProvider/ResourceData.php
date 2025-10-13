@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cache data.
  */
@@ -15,6 +16,7 @@ use Extendify\Shared\Services\Sanitizer;
 /**
  * The cache data class.
  */
+
 class ResourceData
 {
     /**
@@ -45,19 +47,21 @@ class ResourceData
      */
     public static function scheduleCache()
     {
-        // phpcs:ignore WordPress.WP.CronInterval -- Verified > 30 days.
-        \add_filter('cron_schedules', function ($schedules) {
-            $schedules['every_month'] = [
-                'interval' => (30 * DAY_IN_SECONDS), // phpcs:ignore
-                'display' => __('Every month', 'extendify-local'),
-            ];
-            return $schedules;
+        \add_action('init', function () {
+		        // phpcs:ignore WordPress.WP.CronInterval -- Verified > 30 days.
+            \add_filter('cron_schedules', function ($schedules) {
+                $schedules['extendify_every_month'] = [
+                    'interval' => (30 * DAY_IN_SECONDS), // phpcs:ignore
+                    'display' => __('Every month', 'extendify-local'),
+                ];
+                return $schedules;
+            });
         });
 
         if (! \wp_next_scheduled('extendify_cache_data')) {
             \wp_schedule_event(
                 (\current_time('timestamp') + DAY_IN_SECONDS), // phpcs:ignore
-                'every_month',
+                'extendify_every_month',
                 'extendify_cache_data'
             );
         }
@@ -78,11 +82,11 @@ class ResourceData
                 return;
             }
 
-            wp_schedule_single_event(time(), 'update_domains_cache');
+            wp_schedule_single_event(time(), 'extendify_update_domains_cache');
             spawn_cron();
         });
 
-        \add_action('update_domains_cache', function () {
+        \add_action('extendify_update_domains_cache', function () {
             if (!defined('EXTENDIFY_PARTNER_ID')) {
                 return;
             }
@@ -90,7 +94,6 @@ class ResourceData
             $data = DomainsSuggestionController::fetchDomainSuggestions()->get_data();
             set_transient('extendify_domains', Sanitizer::sanitizeArray($data));
         });
-
     }
 
     /**
@@ -110,7 +113,7 @@ class ResourceData
 
         $domains = get_transient('extendify_domains');
         if (empty($domains)) {
-            wp_schedule_single_event(time(), 'update_domains_cache');
+            wp_schedule_single_event(time(), 'extendify_update_domains_cache');
             spawn_cron();
         }
 
@@ -165,6 +168,10 @@ class ResourceData
     protected function cacheData($functionName, $data)
     {
         // The scheduler runs monthly, one day before the cache expires.
-        set_transient('extendify_' . $functionName, Sanitizer::sanitizeArray($data), (DAY_IN_SECONDS + MONTH_IN_SECONDS));
+        set_transient(
+            'extendify_' . $functionName,
+            Sanitizer::sanitizeArray($data),
+            (DAY_IN_SECONDS + MONTH_IN_SECONDS)
+        );
     }
 }

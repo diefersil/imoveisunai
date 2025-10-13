@@ -20,7 +20,7 @@ if(houzez_option('blog_author_box')) {
 <div class="author-detail-wrap">
     <div class="d-flex">
         <div class="post-author-thumb">
-            <a><img src="<?php echo esc_url( $author_image ); ?>" alt="img" class="rounded-circle img-fluid"></a>
+            <a href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>"><img src="<?php echo esc_url( $author_image ); ?>" width="70" height="70" alt="img" class="rounded-circle img-fluid"></a>
         </div><!-- post-author-thumb -->
 
         <div class="post-author-bio">
@@ -32,7 +32,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $facebook ) ) { ?>
                 <span>
                     <a class="btn-facebook" target="_blank" href="<?php echo esc_url( $facebook ); ?>">
-                        <i class="houzez-icon icon-social-media-facebook mr-2"></i>
+                        <i class="houzez-icon icon-social-media-facebook me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -40,7 +40,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $instagram ) ) { ?>
                 <span>
                     <a class="btn-instagram" target="_blank" href="<?php echo esc_url( $instagram ); ?>">
-                        <i class="houzez-icon icon-social-instagram mr-2"></i>
+                        <i class="houzez-icon icon-social-instagram me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -48,7 +48,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $twitter ) ) { ?>
                 <span>
                     <a class="btn-twitter" target="_blank" href="<?php echo esc_url( $twitter ); ?>">
-                        <i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i>
+                        <i class="houzez-icon icon-x-logo-twitter-logo-2 me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -56,7 +56,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $linkedin ) ) { ?>
                 <span>
                     <a class="btn-linkedin" target="_blank" href="<?php echo esc_url( $linkedin ); ?>">
-                        <i class="houzez-icon icon-professional-network-linkedin mr-2"></i>
+                        <i class="houzez-icon icon-professional-network-linkedin me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -64,7 +64,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $googleplus ) ) { ?>
                 <span>
                     <a class="btn-googleplus" target="_blank" href="<?php echo esc_url( $googleplus ); ?>">
-                        <i class="houzez-icon icon-social-media-google-plus-1 mr-2"></i>
+                        <i class="houzez-icon icon-social-media-google-plus-1 me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -72,7 +72,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $youtube ) ) { ?>
                 <span>
                     <a class="btn-youtube" target="_blank" href="<?php echo esc_url( $youtube ); ?>">
-                        <i class="houzez-icon icon-social-video-youtube-clip mr-2"></i>
+                        <i class="houzez-icon icon-social-video-youtube-clip me-2"></i>
                     </a>
                 </span>
                 <?php } ?> 
@@ -80,7 +80,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $tiktok ) ) { ?>
                 <span>
                     <a class="btn-tiktok" target="_blank" href="<?php echo esc_url( $tiktok ); ?>">
-                        <i class="houzez-icon icon-tiktok-1-logos-24 mr-2"></i>
+                        <i class="houzez-icon icon-tiktok-1-logos-24 me-2"></i>
                     </a>
                 </span>
                 <?php } ?> 
@@ -88,7 +88,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $telegram ) ) { ?>
                 <span>
                     <a class="btn-telegram" target="_blank" href="<?php echo esc_url( $telegram ); ?>">
-                        <i class="houzez-icon icon-telegram-logos-24 mr-2"></i>
+                        <i class="houzez-icon icon-telegram-logos-24 me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -96,7 +96,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $pinterest ) ) { ?>
                 <span>
                     <a class="btn-pinterest" target="_blank" href="<?php echo esc_url( $pinterest ); ?>">
-                        <i class="houzez-icon icon-social-pinterest mr-2"></i>
+                        <i class="houzez-icon icon-social-pinterest me-2"></i>
                     </a>
                 </span>
                 <?php } ?>
@@ -104,7 +104,7 @@ if(houzez_option('blog_author_box')) {
                 <?php if( !empty( $vimeo ) ) { ?>
                 <span>
                     <a class="btn-vimeo" target="_blank" href="<?php echo esc_url( $vimeo ); ?>">
-                        <i class="houzez-icon icon-social-video-vimeo mr-2"></i>
+                        <i class="houzez-icon icon-social-video-vimeo me-2"></i>
                     </a>
                 </span>
                 <?php } ?>

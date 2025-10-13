@@ -72,9 +72,6 @@ class Flogia extends Widget_Base {
     public function has_widget_inner_wrapper(): bool {
         return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
     }
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
 
 	protected function register_controls() {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
@@ -847,7 +844,7 @@ class Flogia extends Widget_Base {
         $this->add_control(
             'avatar_size',
             [
-                'label'      => _x('Size', 'bdthemes-prime-slider'),
+                'label'      => esc_html__( 'Size', 'bdthemes-prime-slider' ),
                 'type'       => Controls_Manager::SELECT,
                 'default'    => '42',
                 'options'    => [
@@ -1152,6 +1149,41 @@ class Flogia extends Widget_Base {
             ]
         );
 
+        $this->add_responsive_control(
+            'nav_offset',
+            [
+                'label' => __('Horizontal Offset', 'bdthemes-prime-slider'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 200,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-flogia .bdt-navigation-arrows' => 'margin-right: {{SIZE}}{{UNIT}}; margin-left: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'nav_vertical_offset',
+            [
+                'label' => __('Vertical Offset', 'bdthemes-prime-slider'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 200,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .bdt-prime-slider-flogia .bdt-navigation-arrows' => 'margin-top: {{SIZE}}{{UNIT}}; margin-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
         $this->start_controls_tabs('tabs_navigation_style');
 
         $this->start_controls_tab(
@@ -1249,41 +1281,6 @@ class Flogia extends Widget_Base {
         $this->end_controls_tab();
 
         $this->end_controls_tabs();
-
-        $this->add_responsive_control(
-            'nav_offset',
-            [
-                'label' => __('Horizontal Offset', 'bdthemes-prime-slider'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 200,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider-flogia .bdt-navigation-arrows' => 'margin-right: {{SIZE}}{{UNIT}}; margin-left: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-        $this->add_responsive_control(
-            'nav_vertical_offset',
-            [
-                'label' => __('Vertical Offset', 'bdthemes-prime-slider'),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => ['px'],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 200,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider-flogia .bdt-navigation-arrows' => 'margin-top: {{SIZE}}{{UNIT}}; margin-bottom: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
 
         $this->end_controls_section();
     }

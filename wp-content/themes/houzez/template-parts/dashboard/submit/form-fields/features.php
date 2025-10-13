@@ -22,7 +22,7 @@ if( is_array($all_features) ) {
 
         if( count( $item['childs']) > 0 ) {
 
-            $inner_output =  '<div class="features_group_name col-lg-12">'.$item['name'].'</div>';
+            $inner_output =  '<div class="features group_name fw-bold">'.$item['name'].'</div>';
 
             $child_check = '';
 
@@ -53,7 +53,7 @@ if( is_array($all_features) ) {
 }
 if( $single_feature !='' ) {
     if( $has_child ) {
-        $output_html .= '<div class="features_group_name col-lg-12">'.esc_html__('Other Features','houzez').'</div>';
+        $output_html .= '<div class="features group_name fw-bold">'.esc_html__('Other Features','houzez').'</div>';
     }
     $output_html .= $single_feature;
 }

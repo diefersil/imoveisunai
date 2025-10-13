@@ -1,5 +1,5 @@
 <div class="form-group">
-	<select name="states[]" data-target="houzezThirdList" data-size="5" class="houzezSelectFilter houzezStateFilter houzezSecondList selectpicker <?php houzez_ajax_search(); ?> houzez-state-js form-control bs-select-hidden" title="<?php echo houzez_option('srh_states', 'All States'); ?>" data-live-search-normalize="true" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}" data-live-search="true" data-container="body">
+	<select name="states[]" data-target="houzezThirdList" data-size="5" class="houzezSelectFilter houzezStateFilter houzezSecondList selectpicker <?php houzez_ajax_search(); ?> houzez-state-js form-control bs-select-hidden" title="<?php echo houzez_option('srh_states', 'All States'); ?>" data-live-search-normalize="true" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}" data-live-search="true">
 		<?php
 		global $post;
         $fave_states = get_post_meta(houzez_postid(), 'fave_states', false);

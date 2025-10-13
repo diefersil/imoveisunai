@@ -85,6 +85,7 @@ class Houzez_Studio_Metaboxes {
 	function fts_metaboxes_output( $post ) {
 		$values            = get_post_custom( $post->ID );
 		$template_type     = isset( $values['fts_template_type'] ) ? esc_attr( $values['fts_template_type'][0] ) : '';
+		$block_hook     = isset( $values['fts_block_hook'] ) ? esc_attr( $values['fts_block_hook'][0] ) : '';
 		
 		// We'll use this nonce field later on when saving.
 		wp_nonce_field( 'fts_meta_nounce', 'fts_meta_nounce' );
@@ -102,20 +103,41 @@ class Houzez_Studio_Metaboxes {
 								
 								<option value="tmp_header" <?php selected( $template_type, 'tmp_header' ); ?>><?php _e( 'Header', 'houzez-studio' ); ?></option>
 
-								<option value="tmp_before_header" <?php selected( $template_type, 'tmp_before_header' ); ?>><?php _e( 'Before Header', 'houzez-studio' ); ?></option>
-
-								<option value="tmp_after_header" <?php selected( $template_type, 'tmp_after_header' ); ?>><?php _e( 'After Header', 'houzez-studio' ); ?></option>
-
 								<option value="tmp_footer" <?php selected( $template_type, 'tmp_footer' ); ?>><?php _e( 'Footer', 'houzez-studio' ); ?></option>
-								<option value="tmp_after_footer" <?php selected( $template_type, 'tmp_after_footer' ); ?>><?php _e( 'After Footer', 'houzez-studio' ); ?></option>
 
-								<option value="tmp_before_footer" <?php selected( $template_type, 'tmp_before_footer' ); ?>><?php _e( 'Before Footer', 'houzez-studio' ); ?></option>
+								<option value="single-listing" <?php selected( $template_type, 'single-listing' ); ?>><?php _e( 'Single Listing', 'houzez-studio' ); ?></option>
+
+								<option value="single-agent" <?php selected( $template_type, 'single-agent' ); ?>><?php _e( 'Single Agent', 'houzez-studio' ); ?></option>
+
+								<option value="single-agency" <?php selected( $template_type, 'single-agency' ); ?>><?php _e( 'Single Agency', 'houzez-studio' ); ?></option>
+
+								<option value="single-post" <?php selected( $template_type, 'single-post' ); ?>><?php _e( 'Single Post', 'houzez-studio' ); ?></option>
+
+								<!-- <option value="listing-archive" <?php selected( $template_type, 'listing-archive' ); ?>><?php _e( 'Listing Archive', 'houzez-studio' ); ?></option> -->
 
 								<option value="tmp_megamenu" <?php selected( $template_type, 'tmp_megamenu' ); ?>><?php _e( 'Mega Menu', 'houzez-studio' ); ?></option>
 
-								<option value="tmp_custom_block" <?php selected( $template_type, 'tmp_custom_block' ); ?>><?php _e( 'Custom Block', 'houzez-studio' ); ?></option>
+								<option value="tmp_custom_block" <?php selected( $template_type, 'tmp_custom_block' ); ?>><?php _e( 'Block', 'houzez-studio' ); ?></option>
 							</select>
 						</div><!-- houzez-custom-wpadmin-form-row -->
+					</td>
+				</tr>
+
+				<tr class="fts-row fts-block-hook">
+					<th scope="row">
+						<label for="fts_block_hooks">
+							<?php esc_html_e( 'Block Hook', 'houzez-studio' ); ?>
+						</label>
+					</th>
+					<td>
+						<select name="fts_block_hooks" id="fts_block_hooks" class="form-control">
+							<option value=""><?php esc_html_e( 'Select a Hook', 'houzez-studio' );?></option>
+							<option <?php selected( $block_hook, 'shortcode' ); ?> value="shortcode"><?php esc_html_e( 'Custom (Shortcode)', 'houzez-studio' );?></option>
+							<option <?php selected( $block_hook, 'before_header' ); ?> value="before_header"><?php esc_html_e( 'Before Header', 'houzez-studio' );?></option>
+							<option <?php selected( $block_hook, 'after_header' ); ?> value="after_header"><?php esc_html_e( 'After Header', 'houzez-studio' );?></option>
+							<option <?php selected( $block_hook, 'before_footer' ); ?> value="before_footer"><?php esc_html_e( 'Before Footer', 'houzez-studio' );?></option>
+							<option <?php selected( $block_hook, 'after_footer' ); ?> value="after_footer"><?php esc_html_e( 'After Footer', 'houzez-studio' );?></option>
+						</select>
 					</td>
 				</tr>
 				
@@ -149,7 +171,7 @@ class Houzez_Studio_Metaboxes {
 		$included_settings = get_post_meta( get_the_id(), 'fts_included_options', true );
 		$excluded_settings = get_post_meta( get_the_id(), 'fts_excluded_options', true );
 		?>
-		<tr class="fts-row">
+		<tr class="fts-row fts-row-rules">
 			<th scope="row">
 				<label for="fts_included_display_rules">
 					<?php esc_html_e( 'Display Location', 'houzez-studio' ); ?>
@@ -169,7 +191,7 @@ class Houzez_Studio_Metaboxes {
 			</td>
 		</tr>
 
-		<tr class="fts-row hidden">
+		<tr class="fts-row fts-row-rules-exclude hidden">
 			<th scope="row">
 				<label for="fts_included_display_rules">
 					<?php esc_html_e( 'Exlcude Location', 'houzez-studio' ); ?>
@@ -203,6 +225,7 @@ class Houzez_Studio_Metaboxes {
 
 	    $this->update_template_rules_metadata($postId, $_POST);
 	    $this->update_template_type_metadata($postId, $_POST);
+	    $this->update_block_hook_metadata($postId, $_POST);
 	}
 
 	/**
@@ -240,7 +263,37 @@ class Houzez_Studio_Metaboxes {
 	 */
 	private function update_template_type_metadata($postId, $postData) {
 	    if (isset($postData['fts_template_type'])) {
-	        update_post_meta($postId, 'fts_template_type', sanitize_text_field($postData['fts_template_type']));
+	    	$fts_template_type = sanitize_text_field($postData['fts_template_type']);
+	        update_post_meta($postId, 'fts_template_type', $fts_template_type);
+	        $taxonomy_term = $this->get_single_tax_type($fts_template_type);
+	        wp_set_object_terms( $postId, $taxonomy_term, 'fts_types' );
+	    }
+	}
+
+	private function get_single_tax_type($fts_template_type) {
+	    
+	    if( $fts_template_type == 'single-listing' ||
+	    	$fts_template_type == 'single-agent' ||
+	    	$fts_template_type == 'single-agency' ||
+	    	$fts_template_type == 'single-post'
+	    ) {
+	    	return 'tmp_single';
+	    }
+
+	    // Return the original template type for all other types
+	    return $fts_template_type;
+	}
+
+	/**
+	 * Update block hook metadata.
+	 *
+	 * @param int   $postId Current post ID.
+	 * @param array $postData POST data.
+	 */
+	private function update_block_hook_metadata($postId, $postData) {
+	    if (isset($postData['fts_block_hooks'])) {
+	    	$fts_block_hooks = sanitize_text_field($postData['fts_block_hooks']);
+	        update_post_meta($postId, 'fts_block_hook', $fts_block_hooks);
 	    }
 	}
 

@@ -1,7 +1,7 @@
 <?php
 $mobile_logo = houzez_option( 'mobile_logo', false, 'url' );
 $logo_height = houzez_option('retina_mobilelogo_height');
-$logo_width = houzez_option('retina_mobilelogo_width');
+$logo_width = houzez_option('retina_mobilelogo_width'); 
 ?>
 <div class="logo logo-mobile">
 	<a href="<?php echo esc_url( home_url( '/' ) ); ?>">

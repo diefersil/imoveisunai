@@ -420,6 +420,24 @@ class Base {
 	}
 
 	/**
+	 * Checks to see if test mode is enabled, and whether the current user is a logged-in admin.
+	 *
+	 * @return bool True if test mode should be effective and prevent optimizations for guest users. False otherwise.
+	 */
+	public function test_mode_active() {
+		if (
+			$this->get_option( $this->prefix . 'test_mode' ) &&
+			( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) )
+		) {
+			if ( ! empty( $_GET['ewwwio_test_mode'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Escape any spaces in the filename.
 	 *
 	 * @param string $path The path to a binary file.
@@ -635,6 +653,22 @@ class Base {
 			$supported_types[] = 'image/bmp';
 		}
 		return $supported_types;
+	}
+
+	/**
+	 * Get a list of which image types can be converted to WebP with the current configuration.
+	 *
+	 * @return A list of mime-types suitable for WebP conversion.
+	 */
+	public function get_webp_types() {
+		$webp_types = array( 'image/jpeg' );
+		if ( $this->get_option( 'ewww_image_optimizer_cloud_key' ) ) {
+			$webp_types[] = 'image/png';
+			$webp_types[] = 'image/gif';
+		} elseif ( ! $this->get_option( 'ewww_image_optimizer_jpg_only_mode' ) ) {
+			$webp_types[] = 'image/png';
+		}
+		return $webp_types;
 	}
 
 	/**

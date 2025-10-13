@@ -5,7 +5,7 @@ $section_title = isset($settings['section_title']) && !empty($settings['section_
 <div class="property-availability-calendar-wrap property-section-wrap" id="property-availability-calendar-wrap">
 	<div class="block-wrap">
 		<?php if( $settings['section_header'] ) { ?>
-		<div class="block-title-wrap">
+		<div class="block-title-wrap d-flex justify-content-between align-items-center">
 			<h2><?php echo $section_title;; ?></h2>
 		</div><!-- block-title-wrap -->
 		<?php } ?>

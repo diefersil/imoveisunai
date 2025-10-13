@@ -1,6 +1,6 @@
 <?php
-global $post, $current_user;
-$return_array = houzez20_property_contact_form();
+global $post, $current_user, $ele_settings;
+$return_array = houzez20_get_property_agent();
 if(empty($return_array)) {
     return;
 }
@@ -10,8 +10,10 @@ $agent_display = houzez_get_listing_data('agent_display_option');
 
 $schedule_time_slots = houzez_option('schedule_time_slots');
 $gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
-$schedule_num_days = houzez_option('schedule_num_days', 14);
-$agent_email = is_email( $return_array['agent_email'] );
+$schedule_num_days = houzez_option('schedule_num_days', 8);
+$agent_email = !empty($return_array['agent_email']) ? is_email($return_array['agent_email']) : false;
+
+$agent_info = isset($ele_settings['agent_detail']) ? $ele_settings['agent_detail'] : 'yes';
 
 if ($agent_email && $agent_display != 'none') { 
 
@@ -39,19 +41,17 @@ if(houzez_form_type()) {
     <input type="hidden" name="listing_id" value="<?php echo intval($post->ID)?>">
     <input type="hidden" name="is_listing_form" value="yes">
     <input type="hidden" name="is_schedule_form" value="yes">
-    <input type="hidden" name="agent_id" value="<?php echo intval($return_array['agent_id'])?>">
-    <input type="hidden" name="agent_type" value="<?php echo esc_attr($return_array['agent_type'])?>">
+    <input type="hidden" name="agent_id" value="<?php echo isset($return_array['agent_id']) ? intval($return_array['agent_id']) : ''; ?>">
+    <input type="hidden" name="agent_type" value="<?php echo isset($return_array['agent_type']) ? esc_attr($return_array['agent_type']) : ''; ?>">
 
-    <div class="property-schedule-tour-form-wrap">
-        <div class="property-schedule-tour-day-form">
-            <div class="tour-day-form-slide-arrow next sche-tabs-next-js">
-                <i class="houzez-icon icon-arrow-right-1"></i>
-            </div>
-            <div class="tour-day-form-slide-arrow prev sche-tabs-prev-js">
-                <i class="houzez-icon icon-arrow-left-1"></i>
-            </div>
+    <div class="property-schedule-tour-form-wrap p-4">
+        <?php 
+        if( $agent_info == 'yes' ) {
+            echo $return_array['agent_data']; 
+        }?>
+        <div class="property-schedule-tour-day-form mt-3">
             <div class="property-schedule-tour-day-form-slide-wrap">
-                <div class="property-schedule-tour-day-form-slide-v2">
+                <div class="property-schedule-tour-day-form-slide houzez-all-slider-wrap">
                     
                     <?php
                     $m = date("m"); // Current month
@@ -71,17 +71,15 @@ if(houzez_form_type()) {
                         $day_number = date_i18n('d', mktime(0, 0, 0, $m, ($de + $i), $y));
                         $month = date_i18n('M', mktime(0, 0, 0, $m, ($de + $i), $y));
                     ?>
-                        <div class="hz-date-item">
-                            <div class="form-group">
-                                <label class="control control--radio">
-                                    <input name="schedule_date" type="radio" value="<?php echo $day.' '.$day_number.' '.$month; ?>">
-                                    <span class="control__indicator">
-                                        <?php echo $day ?><br>
-                                        <span class="control__indicator_day"><?php echo $day_number ?></span><br>
-                                        <?php echo $month ?>
-                                    </span>
-                                </label>
-                            </div>
+                        <div class="form-group">
+                            <label class="control control--radio ps-0">
+                                <input name="schedule_date" type="radio" value="<?php echo $day.' '.$day_number.' '.$month; ?>">
+                                <span class="control__indicator d-block w-100 h-100 p-2">
+                                    <?php echo $day ?><br>
+                                    <span class="control__indicator_day"><?php echo $day_number ?></span><br>
+                                    <?php echo $month ?>
+                                </span>
+                            </label>
                         </div>
 
                     <?php
@@ -92,25 +90,25 @@ if(houzez_form_type()) {
             </div>
         </div>
 
-        <div class="property-schedule-tour-form-title"><?php echo houzez_option('spl_con_tour_type', 'Tour Type'); ?></div>
+        <div class="property-schedule-tour-form-title my-3"><?php echo houzez_option('spl_con_tour_type', 'Tour Type'); ?></div>
         
-        <div class="property-schedule-tour-type-form d-flex justify-content-between">
-            <div class="form-group">
-                <label class="control control--radio">
+        <div class="property-schedule-tour-type-form d-flex justify-content-between gap-2 mb-2">
+            <div class="form-group w-100">
+                <label class="control control--radio ps-0">
                 <input name="schedule_tour_type" type="radio" checked value="<?php echo houzez_option('spl_con_in_person', 'In Person'); ?>">
-                <span class="control__indicator"><?php echo houzez_option('spl_con_in_person', 'In Person'); ?></span>
+                <span class="control__indicator d-flex justify-content-center align-items-center w-100 h-100 p-2"><?php echo houzez_option('spl_con_in_person', 'In Person'); ?></span>
                 </label>
             </div>
             <!-- form-group -->
-            <div class="form-group">
-                <label class="control control--radio">
+            <div class="form-group w-100">
+                <label class="control control--radio ps-0">
                 <input name="schedule_tour_type" type="radio" value="<?php echo houzez_option('spl_con_video_chat', 'Video Chat'); ?>">
-                <span class="control__indicator"><?php echo houzez_option('spl_con_video_chat', 'Video Chat'); ?></span>
+                <span class="control__indicator d-flex justify-content-center align-items-center w-100 h-100 p-2"><?php echo houzez_option('spl_con_video_chat', 'Video Chat'); ?></span>
                 </label>
             </div>
             <!-- form-group -->
         </div>
-        <div class="form-group">
+        <div class="form-group mb-2">
             <select name="schedule_time" class="selectpicker form-control bs-select-hidden" title="<?php echo houzez_option('spl_con_time', 'Choose a time'); ?>" data-live-search="false">
                 <?php 
                 $time_slots = explode(',', $schedule_time_slots); 
@@ -121,27 +119,27 @@ if(houzez_form_type()) {
             </select>
             <!-- selectpicker -->
         </div>
-        <div class="form-group">
+        <div class="form-group mb-2">
             <input class="form-control" name="name" placeholder="<?php echo houzez_option('spl_con_name', 'Name'); ?>" type="text">
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-2">
             <input class="form-control" name="phone" placeholder="<?php echo houzez_option('spl_con_phone', 'Phone'); ?>" type="text">
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-2">
             <input class="form-control" name="email" placeholder="<?php echo houzez_option('spl_con_email', 'Email'); ?>" type="email">
         </div>
 
-        <div class="form-group">
+        <div class="form-group form-group-textarea mb-2">
             <textarea class="form-control" name="message" rows="3" placeholder="<?php echo houzez_option('spl_con_message_plac', 'Message'); ?>"></textarea>
         </div>
 
         <?php do_action('houzez_schedule_tour_fields'); ?>
         
         <?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
-        <div class="form-group form-group-terms">
-            <label class="control control--checkbox <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+        <div class="form-group form-group-terms mb-2">
+            <label class="control control--checkbox d-flex align-items-start <?php if( $gdpr_checkbox ){ echo 'p-0 hz-no-gdpr-checkbox';}?>">
                 <?php if( ! $gdpr_checkbox ) { ?>
                 <input type="checkbox" name="privacy_policy">
                 <span class="control__indicator"></span>
@@ -152,8 +150,13 @@ if(houzez_form_type()) {
             </label>
         </div><!-- form-group -->
         <?php } ?>
+        
+
+        <?php do_action('houzez_after_property_schedule_tour_form_fields'); ?>
+
         <div class="form_messages"></div>
-        <button class="schedule_contact_form houzez-ele-button btn btn-secondary btn-full-width">
+
+        <button class="schedule_contact_form houzez-ele-button btn btn-secondary w-100">
             <?php get_template_part('template-parts/loader'); ?>
             <?php echo houzez_option('spl_btn_tour_sch', 'Submit a Tour Request'); ?> 
         </button>

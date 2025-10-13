@@ -49,7 +49,6 @@ class houzez_Code_Banner extends WP_Widget {
 
         		echo '</div>';
         	echo '</div>';
-            
 	    
 		echo wp_kses( $after_widget, $allowed_html_array );
 		

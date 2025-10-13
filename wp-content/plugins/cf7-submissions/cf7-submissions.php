@@ -3,9 +3,9 @@
  * Plugin Name:			CF7 Submissions
  * Plugin URI:			https://pluggable.io/plugin/cf7-submissions
  * Description:			Securely Store and Manage Contact Form 7 Submissions Hassle-Free
- * Version:				0.18
- * Requires at least:	4.4
- * Requires PHP:		7.0
+ * Version:				0.26
+ * Requires at least:	6.0
+ * Requires PHP:		7.4
  * Author:				Codexpert, Inc
  * Author URI:			https://codexpert.io
  * License:				GPLv2 or later
@@ -125,15 +125,18 @@ final class Plugin {
 		 * @since 0.9
 		 * @var $plugin
 		 */
-		$this->plugin					= get_plugin_data( CF7S );
+		$this->plugin					= get_plugin_data( CF7S, true, false );
 		$this->plugin['basename']		= plugin_basename( CF7S );
 		$this->plugin['file']			= CF7S;
 		$this->plugin['server']			= apply_filters( 'cf7-submissions_server', 'https://codexpert.io/dashboard' );
-		$this->plugin['min_php']		= '5.6';
-		$this->plugin['min_wp']			= '4.0';
+		$this->plugin['min_php']		= '7.4';
+		$this->plugin['min_wp']			= '6.0';
 		$this->plugin['icon']			= CF7S_ASSET . '/img/icon.png';
 		$this->plugin['depends']		= [ 'contact-form-7/wp-contact-form-7.php' => 'Contact Form 7' ];
 		
+		$this->plugin['hash_deactivator'] = 'fd149c48-25af-4612-8e6e-06496e983099';
+		$this->plugin['hash_survey']      = '680b0b59-8acf-4c44-a020-ff106ba4c2df';
+		$this->plugin['hash_wizard']      = '193060fe-c1f6-42ed-92f7-2b652bd75b0c';
 	}
 
 	/**
@@ -187,9 +190,9 @@ final class Plugin {
 			 * 
 			 * @author Pluggable <hi@pluggable.io>
 			 */
-			new Feature( CF7S );
-			new Survey( CF7S );
-			new Deactivator( CF7S );
+			// new Feature( $this->plugin, [ 'reserved' => [] ] );
+			new Survey( $this->plugin );
+			new Deactivator( $this->plugin );
 
 		else : // ! is_admin() ?
 

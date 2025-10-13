@@ -13,8 +13,8 @@ if( empty( $total_ratings ) ) {
 }
 ?>
 
-<div class="rating-score-wrap flex-grow-1">
-	<span class="star">
+<div class="rating-score-wrap flex-grow-1" role="complementary">
+	<span class="star d-flex align-items-center" role="img">
 		<?php echo houzez_get_stars($total_ratings, false); ?>
 	</span><!-- star -->
 </div>

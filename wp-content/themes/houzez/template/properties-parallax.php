@@ -36,7 +36,7 @@ if ( $page_content_position !== '1' ) {
     } 
 }?> 
 
-<section class="listing-wrap listing-view">
+<section class="listing-wrap listing-view" role="region" >
 <?php	
 $i = 1;
 if ( $listings_query->have_posts() ) :
@@ -50,33 +50,32 @@ if ( $listings_query->have_posts() ) :
 	$thumb_id = get_post_thumbnail_id( $post->ID );
 	$thumb_url_array = wp_get_attachment_image_src($thumb_id, 'full', false);
 	$thumb_url = $thumb_url_array[0] ?? '';
-	
-	$feat_class = '';
-	if( $prop_featured == 1 ) {
-	    $feat_class = "featured_prop";
-	}
-
-	if($i % 2 == 1 ) {
-		$class_pos = 'left';
-	} else {
-		$class_pos = 'right';
-	}
-	$i++;
     ?>
 
-    <div class="item-listing-parallax item-listing-wrap" style="height: 600px;">
-    	<a class="item-listing-parallax-link" href="<?php echo esc_url(get_permalink()); ?>"></a>
-		<div class="item-parallax-inner parallax" data-parallax-bg-image="<?php echo esc_url($thumb_url); ?>">
-			<div class="item-parallax-wrap" data-aos="fade">
-				<?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>
-				<?php get_template_part('template-parts/listing/partials/item-labels'); ?>
-				<?php get_template_part('template-parts/listing/partials/item-title'); ?>
-				<?php get_template_part('template-parts/listing/partials/item-address'); ?>
-				<?php get_template_part('template-parts/listing/partials/item-price'); ?>
-				<?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>
-			</div><!-- item-parallax-wrap -->
-		</div><!-- parallax -->
-	</div><!-- item-listing-parallax -->
+    <div class="item-listing-wrap item-listing-parallax" style="height: 600px;">
+        <a class="item-listing-parallax-link" href="<?php echo esc_url(get_permalink()); ?>"></a>
+        <div class="item-parallax-inner houzez-parallax" data-parallax-bg-image="<?php echo esc_url($thumb_url); ?>">
+            <div class="d-flex flex-column justify-content-center h-100">
+                <div class="item-parallax-wrap" data-aos="fade">
+                    <div class="labels-wrap d-flex align-items-center mb-2" role="group">
+                        <?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>
+                        <?php get_template_part('template-parts/listing/partials/item-labels-v2');?>
+                    </div>
+                    <h2 class="item-title mb-2">
+                        <a href="<?php echo esc_url(get_permalink()); ?>" role="link"><?php the_title(); ?></a>
+                    </h2><!-- item-title -->
+                    <address class="item-address mb-3" role="contentinfo">
+                        <i class="houzez-icon icon-pin me-1" aria-hidden="true"></i>
+                        <span><?php echo $prop_address; ?></span>
+                    </address>
+                    <ul class="item-price-wrap d-flex flex-column gap-2 mb-4" role="list">
+                        <?php echo houzez_listing_price_v1(); ?>	
+                    </ul>
+                    <?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>
+                </div><!-- item-parallax-wrap -->
+            </div>
+        </div><!-- parallax -->
+    </div><!-- item-listing-parallax -->
 
 <?php
     endwhile;

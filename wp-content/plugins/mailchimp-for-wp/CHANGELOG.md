@@ -1,6 +1,44 @@
 Changelog
 =========
 
+#### 4.10.7 - Sep 05, 2025
+
+- Handle renewing lists through server-side redirect instead of JS component.
+
+
+#### 4.10.6 - Jul 23, 2025
+
+- [WooCommerce Checkout] Fix checkbox from showing up in order confirmation email if using Checkout Block.
+- [Forms] Fix `{response}` tag being escaped.
+
+
+#### 4.10.5 - Jun 25, 2025
+
+- [Ninja Forms] Always show at least one list option so that onchange event fires properly (to load Audience fields).
+- Update third-party JS dependencies.
+- Optimize SVG icons for reduced file sizes.
+
+
+#### 4.10.4 - May 26, 2025
+
+- Improved context-dependent escaping in dynamic content tags. 
+
+
+#### 4.10.3 - Apr 16, 2025
+
+- Update third-party JS dependencies.
+- Add message setting for when a form submission is marked as spam.
+- Log exact anti-spam rule when a form submission is marked as spam.
+- Handle potential Prosopo connection errors gracefully.
+
+
+#### 4.10.2 - Feb 28, 2025
+
+- Fix WPForms parameter type change causing a fatal error if using WPForms with a Mailchimp sign-up field.
+- Add Mailchimp data to Personal Data exporter. Contributed by [David Anderson from UpdraftPlus](https://updraftplus.com/).
+- Prevent PHP notices in lists overview on general settings page.
+
+
 #### 4.10.1 - Feb 06, 2025
 
 - Fix JS error breaking Ninja Forms edit form page when not connected to a Mailchimp account or account has no audiences.

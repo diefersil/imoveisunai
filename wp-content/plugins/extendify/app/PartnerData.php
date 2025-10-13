@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Partner Settings
  */
@@ -12,9 +13,9 @@ use Extendify\Shared\Services\Sanitizer;
 /**
  * Controller for handling partner settings
  */
+
 class PartnerData
 {
-
     /**
      * The partner id
      *
@@ -57,12 +58,27 @@ class PartnerData
         'stagingSites' => ['wordpress'],
         'domainSearchURL' => '',
         'showDraft' => false,
-        'aiChatEnabled' => false,
+        'showChat' => false,
+        'showAIPageCreation' => false,
         'enableImageImports-1-14-6' => false,
         'disableLibraryAutoOpen' => false,
         'enableApexDomain' => false,
-        'allowedPluginsSlugs' => [],
-        'requiredPlugins' => [],
+        'showLaunch' => false,
+        'deactivated' => true,
+        'launchRedirectWebsite' => false,
+        'showAILogo' => false,
+        'showProductRecommendations' => false,
+        'productRecommendations' => [
+            'showPartnerBranding' => false,
+            'disabledProducts' => [],
+            'customProducts' => [],
+        ],
+        'license' => 'active',
+        'showAIAgents' => false,
+        'showImprint' => [],
+        'showLaunchQuestions' => false,
+        'pluginGroupId' => null,
+        'requiredPlugins' => null,
     ];
 
     // phpcs:disable Generic.Metrics.CyclomaticComplexity.MaxExceeded
@@ -73,20 +89,26 @@ class PartnerData
      */
     public function __construct()
     {
-        self::$id = Config::$partnerId;
+        self::$id = defined('EXTENDIFY_PARTNER_ID') ? constant('EXTENDIFY_PARTNER_ID') : null;
         $data = self::getPartnerData();
         self::$config['showDomainBanner'] = ($data['showDomainBanner'] ?? self::$config['showDomainBanner']);
         self::$config['showDomainTask'] = ($data['showDomainTask'] ?? self::$config['showDomainTask']);
-        self::$config['showSecondaryDomainTask'] = ($data['showSecondaryDomainTask'] ?? self::$config['showSecondaryDomainTask']);
-        self::$config['showSecondaryDomainBanner'] = ($data['showSecondaryDomainBanner'] ?? self::$config['showSecondaryDomainBanner']);
+        self::$config['showSecondaryDomainTask'] = ($data['showSecondaryDomainTask']
+            ?? self::$config['showSecondaryDomainTask']);
+        self::$config['showSecondaryDomainBanner'] = ($data['showSecondaryDomainBanner']
+            ?? self::$config['showSecondaryDomainBanner']);
         self::$config['domainTLDs'] = ($data['domainTLDs'] ?? self::$config['domainTLDs']);
         self::$config['stagingSites'] = array_map('trim', ($data['stagingSites'] ?? self::$config['stagingSites']));
         self::$config['domainSearchURL'] = ($data['domainSearchURL'] ?? self::$config['domainSearchURL']);
-        self::$logo = isset($data['logo'][0]['thumbnails']['large']['url']) ? $data['logo'][0]['thumbnails']['large']['url'] : self::$logo;
+        self::$logo = isset($data['logo'][0]['thumbnails']['large']['url'])
+            ? $data['logo'][0]['thumbnails']['large']['url']
+            : self::$logo;
         self::$config['showDraft'] = ($data['showDraft'] ?? self::$config['showDraft']);
-        self::$config['aiChatEnabled'] = ($data['showChat'] ?? self::$config['aiChatEnabled']);
-        self::$config['enableImageImports-1-14-6'] = ($data['enableImageImports-1-14-6'] ?? self::$config['enableImageImports-1-14-6']);
-        self::$config['disableLibraryAutoOpen'] = ($data['disableLibraryAutoOpen'] ?? self::$config['disableLibraryAutoOpen']);
+        self::$config['showChat'] = ($data['showChat'] ?? self::$config['showChat']);
+        self::$config['enableImageImports-1-14-6'] = ($data['enableImageImports-1-14-6']
+            ?? self::$config['enableImageImports-1-14-6']);
+        self::$config['disableLibraryAutoOpen'] = ($data['disableLibraryAutoOpen']
+            ?? self::$config['disableLibraryAutoOpen']);
         self::$config['enableApexDomain'] = ($data['enableApexDomain'] ?? self::$config['enableApexDomain']);
         self::$name = ($data['Name'] ?? self::$name);
         self::$colors = [
@@ -95,68 +117,118 @@ class PartnerData
             'secondaryColor' => ($data['secondaryColor'] ?? ($data['backgroundColor'] ?? null)),
             'secondaryColorText' => '#ffffff',
         ];
-        self::$config['allowedPluginsSlugs'] = ($data['allowedPluginsSlugs'] ?? self::$config['allowedPluginsSlugs']);
+        self::$config['showAIPageCreation'] = ($data['showAIPageCreation'] ?? self::$config['showAIPageCreation']);
+        self::$config['showLaunch'] = ($data['showLaunch'] ?? self::$config['showLaunch']);
+        self::$config['deactivated'] = ($data['deactivated'] ?? self::$config['deactivated']);
+        self::$config['launchRedirectWebsite'] = ($data['launchRedirectWebsite']
+            ?? self::$config['launchRedirectWebsite']);
+        self::$config['showAILogo'] = ($data['showAILogo'] ?? self::$config['showAILogo']);
+        self::$config['showProductRecommendations'] = ($data['showProductRecommendations']
+            ?? self::$config['showProductRecommendations']);
+        self::$config['productRecommendations'] = [
+            'showPartnerBranding' => ($data['productRecommendationShowPartnerBranding']
+                ?? self::$config['productRecommendations']['showPartnerBranding']),
+            'disabledProducts' => ($data['productRecommendationDisabledSlugs']
+                ?? self::$config['productRecommendations']['disabledProducts']),
+            'customProducts' => ($data['productRecommendationCustomSlugs']
+                ?? self::$config['productRecommendations']['customProducts']),
+        ];
+        self::$config['license'] = ($data['license'] ?? self::$config['license']);
+        self::$config['showImprint'] = ($data['showImprint'] ?? self::$config['showImprint']);
+        self::$config['showLaunchQuestions'] = ($data['showLaunchQuestions'] ?? self::$config['showLaunchQuestions']);
+        self::$config['showAIAgents'] = ($data['showAIAgents'] ?? self::$config['showAIAgents']);
+        self::$config['pluginGroupId'] = ($data['pluginGroup'] ?? self::$config['pluginGroupId']);
         self::$config['requiredPlugins'] = ($data['requiredPlugins'] ?? self::$config['requiredPlugins']);
+
+        // Add the job hook to fetch the partner data.
+        \add_action('extendify_fetch_partner_data', [self::class, 'fetchPartnerData']);
     }
 
     /**
-     * Retrieve partner data from a transient or from the API.
+     * Retrieve partner data from the options table or from the API.
      *
      * @return array
      */
     public static function getPartnerData()
     {
         // Do not make a request without a partner ID (i.e. it's opt in).
-        if (!self::$id || self::$id === 'no-partner') {
+        if (!defined('EXTENDIFY_PARTNER_ID')) {
             return [];
         }
 
-        // Return if we have the transient. Data might be empty.
-        if (get_transient('extendify_partner_data_cache_check') !== false) {
-            return array_merge(self::$config, get_option('extendify_partner_data_v2', []));
+        $partnerData = \get_option('extendify_partner_data_v2', 'empty');
+        if ($partnerData !== 'empty') {
+            // We have data, but if it's been 10 minutes, check for new data.
+            $partnerRefresh = \get_transient('extendify_partner_data_cache_check');
+            if (!$partnerRefresh && \is_admin()) {
+                \add_action('init', function () {
+                    if (!\wp_next_scheduled('extendify_fetch_partner_data')) {
+                        \wp_schedule_single_event(time(), 'extendify_fetch_partner_data');
+                        \spawn_cron();
+                    }
+                });
+            }
+
+            return array_merge(self::$config, $partnerData);
         }
 
-        $response = wp_remote_get(
-            add_query_arg(
-                [
-                    'partner' => self::$id,
-                    'wp_language' => \get_locale(),
-                ],
-                'https://dashboard.extendify.com/api/onboarding/partner-data/'
-            ),
-            ['headers' => ['Accept' => 'application/json']]
+        $freshData = self::fetchPartnerData();
+        $mergedData = array_merge(self::$config, $freshData);
+        // Cache here even if empty [] to prevent multiple requests.
+        \update_option('extendify_partner_data_v2', $mergedData);
+        return $mergedData;
+    }
+
+    /**
+     * Fetch or refresh the partner data
+     *
+     * @return array
+     */
+    public static function fetchPartnerData()
+    {
+        if (!defined('EXTENDIFY_PARTNER_ID')) {
+            return [];
+        }
+
+        // Set a 10 minute transient to prevent multiple requests.
+        set_transient('extendify_partner_data_cache_check', true, (10 * MINUTE_IN_SECONDS));
+
+        $url = add_query_arg(
+            [
+                'partner' => self::$id,
+                'wp_language' => \get_locale(),
+                'site_url' => \home_url(),
+            ],
+            'https://dashboard.extendify.com/api/onboarding/partner-data/'
         );
 
-        if (is_wp_error($response)) {
-            // If the request fails, try again in 30 minutes.
-            set_transient('extendify_partner_data_cache_check', true, (30 * MINUTE_IN_SECONDS));
-            return array_merge(self::$config, get_option('extendify_partner_data_v2', []));
+        $response = \wp_safe_remote_get($url, ['headers' => ['Accept' => 'application/json']]);
+
+        // If there was an error, we dont update the cache.
+        if (\is_wp_error($response) || \wp_remote_retrieve_response_code($response) !== 200) {
+            return [];
         }
 
-        $result = json_decode(wp_remote_retrieve_body($response), true);
+        $result = json_decode(\wp_remote_retrieve_body($response), true);
 
-        if (!array_key_exists('data', $result)) {
-            // If the request didn't have the data key, try again in 30 minutes.
-            set_transient('extendify_partner_data_cache_check', true, (30 * MINUTE_IN_SECONDS));
-            return array_merge(self::$config, get_option('extendify_partner_data_v2', []));
-        }
-
-        // Cache the data for 2 days.
-        set_transient('extendify_partner_data_cache_check', true, (2 * DAY_IN_SECONDS));
-        // In the case they sent in a partner id that didn't exist, we get [].
-        if (empty($result['data'])) {
-            update_option('extendify_partner_data_v2', []);
+        // If the data didn't come back as we expected it to, or if we have an error, don't update the cache.
+        if (
+            json_last_error() !== JSON_ERROR_NONE
+            || !is_array($result)
+            || !array_key_exists('data', $result)
+            || empty($result['data'])
+        ) {
             return [];
         }
 
         $sanitizedData = array_merge(
             Sanitizer::sanitizeUnknown($result['data']),
-            ['consentTermsHTML' => \sanitize_text_field(htmlentities(($result['data']['consentTermsHTML'] ?? '')))]
+            ['consentTermsCustom' => \sanitize_text_field(htmlentities(($result['data']['consentTermsCustom'] ?? '')))]
         );
 
         // Merge before persisting as this data is accessed directly elsewhere.
         $mergedData = array_merge(self::$config, $sanitizedData);
-        update_option('extendify_partner_data_v2', $mergedData);
+        \update_option('extendify_partner_data_v2', $mergedData);
 
         return $mergedData;
     }
@@ -198,7 +270,6 @@ class PartnerData
 
         return $cssVariables;
     }
-
 
     /**
      * Retrieves the value of a setting.

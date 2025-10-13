@@ -1,9 +1,8 @@
 <?php
 $attachments = get_post_meta(get_the_ID(), 'fave_attachments', false);
 $documents_download = houzez_option('documents_download');
-$is_show_more = houzez_option('is_show_more', 0);
 ?>
-<div class="property-description-wrap property-section-wrap <?php if($is_show_more) {?>is-show-more<?php } ?>" id="property-description-wrap">
+<div class="property-description-wrap property-section-wrap" id="property-description-wrap" role="region">
 	<div class="block-wrap">
 		<div class="block-title-wrap">
 			<h2><?php echo houzez_option('sps_description', 'Description'); ?></h2>	
@@ -11,16 +10,33 @@ $is_show_more = houzez_option('is_show_more', 0);
 		<div class="block-content-wrap">
 			<div class="property-description-content">
 				<div class="description-content">
-					<?php the_content(); ?>
+					<?php 
+					// Get the raw post content without any filters applied
+					global $post;
+					$content = $post->post_content;
+					
+					// Process content with auto excerpt if enabled
+					$processed_content = houzez_auto_excerpt_content($content, 'property');
+					
+					if( $processed_content['has_more'] ) {
+						// Apply content filters to both parts
+						$content_before_more = apply_filters( 'the_content', $processed_content['content_before'] );
+						$content_after_more = apply_filters( 'the_content', $processed_content['content_after'] );
+						
+						// Get the read more text from settings or use default
+						$more_link_text = houzez_option('read_more_text', __( 'Read More', 'houzez' ));
+						$more_link = '<p><a href="#" class="houzez-read-more-link" onclick="this.style.display=\'none\'; this.parentNode.nextElementSibling.style.display=\'block\'; return false;">' . $more_link_text . '</a></p>';
+						
+						// Output the content with read more functionality
+						echo $content_before_more;
+						echo $more_link;
+						echo '<div class="houzez-more-content" style="display: none;">' . $content_after_more . '</div>';
+					} else {
+						// No more tag needed, just display the content normally
+						echo apply_filters( 'the_content', $processed_content['content'] );
+					}
+					?>
 				</div>
-				<?php if($is_show_more) { ?>
-				<div class="show-more-less">
-					<a class="show-more-less-btn" href="#">
-						<span class="btn-text"><?php esc_html_e('Show more', 'houzez'); ?></span>
-						<i class="houzez-icon arrow-down-1"></i>
-					</a>
-				</div>
-				<?php } ?>
 			</div>
 
 			<?php 
@@ -35,21 +51,20 @@ $is_show_more = houzez_option('is_show_more', 0);
 
 					if(!empty($attachment_meta )) {
 					?>
-					<div class="property-documents">
-						<div class="d-flex justify-content-between">
+					<div class="property-documents mt-2" role="list">
+                        <div class="d-flex justify-content-between" role="listitem">
 							<div class="property-document-title">
-								<i class="houzez-icon icon-task-list-plain-1 mr-1"></i> <?php echo esc_attr( $attachment_meta->post_title ); ?>
+                                <i class="houzez-icon icon-task-list-plain-1 me-1" aria-bs-hidden="true"></i> <?php echo esc_attr( $attachment_meta->post_title ); ?>
 							</div>
-							<div class="property-document-link login-link">
-								
+							<div class="property-document-link<?php echo ($documents_download == 1 && !is_user_logged_in()) ? ' login-link' : ''; ?>">
 								<?php if( $documents_download == 1 ) {
 				                    if( is_user_logged_in() ) { ?>
-				                    <a href="<?php echo esc_url( $attachment_meta->guid ); ?>" target="_blank"><?php esc_html_e( 'Download', 'houzez' ); ?></a>
+				                    <a href="<?php echo esc_url( $attachment_meta->guid ); ?>" download="<?php echo esc_attr( $attachment_meta->post_title ); ?>" rel="noopener"><?php esc_html_e( 'Download', 'houzez' ); ?> <i class="houzez-icon icon-download-bottom ms-2" aria-bs-hidden="true"></i></a>
 				                    <?php } else { ?>
-				                        <a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e( 'Download', 'houzez' ); ?></a>
+				                        <a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form"><?php esc_html_e( 'Download', 'houzez' ); ?> <i class="houzez-icon icon-download-bottom ms-2" aria-bs-hidden="true"></i></a>
 				                    <?php } ?>
 				                <?php } else { ?>
-				                    <a href="<?php echo esc_url( $attachment_meta->guid ); ?>" target="_blank"><?php esc_html_e( 'Download', 'houzez' ); ?></a>
+				                    <a href="<?php echo esc_url( $attachment_meta->guid ); ?>" download="<?php echo esc_attr( $attachment_meta->post_title ); ?>" rel="noopener"><?php esc_html_e( 'Download', 'houzez' ); ?> <i class="houzez-icon icon-download-bottom ms-2" aria-bs-hidden="true"></i></a>
 				                <?php } ?>
 							</div>
 						</div>
@@ -60,97 +75,3 @@ $is_show_more = houzez_option('is_show_more', 0);
 		</div>
 	</div>
 </div>
-
-<style>
-.is-show-more .property-description-content .description-content {
-    max-height: 200px;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    position: relative;
-}
-
-.is-show-more .property-description-content .description-content::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,1));
-    pointer-events: none;
-}
-
-.is-show-more .property-description-content.show-all .description-content {
-    max-height: none;
-}
-
-.is-show-more .property-description-content.show-all .description-content::after {
-    display: none;
-}
-
-.show-more-less {
-    text-align: center;
-    margin-top: 15px;
-}
-
-.show-more-less-btn {
-    display: inline-flex;
-    align-items: center;
-    color: #00aeff;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.show-more-less-btn:hover {
-    color: #33beff;
-    text-decoration: none;
-}
-
-.show-more-less-btn .houzez-icon {
-    font-size: 12px;
-    margin-left: 5px;
-    transition: transform 0.3s ease;
-}
-
-.is-show-more .property-description-content.show-all .show-more-less-btn .houzez-icon {
-    transform: rotate(180deg);
-}
-</style>
-
-<script>
-jQuery(document).ready(function($) {
-    var wrapper = $('#property-description-wrap');
-    var content = $('.property-description-content');
-    var btn = $('.show-more-less-btn');
-    var btnText = btn.find('.btn-text');
-    var descriptionContent = content.find('.description-content');
-    
-    // Check if description content exists
-    if(descriptionContent.length) {
-        // Get the actual height of the content
-        var actualHeight = descriptionContent[0].scrollHeight;
-        
-        // Only show the button and apply the max-height if content is taller than 200px
-        if(actualHeight <= 200) {
-            btn.parent().hide();
-            wrapper.removeClass('is-show-more');
-            descriptionContent.css({
-                'max-height': 'none',
-                'overflow': 'visible'
-            });
-        }
-    }
-    
-    btn.on('click', function(e) {
-        e.preventDefault();
-        content.toggleClass('show-all');
-        
-        if(content.hasClass('show-all')) {
-            btnText.text('<?php esc_html_e('Show less', 'houzez'); ?>');
-        } else {
-            btnText.text('<?php esc_html_e('Show more', 'houzez'); ?>');
-        }
-    });
-});
-</script>

@@ -1,6 +1,6 @@
 <?php global $houzez_local; ?>
-<div class="form-group">
-	<label for="postal_code"><?php echo houzez_option('cl_zip', 'Postal Code / Zip'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="postal_code"><?php echo houzez_option('cl_zip', 'Postal Code / Zip'); ?></label>
 
 	<input class="form-control" id="zip" name="postal_code" value="<?php
     if (houzez_edit_property()) {

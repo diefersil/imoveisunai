@@ -82,13 +82,13 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            \Elementor\Group_Control_Image_Size::get_type(),
+        $this->add_control(
+            'post_thumb_size',
             [
-                'name' => 'post_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
-                'default' => 'houzez-item-image-1',
+                'label' => esc_html__( 'Thumbnail Size', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
+                'default' => 'global',
             ]
         );
 
@@ -125,12 +125,12 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
                 'type'      => \Elementor\Controls_Manager::SELECT,
                 'description' => '',
                 'options' => array(
-                    'col-lg-12 col-md-12' => '1',
-                    'col-lg-6 col-md-6' => '2',
-                    'col-lg-4 col-md-6' => '3',
-                    'col-lg-3 col-md-6' => '4',
+                    'row-cols-1' => '1',
+                    'row-cols-1 row-cols-md-2' => '2',
+                    'row-cols-1 row-cols-md-2 row-cols-lg-3' => '3',
+                    'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' => '4',
                 ),
-                'default' => 'col-lg-3 col-md-6',
+                'default' => 'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4',
             ]
         );
 
@@ -237,49 +237,44 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
             ]
         );
 
-        $this->add_responsive_control(
-            'box_padding_top',
+        $this->add_control(
+            'bbox_padding',
             [
-                'label' => esc_html__( 'Padding Top', 'houzez-theme-functionality' ),
-                'type' => \Elementor\Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 8,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
+                'label' => __( 'Box Padding', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
                 'selectors' => [
-                    '{{WRAPPER}} .blog-post-item-v1' => 'padding-top: {{SIZE}}{{UNIT}};'
-                ],
-                'condition' => [
-                    'grid_style' => 'style_1'
+                    '{{WRAPPER}} .blog-post-item' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
 
-        $this->add_responsive_control(
-            'box_padding_bottom',
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(),
             [
-                'label' => esc_html__( 'Padding Bottom', 'houzez-theme-functionality' ),
-                'type' => \Elementor\Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 8,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
+                'name' => 'bbox_border',
+                'selector' => '{{WRAPPER}} .blog-post-item',
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'bbox_radius',
+            [
+                'label' => __( 'Box Radius', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
                 'selectors' => [
-                    '{{WRAPPER}} .blog-post-item-v1' => 'padding-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}} .blog-post-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
-                'condition' => [
-                    'grid_style' => 'style_1'
-                ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'box_shadow',
+                'selector' => '{{WRAPPER}} .blog-post-item',
             ]
         );
 
@@ -298,7 +293,7 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .blog-post-item-v1' => 'margin-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}} .blog-post-item-v1' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;'
                 ],
                 'condition' => [
                     'grid_style' => 'style_1'
@@ -477,7 +472,7 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .blog-post-body' => 'margin-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}} .blog-post-body' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;'
                 ],
                 'condition' => [
                     'grid_style' => 'style_1'
@@ -584,6 +579,48 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
+            'continue_link_heading',
+            [
+                'label' => esc_html__( 'Continue Link', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_color',
+            [
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-item .blog-post-link a' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_hover_color',
+            [
+                'label'     => esc_html__( 'Hover Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-item .blog-post-link a:hover' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name'     => 'continue_link_typo',
+                'label'    => esc_html__( 'Typography', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .blog-post-item .blog-post-link',
+            ]
+        );
+
+        $this->add_control(
             'post_footer',
             [
                 'label' => esc_html__( 'Footer', 'houzez-theme-functionality' ),
@@ -670,7 +707,14 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
     protected function render() {
         global $ele_settings, $houzez_local;
         $settings = $this->get_settings_for_display();
+
         $ele_settings = $settings;
+        
+        $post_thumb_size = $settings['post_thumb_size'];
+        if ($post_thumb_size === 'global' ) {
+            $ele_settings['post_thumb_size'] = '';
+        }
+
         $houzez_local = houzez_get_localization();
 
         $grid_style  =  $settings['grid_style'];
@@ -678,7 +722,16 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
         $posts_limit =  $settings['posts_limit'];
         $offset      =  $settings['offset'];
         $posts_row   =  $settings['posts_row'];
-        $thumb_size  = $settings['post_thumb_size'];
+
+        if( $posts_row == 'col-lg-12 col-md-12' ) {
+            $posts_row = 'row-cols-1';
+        } elseif( $posts_row == 'col-lg-6 col-md-6' ) {
+            $posts_row = 'row-cols-1 row-cols-md-2';
+        } elseif( $posts_row == 'col-lg-4 col-md-6' ) {
+            $posts_row = 'row-cols-1 row-cols-md-2 row-cols-lg-3';
+        } elseif( $posts_row == 'col-lg-3 col-md-6' ) {
+            $posts_row = 'row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
+        }
 
         $module_style = 'blog-posts-module-v1';
         $templ_part = 'content-grid-1';
@@ -688,12 +741,22 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
             $templ_part = 'content-grid-2';
         }
 
+        // Sanitize template part to prevent LFI attacks
+        $allowed_templates = array( 'content-grid-1', 'content-grid-2' );
+        if ( ! in_array( $templ_part, $allowed_templates, true ) ) {
+            $templ_part = 'content-grid-1'; // Default fallback
+        }
+
         $wp_query_args = array(
             'ignore_sticky_posts' => 1,
             'post_type' => 'post'
         );
         if (!empty($category_id)) {
-            $wp_query_args['cat'] = $category_id;
+            if (is_array($category_id)) {
+                $wp_query_args['category__in'] = $category_id;
+            } else {
+                $wp_query_args['cat'] = $category_id;
+            }
         }
         if (!empty($offset)) {
             $wp_query_args['offset'] = $offset;
@@ -709,14 +772,12 @@ class Houzez_Elementor_Blog_Posts extends \Elementor\Widget_Base {
         ?>
 
         <div class="blog-posts-module <?php echo esc_attr($module_style); ?>">
-            <div class="row module-row">
+            <div class="row <?php echo esc_attr($posts_row); ?> g-3">
                 <?php 
                 if ($the_query->have_posts()): 
-                    while ($the_query->have_posts()): $the_query->the_post(); ?>
-                    <div class="<?php echo esc_attr($posts_row); ?>">
-                        <?php get_template_part($templ_part); ?>
-                    </div>
-                <?php endwhile; 
+                    while ($the_query->have_posts()): $the_query->the_post();
+                        get_template_part($templ_part);
+                    endwhile; 
                 endif;
                 wp_reset_postdata(); ?>
             </div>

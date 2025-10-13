@@ -386,13 +386,11 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 
 		    $results = $wpdb->get_results($wpdb->prepare($query.' ORDER BY enquiry_id DESC LIMIT %d, %d', $offset, $items_per_page), OBJECT);
 
-		    $return_array = array(
-		        'data' => array(
-		            'results' => $results,
-		            'total_records' => $total,
-		            'items_per_page' => $items_per_page,
-		            'page' => $page,
-		        ),
+			$return_array['data'] = array(
+		        'results' => $results,
+		        'total_records' => $total,
+		        'items_per_page' => $items_per_page,
+		        'page' => $page,
 		    );
 
 		    return $return_array;
@@ -629,7 +627,7 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 
 			$listing_ids = sanitize_text_field($_POST['ids']);
 			
-			$target_email = $_POST['email_to'];
+			$target_email = $_POST['email_to'] ?? '';
 			$target_email = is_email($target_email);
 
 			$subject = sprintf( esc_html__('Matched Listing Email from %s', 'houzez-crm'), get_bloginfo('name') );
@@ -663,6 +661,67 @@ if ( ! class_exists( 'Houzez_Enquiry' ) ) {
 			wp_die();
 
 		}
+
+		public static function get_inquiries_stats() {
+
+            $stats = array();
+            $args = array('user_id' => get_current_user_id());
+
+            $stats['enquiries_count'] = self::get_enquiries_Count($args);
+            
+
+            return $stats;
+        }
+
+		public static function get_enquiries_Count( $args = array() ) {
+            $return = array();
+            $user_id = isset( $args['user_id'] ) ? $args['user_id'] : false;
+            
+            $return['lastday'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'lastday' ] );
+            $return['lasttwo'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'lasttwo' ] );
+            $return['lastweek'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'lastweek' ] );
+            $return['last2week'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'last2week' ] );
+            $return['lastmonth'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'lastmonth' ] );
+            $return['last2month'] = self::get_enquiries_insights( [ 'user_id' => $user_id, 'time' => 'last2month' ] );
+            
+            return $return;
+        }
+
+		public static function get_enquiries_insights( $args = array() ) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'houzez_crm_enquiries';
+            $query = array();
+
+            $DateTimeZone = wp_timezone();//new DateTimeZone( '+02:30' );
+            $DateTime = new DateTime('now', $DateTimeZone);
+
+            $args = wp_parse_args( $args, [
+                'user_id' => false,
+                'time' => false,
+            ] );
+
+            $query[] = "SELECT COUNT( {$table_name}.lead_id ) AS count";
+
+            $query[] = "FROM {$table_name}";
+            $query[] = "WHERE user_id =".$args['user_id'];
+
+            if ( !empty( $args['time'] ) && in_array( $args['time'], ['lastday', 'lasttwo', 'lastweek', 'last2week', 'lastmonth', 'last2month', 'lasthalfyear', 'lastyear'] ) ) {
+
+                $time_token = [ 'lastday' => '-1 day', 'lasttwo' => '-2 day', 'lastweek' => '-7 days', 'last2week' => '-14 days', 'lastmonth' => '-30 days', 'last2month' => '-60 days', 'lasthalfyear' => '-182 days', 'lastyear' => '-365 days' ];
+
+                $modifiedTime = $DateTime->modify( $time_token[ $args['time'] ] )->format('Y-m-d H:i:s');
+
+                $query[] = sprintf(
+                    " AND {$table_name}.time >= '%s' ", $modifiedTime
+                );
+            }
+
+            $query = join( "\n", $query );
+
+            $results = $wpdb->get_row( $query, OBJECT );
+
+            return is_object( $results ) && ! empty( $results->count ) ? (int) $results->count : 0;
+        }
 
 
 	} // end Houzez_Enquiry

@@ -12,6 +12,7 @@ use Elementor\Modules\FloatingButtons\Base\Widget_Floating_Bars_Base;
 use Elementor\Modules\FloatingButtons\AdminMenuItems\Floating_Buttons_Empty_View_Menu_Item;
 use Elementor\Modules\FloatingButtons\AdminMenuItems\Floating_Buttons_Menu_Item;
 use Elementor\Modules\FloatingButtons\Base\Widget_Contact_Button_Base;
+use Elementor\Modules\FloatingButtons\Classes\Action\Action_Handler;
 use Elementor\Modules\FloatingButtons\Control\Hover_Animation_Floating_Buttons;
 use Elementor\Modules\FloatingButtons\Documents\Floating_Buttons;
 use Elementor\Plugin;
@@ -19,12 +20,11 @@ use Elementor\TemplateLibrary\Source_Local;
 use Elementor\Utils as ElementorUtils;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 class Module extends BaseModule {
 
-	const EXPERIMENT_NAME = 'floating-buttons';
 	const FLOATING_ELEMENTS_TYPE_META_KEY = '_elementor_floating_elements_type';
 	const ROUTER_OPTION_KEY = 'elementor_floating_buttons_router_version';
 	const META_CLICK_TRACKING = '_elementor_click_tracking';
@@ -48,20 +48,8 @@ class Module extends BaseModule {
 		];
 	}
 
-	// TODO: This is a hidden experiment which needs to remain enabled like this until 3.26 for pro compatibility.
-	public static function get_experimental_data() {
-		return [
-			'name' => self::EXPERIMENT_NAME,
-			'title' => esc_html__( 'Floating Buttons', 'elementor' ),
-			'hidden' => true,
-			'default' => Manager::STATE_ACTIVE,
-			'release_status' => Manager::RELEASE_STATUS_STABLE,
-			'mutable' => false,
-		];
-	}
-
 	public function get_name(): string {
-		return static::EXPERIMENT_NAME;
+		return 'floating-buttons';
 	}
 
 	public function get_widgets(): array {
@@ -80,7 +68,6 @@ class Module extends BaseModule {
 		} else {
 			$admin_menu->register( $menu_args['menu_slug'], new Floating_Buttons_Menu_Item() );
 		};
-
 	}
 
 	public function __construct() {
@@ -100,14 +87,12 @@ class Module extends BaseModule {
 
 		$this->register_contact_pages_cpt();
 
-		if ( ! ElementorUtils::has_pro() ) {
-			add_action( 'elementor/documents/register', function ( Documents_Manager $documents_manager ) {
-				$documents_manager->register_document_type(
-					static::FLOATING_BUTTONS_DOCUMENT_TYPE,
-					Floating_Buttons::get_class_full_name()
-				);
-			} );
-		}
+		add_action( 'elementor/documents/register', function ( Documents_Manager $documents_manager ) {
+			$documents_manager->register_document_type(
+				static::FLOATING_BUTTONS_DOCUMENT_TYPE,
+				Floating_Buttons::get_class_full_name()
+			);
+		} );
 
 		add_action( 'current_screen', function() {
 			$screen = get_current_screen();
@@ -187,44 +172,12 @@ class Module extends BaseModule {
 		} );
 
 		add_action( 'admin_init', function () {
-			$action = filter_input( INPUT_GET, 'action' );
-			$menu_args = $this->get_contact_menu_args();
+			$action = sanitize_text_field( filter_input( INPUT_GET, 'action' ) );
 
-			switch ( $action ) {
-				case 'remove_from_entire_site':
-					$post = filter_input( INPUT_GET, 'post', FILTER_VALIDATE_INT );
-					check_admin_referer( 'remove_from_entire_site_' . $post );
-					delete_post_meta( $post, '_elementor_conditions' );
-
-					wp_redirect( $menu_args['menu_slug'] );
-					exit;
-				case 'set_as_entire_site':
-					$post = filter_input( INPUT_GET, 'post', FILTER_VALIDATE_INT );
-					check_admin_referer( 'set_as_entire_site_' . $post );
-
-					$posts = get_posts( [
-						'post_type' => static::CPT_FLOATING_BUTTONS,
-						'posts_per_page' => -1,
-						'post_status' => 'publish',
-						'fields' => 'ids',
-						'no_found_rows' => true,
-						'update_post_term_cache' => false,
-						'update_post_meta_cache' => false,
-						'meta_query' => Floating_Buttons::get_meta_query_for_floating_buttons(
-							Floating_Buttons::get_floating_element_type( $post )
-						),
-					] );
-
-					foreach ( $posts as $post_id ) {
-						delete_post_meta( $post_id, '_elementor_conditions' );
-					}
-
-					update_post_meta( $post, '_elementor_conditions', [ 'include/general' ] );
-
-					wp_redirect( $menu_args['menu_slug'] );
-					exit;
-				default:
-					break;
+			if ( $action ) {
+				$menu_args = $this->get_contact_menu_args();
+				$action_handler = new Action_Handler( $action, $menu_args );
+				$action_handler->process_action();
 			}
 		} );
 
@@ -285,7 +238,7 @@ class Module extends BaseModule {
 				$starting_clicks = (int) get_post_meta( $post_id, static::META_CLICK_TRACKING, true );
 				$posts_to_update[ $post_id ] = $starting_clicks ? $starting_clicks : 0;
 			}
-			$posts_to_update[ $post_id ] ++;
+			$posts_to_update[ $post_id ]++;
 		}
 
 		foreach ( $posts_to_update as $post_id => $clicks ) {
@@ -395,8 +348,8 @@ class Module extends BaseModule {
 				<div class="e-trashed-items">
 					<?php
 					printf(
-					/* translators: %1$s Link open tag, %2$s: Link close tag. */
-						esc_html__( 'Or view %1$sTrashed Items%1$s', 'elementor' ),
+						/* translators: %1$s Link open tag, %2$s: Link close tag. */
+						esc_html__( 'Or view %1$sTrashed Items%2$s', 'elementor' ),
 						'<a href="' . esc_url( admin_url( 'edit.php?post_status=trash&post_type=' . self::CPT_FLOATING_BUTTONS ) ) . '">',
 						'</a>'
 					);
@@ -440,8 +393,9 @@ class Module extends BaseModule {
 			'public' => true,
 			'show_in_menu' => 'edit.php?post_type=elementor_library&tabs_group=library',
 			'show_in_nav_menus' => false,
-			'capability_type' => 'page',
+			'capability_type' => 'post',
 			'taxonomies' => [ Source_Local::TAXONOMY_TYPE_SLUG ],
+			'show_in_rest' => true,
 			'supports' => [
 				'title',
 				'editor',
@@ -485,7 +439,6 @@ class Module extends BaseModule {
 		] );
 
 		return $posts_query->post_count > 0;
-
 	}
 
 	private function get_contact_menu_args(): array {
@@ -587,7 +540,7 @@ class Module extends BaseModule {
 		}
 	}
 
-	private function get_widgets_style_list():array {
+	private function get_widgets_style_list(): array {
 		return [
 			'widget-floating-buttons' => self::WIDGET_HAS_CUSTOM_BREAKPOINTS, // TODO: Remove in v3.27.0 [ED-15717]
 			'widget-floating-bars-base' => self::WIDGET_HAS_CUSTOM_BREAKPOINTS,

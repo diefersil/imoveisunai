@@ -71,9 +71,6 @@ class Woolamp extends Widget_Base {
 	public function has_widget_inner_wrapper(): bool {
         return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
     }
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
 
 	protected function register_controls() {
 		$reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
@@ -205,6 +202,7 @@ class Woolamp extends Widget_Base {
 			[
 				'label' => esc_html__('Custom Label', 'bdthemes-prime-slider'),
 				'type' => Controls_Manager::TEXT,
+				'dynamic' => [ 'active' => true ],
 			]
 		);
 
@@ -1284,7 +1282,7 @@ class Woolamp extends Widget_Base {
 
 				?>
 					<div class="bdt-social-share-item">
-						<div <?php echo $this->get_render_attribute_string('social-attrs'); ?>>
+						<div <?php $this->print_render_attribute_string('social-attrs'); ?>>
 							<?php echo $button['text'] ? esc_html($button['text']) : Module::get_social_media($social_name)['title']; ?>
 						</div>
 					</div>

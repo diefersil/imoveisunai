@@ -112,10 +112,9 @@ if ( !function_exists( 'houzez_start_thread_filter' ) ) {
 
 	function houzez_start_thread_filter( $data ) {
 
-		global $wpdb, $current_user;
+		global $wpdb;
 
-		wp_get_current_user();
-		$sender_id =  $current_user->ID;
+		$sender_id =  get_current_user_id();
 		$property_id = $data['property_id'];
 		$receiver_id = get_post_field( 'post_author', $property_id );
 		$table_name = $wpdb->prefix . 'houzez_threads';
@@ -163,14 +162,13 @@ if ( !function_exists( 'houzez_thread_message_filter' ) ) {
 
 	function houzez_thread_message_filter( $thread_id, $message, $attachments ) {
 
-		global $wpdb, $current_user;
+		global $wpdb;
 
 		if ( is_array( $attachments ) ) {
 			$attachments = serialize( $attachments );
 		}
 
-		wp_get_current_user();
-		$created_by =  $current_user->ID;
+		$created_by =  get_current_user_id();
 		$table_name = $wpdb->prefix . 'houzez_thread_messages';
 
 		$message = stripslashes($message);

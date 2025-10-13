@@ -49,22 +49,21 @@ if( $check_if_price_zero > 0 ) {
 <div class="payment-method">
     
     <?php if( $enable_paypal != 0 ) { ?>
-    <div class="payment-method-block paypal-method method-select">
+    <div class="payment-method-block paypal-method mb-2">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
-                <input type="radio" class="payment-paypal" name="houzez_payment_type" value="paypal" <?php echo $checked_paypal;?>>
-                    
-                <span class="control-text"><?php esc_html_e( 'Paypal', 'houzez'); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
+            <label class="control control--radio radio-tab d-flex align-items-center">
+                <input type="radio" class="payment-method-select" name="houzez_payment_type" value="paypal" <?php echo $checked_paypal;?>>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Paypal', 'houzez'); ?></strong></span>
+                <img class="img-fluid ms-4" src="<?php echo HOUZEZ_IMAGE; ?>cc-cards.png" alt="Accepted credit cards">
+                <span class="control__indicator start-0 end-auto"></span>
             </label>
         </div>
     </div>
     <?php 
     if( houzez_option('houzez_disable_recurring', 0) != 0 ) {
         if( $houzez_auto_recurring != 1 ) { ?>
-            <div class="recurring-payment-wrap">
-                <label class="control control--checkbox">
+            <div class="border-bottom pb-3 mb-3">
+                <label class="recurring-payment-paypal control control--checkbox">
                     <input type="checkbox" name="paypal_package_recurring" id="paypal_package_recurring" value="1">
                     <?php esc_html_e( 'Set as recurring payment', 'houzez' ); ?>
                     <span class="control__indicator"></span>
@@ -78,13 +77,13 @@ if( $check_if_price_zero > 0 ) {
     }?>
 
     <?php if( $enable_stripe != 0 ) { ?>
-    <div class="payment-method-block stripe-method method-select">
+    <div class="payment-method-block stripe-method mb-2">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
-                <input type="radio" class="payment-stripe" name="houzez_payment_type" value="stripe" <?php echo $checked_stripe;?>>
-                <span class="control-text"><?php esc_html_e( 'Stripe', 'houzez'); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
+            <label class="control control--radio radio-tab d-flex align-items-center">
+                <input type="radio" class="payment-method-select" name="houzez_payment_type" value="stripe" <?php echo $checked_stripe;?>>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Stripe', 'houzez'); ?></strong></span>
+                <img class="img-fluid ms-4" src="<?php echo HOUZEZ_IMAGE; ?>cc-cards.png" alt="Accepted credit cards">
+                <span class="control__indicator start-0 end-auto"></span>
             </label>
             <?php houzez_stripe_create_plan($selected_package_id); ?>
         </div>
@@ -93,8 +92,8 @@ if( $check_if_price_zero > 0 ) {
     <?php 
     if( houzez_option('houzez_disable_recurring', 0) != 0 ) {
         if( $houzez_auto_recurring != 1 ) { ?>
-        <div class="recurring-payment-wrap">
-            <label class="control control--checkbox">
+        <div class="border-bottom pb-3 mb-3">
+            <label class="recurring-payment-stripe control control--checkbox">
                 <input type="checkbox" name="houzez_stripe_recurring" id="houzez_stripe_recurring" value="1">
                 <?php esc_html_e( 'Set as recurring payment', 'houzez' ); ?>
                 <span class="control__indicator"></span>
@@ -109,19 +108,18 @@ if( $check_if_price_zero > 0 ) {
     ?>
 
     <?php if( $enable_wireTransfer != 0 ) { ?>
-    <div class="payment-method-block bank-method method-select">
+    <div class="payment-method-block bank-method border-bottom pb-3 mb-3">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
-                <input type="radio" name="houzez_payment_type" value="direct_pay" <?php echo $checked_bank;?>>
-                <span class="control-text"><?php esc_html_e( 'Bank Transfer', 'houzez' ); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
-                <span class="float-right"><?php esc_html_e('Payment by bank transfer. Use the order ID as a reference', 'houzez'); ?></span>
+            <label class="control control--radio radio-tab d-flex align-items-center">
+                <input type="radio" class="payment-method-select" name="houzez_payment_type" value="direct_pay" <?php echo $checked_bank;?>>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Bank Transfer', 'houzez' ); ?></strong></span>
+                <span><?php esc_html_e('Payment by bank transfer. Use the order ID as a reference', 'houzez'); ?></span>
+                <span class="control__indicator start-0 end-auto"></span>
             </label>
         </div>
-
     </div>
     <?php } ?>
+
 </div>
 <?php } //$pack_price != 0 if ?>
 
@@ -130,7 +128,7 @@ if( $check_if_price_zero > 0 ) {
 
 <?php if( $check_if_price_zero > 0 ) { ?>
 
-    <button id="houzez_complete_membership" type="button" class="btn btn-success btn-full-width mt-4 mb-4">
+    <button id="houzez_complete_membership" type="button" class="btn btn-success w-100 mt-4 mb-4">
         <?php get_template_part('template-parts/loader'); ?>
         <?php esc_html_e('Complete Membership', 'houzez'); ?>
     </button>
@@ -140,7 +138,7 @@ if( $check_if_price_zero > 0 ) {
     if( is_user_logged_in() ) { 
 
         if (houzez_user_had_free_package($userID)) { ?>
-            <button id="houzez_complete_membership" type="button" class="btn btn-success btn-full-width mt-4 mb-4">
+            <button id="houzez_complete_membership" type="button" class="btn btn-success w-100 mt-4 mb-4">
                 <?php get_template_part('template-parts/loader'); ?>
                 <?php esc_html_e('Complete Membership', 'houzez'); ?>
             </button>
@@ -154,7 +152,7 @@ if( $check_if_price_zero > 0 ) {
 
     } else { // is_user_logged_in() ?>
 
-        <button id="houzez_complete_membership" type="button" class="btn btn-success btn-full-width mt-4 mb-4">
+        <button id="houzez_complete_membership" type="button" class="btn btn-success w-100 mt-4 mb-4">
             <?php get_template_part('template-parts/loader'); ?>
             <?php esc_html_e('Complete Membership', 'houzez'); ?>
         </button>

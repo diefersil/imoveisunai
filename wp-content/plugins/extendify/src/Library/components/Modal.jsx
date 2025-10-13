@@ -1,17 +1,17 @@
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dialog } from '@headlessui/react';
 import { useActivityStore } from '@shared/state/activity';
 import { motion } from 'framer-motion';
 import { updateOption } from '@library/api/WPApi';
+import { ModalContent } from '@library/components/ModalContent';
+import { Sidebar } from '@library/components/sidebar/Sidebar';
+import { Topbar } from '@library/components/topbar/Topbar';
 import { useGlobalsStore } from '@library/state/global';
 import { useSiteSettingsStore } from '@library/state/site';
 import { useUserStore } from '@library/state/user';
 import { insertBlocks } from '@library/util/insert';
-import { ModalContent } from './ModalContent';
-import { Sidebar } from './sidebar/Sidebar';
-import { Topbar } from './topbar/Topbar';
 
 const isNewPage = window?.location?.pathname?.includes('post-new.php');
 
@@ -23,9 +23,7 @@ export const Modal = () => {
 	const { createNotice } = dispatch('core/notices');
 	const once = useRef(false);
 
-	const onClose = () => {
-		setOpen(false);
-	};
+	const onClose = () => setOpen(false);
 	const insertPattern = async (blocks) => {
 		await insertBlocks(blocks);
 		incrementImports();
@@ -79,6 +77,15 @@ export const Modal = () => {
 			window.removeEventListener('extendify::close-library', handleClose);
 		};
 	}, [setOpen, open]);
+
+	useEffect(() => {
+		if (!open) return;
+		const welcomeGuide =
+			select('core/edit-post').isFeatureActive('welcomeGuide');
+		if (welcomeGuide) {
+			dispatch('core/edit-post').toggleFeature('welcomeGuide');
+		}
+	}, [open]);
 
 	if (!open) return null;
 

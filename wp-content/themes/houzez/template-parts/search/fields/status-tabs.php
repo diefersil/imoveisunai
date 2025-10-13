@@ -1,6 +1,6 @@
-<ul class="houzez-status-tabs nav nav-pills justify-content-center" role="tablist" data-toggle="buttons">
+<ul class="houzez-status-tabs nav nav-pills justify-content-center" role="tablist" data-bs-toggle="buttons">
 	<li class="nav-item">
-		<a class="nav-link active" data-val="" data-toggle="pill" href="#" role="tab" aria-selected="true">
+		<a class="nav-link active" data-val="" data-bs-toggle="pill" href="#" role="tab" aria-bs-selected="true">
 			<?php echo houzez_option('srh_all_status', 'All Status'); ?>
 		</a>
 	</li>
@@ -24,7 +24,7 @@
         		break;
         	}
         	echo '<li class="nav-item">
-					<a class="nav-link" data-val="'.esc_attr($status->slug).'" data-toggle="pill" href="#" role="tab" aria-selected="true">
+					<a class="nav-link" data-val="'.esc_attr($status->slug).'" data-bs-toggle="pill" href="#" role="tab" aria-bs-selected="true">
 						'.esc_attr($status->name).'
 					</a>
 				</li>';

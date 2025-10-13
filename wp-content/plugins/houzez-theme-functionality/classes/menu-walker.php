@@ -138,7 +138,7 @@ class houzez_plugin_nav_walker extends \Walker_Nav_Menu {
 	    }
 
         if( wp_is_mobile() ) {
-            $attributes .= $args->has_children ? ' data-toggle="dropdown" ' : '';
+            $attributes .= $args->has_children ? ' data-bs-toggle="dropdown" ' : '';
         }
 
         ! empty( $item->attr_title )

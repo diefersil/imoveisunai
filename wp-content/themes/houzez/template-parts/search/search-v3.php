@@ -1,5 +1,5 @@
 <?php
-global $sticky_hidden, $sticky_data, $hidden_data;
+global $sticky_hidden, $desktop_sticky_data, $mobile_sticky_data, $hidden_data;
 $search_builder = houzez_search_builder();
 $layout = $search_builder['enabled'];
 if(empty($layout)) {
@@ -39,18 +39,16 @@ if(array_key_exists('geolocation', $layout)) {
 	$is_geolocation = 'advanced-search-v1-geolocation';
 }
 ?>
-<section id="desktop-header-search" class="advanced-search advanced-search-nav <?php echo esc_attr($sticky_hidden); ?>" data-hidden="<?php echo esc_attr($hidden_data); ?>" data-sticky='<?php echo esc_attr( $sticky_data ); ?>'>
+<section id="desktop-header-search" class="advanced-search advanced-search-nav desktop-search-nav <?php echo esc_attr($sticky_hidden); ?>" data-hidden="<?php echo esc_attr($hidden_data); ?>" data-sticky='<?php echo esc_attr( $desktop_sticky_data ); ?>'>
 	<div class="<?php echo houzez_header_search_width(); ?>">
-		<form class="houzez-search-form-js <?php houzez_search_filters_class(); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
+		<form id="desktop-search-form" class="houzez-search-form-js <?php houzez_search_filters_class(); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
 
 			<?php do_action('houzez_search_hidden_fields'); ?>
 			
 		<div class="advanced-search-v3">
-			<div class="d-flex">
-				
+			<div class="d-flex gap-2">
 				<?php
 				$i = 0;
-				
 				if ($layout) {
 					foreach ($layout as $key=>$value) { $i ++;
 						$class_flex_grow = '';
@@ -80,7 +78,7 @@ if(array_key_exists('geolocation', $layout)) {
 						} else {
 
 							echo '<div class="'.$common_class.' '.$class_flex_grow.'">';
-								houzez_get_custom_search_field($key);
+								Houzez_Property_Search::get_custom_search_field($key);
 							echo '</div>';
 							
 						}
@@ -95,6 +93,8 @@ if(array_key_exists('geolocation', $layout)) {
 					<?php get_template_part('template-parts/search/fields-v3/more-options'); ?>
 				</div>
 				<?php } ?>
+
+				<?php get_template_part('template-parts/search/fields/reset-btn'); ?>
 				
 				<div class="flex-search btn-no-right-padding">
 					<?php get_template_part('template-parts/search/fields/submit-button'); ?>

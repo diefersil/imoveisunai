@@ -19,7 +19,7 @@ global $wp_version;
 */
 define( 'HOUZEZ_THEME_NAME', 'Houzez' );
 define( 'HOUZEZ_THEME_SLUG', 'houzez' );
-define( 'HOUZEZ_THEME_VERSION', '3.4.7' );
+define( 'HOUZEZ_THEME_VERSION', '4.2.0' );
 define( 'HOUZEZ_FRAMEWORK', get_template_directory() . '/framework/' );
 define( 'HOUZEZ_WIDGETS', get_template_directory() . '/inc/widgets/' );
 define( 'HOUZEZ_INC', get_template_directory() . '/inc/' );
@@ -27,12 +27,12 @@ define( 'HOUZEZ_TEMPLATE_PARTS', get_template_directory() . '/template-parts/' )
 define( 'HOUZEZ_IMAGE', get_template_directory_uri() . '/img/' );
 define( 'HOUZEZ_CSS_DIR_URI', get_template_directory_uri() . '/css/' );
 define( 'HOUZEZ_JS_DIR_URI', get_template_directory_uri() . '/js/' );
+
 /**
 *	----------------------------------------------------------------------------------------
 *	Set up theme default and register various supported features.
 *	----------------------------------------------------------------------------------------
 */
-
 if ( ! function_exists( 'houzez_setup' ) ) {
 	
 	function houzez_setup() {
@@ -40,25 +40,17 @@ if ( ! function_exists( 'houzez_setup' ) ) {
 		/* add title tag support */
 		add_theme_support( 'title-tag' );
 
-		/* Load child theme languages */
-		load_theme_textdomain( 'houzez', get_stylesheet_directory() . '/languages' );
-
-		/* load theme languages */
+		/* Load parent theme languages */
 		load_theme_textdomain( 'houzez', get_template_directory() . '/languages' );
+
+		/* Load child theme languages to override parent's translations */
+		load_child_theme_textdomain( 'houzez', get_stylesheet_directory() . '/languages' );
 
 		/* Add default posts and comments RSS feed links to head */
 		add_theme_support( 'automatic-feed-links' );
 
 		//Add support for post thumbnails.
 		add_theme_support( 'post-thumbnails' );
-		add_image_size( 'houzez-gallery', 1170, 785, true);	
-		add_image_size( 'houzez-item-image-1', 592, 444, true );
-		add_image_size( 'houzez-top-v7', 780, 780, true );
-		add_image_size( 'houzez-item-image-4', 758, 564, true );
-		add_image_size( 'houzez-item-image-6', 584, 438, true );
-		add_image_size( 'houzez-variable-gallery', 0, 600, false );
-		add_image_size( 'houzez-map-info', 120, 90, true );
-		add_image_size( 'houzez-image_masonry', 496, 9999, false ); // blog-masonry.php
 
 		/**
 		*	Register nav menus. 
@@ -114,16 +106,22 @@ remove_filter( 'pre_user_description', 'wp_filter_kses' );
 add_filter( 'pre_user_description', 'wp_filter_post_kses' );
 
 /**
- *	---------------------------------------------------------------------
- *	Classes
- *	---------------------------------------------------------------------
+ *	---------------------------------------------------------------------------------------
+ *	Options Admin Panel
+ *	---------------------------------------------------------------------------------------
  */
-require_once( HOUZEZ_FRAMEWORK . 'classes/Houzez_Query.php' );
-require_once( HOUZEZ_FRAMEWORK . 'classes/houzez_data_source.php' );
-require_once( HOUZEZ_FRAMEWORK . 'classes/upgrade20.php');
-require_once( HOUZEZ_FRAMEWORK . 'classes/script-loader.php');
-require_once( HOUZEZ_FRAMEWORK . 'classes/houzez-lazy-load.php');
-require_once( HOUZEZ_FRAMEWORK . 'admin/class-admin.php');
+require_once( HOUZEZ_FRAMEWORK . 'options/remove-tracking-class.php' ); // Remove tracking
+require_once( HOUZEZ_FRAMEWORK . 'options/houzez-option.php' );
+
+if( ! function_exists( 'houzez_load_redux_config' ) ) {
+	function houzez_load_redux_config() {
+		if ( class_exists( 'ReduxFramework' ) ) {
+			require_once(get_theme_file_path('/framework/options/houzez-options.php'));
+			require_once(get_theme_file_path('/framework/options/main.php'));
+		}
+	}
+}
+add_action('after_setup_theme', 'houzez_load_redux_config', 20);
 
 /**
  *	---------------------------------------------------------------------
@@ -132,19 +130,18 @@ require_once( HOUZEZ_FRAMEWORK . 'admin/class-admin.php');
  */
 require_once( HOUZEZ_FRAMEWORK . 'template-hooks.php' );
 
+
 /**
  *	---------------------------------------------------------------------
  *	Functions
  *	---------------------------------------------------------------------
  */
 require_once( HOUZEZ_FRAMEWORK . 'functions/template-functions.php' );
-//require_once( HOUZEZ_FRAMEWORK . 'functions/header-functions.php' );
-//require_once( HOUZEZ_FRAMEWORK . 'functions/footer-functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/price_functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/helper_functions.php' );
-require_once( HOUZEZ_FRAMEWORK . 'functions/search_functions.php' );
-require_once( HOUZEZ_FRAMEWORK . 'functions/google_map_functions.php' );
-require_once( HOUZEZ_FRAMEWORK . 'functions/open_street_map_functions.php' );
+require_once( HOUZEZ_FRAMEWORK . 'functions/taxonomy-helper.php' );
+require_once( HOUZEZ_FRAMEWORK . 'functions/cache.php' );
+require_once( HOUZEZ_FRAMEWORK . 'functions/map-functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/profile_functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/property_functions.php' );
 require_once( HOUZEZ_FRAMEWORK . 'functions/emails-functions.php' );
@@ -161,7 +158,6 @@ require_once( HOUZEZ_FRAMEWORK . 'functions/stats.php');
 require_once( HOUZEZ_FRAMEWORK . 'functions/agency_agents.php');
 require_once( HOUZEZ_FRAMEWORK . 'admin/menu/menu.php');
 
-
 if ( class_exists( 'WooCommerce', false ) ) {
 	require_once( HOUZEZ_FRAMEWORK . 'functions/woocommerce.php' );
 }
@@ -169,6 +165,24 @@ if ( class_exists( 'WooCommerce', false ) ) {
 require_once( get_template_directory() . '/template-parts/header/partials/favicon.php' );
 
 require_once(get_theme_file_path('localization.php'));
+
+require_once( HOUZEZ_FRAMEWORK . 'backward-compatibility.php' );
+
+
+/**
+ *	---------------------------------------------------------------------
+ *	Classes
+ *	---------------------------------------------------------------------
+ */
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-query.php' );
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-data-source.php' );
+require_once( HOUZEZ_FRAMEWORK . 'class-script-loader.php');
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-lazy-load.php');
+require_once( HOUZEZ_FRAMEWORK . 'admin/class-admin.php');
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-property-submit.php');
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-property-search.php');
+require_once( HOUZEZ_FRAMEWORK . 'class-houzez-user-verification.php');
+require_once( HOUZEZ_FRAMEWORK . 'class-plugin-version-checker.php');
 
 /**
  *	---------------------------------------------------------------------------------------
@@ -223,38 +237,12 @@ if( houzez_theme_verified() ) {
 
 
 /**
- *	---------------------------------------------------------------------------------------
- *	Options Admin Panel
- *	---------------------------------------------------------------------------------------
- */
-require_once( HOUZEZ_FRAMEWORK . 'options/remove-tracking-class.php' ); // Remove tracking
-require_once( HOUZEZ_FRAMEWORK . 'options/houzez-option.php' );
-
-if( ! function_exists( 'houzez_load_redux_config' ) ) {
-	function houzez_load_redux_config() {
-		if ( class_exists( 'ReduxFramework' ) ) {
-			require_once(get_theme_file_path('/framework/options/houzez-options.php'));
-			require_once(get_theme_file_path('/framework/options/main.php'));
-		}
-	}
-}
-add_action('after_setup_theme', 'houzez_load_redux_config', 20);
-
-
-/**
  *	----------------------------------------------------------------
  *	Enqueue scripts and styles.
  *	----------------------------------------------------------------
  */
 require_once( HOUZEZ_INC . 'register-scripts.php' );
 
-/**
- *	----------------------------------------------------
- *	TMG plugin activation
- *	----------------------------------------------------
- */
-require_once( HOUZEZ_FRAMEWORK . 'class-tgm-plugin-activation.php' );
-require_once( HOUZEZ_FRAMEWORK . 'register-plugins.php' );
 
 /**
  *	----------------------------------------------------------------
@@ -295,7 +283,6 @@ require_once(get_theme_file_path('/framework/widgets/latest-posts.php'));
 require_once(get_theme_file_path('/framework/widgets/agents-search.php'));
 require_once(get_theme_file_path('/framework/widgets/agency-search.php'));
 require_once(get_theme_file_path('/framework/widgets/advanced-search.php'));
-
 
  /**
  *	---------------------------------------------------------------------------------------
@@ -359,135 +346,135 @@ if( !function_exists('houzez_widgets_init') ) {
 			'name' => esc_html__('Default Sidebar', 'houzez'),
 			'id' => 'default-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in the blog sidebar.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Property Listings', 'houzez'),
 			'id' => 'property-listing',
 			'description' => esc_html__('Widgets in this area will be shown in property listings sidebar.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Search Sidebar', 'houzez'),
 			'id' => 'search-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in search result page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Single Property', 'houzez'),
 			'id' => 'single-property',
 			'description' => esc_html__('Widgets in this area will be shown in single property sidebar.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Page Sidebar', 'houzez'),
 			'id' => 'page-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in page sidebar.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Agency Sidebar', 'houzez'),
 			'id' => 'agency-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in agencies template and agency detail page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Agent Sidebar', 'houzez'),
 			'id' => 'agent-sidebar',
 			'description' => esc_html__('Widgets in this area will be shown in agents template and angent detail page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Mobile Menu', 'houzez'),
 			'id' => 'hz-mobile-menu',
 			'description' => esc_html__('Widgets in this area will be shown in the mobile menu', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Custom Widget Area 1', 'houzez'),
 			'id' => 'hz-custom-widget-area-1',
 			'description' => esc_html__('You can assign this widget are to any page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Custom Widget Area 2', 'houzez'),
 			'id' => 'hz-custom-widget-area-2',
 			'description' => esc_html__('You can assign this widget are to any page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Custom Widget Area 3', 'houzez'),
 			'id' => 'hz-custom-widget-area-3',
 			'description' => esc_html__('You can assign this widget are to any page.', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Footer Area 1', 'houzez'),
 			'id' => 'footer-sidebar-1',
 			'description' => esc_html__('Widgets in this area will be show in footer column one', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Footer Area 2', 'houzez'),
 			'id' => 'footer-sidebar-2',
 			'description' => esc_html__('Widgets in this area will be show in footer column two', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Footer Area 3', 'houzez'),
 			'id' => 'footer-sidebar-3',
 			'description' => esc_html__('Widgets in this area will be show in footer column three', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 		register_sidebar(array(
 			'name' => esc_html__('Footer Area 4', 'houzez'),
 			'id' => 'footer-sidebar-4',
 			'description' => esc_html__('Widgets in this area will be show in footer column four', 'houzez'),
-			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap %2$s">',
+			'before_widget' => '<div id="%1$s" class="footer-widget widget widget-wrap mb-4 p-4 %2$s">',
 			'after_widget' => '</div>',
-			'before_title' => '<div class="widget-header"><h3 class="widget-title">',
+			'before_title' => '<div class="widget-header"><h3 class="widget-title mb-4">',
 			'after_title' => '</h3></div>',
 		));
 	}
@@ -566,13 +553,11 @@ if(!function_exists('houzez_hide_admin_bar')) {
 	  
 	  if ( !current_user_can('administrator') && !is_admin() ) {
 	  		return false;
-
-	  } else if ( houzez_is_dashboard() ) :
+	  } elseif ( houzez_is_dashboard() ) {
 	    return false;
-
-	  else :
+	  } else {
 	    return $bool;
-	  endif;
+	  }
 	}
 	add_filter('show_admin_bar', 'houzez_hide_admin_bar');
 }
@@ -637,25 +622,6 @@ if( ! function_exists('houzez_save_custom_options_for_cron') ) {
     }
 }
 
-if( ! function_exists( 'houzez_is_mobile_filter' ) ) {
-	function houzez_is_mobile_filter( $is_mobile ) {
-		if ( empty( $_SERVER['HTTP_USER_AGENT'] ) ) {
-			$is_mobile = false;
-		} elseif ( strpos( $_SERVER['HTTP_USER_AGENT'], 'Mobile' ) !== false // Many mobile devices (all iPhone, iPad, etc.)
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'Android' ) !== false
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'Silk/' ) !== false
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'Kindle' ) !== false
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'BlackBerry' ) !== false
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'Opera Mini' ) !== false
-			|| strpos( $_SERVER['HTTP_USER_AGENT'], 'Opera Mobi' ) !== false ) {
-				$is_mobile = true;
-		} else {
-			$is_mobile = false;
-		}
-		return $is_mobile ;
-	}
-	//add_filter( 'wp_is_mobile', 'houzez_is_mobile_filter' );
-}
 
 if( ! function_exists('houzez_update_existing_users_with_manager_role_once') ) {
 	function houzez_update_existing_users_with_manager_role_once() {
@@ -681,4 +647,105 @@ if( ! function_exists('houzez_update_existing_users_with_manager_role_once') ) {
 
 	// Run the function to update users
 	houzez_update_existing_users_with_manager_role_once();
+}
+
+/**
+ * Remove unnecessary scripts and styles from dashboard pages
+ */
+if( ! function_exists('houzez_remove_frontend_assets_from_dashboard') ) {
+	function houzez_remove_frontend_assets_from_dashboard() {
+		if (!houzez_is_dashboard()) {
+			return;
+		}
+
+		wp_dequeue_style('houzez-main');
+	}
+	add_action('wp_enqueue_scripts', 'houzez_remove_frontend_assets_from_dashboard', 100);
+}
+
+/**
+ * Fix agent page duplicate URLs issue
+ * Adds canonical URLs and handles invalid pagination
+ *
+ * For additional crawler protection, add this to your robots.txt:
+ * Disallow: /medarbejder/
+ * (adjust the path based on your URL structure)
+ */
+if( ! function_exists('houzez_fix_agent_pagination_duplicates') ) {
+	function houzez_fix_agent_pagination_duplicates() {
+		// Only run on single agent pages
+		if (!is_singular('houzez_agent')) {
+			return;
+		}
+
+		global $paged;
+
+		// Get current page number
+		if (get_query_var('paged')) {
+			$current_page = get_query_var('paged');
+		} elseif (get_query_var('page')) {
+			$current_page = get_query_var('page');
+		} else {
+			$current_page = 1;
+		}
+
+		$agent_id = get_the_ID();
+
+		// Only validate pagination if we're on page 2 or higher (optimization)
+		if ($current_page > 1) {
+			$posts_per_page = houzez_option('num_of_agent_listings', 10);
+
+			// Lightweight query to just get the count
+			$count_args = array(
+				'post_type' => 'property',
+				'post_status' => 'publish',
+				'posts_per_page' => 1, // We only need 1 post to get found_posts
+				'fields' => 'ids', // Only get IDs, not full post objects
+				'meta_query' => array(
+					'relation' => 'AND',
+					array(
+						'key' => 'fave_agents',
+						'value' => $agent_id,
+						'compare' => '='
+					),
+					array(
+						'key' => 'fave_agent_display_option',
+						'value' => 'agent_info',
+						'compare' => '='
+					)
+				)
+			);
+
+			// Apply the same filters that the main query uses
+			$count_args = apply_filters('houzez_sold_status_filter', $count_args);
+
+			$count_query = new WP_Query($count_args);
+			$total_properties = $count_query->found_posts;
+			$max_pages = ceil($total_properties / $posts_per_page);
+
+			// If current page exceeds max pages, redirect to agent page
+			if ($current_page > $max_pages) {
+				wp_redirect(get_permalink($agent_id), 301);
+				exit;
+			}
+
+			// Clean up the query
+			wp_reset_postdata();
+		}
+
+		// Add canonical URL
+		if ($current_page == 1) {
+			// For page 1, canonical should be the main URL without pagination
+			echo '<link rel="canonical" href="' . esc_url(get_permalink($agent_id)) . '" />' . "\n";
+		} else {
+			// For pagination pages, use the paginated URL as canonical
+			echo '<link rel="canonical" href="' . esc_url(get_pagenum_link($current_page)) . '" />' . "\n";
+		}
+
+		// Add noindex for paginated pages to prevent SEO duplicate content issues
+		if ($current_page > 1) {
+			echo '<meta name="robots" content="noindex, follow" />' . "\n";
+		}
+	}
+	add_action('wp_head', 'houzez_fix_agent_pagination_duplicates', 1);
 }

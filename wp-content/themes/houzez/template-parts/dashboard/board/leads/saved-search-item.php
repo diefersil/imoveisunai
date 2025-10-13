@@ -6,8 +6,13 @@ $get_date = houzez_return_formatted_date($datetime_unix);
 $get_time = houzez_get_formatted_time($datetime_unix);
 
 $search_args = $houzez_search_data->query;
-$search_args_decoded = unserialize( base64_decode( $search_args ) );
+$search_args_decoded = houzez_decode_search_data( $search_args );
 $search_uri = $houzez_search_data->url;
+
+// Fix double protocol issue: Remove http:// or https:// prefix that esc_url_raw() incorrectly adds
+// The saved data should only be query parameters, not a full URL
+$search_uri = preg_replace('/^https?:\/\//', '', $search_uri);
+
 $search_page = houzez_get_template_link('template/template-search.php');
 $search_link = $search_page.'/?'.$search_uri;
 $explode_qry = explode('&', $search_uri);
@@ -54,7 +59,6 @@ endif;
 
 ?>
 <tr>
-	
 	<td data-label="<?php esc_html_e('Search Parameters', 'houzez'); ?>">
         <?php 
         if( isset( $search_args_decoded['tax_query'] ) ) {
@@ -141,13 +145,10 @@ endif;
 
             endforeach;
         }
-         ?>
+        ?>
     </td>
-    <td>
-    	<a target="_blank" href="<?php echo esc_url($search_link); ?>"><?php esc_html_e('View', 'houzez'); ?></a>
-    </td>
-	<td class="table-nowrap" data-label="<?php esc_html_e('Date', 'houzez'); ?>">
-		<?php echo esc_attr($get_date); ?><br>
-        <?php echo esc_html__('at', 'houzez'); ?> <?php echo esc_attr($get_time); ?>
+    <td> <a target="_blank" href="<?php echo esc_url($search_link); ?>"><?php esc_html_e('View', 'houzez'); ?></a></td>
+	<td class="text-nowrap" data-label="<?php esc_html_e('Date', 'houzez'); ?>">
+		<?php echo esc_attr($get_date); ?>
 	</td>
 </tr>

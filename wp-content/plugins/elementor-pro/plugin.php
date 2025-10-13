@@ -1,12 +1,12 @@
 <?php
 namespace ElementorPro;
 
+use ElementorPro\Core\Maintenance;
 use ElementorPro\Core\PHP_Api;
 use ElementorPro\Core\Admin\Admin;
 use ElementorPro\Core\App\App;
 use ElementorPro\Core\Connect;
 use ElementorPro\Core\Compatibility\Compatibility;
-use Elementor\Core\Responsive\Files\Frontend as FrontendFile;
 use Elementor\Utils;
 use ElementorPro\Core\Editor\Editor;
 use ElementorPro\Core\Integrations\Integrations_Manager;
@@ -16,6 +16,7 @@ use ElementorPro\Core\Preview\Preview;
 use ElementorPro\Core\Upgrade\Manager as UpgradeManager;
 use ElementorPro\License\API;
 use ElementorPro\License\Updater;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -134,7 +135,7 @@ class Plugin {
 	/**
 	 * @return Plugin
 	 */
-	public static function instance() {
+	public static function instance(): Plugin {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -177,19 +178,6 @@ class Plugin {
 		}
 	}
 
-	public function enqueue_styles() {
-		$min_suffix = $this->get_assets_suffix();
-		$direction_suffix = is_rtl() ? '-rtl' : '';
-		$has_custom_file = self::elementor()->breakpoints->has_custom_breakpoints();
-
-		wp_enqueue_style(
-			'elementor-pro',
-			$this->get_frontend_file_url( "frontend{$direction_suffix}{$min_suffix}.css", $has_custom_file ),
-			[],
-			$has_custom_file ? null : ELEMENTOR_PRO_VERSION
-		);
-	}
-
 	public static function get_frontend_file_url( $frontend_file_name, $custom_file ) {
 		if ( $custom_file ) {
 			$frontend_file = self::get_frontend_file( $frontend_file_name );
@@ -213,6 +201,12 @@ class Plugin {
 
 		return $frontend_file_path;
 	}
+
+	/**
+	 * @deprecated 3.26.0
+	 * @return void
+	 */
+	public function enqueue_styles(): void {}
 
 	public function enqueue_frontend_scripts() {
 		$suffix = $this->get_assets_suffix();
@@ -278,7 +272,7 @@ class Plugin {
 	}
 
 	public function register_frontend_scripts() {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = $this->get_assets_suffix();
 
 		wp_register_script(
 			'elementor-pro-webpack-runtime',
@@ -326,7 +320,7 @@ class Plugin {
 	}
 
 	public function register_preview_scripts() {
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = $this->get_assets_suffix();
 
 		wp_enqueue_script(
 			'elementor-pro-preview',
@@ -406,6 +400,11 @@ class Plugin {
 			$settings['library_connect']['current_access_tier'] = API::get_access_tier();
 		}
 
+		// Core >= 3.32.0
+		if ( isset( $settings['library_connect']['plan_type'] ) ) {
+			$settings['library_connect']['plan_type'] = API::get_plan_type();
+		}
+
 		return $settings;
 	}
 
@@ -416,7 +415,6 @@ class Plugin {
 		add_action( 'elementor/preview/enqueue_scripts', [ $this, 'register_preview_scripts' ] );
 
 		add_action( 'elementor/frontend/before_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
-		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'enqueue_styles' ] );
 
 		add_filter( 'elementor/core/breakpoints/get_stylesheet_template', [ $this, 'get_responsive_stylesheet_templates' ] );
 		add_action( 'elementor/document/save_version', [ $this, 'on_document_save_version' ] );
@@ -460,6 +458,7 @@ class Plugin {
 
 	/**
 	 * Plugin constructor.
+	 * @throws Exception
 	 */
 	private function __construct() {
 		spl_autoload_register( [ $this, 'autoload' ] );
@@ -492,13 +491,15 @@ class Plugin {
 			$this->license_admin->register_actions();
 		}
 
+		Maintenance::init();
+
 		// The `Updater` class is responsible for adding some updates related filters, including auto updates, and since
 		// WP crons don't run on admin mode, it should not depend on it.
 		$this->updater = new Updater();
 	}
 
 	private function get_assets_suffix() {
-		return defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		return Utils::is_script_debug() ? '' : '.min';
 	}
 
 	private static function get_frontend_file( $frontend_file_name ) {

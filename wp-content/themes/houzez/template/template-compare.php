@@ -188,7 +188,7 @@ $basic_info = $prop_address = $prop_status = $prop_type = $listing_title = $list
                 //print_r($custom_compare_data);
                 ?>         
                 <div class="compare-table">
-                    <table class="table-striped table-hover">
+                    <table class="table table-striped table-hover" role="grid">
                         <thead>
                             <tr>
                                 <th><!-- empty --></th>

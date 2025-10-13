@@ -1,4 +1,9 @@
-<ul class="item-amenities <?php echo houzez_v1_4_meta_type(); ?>">
+<?php
+// $args parameter to determine if this is a half-map view
+$args = isset($args) ? $args : '';
+$is_half_map = (isset($args['is_half_map']) && $args['is_half_map']) ? true : false;
+?>
+<ul class="item-amenities d-flex flex-wrap align-items-center gap-2 mb-2 <?php echo houzez_v1_4_meta_type(); ?>" role="list">
 	<?php
 	$listing_data_composer = houzez_option('listing_data_composer');
 	// Ensure 'enabled' key exists in the array and is an array itself
@@ -16,17 +21,17 @@
 				$custom_field_value = houzez_get_listing_data($key);
 				$output = '';
 				if( $custom_field_value != '' ) { 
-					$output .= '<li class="h-'.$key.'">';
+					$output .= '<li class="h-'.$key.' d-flex align-items-center me-1" role="listitem">';
 
 						if(houzez_option('icons_type') == 'font-awesome') {
-							$output .= '<i class="'.houzez_option('fa_'.$key).' mr-1"></i>';
+							$output .= '<i class="'.houzez_option('fa_'.$key).' me-2" aria-hidden="true"></i>';
 
 						} elseif (houzez_option('icons_type') == 'custom') {
 							$cus_icon = houzez_option($key);
 							if(!empty($cus_icon['url'])) {
 
 								$alt = isset($cus_icon['title']) ? $cus_icon['title'] : '';
-								$output .= '<img class="img-fluid mr-1" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
+								$output .= '<img class="img-fluid me-2" src="'.esc_url($cus_icon['url']).'" width="18" height="18" alt="'.esc_attr($alt).'">';
 							}
 						}
 						

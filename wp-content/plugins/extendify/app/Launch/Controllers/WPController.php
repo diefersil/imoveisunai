@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WP Controller
  */
@@ -13,6 +14,7 @@ use Extendify\Shared\Services\Sanitizer;
 /**
  * The controller for interacting with WordPress.
  */
+
 class WPController
 {
     /**
@@ -26,6 +28,25 @@ class WPController
         // TODO: Move unprefixed updates to the server, or create an allowlist.
         $params = $request->get_json_params();
         \update_option($params['option'], Sanitizer::sanitizeUnknown($params['value']));
+
+        return new \WP_REST_Response(['success' => true]);
+    }
+    /**
+     * Save a block to the database
+     *
+     * @param \WP_REST_Request $request - The request.
+     * @return \WP_REST_Response
+     */
+    public static function savePattern($request)
+    {
+        $params = $request->get_json_params();
+        $key = $params['option'];
+        // Remove the 'extendify_' prefix if it exists.
+        if (strpos($key, 'extendify_') === 0) {
+            $key = substr($key, 10);
+        }
+
+        \update_option('extendify_' . $key, Sanitizer::sanitizeBlocks($params['value']));
 
         return new \WP_REST_Response(['success' => true]);
     }

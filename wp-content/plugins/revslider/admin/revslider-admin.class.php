@@ -257,8 +257,11 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 	 * Load the plugin text domain for translation.
 	 */
 	public function load_plugin_textdomain(){
-		load_plugin_textdomain('revslider', false, dirname(RS_PLUGIN_SLUG_PATH) . '/languages/');
-		load_plugin_textdomain('revsliderhelp', false, dirname(RS_PLUGIN_SLUG_PATH) . '/languages/');
+		$desired_locale = $this->get_val($this->global_settings, 'lang', 'default');
+		$desired_locale = (!$desired_locale || $desired_locale === 'default') ? get_locale() : $desired_locale;
+		
+		if(file_exists(RS_PLUGIN_PATH . 'languages/revslider-'.$desired_locale.'.mo')) load_textdomain('revslider', RS_PLUGIN_PATH . 'languages/revslider-'.$desired_locale.'.mo');
+		if(file_exists(RS_PLUGIN_PATH . 'languages/revsliderhelp-'.$desired_locale.'.mo')) load_textdomain('revsliderhelp', dirname(RS_PLUGIN_SLUG_PATH) . '/languages/revsliderhelp-'.$desired_locale.'.mo');
 	}
 
 	/**
@@ -338,7 +341,7 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 
 		switch($page){
 			case 'revslider-buy-license':
-				wp_redirect('https://account.sliderrevolution.com/portal/pricing/?utm_source=admin&utm_medium=menu&utm_campaign=srusers&utm_content=buykey');
+				wp_redirect('https://account.sliderrevolution.com/portal/premium-slider-revolution/?utm_source=admin&utm_medium=menu&utm_campaign=srusers&utm_content=gopremium');
 				exit;
 			break;
 			case 'revslider-documentation':
@@ -457,8 +460,15 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 		$slide_template = $f->get_post_var('slide_template');
 		if(in_array($slide_template, array('', 'default'))){
 			delete_post_meta($post_id, 'slide_template');
+			delete_post_meta($post_id, 'slide_template_v7');
 		}else{
 			update_post_meta($post_id, 'slide_template', $slide_template);
+			$slide_template_v7 = $f->get_v7_slide_map($slide_template);
+			if($slide_template_v7 !== false){
+				update_post_meta($post_id, 'slide_template_v7', $slide_template_v7);
+			}else{
+				delete_post_meta($post_id, 'slide_template_v7');
+			}
 		}
 
 		// Blank Page Template Background Color
@@ -530,7 +540,7 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 		
 		$cache = RevSliderGlobals::instance()->get('RevSliderCache');
 		
-		add_action('plugins_loaded', array($this, 'load_plugin_textdomain'));
+		add_action('plugins_loaded', array($this, 'load_plugin_textdomain'), 1);
 		add_action('admin_head', array($this, 'hide_notices'), 1);
 		add_action('admin_menu', array($this, 'add_admin_pages'));
 		add_action('admin_init', array($this, 'display_external_redirects'));
@@ -568,15 +578,6 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 	 **/
 	public function add_filters(){
 		add_filter('admin_body_class', array($this, 'modify_admin_body_class'));
-		add_filter('plugin_locale', array($this, 'change_lang'), 10, 2);
-	}
-	
-	/**
-	 * Change the language of the Slider Backend even if WordPress is set to be a different language
-	 * @since: 6.1.6
-	 **/
-	public function change_lang($locale, $domain = ''){
-		return (in_array($domain, array('revslider', 'revsliderhelp'), true)) ? $this->get_val($this->global_settings, 'lang', 'default') : $locale;
 	}
 
 	/**
@@ -764,7 +765,6 @@ class RevSliderAdmin extends RevSliderFunctionsAdmin {
 			'success' => $success,
 			'message' => $message,
 		);
-
 		if(!empty($data)){
 			if(gettype($data) == 'string') $data = array('data' => $data);
 			$response = array_merge($response, $data);

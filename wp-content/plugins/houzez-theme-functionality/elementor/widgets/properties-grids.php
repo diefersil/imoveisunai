@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.5.6
  */
 class Houzez_Elementor_Properties_Grids extends Widget_Base {
-    use Houzez_Property_Card_Common_Filters;
-    use Houzez_Property_Filters_2;
+    use Houzez_Filters_Traits;
+     
 
     /**
      * Get widget name.
@@ -100,7 +100,7 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
             ]
         );
 
-        $this->register_common_filter_controls_2();
+        $this->listings_cards_general_filters();
 
         
         $this->end_controls_section();
@@ -114,7 +114,7 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
             ]
         );
 
-        $this->register_common_filters_controls();
+        $this->listings_cards_filters();
 
         $this->end_controls_section();
 
@@ -160,69 +160,16 @@ class Houzez_Elementor_Properties_Grids extends Widget_Base {
         global $ele_lazyloadbg; 
         
         $settings = $this->get_settings_for_display();
-        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = $properties_by_agencies = '';
-
-        if(!empty($settings['property_type'])) {
-            $property_type = implode (",", $settings['property_type']);
-        }
-
-        if(!empty($settings['property_status'])) {
-            $property_status = implode (",", $settings['property_status']);
-        }
-
-        if(!empty($settings['property_label'])) {
-            $property_label = implode (",", $settings['property_label']);
-        }
-
-        if(!empty($settings['property_state'])) {
-            $property_state = implode (",", $settings['property_state']);
-        }
-
-        if(!empty($settings['property_country'])) {
-            $property_country = implode (",", $settings['property_country']);
-        }
-
-        if(!empty($settings['property_city'])) {
-            $property_city = implode (",", $settings['property_city']);
-        }
-
-        if(!empty($settings['property_area'])) {
-            $property_area = implode (",", $settings['property_area']);
-        }
-
-        if( !empty($settings['properties_by_agents']) ) {
-            $properties_by_agents = $settings['properties_by_agents'];
-        }
-
-        if( !empty($settings['properties_by_agencies']) ) {
-            $properties_by_agencies = $settings['properties_by_agencies'];
-        }
-
-        $args['prop_grid_type'] =  $settings['prop_grid_type'];
-        $args['featured_prop'] =  $settings['featured_prop'];
-        $args['posts_limit'] =  $settings['posts_limit'];
-        $args['offset'] =  $settings['offset'];
-        $args['post_status'] =  $settings['post_status'];
-
-        $args['property_type']    =  $property_type;
-        $args['property_status']  =  $property_status;
-        $args['property_label']   =  $property_label;
-        $args['property_country'] =  $property_country;
-        $args['property_state']   =  $property_state;
-        $args['property_city']    =  $property_city;
-        $args['property_area']    =  $property_area;
-        $args['properties_by_agents'] = $properties_by_agents;
-        $args['properties_by_agencies'] = $properties_by_agencies;
-        $args['min_price'] = $settings['min_price'];
-        $args['max_price'] = $settings['max_price'];
-        $args['property_ids'] =  $settings['property_ids'];
+        // Convert Elementor settings to shortcode attributes format
+        $args = $this->listings_cards_args($settings);
 
         $ele_lazyloadbg = '';
         if ( ! Plugin::$instance->editor->is_edit_mode() ) {
             $ele_lazyloadbg = houzez_get_lazyload_for_bg();
         }
         $args['ele_lazyloadbg']   =  $ele_lazyloadbg;
-       
+        $args['prop_grid_type']   =  $settings['prop_grid_type'];
+        
         if( function_exists( 'houzez_prop_grids' ) ) {
             echo houzez_prop_grids( $args );
         }

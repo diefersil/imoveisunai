@@ -1,6 +1,7 @@
 import { createBlock } from '@wordpress/blocks';
 import { __, isRTL } from '@wordpress/i18n';
 import { waitUntilExists, waitUntilGone } from '@help-center/lib/tour-helpers';
+import { hasPageCreatorEnabled } from '@help-center/lib/utils';
 
 const hasIframe = () =>
 	!!document.querySelector('iframe[name="editor-canvas"]');
@@ -14,7 +15,11 @@ export default {
 	settings: {
 		allowOverflow: true,
 		startFrom: [
-			window.extSharedData.adminUrl + 'post-new.php?post_type=page&ext-close',
+			hasPageCreatorEnabled
+				? window.extSharedData.adminUrl +
+					'post-new.php?post_type=page&ext-page-creator-close=1'
+				: window.extSharedData.adminUrl +
+					'post-new.php?post_type=page&ext-close=1',
 			window.extSharedData.adminUrl + 'post-new.php?post_type=page',
 		],
 	},

@@ -32,66 +32,86 @@ if($property_price == 0) {
 }
 
 ?>
-<div class="d-flex align-items-center sm-column">
-	<div class="mortgage-calculator-chart flex-fill">
-		<div class="mortgage-calculator-monthly-payment-wrap">
-			<div id="m_monthly_val" class="mortgage-calculator-monthly-payment"></div>
+<div class="d-flex align-items-center flex-column flex-sm-row gap-4">
+	<div class="mortgage-calculator-chart d-flex align-items-center mb-4" role="complementary">
+		<div class="mortgage-calculator-monthly-payment-wrap w-100 text-center">
+			<div id="m_monthly_val" class="mortgage-calculator-monthly-payment mb-1"></div>
 			<div class="mortgage-calculator-monthly-requency"><?php echo houzez_option('spc_monthly', 'Monthly'); ?></div>
 		</div>
 
-		<canvas id="mortgage-calculator-chart" width="300" height="300"></canvas>
-
-
+		<canvas id="mortgage-calculator-chart" class="m-auto" width="250" height="250"></canvas>
 	</div><!-- mortgage-calculator-chart -->
-	<div class="mortgage-calculator-data flex-fill">
-		<ul class="list-unstyled">
-			<li class="mortgage-calculator-data-1 stats-data-01">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_down_payment', 'Down Payment'); ?></strong> 
-				<span id="downPaymentResult"></span>
+
+	<div class="mortgage-calculator-data w-100 mb-4" role="complementary">
+		<ul class="list-unstyled list-lined" role="list">
+			<li class="mortgage-calculator-data-1 d-flex align-items-center justify-content-between stats-data-1" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_down_payment', 'Down Payment'); ?></strong> 
+					</span>
+					<span id="downPaymentResult"></span>
+				</div>
 			</li>
 
-			<li class="mortgage-calculator-data-1 stats-data-01">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_loan_amount', 'Loan Amount'); ?></strong> 
-				<span id="loadAmountResult"></span>
+			<li class="mortgage-calculator-data-1 d-flex align-items-center justify-content-between stats-data-01" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_loan_amount', 'Loan Amount'); ?></strong> 
+					</span>
+					<span id="loadAmountResult"></span>
+				</div>
 			</li>
 
-			<li class="mortgage-calculator-data-1 stats-data-1">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_monthly_mortgage_payment', 'Monthly Mortgage Payment'); ?></strong> 
-				<span id="monthlyMortgagePaymentResult"></span>
+			<li class="mortgage-calculator-data-1 d-flex align-items-center justify-content-between stats-data-1" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_monthly_mortgage_payment', 'Monthly Mortgage Payment'); ?></strong> 
+					</span>
+					<span id="monthlyMortgagePaymentResult"></span>
+				</div>
 			</li>
 
 			<?php if($mcal_prop_tax_enable) { ?>
-			<li class="mortgage-calculator-data-2 stats-data-2">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_prop_tax', 'Property Tax'); ?></strong> 
-				<span id="monthlyPropertyTaxResult"></span>
+			<li class="mortgage-calculator-data-2 d-flex align-items-center justify-content-between stats-data-2" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_prop_tax', 'Property Tax'); ?></strong> 
+					</span>
+					<span id="monthlyPropertyTaxResult"></span>
+				</div>
 			</li>
 			<?php } ?>
 
 			<?php if($mcal_hi_enable) { ?>
-			<li class="mortgage-calculator-data-3 stats-data-3">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_hi', 'Home Insurance'); ?></strong> 
-				<span id="monthlyHomeInsuranceResult"></span>
+			<li class="mortgage-calculator-data-3 d-flex align-items-center justify-content-between stats-data-3" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_hi', 'Home Insurance'); ?></strong> 
+					</span>
+					<span id="monthlyHomeInsuranceResult"></span>
+				</div>
 			</li>
 			<?php } ?>
 
 			<?php if($mcal_pmi_enable) { ?>
-			<li class="mortgage-calculator-data-4 rslt-pmi stats-data-4">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_pmi', 'PMI'); ?></strong> 
-				<span id="monthlyPMIResult"></span>
+			<li class="mortgage-calculator-data-4 d-flex align-items-center justify-content-between stats-data-4" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">	
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_pmi', 'PMI'); ?></strong> 
+					</span>
+					<span id="monthlyPMIResult"></span>
+				</div>
 			</li>
 			<?php } ?>
 
-			<?php if($mcal_hoa_enable) { ?>
-			<li class="mortgage-calculator-data-4 stats-data-04">
-				<i class="houzez-icon icon-sign-badge-circle mr-1"></i> 
-				<strong><?php echo houzez_option('spc_hoa', 'Monthly HOA Fees'); ?></strong> 
-				<span id="monthlyHOAResult"></span>
+			<?php if($mcal_hoa_enable) { ?> 
+			<li class="mortgage-calculator-data-5 d-flex align-items-center justify-content-between stats-data-5" role="listitem">
+				<div class="list-lined-item w-100 d-flex justify-content-between py-2">
+					<span>
+						<i class="houzez-icon icon-sign-badge-circle me-1" aria-hidden="true"></i> <strong><?php echo houzez_option('spc_hoa', 'Monthly HOA Fees'); ?></strong> 
+					</span>
+					<span id="monthlyHOAResult"></span>
+				</div>
 			</li>
 			<?php } ?>
 		</ul>
@@ -100,108 +120,96 @@ if($property_price == 0) {
 
 <form id="houzez-calculator-form" method="post">
 	<div class="row">
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_total_amt', 'Total Amount'); ?></label>
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label for="homePrice" class="form-label"><?php echo houzez_option('spc_total_amt', 'Total Amount'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text"><?php echo esc_attr($currency_symbol);?></div>
-					</div><!-- input-group-prepend -->
-					<input id="homePrice" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_total_amt', 'Total Amount'); ?>" value="<?php echo intval($property_price); ?>">
+					<span class="input-group-text" aria-hidden="true"><?php echo esc_attr($currency_symbol);?></span>
+					<input type="text" class="form-control" id="homePrice" placeholder="<?php echo houzez_option('spc_total_amt', 'Total Amount'); ?>" value="<?php echo intval($property_price); ?>">
+				</div><!-- input-group -->
+
+			</div><!-- form-group -->
+		</div><!-- col-md-6 -->
+
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="down-payment"><?php echo houzez_option('spc_down_payment', 'Down Payment'); ?></label>
+				<div class="input-group">
+					<span class="input-group-text" aria-hidden="true">%</span>
+					<input type="text" class="form-control" id="downPaymentPercentage" placeholder="<?php echo houzez_option('spc_down_payment', 'Down Payment'); ?>" value="<?php echo esc_attr($mcal_down_payment); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_down_payment', 'Down Payment'); ?></label>
+		</div><!-- col-md-6 -->
+
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="annualInterestRate"><?php echo houzez_option('spc_ir', 'Interest Rate'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text">%</div>
-					</div><!-- input-group-prepend -->
-					<input id="downPaymentPercentage" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_down_payment', 'Down Payment'); ?>" value="<?php echo esc_attr($mcal_down_payment); ?>">
+					<span class="input-group-text" aria-hidden="true">%</span>
+					<input type="text" class="form-control" id="annualInterestRate" placeholder="<?php echo houzez_option('spc_ir', 'Interest Rate'); ?>" value="<?php echo esc_attr($mcal_interest_rate); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_ir', 'Interest Rate'); ?></label>
+		</div><!-- col-md-6 -->
+		
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="loanTermInYears"><?php echo houzez_option('spc_load_term', 'Loan Terms (Years)'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text">%</div>
-					</div><!-- input-group-prepend -->
-					<input id="annualInterestRate" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_ir', 'Interest Rate'); ?>" value="<?php echo esc_attr($mcal_interest_rate); ?>">
-				</div><!-- input-group -->
-			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_load_term', 'Loan Terms (Years)'); ?></label>
-				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text">
-							<i class="houzez-icon icon-calendar-3"></i>
-						</div>
-					</div><!-- input-group-prepend -->
+					<span class="input-group-text" aria-hidden="true">
+						<i class="houzez-icon icon-calendar-3"></i>
+					</span>
 					<input id="loanTermInYears" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_load_term', 'Loan Terms (Years)'); ?>" value="<?php echo esc_attr($mcal_terms); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
+		</div><!-- col-md-6 -->
 
 		<?php if($mcal_prop_tax_enable) { ?>
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_prop_tax', 'Annual Property Tax Rate'); ?></label>
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="annualPropertyTaxRate"><?php echo houzez_option('spc_prop_tax', 'Annual Property Tax Rate'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text">%</div>
-					</div><!-- input-group-prepend -->
+					<span class="input-group-text" aria-hidden="true">%</span>
 					<input id="annualPropertyTaxRate" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_prop_tax', 'Property Tax'); ?>" value="<?php echo esc_attr($mcal_prop_tax); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
+		</div><!-- col-md-6 -->
 		<?php } ?>
 
 
 		<?php if($mcal_hi_enable) { ?>
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_hi', 'Annual Home Insurance'); ?></label>
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="annualHomeInsurance"><?php echo houzez_option('spc_hi', 'Annual Home Insurance'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text"><?php echo esc_attr($currency_symbol);?></div>
-					</div><!-- input-group-prepend -->
+					<span class="input-group-text" aria-hidden="true"><?php echo esc_attr($currency_symbol);?></span>
 					<input id="annualHomeInsurance" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_hi', 'Home Insurance'); ?>" value="<?php echo esc_attr($mcal_hi); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
+		</div><!-- col-md-6 -->
 		<?php } ?>
 
 		<?php if($mcal_hoa_enable) { ?>
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_hoa', 'Monthly HOA Fees'); ?></label>
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="monthlyHOAFees"><?php echo houzez_option('spc_hoa', 'Monthly HOA Fees'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text"><?php echo esc_attr($currency_symbol);?></div>
-					</div><!-- input-group-prepend -->
+					<span class="input-group-text" aria-hidden="true"><?php echo esc_attr($currency_symbol);?></span>
 					<input id="monthlyHOAFees" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_hoa', 'Monthly HOA Fees'); ?>" value="<?php echo esc_attr($mcal_hoa); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
+		</div><!-- col-md-6 -->
 		<?php } ?>
 
 		<?php if($mcal_pmi_enable) { ?>
-		<div class="col-md-4">
-			<div class="form-group">
-				<label><?php echo houzez_option('spc_pmi', 'PMI'); ?></label>
+		<div class="col-md-6">
+			<div class="form-group mb-3">
+				<label class="form-label" for="pmi"><?php echo houzez_option('spc_pmi', 'PMI'); ?></label>
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<div class="input-group-text">%</div>
-					</div><!-- input-group-prepend -->
+					<span class="input-group-text" aria-hidden="true">%</span>
 					<input id="pmi" type="text" class="form-control" placeholder="<?php echo houzez_option('spc_pmi', 'PMI'); ?>" value="<?php echo esc_attr($mcal_pmi); ?>">
 				</div><!-- input-group -->
 			</div><!-- form-group -->
-		</div><!-- col-md-4 -->
+		</div><!-- col-md-6 -->
 		<?php } ?>
 	</div><!-- row -->
 </form>

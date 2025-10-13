@@ -1,5 +1,7 @@
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
+import { prependHTTPS } from '@wordpress/url';
 import { pageNames } from '@shared/lib/pages';
+import { wasPluginInstalled } from '@shared/lib/utils';
 import { getLinkSuggestions } from '@launch/api/DataApi';
 import {
 	getActivePlugins,
@@ -7,7 +9,6 @@ import {
 	getPageById,
 	updatePage,
 } from '@launch/api/WPApi';
-import { wasInstalled } from '@launch/lib/util';
 
 const { homeUrl } = window.extSharedData;
 const buttonRegex = /href="(#extendify-[\w-]+)"/gi;
@@ -43,7 +44,7 @@ export const updateButtonLinks = async (wpPages, pluginPages) => {
 		.map(({ slug }) => `/${slug}`);
 
 	// Add plugin related pages only if plugin is active
-	if (wasInstalled(activePlugins, 'woocommerce')) {
+	if (wasPluginInstalled(activePlugins, 'woocommerce')) {
 		const shopPage = await getPageById(
 			await getOption('woocommerce_shop_page_id'),
 		);
@@ -116,9 +117,33 @@ export const updateButtonLinks = async (wpPages, pluginPages) => {
 	);
 };
 
-export const updateSinglePageLinksToSections = async (wpPages, pages) => {
+export const updateSinglePageLinksToSections = async (
+	wpPages,
+	pages,
+	options = {},
+) => {
 	let homePageContent = wpPages?.[0]?.content?.raw;
 	if (!homePageContent) return wpPages;
+
+	/**
+	 * Special case handling for landing page sites.
+	 *
+	 * For landing pages, all internal navigation links are either replaced with
+	 * a single, provided CTA link, or set to '#' if no CTA link is provided.
+	 * This function updates the home page content and returns the updated pages array.
+	 */
+	const { linkOverride, siteObjective } = options;
+	if (siteObjective === 'landing-page') {
+		wpPages[0] = updatePage({
+			id: wpPages[0].id,
+			content: homePageContent.replaceAll(
+				/href="(#extendify-[\w|-]+)"/gi,
+				linkOverride ? `href="${prependHTTPS(linkOverride)}"` : 'href="#"',
+			),
+		});
+
+		return wpPages;
+	}
 
 	// get all the patterns that we have in the home page
 	const patternTypes = pages?.[0]?.patterns
@@ -145,16 +170,16 @@ export const updateSinglePageLinksToSections = async (wpPages, pages) => {
 	const pluginPages = [];
 
 	// check if woocommerce is active, if so we add it to the list of pages
-	if (wasInstalled(activePlugins, 'woocommerce')) {
-		const { slug } = await getPageById(
+	if (wasPluginInstalled(activePlugins, 'woocommerce')) {
+		const page = await getPageById(
 			await getOption('woocommerce_shop_page_id'),
-		);
+		).catch(() => null);
 
-		pluginPages.push(slug);
+		page?.slug && pluginPages.push(page.slug);
 	}
 
 	// check if events calendar is active, if so we add it to the list of pages
-	if (wasInstalled(activePlugins, 'the-events-calendar')) {
+	if (wasPluginInstalled(activePlugins, 'the-events-calendar')) {
 		pluginPages.push('events');
 	}
 

@@ -34,7 +34,7 @@ export const pageNames = {
 		title: __('Contact', 'extendify-local'),
 		// translators: This string represents the slug of a "Contact" page on a website that gives information for visitors on how to contact the website or organization. Please translate it in a way that fits a slug for a "Contact" page in the target language, considering the common usage in websites for that language. Make sure to keep the slug lowercase and url-friendly.
 		slug: __('contact', 'extendify-local'),
-		alias: ['contact', 'contact-with-form'],
+		alias: ['contact', 'contact-form', 'contact-in-person'],
 	},
 	events: {
 		// translators: This string represents the title of an "Events" page on a website that lists events of any kind. Please translate it in a way that fits the standard phrasing for an "Events" page in the target language, considering the common usage in websites for that language.
@@ -76,7 +76,7 @@ export const pageNames = {
 		slug: __('menu', 'extendify-local'),
 		alias: ['menu'],
 	},
-	porfolio: {
+	portfolio: {
 		// translators: This string represents the title of a "Portfolio" page on a website that showcases a collection of work. Please translate it in a way that fits the standard phrasing for a "Portfolio" page in the target language, considering the common usage in websites for that language.
 		title: __('Portfolio', 'extendify-local'),
 		// translators: This string represents the slug of a "Portfolio" page on a website that showcases a collection of work. Please translate it in a way that fits a slug for a "Portfolio" page in the target language, considering the common usage in websites for that language. Make sure to keep the slug lowercase and url-friendly.

@@ -6,33 +6,40 @@ $media_tabs = houzez_get_media_tabs();
 $tabs_count = count($media_tabs);
 $tabs_count = $tabs_count + 2; //add 2 for mobile
 ?>
-<div class="visible-on-mobile">
+<div class="d-block d-md-none">
     <div class="mobile-top-wrap">
-        <div class="mobile-property-tools houzez-media-tabs-<?php esc_attr_e($tabs_count);?> clearfix">
-            <?php 
-            if( !empty($fave_property_images) ) {
-                get_template_part('property-details/partials/banner-nav'); 
-            }?>
-            <?php 
-            if( $tools_position == 'under_banner' ) {
-                get_template_part('property-details/partials/tools'); 
-            } ?> 
-        </div><!-- mobile-property-tools -->
-        <div class="mobile-property-title clearfix">
-            <?php 
-            if( houzez_option( 'detail_featured_label', 1 ) != 0 ) {
-                get_template_part('template-parts/listing/partials/item-featured-label'); 
-            }?>
-            <?php get_template_part('property-details/partials/item-labels-mobile'); ?>
-            <?php get_template_part('property-details/partials/title', 'mobile'); ?> 
-            <?php get_template_part('property-details/partials/item-address'); ?>
-            <?php get_template_part('property-details/partials/item-price'); ?>
+       
+        <div class="mobile-property-tools block-wrap">
+            <div class="houzez-media-tabs-<?php esc_attr_e($tabs_count);?> d-flex justify-content-between">
+                <?php 
+                if( !empty($fave_property_images) && $top_area != 'v6' && $top_area != 'v7' ) {?>
+                    <?php get_template_part('property-details/partials/banner-nav'); ?>
+                <?php } ?>
+
+                <?php 
+                if( $tools_position == 'under_banner' ) {
+                    get_template_part('property-details/partials/tools'); 
+                } ?>  
+            </div>
+        </div>
+
+        <div class="mobile-property-title block-wrap">
+            <div class="d-flex align-items-center mb-3">
+                <?php 
+                get_template_part('property-details/partials/item-labels');?>
+            </div>
+            <div class="page-title mb-1">
+                <h1><?php the_title(); ?></h1>
+            </div>
+            <?php get_template_part('property-details/partials/item-address');?>
+            <ul class="item-price-wrap" role="list">
+                <?php echo houzez_listing_price_v1(); ?>
+            </ul>
             <?php if( $tools_position == 'under_title' ) { ?>
-            <div class="mobile-property-tools mobile-property-tools-bottom clearfix">
+            <div class="mobile-property-tools mobile-property-tools-bottom mt-4">
                 <?php get_template_part('property-details/partials/tools'); ?> 
             </div>
             <?php } ?>
-            
-        </div><!-- mobile-property-title -->
-    </div><!-- mobile-top-wrap -->
-</div><!-- visible-on-mobile -->
+        </div>
+    </div>
+</div>

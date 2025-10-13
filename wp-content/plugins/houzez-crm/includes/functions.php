@@ -70,11 +70,13 @@ if( !function_exists('matched_listings')) {
         $tax_query = array();
         $meta_query = array();
 
+        $allowed_per_page = [10,20,50,100];
+        $no_of_prop = isset($_GET['per_page']) && in_array( intval($_GET['per_page']), $allowed_per_page ) ? intval($_GET['per_page']) : 10;
         $paged  = (get_query_var('paged')) ? get_query_var('paged') : 1;
 
         $args = array(
             'post_type' => 'property',
-            'posts_per_page' => 15,
+            'posts_per_page' => $no_of_prop,
             'paged' => $paged,
             'author' => get_current_user_id(),
             'post_status' => 'publish'
@@ -503,7 +505,7 @@ if( ! function_exists('houzez_crm_pagination') ) {
         ));
 
         if (!empty($pagination_links)) {
-            echo '<div class="pagination-wrap"><nav><ul class="pagination justify-content-center">';
+            echo '<div class="pagination"><ul class="pagination list-unstyled d-flex align-items-center justify-content-center gap-1 m-0">';
 
             foreach ($pagination_links as $link) {
                 // Replace 'page-numbers' class with 'page-link'
@@ -517,7 +519,7 @@ if( ! function_exists('houzez_crm_pagination') ) {
                 }
             }
 
-            echo '</ul></nav></div>';
+            echo '</ul></div>';
         }
     }
 }

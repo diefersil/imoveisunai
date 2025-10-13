@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -187,6 +186,203 @@ class Houzez_Elementor_Agents extends Widget_Base {
 
         $this->end_controls_section();
 
+        /*----------------------------------------------------------
+        * Styling
+        **---------------------------------------------------------*/
+        $this->start_controls_section(
+            'styling_section',
+            [
+                'label'     => esc_html__( 'Box', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'agent_box_bg_color',
+            [
+                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} .agent-module .agent-item' => 'background-color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'agent_box_border',
+                'selector' => '{{WRAPPER}} .agent-module .agent-item',
+            ]
+        );
+
+        $this->add_control(
+            'agent_box_border_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}} .agent-module .agent-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'agent_box_shadow',
+                'selector' => '{{WRAPPER}} .agent-module .agent-item',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'typo_section',
+            [
+                'label'     => esc_html__( 'Typography', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'agent_title',
+                'label'    => esc_html__( 'Agent Name', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .agent-name',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'agent_position',
+                'label'    => esc_html__( 'Position', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .agent-company',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'agent_content_bio',
+                'label'    => esc_html__( 'Content', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .agent-body',
+            ]
+        );
+
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'agent_button_typo',
+                'label'    => esc_html__( 'Button', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .agent-link a',
+            ]
+        );
+
+        $this->end_controls_section(); 
+
+
+        $this->start_controls_section(
+            'button_section',
+            [
+                'label'     => esc_html__( 'Button', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->start_controls_tabs(
+            'button_style_tabs'
+        );
+
+        $this->start_controls_tab(
+            'style_normal_botton',
+            [
+                'label' => esc_html__( 'Normal', 'textdomain' ),
+            ]
+        );
+
+        $this->add_control(
+            'view_button_bg',
+            [
+                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .agent-link a' => 'background-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'view_button_color',
+            [
+                'label'     => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .agent-link a' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'agent_button_border',
+                'selector' => '{{WRAPPER}} .agent-link a',
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->start_controls_tab(
+            'style_hover_botton',
+            [
+                'label' => esc_html__( 'Hover', 'textdomain' ),
+            ]
+        );
+
+        $this->add_control(
+            'view_button_hover_bg',
+            [
+                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .agent-link a:hover' => 'background-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'view_button_hover_color',
+            [
+                'label'     => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .agent-link a:hover' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'agent_button_hover_border',
+                'selector' => '{{WRAPPER}} .agent-link a:hover',
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+
+        $this->end_controls_section();
+
     }
 
     /**
@@ -224,60 +420,6 @@ class Houzez_Elementor_Agents extends Widget_Base {
         if( function_exists( 'houzez_agents' ) ) {
             echo houzez_agents( $args );
         }
-
-        if ( Plugin::$instance->editor->is_edit_mode() ) : 
-            $token = wp_generate_password(5, false, false);
-            if (is_rtl()) {
-                $houzez_rtl = "true";
-            } else {
-                $houzez_rtl = "false";
-            }
-            ?>
-
-            <style>
-                .slide-animated {
-                    opacity: 1;
-                }
-            </style>
-            <script>
-            if(jQuery("#agents-carousel-<?php echo esc_attr( $token ); ?>").length > 0){
-                var slides_to_show = <?php echo $settings['columns']; ?>,
-
-                var owlAgents = jQuery('#agents-carousel-<?php echo esc_attr( $token ); ?>');
-                owlAgents.slick({
-                rtl: <?php echo esc_attr( $houzez_rtl ); ?>,
-                lazyLoad: 'ondemand',
-                infinite: true,
-                speed: 300,
-                slidesToShow: slides_to_show,
-                arrows: true,
-                adaptiveHeight: true,
-                dots: true,
-                appendArrows: '.agents-module-slider',
-                prevArrow: jQuery('.agents-prev-js'),
-                nextArrow: jQuery('.agents-next-js'),
-                responsive: [{
-                        breakpoint: 992,
-                        settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 2
-                        }
-                    },
-                    {
-                        breakpoint: 769,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1
-                        }
-                    }
-                ]
-            });
-
-            }
-            
-            </script>
-        
-        <?php endif;
     }
 
 }

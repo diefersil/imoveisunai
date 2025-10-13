@@ -35,6 +35,7 @@ class MC4WP_Form_Tags extends MC4WP_Dynamic_Content_Tags
         $this->tags['response'] = [
             'description' => __('Replaced with the form response (error or success messages).', 'mailchimp-for-wp'),
             'callback'    => [ $this, 'get_form_response' ],
+            'raw_html' => true,
         ];
 
         $this->tags['data'] = [
@@ -55,7 +56,7 @@ class MC4WP_Form_Tags extends MC4WP_Dynamic_Content_Tags
         $this->form         = $form;
         $this->form_element = $element;
 
-        $string = $this->replace($string);
+        $string = $this->replace_in_html($string);
         return $string;
     }
 
@@ -63,7 +64,7 @@ class MC4WP_Form_Tags extends MC4WP_Dynamic_Content_Tags
     {
         $this->form = $form;
 
-        $string = $this->replace($string);
+        $string = $this->replace_in_html($string);
         return $string;
     }
 
@@ -124,6 +125,6 @@ class MC4WP_Form_Tags extends MC4WP_Dynamic_Content_Tags
             $value = join(', ', $value);
         }
 
-        return esc_html($value);
+        return $value;
     }
 }

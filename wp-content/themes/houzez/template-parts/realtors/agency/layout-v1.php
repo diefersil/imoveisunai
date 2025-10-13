@@ -75,7 +75,7 @@ $agencies_query = new WP_Query( $qry_args );
                     } 
                 }?>
 
-                <div class="agents-list-view">
+                <div class="agents-list-view" role="list">
                     <?php
                     if ( $agencies_query->have_posts() ) :
                     while ( $agencies_query->have_posts() ) : $agencies_query->the_post();
@@ -85,7 +85,7 @@ $agencies_query = new WP_Query( $qry_args );
                     endwhile;
                     
                     else:
-                        get_template_part('template-parts/realtors/agency/none');
+                        get_template_part('template-parts/realtors/realtor-none');
                     endif;
                     ?>
                 </div><!-- listing-view -->

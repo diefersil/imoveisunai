@@ -4,7 +4,7 @@ global $settings, $post, $multi_units_ids;
 $section_title = isset($settings['section_title']) && !empty($settings['section_title']) ? $settings['section_title'] : houzez_option('sps_sub_listings', 'Sub Listings');
 
 $multi_units_ids = houzez_get_listing_data('multi_units_ids');
-$listing_agent = houzez_get_property_agent( $post->ID );
+if( ! empty($multi_units_ids) ) {
 ?>
 <div class="property-sub-listings-wrap property-section-wrap" id="property-sub-listings-wrap">
 	<div class="block-wrap">
@@ -14,7 +14,7 @@ $listing_agent = houzez_get_property_agent( $post->ID );
 		</div><!-- block-title-wrap -->
 		<?php } ?>
 		<div class="block-content-wrap">
-			<div class="listing-view list-view">
+			<div class="listing-view list-view row g-4">
 				<?php
                 $ids = explode(',', $multi_units_ids);
                 $args = array(
@@ -26,7 +26,7 @@ $listing_agent = houzez_get_property_agent( $post->ID );
 
                 if($query->have_posts()): 
                 	while ($query->have_posts()): $query->the_post(); 
-                		get_template_part('template-parts/listing/item-v1'); 
+						get_template_part('template-parts/listing/item-list-v1'); 
                 	endwhile; 
                 endif; 
                 wp_reset_query();
@@ -36,3 +36,4 @@ $listing_agent = houzez_get_property_agent( $post->ID );
 		</div><!-- block-content-wrap -->
 	</div><!-- block-wrap -->
 </div><!-- property-address-wrap -->
+<?php } ?>

@@ -451,7 +451,7 @@ class Core {
 	}
 
 	/**
-	 * Display various notifications to a user
+	 * Display various notifications to a user.
 	 *
 	 * @since 1.0.0
 	 */

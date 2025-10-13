@@ -16,12 +16,12 @@ export default {
 	},
 	link: 'post.php?post=$&action=edit',
 	type: 'internalLink',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: () => {
 		// They need either extendable or launch completed
 		if (themeSlug !== 'extendable' && !launchCompleted) return false;
 		return !!frontPage;
 	},
 	backgroundImage:
-		'https://assets.extendify.com/assist-tasks/edit-homepage.webp',
+		'https://images.extendify-cdn.com/assist-tasks/edit-homepage.webp',
 };

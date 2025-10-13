@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -277,11 +276,11 @@ class Houzez_Elementor_Listings_Tabs extends Widget_Base {
                 'options' => [
                     ''    => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-left',
+                        'icon' => 'eicon-text-align-' . ( is_rtl() ? 'right' : 'left' ),
                     ],
                     'justify-content-center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-center',
+                        'icon' => 'eicon-text-align-center',
                     ]
                 ],
                 'default' => '',
@@ -395,7 +394,5 @@ class Houzez_Elementor_Listings_Tabs extends Widget_Base {
     
     <?php
     }
-
 }
-
 Plugin::instance()->widgets_manager->register( new Houzez_Elementor_Listings_Tabs );

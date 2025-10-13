@@ -69,17 +69,32 @@ class HOUZEZ_properties_viewed extends WP_Widget {
 
 				<?php if( $wp_qry->have_posts() ): while( $wp_qry->have_posts() ): $wp_qry->the_post(); ?>
 
-					<div class="property-item-widget">
-						<div class="d-flex align-items-start">
-							<div class="left-property-item-widget-wrap">
-								<?php get_template_part('template-parts/listing/partials/item-image'); ?>
-							</div><!-- left-property-item-widget-wrap -->
-							<div class="right-property-item-widget-wrap">
-								<?php get_template_part('template-parts/listing/partials/item-title'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-price'); ?>
-							</div><!-- right-property-item-widget-wrap -->
-						</div><!-- d-flex -->
-					</div><!-- property-item-widget -->
+				<div class="property-item-widget mt-3" role="article">
+					<div class="d-flex align-items-center">
+						<div class="left-property-item-widget-wrap me-3">
+						<?php
+						$thumbnail_size = 'thumbnail';
+
+					    if( has_post_thumbnail( get_the_ID() ) && get_the_post_thumbnail(get_the_ID()) != '' ) {
+					        the_post_thumbnail( $thumbnail_size, array('class' => 'img-fluid') );
+					    }else{
+					        houzez_image_placeholder( $thumbnail_size );
+					    }
+					    ?>
+						</div><!-- left-property-item-widget-wrap -->
+						<div class="right-property-item-widget-wrap">
+							<h2 class="item-title mb-1">
+								<a href="<?php the_permalink(); ?>" role="link"><?php the_title(); ?></a>
+							</h2>
+							<?php get_template_part('template-parts/listing/partials/item-features', 'v1');?>
+							<ul class="item-price-wrap mb-0" role="list">
+								<li class="item-price" role="listitem">
+									<?php echo houzez_listing_price_v5(); ?>
+								</li>
+							</ul>
+						</div><!-- right-property-item-widget-wrap -->
+					</div><!-- d-flex -->
+				</div><!-- property-item-widget -->
 
 				<?php endwhile; endif; ?>
 				<?php wp_reset_postdata(); ?>

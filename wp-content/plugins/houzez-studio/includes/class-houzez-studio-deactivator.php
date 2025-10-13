@@ -32,7 +32,7 @@ class Houzez_Studio_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
-
+		delete_option('houzez_studio_plugin_active');
 	}
 
 }

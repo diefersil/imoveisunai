@@ -1,5 +1,5 @@
-<div class="dashboard-mobile-edit-menu-wrap">
-    <div class="form-group">
+<div class="dashboard-mobile-edit-menu-wrap d-block d-lg-none">
+    <div class="mb-3">
         <select id="menu_edit_mobile" class="selectpicker form-control bs-select-hidden" title="<?php esc_html_e('Menu', 'houzez'); ?> " data-live-search="false" data-drop-up="false" data-size="13">
             <?php
             $layout = houzez_option('property_form_sections');
@@ -65,8 +65,7 @@
             }
             ?>
         </select><!-- selectpicker -->
+    </div><!-- mb-3 -->
 
-        <?php get_template_part( 'template-parts/dashboard/submit/partials/author-mobile'); ?>
-        
-    </div><!-- form-group -->
+    <?php get_template_part( 'template-parts/dashboard/submit/partials/author-mobile'); ?>
 </div><!-- dashboard-mobile-edit-menu-wrap -->

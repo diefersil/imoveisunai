@@ -1,5 +1,5 @@
 <?php
-namespace Houzez\Elementor\Widgets\HeaderFooter;
+namespace Elementor;
 
 use Elementor\Controls_Manager;
 use Elementor\Control_Media;
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Site Logo Widget.
+ * Site Logo Widget. 
  * @since 1.0.0
  */
 class Houzez_Site_Logo extends Widget_Base {
@@ -78,8 +78,21 @@ class Houzez_Site_Logo extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'houzez-elements', 'houzez-header-footer' ];
-    }
+	    // Check if the current post type is 'fts_builder'
+	    if (get_post_type() === 'fts_builder') {
+	        // Get the template type of the current post
+	        $template_type = htb_get_template_type(get_the_ID());
+
+	        // Check if the template type is 'tmp_header' or 'tmp_footer'
+	        if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+	            // Return the specific category for header and footer builders
+	            return ['houzez-header-footer-builder'];
+	        }
+	    }
+	    
+	    // Return the default categories
+	    return ['houzez-elements', 'houzez-header-footer'];
+	}
 
     /**
      * Register widget controls.
@@ -408,17 +421,15 @@ class Houzez_Site_Logo extends Widget_Base {
 			]
 		);
 
-		$this->add_group_control(
-			Group_Control_Image_Size::get_type(),
-			[
-				'name'    => 'logo_size',
-				'label'   => __( 'Image Size', 'houzez-theme-functionality' ),
-				'default' => 'medium',
-				'condition' => [
-					'logo_source' => 'custom_logo',
-				],
-			]
-		);
+		$this->add_control(
+            'logo_size_size',
+            [
+                'label' => esc_html__( 'Image Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
+                'default' => 'full',
+            ]
+        );
 
 		$this->add_responsive_control(
 			'align',
@@ -428,15 +439,15 @@ class Houzez_Site_Logo extends Widget_Base {
 				'options'   => [
 					'left'   => [
 						'title' => __( 'Left', 'houzez-theme-functionality' ),
-						'icon'  => 'fa fa-align-left',
+						'icon'  => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => __( 'Center', 'houzez-theme-functionality' ),
-						'icon'  => 'fa fa-align-center',
+						'icon'  => 'eicon-text-align-center',
 					],
 					'right'  => [
 						'title' => __( 'Right', 'houzez-theme-functionality' ),
-						'icon'  => 'fa fa-align-right',
+						'icon'  => 'eicon-text-align-right',
 					],
 				],
 				'default'   => 'left',
@@ -713,7 +724,7 @@ class Houzez_Site_Logo extends Widget_Base {
 
     protected function custom_logo_render( $settings ) {
 		$has_caption = $this->has_caption( $settings );
-		$size = $settings['logo_size_size'];
+		$size = $settings['logo_size_size'] === 'global' ? 'full' : $settings['logo_size_size'];
 		$site_image = $this->site_image_url( $size );
 		$img_animation = '';
 

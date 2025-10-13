@@ -211,6 +211,100 @@ Redux::setSection( $houzez_opt_name, array(
 ) );
 
 Redux::setSection( $houzez_opt_name, array(
+    'title'            => esc_html__( 'User Approval', 'houzez' ),
+    'id'               => 'header-user-approval',
+    'subsection'       => true,
+    'desc'             => '',
+    'fields'           => array(
+        array(
+            'id'       => 'enable_user_approval',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'User Approval System', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable/Disable user approval system for new registrations', 'houzez' ),
+            'desc'     => esc_html__( 'When enabled, new users will need admin approval before they can login', 'houzez' ),
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+            'default'  => 0
+        ), 
+        array(
+            'id'       => 'auto_approved_roles',
+            'type'     => 'select',
+            'required' => array( 'enable_user_approval', '=', 1 ),
+            'title'    => esc_html__( 'Auto-Approved Roles', 'houzez' ),
+            'subtitle' => esc_html__( 'Select user roles that will be automatically approved', 'houzez' ),
+            'desc'     => esc_html__( 'Users with these roles will bypass the approval system and be automatically approved upon registration', 'houzez' ),
+            'multi'    => true,
+            'options'  => array(
+                'houzez_agent'      => esc_html__( 'Agent', 'houzez' ),
+                'houzez_agency'     => esc_html__( 'Agency', 'houzez' ),
+                'houzez_owner'      => esc_html__( 'Owner', 'houzez' ),
+                'houzez_buyer'      => esc_html__( 'Buyer', 'houzez' ),
+                'houzez_seller'     => esc_html__( 'Seller', 'houzez' ),
+                'houzez_manager'    => esc_html__( 'Manager', 'houzez' ),
+                'subscriber'        => esc_html__( 'Subscriber', 'houzez' ),
+            ),
+            'default'  => array()
+        ),
+    )
+));
+
+Redux::setSection( $houzez_opt_name, array(
+    'title'            => esc_html__( 'User Verification', 'houzez' ),
+    'id'               => 'header-user-verification',
+    'subsection'       => true,
+    'desc'             => '',
+    'fields'           => array(
+        array(
+            'id'       => 'enable_user_verification',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'User Verification System', 'houzez' ),
+            'subtitle' => esc_html__( 'Enable/Disable user verification system for agents and agencies', 'houzez' ),
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+            'default'  => 0
+        ),
+        array(
+            'id'       => 'verification_required_for_property',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Verification Required for New Properties', 'houzez' ),
+            'subtitle' => esc_html__( 'Require users to be verified before they can add new properties', 'houzez' ),
+            'desc'     => esc_html__( 'When enabled, only verified users will be able to add new properties', 'houzez' ),
+            'on'       => esc_html__( 'Yes', 'houzez' ),
+            'off'      => esc_html__( 'No', 'houzez' ),
+            'default'  => 0,
+            'required' => array( 'enable_user_verification', '=', 1 )
+        ),
+        array(
+            'id'       => 'verification_message',
+            'type'     => 'textarea',
+            'title'    => esc_html__( 'Verification Required Message', 'houzez' ),
+            'subtitle' => esc_html__( 'Message to display when unverified users attempt to add properties', 'houzez' ),
+            'desc'     => esc_html__( 'This message will be shown to unverified users when they try to add a new property', 'houzez' ),
+            'default'  => esc_html__( 'Your account must be verified before you can add new properties. Please complete the verification process.', 'houzez' ),
+            'required' => array( 'verification_required_for_property', '=', 1 )
+        ),
+        array(
+            'id'       => 'exempt_roles_verification',
+            'type'     => 'select',
+            'title'    => esc_html__( 'Exempt Roles from Verification', 'houzez' ),
+            'subtitle' => esc_html__( 'Select user roles that will be exempt from verification requirements', 'houzez' ),
+            'desc'     => esc_html__( 'Users with these roles can add properties without verification', 'houzez' ),
+            'multi'    => true,
+            'options'  => array(
+                'houzez_agent'      => esc_html__( 'Agent', 'houzez' ),
+                'houzez_agency'     => esc_html__( 'Agency', 'houzez' ),
+                'houzez_owner'      => esc_html__( 'Owner', 'houzez' ),
+                'houzez_seller'     => esc_html__( 'Seller', 'houzez' ),
+                'author'    => esc_html__( 'Author', 'houzez' ),
+            ),
+            'default'  => array(),
+            'required' => array( 'verification_required_for_property', '=', 1 )
+        ),
+    )
+));
+
+
+Redux::setSection( $houzez_opt_name, array(
     'title'            => esc_html__( 'User Roles', 'houzez' ),
     'id'               => 'header-user-roles',
     'subsection'       => true,

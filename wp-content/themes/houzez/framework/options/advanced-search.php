@@ -660,6 +660,19 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
+            'id'       => 'advanced_btn_type',
+            'type'     => 'button_set',
+            'title'    => __('Advanced Search Button Type', 'houzez'),
+            'subtitle' => '',
+            'desc'     => '',
+            'options' => array(
+                'icon' => esc_html__('Icon', 'houzez'), 
+                'icon_text' => esc_html__('Icon with text', 'houzez'), 
+             ), 
+            'default' => 'icon'
+        ),
+
+        array(
             'id'          => 'search_exclude_status',
             'type'        => 'select',
             'title'       => esc_html__( 'Exclude Statuses', 'houzez' ),
@@ -1019,7 +1032,6 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
 
                 'Listings Version 5' => array(
-                    'list-view-v5' => 'List View',
                     'grid-view-v5' => 'Grid View',
                 ),
 
@@ -1060,8 +1072,43 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__('Number of Listings', 'houzez'),
             'desc'    => esc_html__('Enter the number of listings to display on the search result page', 'houzez'),
             'subtitle' => '',
-            //'desc'     => '',
-            'default'  => '9',
+            'default'  => '10',
+        ),
+
+        array(
+            'id'       => 'auto_load_map_listings',
+            'type'     => 'switch',
+            'title'    => esc_html__('Auto Load Map Listings', 'houzez'),
+            'subtitle' => esc_html__('Enable or disable automatic loading of additional listings when users pan or zoom the map', 'houzez'),
+            'desc'     => esc_html__('If disabled, only the number of listings per page will be shown on the map', 'houzez'),
+            'default'  => 0,
+            'on'       => esc_html__('Enabled', 'houzez'),
+            'off'      => esc_html__('Disabled', 'houzez'),
+            'required' => array('search_result_page', '=', 'half_map'),
+        ),
+
+        array(
+            'id'       => 'search_num_map_posts',
+            'type'     => 'text',
+            'title'    => esc_html__('Initial Number of Listings on Map', 'houzez'),
+            'subtitle' => esc_html__('Enter the number of listings to initially load on the map. Additional listings will appear as users pan or zoom the map.', 'houzez'),
+            'desc'    => esc_html__('This setting controls the initial map load. More listings will automatically display based on map coordinates when users interact with the map.', 'houzez'),
+            'default'  => '100',
+            'required' => array(
+                array('search_result_page', '=', 'half_map'),
+                array('auto_load_map_listings', '=', '1')
+            ),
+        ),
+
+        array(
+            'id'       => 'search_show_all_listings_on_map',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Show All Listings on Map', 'houzez' ),
+            'subtitle' => esc_html__( 'This option will show all listings on the map when the map is enabled in the header, if disabled, only the listings per page will be shown', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enable', 'houzez' ),
+            'off'      => esc_html__( 'Disable', 'houzez' ),
+            'required' => array( 'search_result_page', '=', 'normal_page' ),
         ),
     )
 ));

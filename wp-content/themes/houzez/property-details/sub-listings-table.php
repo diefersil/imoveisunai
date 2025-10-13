@@ -8,19 +8,19 @@ if( isset($multi_units[0]['fave_mu_title']) && !empty( $multi_units[0]['fave_mu_
 			<h2><?php echo houzez_option('sps_sub_listings', 'Sub Listings'); ?></h2>
 		</div><!-- block-title-wrap -->
 		<div class="block-content-wrap">
-			<table class="sub-listings-table table-lined responsive-table">
-				<thead>
-					<tr>
-						<th><?php esc_html_e('Title', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Property Type', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Price', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Beds', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Baths', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Property Size', 'houzez'); ?></th>
-                        <th><?php esc_html_e('Availability Date', 'houzez'); ?></th>
+			<table class="sub-listings-table table-lined responsive-table" role="table">
+				<thead role="rowgroup">
+					<tr role="row">
+						<th role="columnheader" scope="col"><?php esc_html_e('Title', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Type', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Price', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Beds', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Baths', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Size', 'houzez'); ?></th>
+                        <th role="columnheader" scope="col"><?php esc_html_e('Availability Date', 'houzez'); ?></th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody role="rowgroup">
 
 					<?php 
 					$mu_price_postfix = '';
@@ -54,24 +54,24 @@ if( isset($multi_units[0]['fave_mu_title']) && !empty( $multi_units[0]['fave_mu_
                         	$fave_mu_baths = $mu['fave_mu_baths'];
                         }
                         ?>
-						<tr>
-							<td data-label="<?php esc_html_e('Title', 'houzez'); ?>">
+						<tr role="row">
+							<td role="cell" data-label="<?php esc_html_e('Title', 'houzez'); ?>">
 								<strong><?php echo esc_attr( $mu['fave_mu_title'] ); ?></strong>
 							</td>
-							<td data-label="<?php esc_html_e('Property Type', 'houzez'); ?>"><?php echo esc_attr( $mu['fave_mu_type'] ); ?></td>
-							<td data-label="<?php esc_html_e('Price', 'houzez'); ?>">
+							<td role="cell" data-label="<?php esc_html_e('Property Type', 'houzez'); ?>"><?php echo esc_attr( $mu['fave_mu_type'] ); ?></td>
+							<td role="cell" data-label="<?php esc_html_e('Price', 'houzez'); ?>">
 								<strong><?php echo houzez_get_property_price( $mu['fave_mu_price'] ).$mu_price_postfix; ?></strong>
 							</td>
-							<td data-label="<?php esc_html_e('Beds', 'houzez'); ?>">
-								<i class="houzez-icon icon-hotel-double-bed-1 mr-1"></i>
+							<td role="cell" data-label="<?php esc_html_e('Beds', 'houzez'); ?>">
+								<i class="houzez-icon icon-hotel-double-bed-1 me-1"></i>
 								<?php echo esc_attr( $fave_mu_beds ); ?> 
 							</td>
-							<td data-label="<?php esc_html_e('Baths', 'houzez'); ?>">
-								<i class="houzez-icon icon-bathroom-shower-1 mr-1"></i>
+							<td role="cell" data-label="<?php esc_html_e('Baths', 'houzez'); ?>">
+								<i class="houzez-icon icon-bathroom-shower-1 me-1"></i>
 								<?php echo esc_attr( $fave_mu_baths ); ?> 
 							</td>
-							<td data-label="<?php esc_html_e('Property Size', 'houzez'); ?>"><?php echo $fave_mu_size.' '.$postfix; ?></td>
-							<td data-label="<?php esc_html_e('Availability Date', 'houzez'); ?>"><?php echo esc_attr($fave_mu_availability_date); ?></td>
+							<td role="cell" data-label="<?php esc_html_e('Property Size', 'houzez'); ?>"><?php echo $fave_mu_size.' '.$postfix; ?></td>
+							<td role="cell" data-label="<?php esc_html_e('Availability Date', 'houzez'); ?>"><?php echo esc_attr($fave_mu_availability_date); ?></td>
 						</tr>
 					<?php endforeach; ?>
 					

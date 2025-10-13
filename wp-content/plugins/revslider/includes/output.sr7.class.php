@@ -136,6 +136,13 @@ class RevSlider7Output extends RevSliderFunctions {
 	public function set_revapi($revapi){
 		$this->revapi = $revapi;
 	}
+
+	/**
+	 * set the slider manually
+	 */
+	public function set_slider($slider){
+		$this->slider = apply_filters('revslider_set_slider', $slider, $this);
+	}
 	
 	/**
 	 * set slide data and layers
@@ -301,6 +308,7 @@ class RevSlider7Output extends RevSliderFunctions {
 	 */
 	public function set_layer($layer){
 		$this->layer = apply_filters('revslider_set_layer', $layer, $this);
+		$this->layer['has_shortcode'] = false;
 	}
 	
 	/**
@@ -548,6 +556,7 @@ class RevSlider7Output extends RevSliderFunctions {
 
 					$http			= $this->get_val($act, 'link_help_in', 'keep');
 					$_link			= ($action_type === 'menu') ? $this->remove_http($this->get_val($act, 'menu_link', ''), $http) : $this->remove_http($this->get_val($act, 'image_link', ''), $http);
+					if($this->has_any_shortcode($_link)) $this->layer['has_shortcode'] = true;
 					$_link			= do_shortcode($_link);
 					$link_open_in	= $this->get_val($act, 'link_open_in', '');
 					$link			= 'href="'.esc_url($_link).'"';
@@ -634,7 +643,16 @@ class RevSlider7Output extends RevSliderFunctions {
 	public function get_layer_type(){
 		$layer = $this->get_layer();
 		return $this->get_val($layer, 'type', 'text');
-	} 
+	}
+
+	/**
+	 * get all direct layer attr
+	 */
+	public function get_layer_attr(){
+		$layer = $this->get_layer();
+		
+		return ($this->get_val($layer, 'has_shortcode', false) === true) ? 'srscsrc' : '';
+	}
 
 	/**
 	 * get the html class for a layer
@@ -716,6 +734,12 @@ class RevSlider7Output extends RevSliderFunctions {
 				$this->slider_v7->init_by_mixed($this->get_slider_id(), false);
 				if($this->slider_v7->inited === false) $this->slider_v7 = null;
 
+				//check if v6 and v7 slides are in the same amount, if not revert back to v6!
+				if($this->slider_v7 !== null){
+					$v7sid = $this->slider_v7->get_id();
+					if($this->check_if_migration_done($v7sid) === false) $this->slider_v7 = null;
+				}
+
 				//$SR_GLOBALS['use_table_version'] = $use;
 				if(empty($this->slider_v7)) $SR_GLOBALS['use_table_version'] = 6;
 			}
@@ -725,6 +749,8 @@ class RevSlider7Output extends RevSliderFunctions {
 			if(!empty($this->slider)) apply_filters('revslider_add_slider_base', $this->slider);
 			if(!empty($this->slider_v7)) apply_filters('revslider_add_slider_base', $this->slider_v7);
 			
+			echo $this->add_youtube_api_html();
+
 			//set slider language
 			if($this->get_preview_mode() === false){
 				$SR_wpml = RevSliderGlobals::instance()->get('RevSliderWpml');
@@ -755,9 +781,11 @@ class RevSlider7Output extends RevSliderFunctions {
 
 			if($this->get_from_caching()) return true;
 
+			$this->modify_settings();
+
 			$slider_id	= (!empty($this->slider_v7)) ? $this->slider_v7->get_param('id', '') : $this->slider->get_param('id', '');
 			$html_id	= (trim($slider_id) !== '') ? $slider_id : 'SR7_'.$sid.'_'.$SR_GLOBALS['serial'];
-			$revapi		= (in_array('sr7'.$sid, $SR_GLOBALS['collections']['js']['revapi'], true)) ? 'sr7'.$sid.'_'.$SR_GLOBALS['serial'] : 'sr7'.$sid;
+			$revapi		= (in_array('sr7'.$sid, $SR_GLOBALS['collections']['js']['revapi'], true)) ? 'revapi'.$sid.'_'.$SR_GLOBALS['serial'] : 'revapi'.$sid;
 			$this->set_html_id($html_id);
 			$this->set_revapi($revapi);
 			
@@ -778,6 +806,7 @@ class RevSlider7Output extends RevSliderFunctions {
 
 			echo $this->close_slider_div();
 			echo $this->js_get_start_size();
+			//echo $this->js_get_custom_settings();
 			
 			if($SR_GLOBALS['loaded_by_editor'] === true){ //for elementor
 				$this->add_js();
@@ -935,6 +964,7 @@ class RevSlider7Output extends RevSliderFunctions {
 	 **/
 	public function get_slider_div(){
 		$class	= (!empty($this->slider_v7)) ? $this->slider_v7->get_param('class', '') : $this->slider->get_param('class', '');
+		$class	= (!is_array($class) && !empty($class)) ? explode(' ', $class) : $class;
 		$class	= (empty($class)) ? array() : (array)$class;
 		$modal	= $this->get_modal();
 		$id		= (!empty($this->slider_v7)) ? $this->slider_v7->get_id() : $this->slider->get_id();
@@ -1020,7 +1050,7 @@ class RevSlider7Output extends RevSliderFunctions {
 		foreach($used_images ?? [] as $image){
 			$imgsrc	 = $this->remove_http($this->get_val($image, 'src'));
 			$imgorig = $this->remove_http($this->get_val($image, 'orig'));
-			if(empty($imgsrc) || empty($imgorig)) continue;
+			if(empty($imgsrc) || empty($imgorig) || strpos(wp_check_filetype($image['src'])['type'], 'image/') === false) continue;
 
 			$lib_id	 = $this->get_val($image, 'lib_id');
 			$info	 = false;
@@ -1056,6 +1086,15 @@ class RevSlider7Output extends RevSliderFunctions {
 		return (empty($images)) ? '' : RS_T5.'<image_lists style="display:none">'."\n".
 				implode("\n", $images) . "\n" .
 				RS_T5.'</image_lists>'."\n";
+	}
+
+	//add custom settings for modules
+	public function js_get_custom_settings(){
+		if(empty($this->revapi)) return '';
+		$html_id = esc_attr($this->get_html_id());
+		if(empty($html_id)) return '';
+		$settings = $this->get_custom_settings();
+		return (empty($settings) || !is_array($settings)) ? '' : RS_T4.'<script>'."\n". RS_T5.'document.addEventListener("sr.module.ready", function (e, id) {'."\n".RS_T6.'if(e.id !== "'.$html_id.'") return;'."\n".RS_T6.$this->revapi.'.settings('.json_encode($settings).');'."\n". RS_T5.'});'."\n". RS_T4.'</script>'."\n";
 	}
 
 	/**
@@ -1313,13 +1352,13 @@ class RevSlider7Output extends RevSliderFunctions {
 		$html_id = esc_attr($this->get_html_id());
 		$ret = 'SR7.PMH ??={}; '.
 			'SR7.PMH["'. $html_id .'"] = {' .
-			'cn:0,'.
+			'cn:100,'.
 			'state:false,'.
 			'fn: function() {'.
 				' if (_tpt!==undefined && _tpt.prepareModuleHeight !== undefined) {'.
 				'  _tpt.prepareModuleHeight({id:"'. $html_id .'",'. $html .'});'.
 				'   SR7.PMH["'. $html_id .'"].state=true;'.
-				'} else if((SR7.PMH["'. $html_id .'"].cn++)<100)'.				
+				'} else if(SR7.PMH["'. $html_id .'"].cn-->0)'.
 				'	setTimeout( SR7.PMH["'. $html_id .'"].fn,19);'.
 			'}'.
 			'};'.
@@ -1400,6 +1439,8 @@ class RevSlider7Output extends RevSliderFunctions {
 		$html = (strpos($ws, 'content') !== false || strpos($ws, 'full') !== false) ? nl2br($html) : $html;
 		//do shortcodes here, so that nl2br is not done within the shortcode content
 		
+		if($this->has_any_shortcode($html)) $this->layer['has_shortcode'] = true;
+
 		return (!in_array($type, array('image', 'svg', 'column', 'shape'), true)) ? do_shortcode(stripslashes($html)) : $html;
 	}
 
@@ -1427,14 +1468,17 @@ class RevSlider7Output extends RevSliderFunctions {
 	 * get the Slides HTML of the Slider
 	 **/
 	public function get_slides(){
-		$slides = (!empty($this->slider_v7)) ? $this->slider_v7->get_slides() : $this->slider->get_slides(); //fetch all slides connected to the Slider (no static slide)
+		$type	= (!empty($this->slider_v7)) ? $this->slider_v7->get_param('type', 'standard') : $this->slider->get_param('type', 'standard');
+		$wpml	= (!empty($this->slider_v7)) ? $this->slider_v7->get_param('wpml', false) : $this->slider->get_param(array('general', 'useWPML'), false);
+		$hero	= ($type === 'hero') ? true : false;
+		$slides = (!empty($this->slider_v7)) ? $this->slider_v7->get_slides(true, $wpml, $hero) : $this->slider->get_slides(true, $wpml, $hero); //fetch all slides connected to the Slider (no static slide)
 		$slides = (!empty($this->slider_v7)) ? $this->slider_v7->get_language_slides_v7($slides) : $this->slider->get_language_slides_v7($slides); //get WPML language slides
 		
 		/**
 		 * if we are now at 0 slides, there will be no more chances to add them
 		 * so return back with no slides markup
 		 **/
-		if(empty($slides)) return false;
+		if(empty($slides)) throw new Exception('No active slides found');
 
 		/**
 		 * if we are a stream
@@ -1639,12 +1683,14 @@ class RevSlider7Output extends RevSliderFunctions {
 		$html_rel			= $this->get_html_rel();
 		$html_layer			= $this->get_html_layer();
 		$layertype 			= $this->get_layer_type();
+		$layerattr			= $this->get_layer_attr();
 		echo $this->ld().RS_T7.'<'.$layer_tag;
 		echo ($ids != '')				? ' '.$ids : '';
 		echo ($html_class !== '')		? ' '.$html_class : '';
 		echo ($html_simple_link !== '')	? ' '.$html_simple_link : '';
 		echo ($html_rel !== '')			? ' '.$html_rel : '';
 		echo ($html_title !== '')		? ' '.$html_title : '';
+		echo ($layerattr !== '')		? ' '.$layerattr : '';
 		echo '>';//."\n";
 		echo ($special_type === false && $layertype !== 'video') ? apply_filters('revslider_layer_content', $html_layer, $html_layer, $slider_id, $this->slide, $layer) : '';
 		if($special_type === false){
@@ -1660,9 +1706,8 @@ class RevSlider7Output extends RevSliderFunctions {
 		
 		if(empty($slides)) return $found;
 
-		$base_transitions = $this->get_base_transitions();
-
-		$_transitions = array();
+		$base_transitions	= $this->get_base_transitions();
+		$_transitions		= array();
 		if(!empty($this->slider_v7)){
 			if($this->slider_v7->get_param(array('fs', 'as'), false) === true && $this->slider_v7->get_param('type') !== 'hero'){
 				if($this->slider_v7->get_param(array('fs', 'a', 'rnd'), false) === true) $_transitions['rndany'] = 'rndany';
@@ -1682,8 +1727,11 @@ class RevSlider7Output extends RevSliderFunctions {
 			
 				foreach($layers as $layer){
 					if($this->get_val($layer, 'subtype') !== 'slidebg') continue;
-					if($this->get_val($layer, array('tl', 'in', 'bg', 'rnd'), false) === false) continue;
-					$_transitions['rndany'] = 'rndany';
+					if($this->get_val($layer, array('tl', 'in', 'bg', 'all', '1', 'rnd'), false) === false) continue;
+					$rnd_trans = $this->get_val($layer, array('tl', 'in', 'bg', 'all', '1', 'rndmain'), 'all');
+					$rnd_trans = ($rnd_trans === 'all') ? 'rndany' : $rnd_trans;
+
+					$_transitions[$rnd_trans] = $rnd_trans;
 				}
 			}else{
 				$transitions = (array)$slide->get_param(array('timeline', 'transition'), 'fade');
@@ -1877,8 +1925,8 @@ class RevSlider7Output extends RevSliderFunctions {
 		}
 
 		echo RS_T."if (SR7.F.init) SR7.F.init(); // DOUBLE CALL NOT A PROBLEM, MANAGED IN INIT"."\n";
-		echo RS_T."document.addEventListener('DOMContentLoaded', function() {if (SR7.F.init) SR7.F.init();});"."\n";
-		echo RS_T."window.addEventListener('load', function() {if (SR7.F.init) SR7.F.init(); });"."\n";
+		echo RS_T."document.addEventListener('DOMContentLoaded', function() {if (SR7.F.init) SR7.F.init(); else SR7.shouldBeInited = true;});"."\n";
+		echo RS_T."window.addEventListener('load', function() {if (SR7.F.init) SR7.F.init(); else SR7.shouldBeInited = true; });"."\n";
 
 		if(!empty($SR_GLOBALS['collections']['trans'])){
 			echo RS_T.'SR7.E.transtable ??={};'."\n";
@@ -1983,6 +2031,27 @@ class RevSlider7Output extends RevSliderFunctions {
 	}
 
 	/**
+	 * modify slider settings through the shortcode directly
+	 */
+	private function modify_settings(){
+		$settings = $this->get_custom_settings();
+		$settings = apply_filters('revslider_modify_slider_settings', $settings, $this->get_slider_id());
+		
+		if(empty($settings) || !is_array($settings)) return;
+		
+		$params = $this->slider->get_params();
+		foreach($settings as $handle => $setting){
+			$params[$handle] = $setting;
+		}
+		
+		if(!empty($this->slider_v7)){
+			$this->slider_v7->set_params($params);
+		}else{
+			$this->slider->set_params($params);
+		}
+	}
+
+	/**
 	 * add error message into the console
 	 */
 	public function print_error_message_console($message){
@@ -2044,6 +2113,30 @@ class RevSlider7Output extends RevSliderFunctions {
 		add_action('wp_print_footer_scripts', array($this, 'add_js'), 100);
 		
 		echo $html;
+	}
+
+	/**
+	 * check if the youtube api needs to be added, this should only be done once for all sliders
+	 * @since: 6.5.7
+	 **/
+	public function add_youtube_api_html(){
+		global $SR_GLOBALS;
+		
+		$r = '';
+
+		if($this->get_val($SR_GLOBALS, 'yt_api_loaded', false) === true) return $r; //already loaded
+		
+		if(empty($this->slider_v7)) return $r; //on the fly frontend js migration will handle it
+		if($this->slider_v7->get_param('hasYT', false) === false) return $r;
+		
+		//check global option if enabled
+		$gs = $this->get_global_settings();
+		if($this->_truefalse($this->get_val($gs, array('script', 'ytapi'), false)) === true){
+			$r = RS_T.'<script src="https://www.youtube.com/iframe_api"></script>'."\n";
+			$SR_GLOBALS['yt_api_loaded'] = true;
+		}
+		
+		return apply_filters('revslider_add_youtube_api_html', $r, $this);
 	}
 
 	/**

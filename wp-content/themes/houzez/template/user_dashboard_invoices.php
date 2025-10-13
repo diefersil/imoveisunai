@@ -14,15 +14,18 @@ global $paged, $houzez_local, $current_user, $dashboard_invoices;
 $dashboard_invoices = houzez_get_template_link_2('template/user_dashboard_invoices.php');
 $mine_link = add_query_arg( array('mine' => 1 ), $dashboard_invoices );
 
-get_header();
+get_header('dashboard');
 
 $invoice_status = isset($_GET['invoice_status']) ? sanitize_text_field($_GET['invoice_status']) : '';
 $invoice_type = isset($_GET['invoice_type']) ? sanitize_text_field($_GET['invoice_type']) : '';
 $startDate = isset($_GET['startDate']) ? sanitize_text_field($_GET['startDate']) : '';
 $endDate = isset($_GET['endDate']) ? sanitize_text_field($_GET['endDate']) : '';
 
+// Default number of properties and page number
+$allowed_per_page = [10,20,50,100];
+$no_of_items = isset($_GET['per_page']) && in_array( intval($_GET['per_page']), $allowed_per_page ) ? intval($_GET['per_page']) : 10;
+$paged = get_query_var('paged') ?: get_query_var('page') ?: 1;
 
-$paged = get_query_var('paged') ? get_query_var('paged') : 1;
 $meta_query = array();
 $date_query = array();
 
@@ -30,7 +33,7 @@ $results_found = false;
 
 $invoices_args = array(
     'post_type' => 'houzez_invoice',
-    'posts_per_page' => 20,
+    'posts_per_page' => $no_of_items,
     'paged' => $paged
 );
 
@@ -95,122 +98,60 @@ if( $date_query ) {
 $invoice_query = new WP_Query($invoices_args);
 $total_invoices = $invoice_query->found_posts;
 ?>
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_invoices', 'Invoices'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
-            <?php 
-            if( isset( $_GET['invoice_id']) && !empty($_GET['invoice_id']) ) {
-                get_template_part('template-parts/dashboard/invoice/detail');
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
 
-            } else { ?>
+    <div class="dashboard-content">
+        <div class="heading d-flex align-items-center justify-content-between">
+            <div class="heading-text">
+                <h2><?php echo houzez_option('dsh_invoices', 'Invoices'); ?></h2>
+            </div>
+        </div>
 
-            <h2><?php echo esc_html__('Search Invoices', 'houzez'); ?></h2>
-            <div class="dashboard-content-block">
-                <div class="row">
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label><?php echo $houzez_local['start_date']; ?></label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text"><i class="houzez-icon icon-calendar-3"></i></div>
-                                </div>
-                                <input id="startDate" type="text" class="form-control db_input_date" placeholder="<?php echo esc_html__('Select a date', 'houzez'); ?>" value="<?php echo $startDate; ?>" readonly>
-                            </div><!-- input-group -->
-                        </div><!-- form-group -->
-                    </div><!-- col-md-3 col-sm-12 -->
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label><?php echo $houzez_local['end_date']; ?></label>
-                            <div class="input-group date">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text"><i class="houzez-icon icon-calendar-3"></i></div>
-                                </div>
-                                <input id="endDate" type="text" class="form-control db_input_date" placeholder="<?php echo esc_html__('Select a date', 'houzez'); ?>" value="<?php echo $endDate; ?>" readonly>
-                            </div><!-- input-group -->
-                        </div><!-- form-group -->
-                    </div><!-- col-md-3 col-sm-12 -->
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="invoice_type"><?php echo $houzez_local['invoice_type']; ?></label>
-                            <select class="selectpicker form-control bs-select-hidden" id="invoice_type" data-live-search="false">
-                                <option value=""><?php echo $houzez_local['any']; ?></option>
-                                <option <?php selected( $invoice_type, 'Listing' ); ?> value="Listing"><?php echo $houzez_local['invoice_listing']; ?></option>
-                                <option <?php selected( $invoice_type, 'package' ); ?> value="package"><?php echo $houzez_local['invoice_package']; ?></option>
-                                <option <?php selected( $invoice_type, 'Listing with Featured' ); ?> value="Listing with Featured"><?php echo $houzez_local['invoice_feat_list']; ?></option>
-                                <option <?php selected( $invoice_type, 'Upgrade to Featured' ); ?> value="Upgrade to Featured"><?php echo $houzez_local['invoice_upgrade_list']; ?></option>
-                            </select>
-                        </div><!-- form-group -->
-                    </div><!-- col-md-3 col-sm-12 -->
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="invoice_status"><?php echo $houzez_local['invoice_status']; ?></label>
-                            <select class="selectpicker form-control bs-select-hidden" id="invoice_status" data-live-search="false">
-                                <option value=""><?php echo $houzez_local['any']; ?></option>
-                                <option <?php selected( $invoice_status, '1' ); ?>  value="1"><?php echo $houzez_local['paid']; ?></option>
-                                <option <?php selected( $invoice_status, '0' ); ?> value="0"><?php echo $houzez_local['not_paid']; ?></option>
-                            </select>
-                        </div><!-- form-group -->
-                    </div><!-- col-md-3 col-sm-12 -->
-                </div><!-- row -->
-            </div><!-- dashboard-content-block -->
+        <?php get_template_part('template-parts/dashboard/invoice/filters'); ?>
 
-            <div class="dashboard-tool-block">
-                <div class="dashboard-tool-buttons-block">
-                    <div class="dashboard-tool-button">
-                        <div class="btn">
-                            <?php echo esc_attr($total_invoices); ?> <?php esc_html_e('Results Found', 'houzez'); ?>
-                        </div>
-                    </div>
-                </div><!-- dashboard-tool-buttons-block -->
-            </div><!-- dashboard-tool-block -->
+        <div class="houzez-data-content"> 
+            <div class="houzez-data-table">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle m-0">
+                        <thead>
+                            <tr> 
+                                <th data-label="<?php echo $houzez_local['order']; ?>"><?php echo $houzez_local['order']; ?></th>
+                                <th data-label="<?php echo $houzez_local['date']; ?>"><?php echo $houzez_local['date']; ?></th>
+                                <th data-label="<?php echo $houzez_local['billing_for']; ?>"><?php echo $houzez_local['billing_for']; ?></th>  
+                                <th data-label="<?php echo $houzez_local['billing_type']; ?>"><?php echo $houzez_local['billing_type']; ?></th>  
+                                <th data-label="<?php echo esc_html__('Client', 'houzez'); ?>"><?php echo esc_html__('Client', 'houzez'); ?></th>
+                                <th data-label="<?php echo $houzez_local['payment_method']; ?>"><?php echo $houzez_local['payment_method']; ?></th>
+                                <th data-label="<?php echo $houzez_local['total']; ?>"><?php echo $houzez_local['total']; ?></th>
+                                <th data-label="<?php echo $houzez_local['invoice_status']; ?>"><?php echo $houzez_local['invoice_status']; ?></th>
+                                <th data-label="<?php echo esc_html__('View', 'houzez'); ?>" class="text-center"><?php echo esc_html__('View', 'houzez'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            if ($invoice_query->have_posts()) :
+                                while ($invoice_query->have_posts()) : $invoice_query->the_post();
 
-            <table class="dashboard-table table-lined table-hover responsive-table">
-                <thead>
-                    <tr>
-                        <th><?php echo $houzez_local['order']; ?></th>
-                        <th><?php echo $houzez_local['date']; ?></th>
-                        <th><?php echo $houzez_local['billing_for']; ?></th>
-                        <th><?php echo $houzez_local['billing_type']; ?></th>
-                        <th><?php echo $houzez_local['invoice_status']; ?></th>
-                        <th><?php echo $houzez_local['payment_method']; ?></th>
-                        <th><?php echo $houzez_local['total']; ?></th>
-                        <th class="action-col"><?php echo esc_html__('Actions', 'houzez'); ?></th>
-                    </tr>
-                </thead>
-                <tbody id="invoices_content">
-                    <?php
-                    if ($invoice_query->have_posts()) :
-                        while ($invoice_query->have_posts()) : $invoice_query->the_post();
+                                    get_template_part('template-parts/dashboard/invoice/invoice-item'); 
 
-                            get_template_part('template-parts/dashboard/invoice/invoice-item'); 
+                                    get_template_part('template-parts/dashboard/invoice/modal');
 
-                        endwhile; 
-                    endif;
-                    wp_reset_postdata();
-                    ?>
-                </tbody>
-            </table><!-- dashboard-table -->
+                                endwhile; 
+                            endif;
+                            wp_reset_postdata();
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php get_template_part('template-parts/dashboard/invoice/pagination'); ?>
+        </div>
 
-            <?php houzez_pagination( $invoice_query->max_num_pages ); ?>
-            <?php } ?>
+    </div>
+</div>
 
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
-
-<?php get_footer(); ?>
+<?php get_footer('dashboard'); ?>

@@ -4,8 +4,8 @@ $languages = get_post_meta( get_the_ID(), 'fave_agent_language', true );
 
 if( !empty( $languages ) ) { ?>
 	<p>
-		<i class="houzez-icon icon-messages-bubble mr-1"></i>
+		<i class="houzez-icon icon-messages-bubble me-1"></i>
 		<strong><?php echo $houzez_local['languages']; ?>:</strong> 
-		<?php echo esc_attr( $languages ); ?>
+		<span itemprop="knowsLanguage"><?php echo esc_attr( $languages ); ?></span>
 	</p>
 <?php } ?>

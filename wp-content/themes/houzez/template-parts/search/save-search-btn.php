@@ -13,14 +13,14 @@ if( houzez_option('enable_disable_save_search', 0) ) {
     <form method="post" action="" class="save_search_form">
     <?php } ?>
             
-        <input type="hidden" name="search_args" value='<?php print base64_encode( serialize( $search_qry ) ); ?>'>
+        <input type="hidden" name="search_args" value='<?php print base64_encode( json_encode( $search_qry ) ); ?>'>
         <input type="hidden" name="search_URI" value="<?php echo esc_attr($search_uri); ?>">
         <input type="hidden" name="search_geolocation" value="<?php echo isset($_GET['search_location']) ? esc_attr($_GET['search_location']) : ''; ?>">
         <input type="hidden" name="houzez_save_search_ajax" value="<?php echo wp_create_nonce('houzez-save-search-nounce')?>">
 
         <button class="btn save_search_click save-search-btn" type="button">
             <?php get_template_part('template-parts/loader'); ?>
-            <i class="houzez-icon icon-alarm-bell mr-1"></i> <?php echo houzez_option('srh_btn_save_search', 'Save Search'); ?>
+            <i class="houzez-icon icon-alarm-bell me-1"></i> <?php echo houzez_option('srh_btn_save_search', 'Save Search'); ?>
         </button>
     <?php if( !houzez_is_half_map() ) { ?>
     </form>

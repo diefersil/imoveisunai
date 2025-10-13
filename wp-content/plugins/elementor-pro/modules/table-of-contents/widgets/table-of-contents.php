@@ -42,6 +42,10 @@ class Table_Of_Contents extends Base_Widget {
 		return false;
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -225,6 +229,21 @@ class Table_Of_Contents extends Base_Widget {
 				'skin' => 'inline',
 				'label_block' => false,
 				'exclude_inline_options' => [ 'svg' ],
+				'frontend_available' => true,
+			]
+		);
+
+		$this->add_control(
+			'no_headings_message',
+			[
+				'label' => esc_html__( 'No Headings Found Message', 'elementor-pro' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'No headings were found on this page.', 'elementor-pro' ),
+				'dynamic' => [
+					'active' => true,
+				],
+				'label_block' => true,
+				'separator' => 'before',
 				'frontend_available' => true,
 			]
 		);
@@ -892,7 +911,7 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Open table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Open table of contents', 'elementor-pro' ),
 				]
 			);
 			$this->add_render_attribute(
@@ -903,22 +922,26 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Close table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Close table of contents', 'elementor-pro' ),
 				]
 			);
 		}
 
 		$html_tag = Utils::validate_html_tag( $settings['html_tag'] );
 		?>
+		<?php if ( ! Utils::is_empty( $settings['title'] ) || ( 'yes' === $settings['minimize_box'] ) ) : ?>
 		<div <?php $this->print_render_attribute_string( 'header' ); ?>>
+			<?php if ( ! Utils::is_empty( $settings['title'] ) ) : ?>
 			<<?php Utils::print_validated_html_tag( $html_tag ); ?> class="elementor-toc__header-title">
-				<?php $this->print_unescaped_setting( 'title' ); ?>
+				<?php echo wp_kses_post( $settings['title'] ); ?>
 			</<?php Utils::print_validated_html_tag( $html_tag ); ?>>
+			<?php endif; ?>
 			<?php if ( 'yes' === $settings['minimize_box'] ) : ?>
 				<div <?php $this->print_render_attribute_string( 'expand-button' ); ?>><?php Icons_Manager::render_icon( $settings['expand_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 				<div <?php $this->print_render_attribute_string( 'collapse-button' ); ?>><?php Icons_Manager::render_icon( $settings['collapse_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
 		<div <?php $this->print_render_attribute_string( 'body' ); ?>>
 			<div class="elementor-toc__spinner-container">
 				<?php

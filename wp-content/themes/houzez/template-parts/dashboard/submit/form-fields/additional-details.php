@@ -1,11 +1,11 @@
-<table class="dashboard-table additional-details-table">
+<table class="dashboard-table additional-details-table w-100" role="grid">
 	<thead>
 		<tr>
 			<td>
-				<label><?php echo houzez_option('cl_additional_title', 'Title'); ?></label>
+				<label class="form-label"><?php echo houzez_option('cl_additional_title', 'Title'); ?></label>
 			</td>
 			<td>
-				<label><?php echo houzez_option('cl_additional_value', 'Value'); ?></label>
+				<label class="form-label"><?php echo houzez_option('cl_additional_value', 'Value'); ?></label>
 			</td>
 			<td></td>
 			<td></td>
@@ -26,17 +26,17 @@
                 	?>
 
                 	<tr>
-						<td class="table-half-width">
+						<td>
 							<input class="form-control" name="additional_features[<?php echo esc_attr( $count ); ?>][fave_additional_feature_title]" placeholder="<?php echo houzez_option('cl_additional_title_plac', 'Eg: Equipment' ); ?>" type="text" value="<?php echo esc_attr($add_title); ?>">
 						</td>
-						<td class="table-half-width">
+						<td>
 							<input class="form-control" name="additional_features[<?php echo esc_attr( $count ); ?>][fave_additional_feature_value]" placeholder="<?php echo houzez_option( 'cl_additional_value_plac', 'Grill - Gas' ); ?>" type="text" value="<?php echo esc_attr($add_value); ?>">
 						</td>
-						<td class="">
-							<a class="sort-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-navigation-menu"></i></a>
-						</td>
-						<td>
-							<button data-remove="<?php echo esc_attr( $count ); ?>" class="remove-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-close"></i></button>
+						<td style="width: 0;" colspan="2">
+							<div class="d-flex justify-content-end align-items-center gap-1 ms-1">
+								<a class="sort-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-navigation-menu"></i></a>
+								<button data-remove="<?php echo esc_attr( $count ); ?>" class="remove-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-close"></i></button>
+							</div>
 						</td>
 					</tr>
             <?php
@@ -48,27 +48,26 @@
 		} else {
 		?>
 		<tr>
-			<td class="table-half-width">
+			<td>
 				<input class="form-control" name="additional_features[0][fave_additional_feature_title]" placeholder="<?php echo houzez_option('cl_additional_title_plac', 'Eg: Equipment' ); ?>" type="text">
 			</td>
-			<td class="table-half-width">
+			<td>
 				<input class="form-control" name="additional_features[0][fave_additional_feature_value]" placeholder="<?php echo houzez_option( 'cl_additional_value_plac', 'Grill - Gas' ); ?>" type="text">
 			</td>
-			<td class="">
-				<a class="sort-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-navigation-menu"></i></a>
-			</td>
-			<td>
-				<button data-remove="0" class="remove-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-close"></i></button>
+			<td style="width: 0;" colspan="2">
+				<div class="d-flex justify-content-end align-items-center gap-1 ms-1">
+					<a class="sort-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-navigation-menu"></i></a>
+					<button data-remove="0" class="remove-additional-row btn btn-light-grey-outlined"><i class="houzez-icon icon-close"></i></button>
+				</div>
 			</td>
 		</tr>
 	<?php } ?>
 	</tbody>
     <tfoot>
-		<tr >
+		<tr>
 			<td colspan="4">
-				<button data-increment="<?php echo esc_attr($data_increment); ?>" class="add-additional-row btn btn-primary btn-left-icon mt-2"><i class="houzez-icon icon-add-circle"></i> <?php esc_html_e( 'Add New', 'houzez' ); ?></button>
+				<button data-increment="<?php echo esc_attr($data_increment); ?>" class="add-additional-row btn btn-primary mt-2"><i class="houzez-icon icon-add-circle me-2"></i> <?php esc_html_e( 'Add New', 'houzez' ); ?></button>
 			</td>
 		</tr>
 	</tfoot>
-	</tbody>
 </table>

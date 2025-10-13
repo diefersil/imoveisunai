@@ -1,5 +1,5 @@
 <?php
-global $all_enquires;
+global $all_enquires, $dashboard_crm;
 
 $is_not_lead_detail = true;
 if(isset($_GET['tab']) && $_GET['tab'] == 'enquires') {

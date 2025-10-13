@@ -1,7 +1,7 @@
 <?php global $houzez_local; ?>
-<div class="form-group">
-	<label for="lng"><?php echo houzez_option( 'cl_longitude', 'Longitude' ); ?></label>
-	<input class="form-control" id="longitude" name="lng" value="<?php
+<div class="form-group mb-3">
+	<label class="form-label" for="longitude"><?php echo houzez_option( 'cl_longitude', 'Longitude' ); ?></label>
+	<input class="form-control" id="longitude" name="longitude" value="<?php
     if (houzez_edit_property()) {
         $lng = houzez_get_field_meta('property_location');
         $lng = explode(",", $lng);

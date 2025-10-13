@@ -5,7 +5,7 @@ use Elementor\Core\Schemes;
 use Elementor\Group_Control_Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly 
 }
 
 class Houzez_Login_Modal extends Widget_Base {
@@ -24,7 +24,20 @@ class Houzez_Login_Modal extends Widget_Base {
 	}
 
 	public function get_categories() {
-		return [ 'houzez-elements', 'houzez-header-footer' ];
+		// Check if the current post type is 'fts_builder'
+	    if (get_post_type() === 'fts_builder') {
+	        // Get the template type of the current post
+	        $template_type = htb_get_template_type(get_the_ID());
+
+	        // Check if the template type is 'tmp_header' or 'tmp_footer'
+	        if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+	            // Return the specific category for header and footer builders
+	            return ['houzez-header-footer-builder'];
+	        }
+	    }
+	    
+	    // Return the default categories
+	    return ['houzez-elements', 'houzez-header-footer'];
 	}
 
 	public function get_keywords() {
@@ -555,23 +568,34 @@ class Houzez_Login_Modal extends Widget_Base {
 		$ele_settings = $settings;
 		$login_type = $settings['login_type'];
 
-		if ( Plugin::$instance->editor->is_edit_mode() ) { global $ele_edit_mode_settings;  $ele_edit_mode_settings = $settings; ?>
+		if ( Plugin::$instance->editor->is_edit_mode() ) { 
+			global $ele_edit_mode_settings;  $ele_edit_mode_settings = $settings; ?>
 
 			<?php if( $settings['logged_in_view'] == 'no') { ?>
 			<div class="login-register">	
 				<?php if( $login_type == "as_text" ) { ?>
 				<ul class="login-register-nav">
 					<li class="login-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Login', 'houzez'); ?>
+						</a>
 					</li>
 
 					<li class="register-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Register', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Register', 'houzez'); ?>
+						</a>
 					</li>
 				</ul>
 				<?php } else { ?>
 				<div class="login-link">
-					<a class="btn btn-icon-login-register" href="#" data-toggle="modal" data-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle"></i></a>
+					<a class="btn btn-icon-login-register dropdown-toggle" 
+					   href="#" 
+					   data-bs-toggle="modal" 
+					   data-bs-target="#login-register-form"
+					   role="menuitem">
+						<i class="houzez-icon icon-single-neutral-circle" aria-hidden="true"></i>
+					</a>
 				</div>
 				<?php } ?>
 			</div>
@@ -587,18 +611,28 @@ class Houzez_Login_Modal extends Widget_Base {
 				<?php if( $login_type == "as_text" ) { ?>
 				<ul class="login-register-nav">
 					<li class="login-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Login', 'houzez'); ?>
+						</a>
 					</li>
 
 					<?php if( houzez_option('header_register') ) { ?>
 					<li class="register-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Register', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Register', 'houzez'); ?>
+						</a>
 					</li>
 					<?php } ?>
 				</ul>
 				<?php } else { ?>
 				<div class="login-link">
-					<a class="btn btn-icon-login-register" href="#" data-toggle="modal" data-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle"></i></a>
+					<a class="btn btn-icon-login-register dropdown-toggle" 
+						   href="#" 
+						   data-bs-toggle="modal" 
+						   data-bs-target="#login-register-form"
+						   role="menuitem">
+						<i class="houzez-icon icon-single-neutral-circle" aria-hidden="true"></i>
+					</a>
 				</div>
 				<?php } ?>
 			</div>

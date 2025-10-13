@@ -1,8 +1,8 @@
-<div class="btn-group">
-	<button type="button" class="btn btn-light-grey-outlined" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div class="btn-group" role="group">
+	<button type="button" class="btn btn-light-grey-outlined" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false" aria-controls="label-dropdown">
 		<?php echo houzez_option('srh_label','Label'); ?>
 	</button>
-	<div class="dropdown-menu dropdown-menu-small dropdown-menu-right advanced-search-dropdown clearfix">
+	<div id="label-dropdown" class="dropdown-menu dropdown-menu-small dropdown-menu-right advanced-search-dropdown clearfix" role="menu">
 		
 		<?php
 		$get_label = array();
@@ -53,7 +53,9 @@
 		    }
 		} ?>
 
-		<button class="btn btn-clear clear-checkboxes"><?php echo houzez_option('srh_clear', 'Clear'); ?></button> 
-		<button class="btn btn-apply"><?php echo houzez_option('srh_apply', 'Apply'); ?></button>
+		<div class="d-flex gap-2 mt-2 justify-content-start">
+			<button class="btn btn-apply btn-primary" type="button"><?php echo houzez_option('srh_apply', 'Apply'); ?></button>
+			<button class="btn btn-clear clear-checkboxes btn-primary-outlined" type="button"><?php echo houzez_option('srh_clear', 'Clear'); ?></button>
+		</div>
 	</div><!-- advanced-search-dropdown -->
 </div><!-- btn-group -->

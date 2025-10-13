@@ -15,7 +15,12 @@ class Houzez_Warning_note extends \Elementor\Base_Control {
 	public function content_template() {
 		?>
 		<div class="houzez-warning-control-wrap">
-			<p style="line-height: 18px; color: red;" class="houzez-warning-control">{{{ data.label }}}</p>
+			<p style="font-size: 12px;
+			line-height: 18px;
+    font-style: italic;
+    background-color: #f8d7da;
+    padding: 10px;
+    border-left: 3px solid #dc3545;" class="houzez-warning-control">{{{ data.label }}}</p>
 		</div>
 		<?php
 	}

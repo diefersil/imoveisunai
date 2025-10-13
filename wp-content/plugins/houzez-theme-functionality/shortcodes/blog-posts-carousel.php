@@ -31,7 +31,11 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
             'post_type' => 'post'
         );
         if (!empty($category_id)) {
-            $wp_query_args['cat'] = $category_id;
+            if (is_array($category_id)) {
+                $wp_query_args['category__in'] = $category_id;
+            } else {
+                $wp_query_args['cat'] = $category_id;
+            }
         }
         if (!empty($offset)) {
             $wp_query_args['offset'] = $offset;
@@ -60,12 +64,12 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
         <script>
             jQuery(document).ready(function ($) {
 
-                var slides_to_show = <?php echo $slides_to_show; ?>,
-                    navigation = <?php echo $navigation; ?>,
-                    auto_play = <?php echo $slide_auto; ?>,
-                    auto_play_speed = parseInt(<?php echo $auto_speed; ?>),
-                    dots = <?php echo $slide_dots; ?>,
-                    slide_infinite =  <?php echo $slide_infinite; ?>;
+                var slides_to_show = <?php echo absint($slides_to_show); ?>,
+                    navigation = <?php echo ($navigation === 'true') ? 'true' : 'false'; ?>,
+                    auto_play = <?php echo ($slide_auto === 'true') ? 'true' : 'false'; ?>,
+                    auto_play_speed = <?php echo absint($auto_speed); ?>,
+                    dots = <?php echo ($slide_dots === 'true') ? 'true' : 'false'; ?>,
+                    slide_infinite = <?php echo ($slide_infinite === 'true') ? 'true' : 'false'; ?>;
 
                 var owl_post_card = $('#carousel-post-card-<?php echo esc_attr( $token ); ?>');
 
@@ -111,24 +115,22 @@ if( !function_exists('houzez_blog_posts_carousel') ) {
             </div><!-- property-carousel-buttons-wrap -->
             <?php } ?>
 
-            <div class="blog-posts-slider-wrap">
-                <div id="carousel-post-card-<?php echo esc_attr($token); ?>" class="blog-posts-slide-wrap blog-posts-slide-wrap-js houzez-all-slider-wrap">
-                    <?php 
-                    if ($the_query->have_posts()): 
-                        while ($the_query->have_posts()): $the_query->the_post(); ?>
-                        <div class="blog-posts-slide-wrap">
-                            <?php 
-                            if($grid_style == "style_1") {
-                                get_template_part('content-grid-1'); 
-                            } else {
-                                get_template_part('content-grid-2');
-                            }
-                            ?>
-                        </div>
-                    <?php endwhile; 
-                    endif;
-                    wp_reset_postdata(); ?>
-                </div>
+            <div id="carousel-post-card-<?php echo esc_attr($token); ?>" class="blog-posts-slider-wrap blog-posts-slide-wrap-js houzez-all-slider-wrap">
+                <?php 
+                if ($the_query->have_posts()): 
+                    while ($the_query->have_posts()): $the_query->the_post(); ?>
+                    <div class="blog-posts-slide-wrap">
+                        <?php 
+                        if($grid_style == "style_1") {
+                            get_template_part('content-grid-1'); 
+                        } else {
+                            get_template_part('content-grid-2');
+                        }
+                        ?>
+                    </div>
+                <?php endwhile; 
+                endif;
+                wp_reset_postdata(); ?>
             </div>
         </div><!-- blog-posts-module -->
 

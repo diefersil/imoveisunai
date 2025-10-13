@@ -33,7 +33,6 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
 
                 'Listings Version 5' => array(
-                    'list-view-v5' => 'List View',
                     'grid-view-v5' => 'Grid View',
                 ),
 

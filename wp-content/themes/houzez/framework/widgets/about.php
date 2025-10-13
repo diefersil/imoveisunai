@@ -44,9 +44,9 @@ class houzez_about_site extends WP_Widget {
 			if ( $title ) echo wp_kses( $before_title, $allowed_html_array ) . $title . wp_kses( $after_title, $allowed_html_array );
 			?>
 
-			<div class="widget-body">
+			<div class="widget-body" role="region">
 				<?php if( !empty($img_url) ) { ?>
-				<div class="widget-about-image">
+				<div class="widget-about-image mb-3" role="img">
 					<img src="<?php echo esc_url( $img_url ); ?>" alt="">
 				</div><!-- widget-about-image -->
 				<?php } ?>

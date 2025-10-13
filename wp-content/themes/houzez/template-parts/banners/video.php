@@ -7,11 +7,7 @@ $ogv = get_post_meta($post->ID, 'fave_page_header_bg_ogv', true);
 
 $video_image_id = get_post_meta($post->ID, 'fave_page_header_video_img', true);
 $img_url = wp_get_attachment_image_src( $video_image_id, 'full' );
-
-$ogv = substr($ogv, 0, strrpos($ogv, "."));
-$mp4 = substr($mp4, 0, strrpos($mp4, "."));
-$webm = substr($webm, 0, strrpos($webm, "."));
-$video_image = substr($img_url[0], 0, strrpos($img_url[0], "."));
+$img_url = $img_url[0] ?? '';
 $is_dock_search = '';
 if(houzez_option('adv_search_which_header_show')['header_video'] != 0) {
 	$is_dock_search = houzez_dock_search_class();
@@ -21,7 +17,14 @@ if(houzez_option('adv_search_which_header_show')['header_video'] != 0) {
 
 	<?php houzez_banner_search_autocomplete_html(); ?>
 
-	<div id="video-background" class="video-background" data-vide-bg="mp4: <?php echo esc_url($mp4); ?>, webm: <?php echo esc_url($webm); ?>, ogv: <?php echo esc_url($ogv); ?>, poster: <?php echo esc_url($video_image); ?>" data-vide-options="position: 0% 50%"></div>
+	<div id="video-background" class="splash-video-background">
+		<video autoplay muted loop playsinline poster="<?php echo esc_url($img_url); ?>">
+			<source src="<?php echo esc_url($mp4); ?>" type="video/mp4">
+			<source src="<?php echo esc_url($webm); ?>" type="video/webm">
+			<source src="<?php echo esc_url($ogv); ?>" type="video/ogg">
+		</video>
+	</div>
+	
 	<div class="align-self-center flex-fill">
 		<div class="banner-caption">
 			

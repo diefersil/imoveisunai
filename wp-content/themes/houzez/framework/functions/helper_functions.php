@@ -51,6 +51,40 @@ if( ! function_exists('houzez_random_token') ) {
     }
 }
 
+if( ! function_exists('houzez_header_sticky') ) {
+    function houzez_header_sticky() {
+
+        echo houzez_get_header_sticky();
+    }
+}
+
+if( ! function_exists('houzez_get_header_sticky') ) {
+    function houzez_get_header_sticky() {
+
+        if( houzez_is_half_map() ) {
+            return 0;
+        }
+        return houzez_option('main-menu-sticky', 0);
+    }
+}
+
+if( ! function_exists('houzez_header_sticky_mobile') ) {
+    function houzez_header_sticky_mobile() {
+
+        echo houzez_get_header_sticky_mobile();
+    }
+}
+
+if( ! function_exists('houzez_get_header_sticky_mobile') ) {
+    function houzez_get_header_sticky_mobile() {
+
+        if( houzez_is_half_map() ) {
+            return 0;
+        }
+        return houzez_option('mobile-menu-sticky', 0);
+    }
+}
+
 if (!function_exists('fave_option')) {
     /**
      * Retrieve a specific option value from the 'houzez_options' settings.
@@ -80,7 +114,7 @@ if( ! function_exists('houzez_get_listing_link_target') ) {
     function houzez_get_listing_link_target() {
         $listing_link_target = houzez_option('listing_link_target', '_self');
 
-        $link_target = 'target='.$listing_link_target.'';
+        $link_target = 'target="'.$listing_link_target.'"';
 
         return $link_target;
     }
@@ -100,6 +134,30 @@ if( ! function_exists('houzez_get_project_link_target') ) {
         $link_target = 'target='.$project_link_target.'';
 
         return $link_target;
+    }
+}
+
+/**
+ * Get the assigned image size for a specific layout element
+ * 
+ * @param string $layout_element The layout element key (e.g., 'listing_grid_v1')
+ * @param string $default_size Optional default size if no assignment is found
+ * @return string The image size slug to use
+ */
+if( ! function_exists('houzez_get_image_size_for') ) {
+    /**
+     * Get the assigned image size for a specific layout element
+     * 
+     * @param string $layout_element The layout element key (e.g., 'listing_grid_v1')
+     * @param string $default_size Optional default size if no assignment is found
+     * @return string The image size slug to use
+     */
+    function houzez_get_image_size_for($layout_element, $default_size = 'houzez-item-image-6') {
+        // Get image size assignments from options
+        $image_assignments = get_option('houzez_layout_image_assignments', array());
+        
+        // Return assigned size if exists, otherwise return default
+        return $image_assignments[$layout_element] ?? $default_size;
     }
 }
 
@@ -167,29 +225,6 @@ if( ! function_exists( 'houzez_get_main_wrap_class' ) ) {
         $classes[] = 'main-wrap-js';
 
         if ( is_singular() ) {
-
-            $agent_detail_layout = houzez_option('agent-detail-layout', 'v1');
-            $agency_detail_layout = houzez_option('agency-detail-layout', 'v1');
-
-            $agents_layout = houzez_option('agents-template-layout', 'v1');
-            $agencies_layout = houzez_option('agencies-template-layout', 'v1');
-
-            if( isset( $_GET['agents-layout'] ) && $_GET['agents-layout'] != "" ) {
-                $agents_layout = esc_html($_GET['agents-layout']);
-            }
-
-            if( isset( $_GET['single-agent-layout'] ) && $_GET['single-agent-layout'] != "" ) {
-                $agent_detail_layout = esc_html($_GET['single-agent-layout']);
-            }
-
-            if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
-                $agencies_layout = esc_html($_GET['agencies-layout']);
-            }
-
-            if( isset( $_GET['single-agency-layout'] ) && $_GET['single-agency-layout'] != "" ) {
-                $agency_detail_layout = esc_html($_GET['single-agency-layout']);
-            }
-
             
             $files = array(
                 'template/template-listing-grid-v7.php',
@@ -210,16 +245,8 @@ if( ! function_exists( 'houzez_get_main_wrap_class' ) ) {
                 $classes[] = 'houzez-main-wrap-v2'; 
             }
 
-            if ( is_page_template( 'template/template-agents.php' ) && $agents_layout != 'v1' ) {
-                $classes[] = 'houzez-main-wrap-v2'; 
-            }
-
-            if ( is_page_template( 'template/template-agencies.php' ) && $agencies_layout != 'v1' ) {
-                $classes[] = 'houzez-main-wrap-v2'; 
-            }
-
-            if( ( is_singular('houzez_agent') && $agent_detail_layout == 'v2' ) || ( is_singular('houzez_agency') && $agency_detail_layout == 'v2' ) ) {
-                $classes[] = 'agent-detail-page-v2';
+            if ( houzez_is_half_map() ) {
+                $classes[] = 'main-half-map-wrap';
             }
 
         } elseif ( is_archive() ) {
@@ -313,69 +340,6 @@ function houzez_is_elementor_pro() {
     }
 
     return false;
-}
-
-if( ! function_exists('houzez_elementor_template_enqueue') ) {
-
-    function houzez_elementor_template_enqueue() {
-        $templates   = array();
-
-        if ( class_exists( '\Elementor\Plugin' ) ) {
-            $elementor = \Elementor\Plugin::instance();
-            $elementor->frontend->enqueue_styles();
-        }
-
-        if ( class_exists( '\ElementorPro\Plugin' ) ) {
-            $elementor = \ElementorPro\Plugin::instance();
-            $elementor->enqueue_styles();
-        }
-
-        if ( ! class_exists( 'Elementor\Core\Files\CSS\Post' ) ) {
-            return;
-        }
-
-        $header_location_exists = false;
-        $footer_location_exists = false;
-
-        if ( houzez_is_elementor_pro() && function_exists( 'elementor_location_exits' ) ) {
-            $header_location_exists = elementor_location_exits( 'header', true );
-            $footer_location_exists = elementor_location_exits( 'footer', true );
-        }
-
-        $header_type = houzez_option('houzez_header_type');
-        $footer_type = houzez_option('houzez_footer_type');
-        $before_header_block  = houzez_option('shopely_above_header_block');
-        $after_header_block  = houzez_option('shopely_after_header_block');
-
-        $before_footer_block  = houzez_option('shopely_before_footer_block');
-        $after_footer_block  = houzez_option('shopely_after_footer_block');
-
-        $shop_before_main_content_block  = houzez_option('shopely_shop_before_main_content_block');
-        $shop_after_main_content_block  = houzez_option('shopely_shop_after_main_content_block');
-
-        $before_shop_loop_block  = houzez_option('shopely_before_shop_loop_block');
-        $after_shop_loop_block  = houzez_option('shopely_after_shop_loop_block');
-
-        $before_single_product_block  = houzez_option('shopely_before_single_product_block');
-        $after_single_product_block  = houzez_option('shopely_after_single_product_block');
-
-
-        $header_id = favestudio_header_template_id();
-
-        if ( favestudio_header_template_id() ) {
-            $templates[] = $header_id;
-        }
-        if ( $header_type === '_custom' && ! $header_location_exists ) {
-            $templates[] = houzez_option('houzez_ele_header_template');
-        }
-
-
-        foreach ( $templates as $template ) {
-            $css_file = new Elementor\Core\Files\CSS\Post( $template );
-            $css_file->enqueue();
-        }
-    }
-    //add_action( 'wp_enqueue_scripts', 'houzez_elementor_template_enqueue', 500 );
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -509,7 +473,7 @@ if ( !function_exists( 'houzez_get_media_tabs' ) ) {
         
         unset($media_tabs['placebo']);
 
-        if( houzez_map_in_section() || ! houzez_get_listing_data('property_map') ) {
+        if( ! houzez_get_listing_data('property_map') ) {
             unset($media_tabs['map']);
             unset($media_tabs['street_view']);
 
@@ -854,9 +818,9 @@ if(!function_exists('houzez_get_percent_up_down')) {
             $arrow = 'icon-arrow-button-down-2';
         } 
         
-        $output = '<div class="views-percentage '.$class.'">
+        $output = '<span class="'.$class.'">
             <i class="houzez-icon '.$arrow.'"></i> '.round($percent, 1).'%
-        </div>';
+        </span>';
 
         return $output;
     }
@@ -1042,18 +1006,18 @@ if(!function_exists('houzez_listing_composer_fields')) {
 
 if(!function_exists('houzez_overview_composer_fields')) {
     function houzez_overview_composer_fields() {
-        $array = array(
-            'type',
-            'bedrooms',
-            'rooms',
-            'bathrooms',
-            'garage',
-            'area-size',
-            'land-area',
-            'year-built',
-            'property-id',
+        $field_mapping = array(
+            'property-id' => array('type' => 'meta', 'field' => 'property_id', 'check' => 'not_empty'),
+            'bedrooms' => array('type' => 'meta', 'field' => 'property_bedrooms', 'check' => 'not_empty_string'),
+            'rooms' => array('type' => 'meta', 'field' => 'property_rooms', 'check' => 'not_empty_string'),
+            'bathrooms' => array('type' => 'meta', 'field' => 'property_bathrooms', 'check' => 'not_empty_string'),
+            'garage' => array('type' => 'meta', 'field' => 'property_garage', 'check' => 'not_empty_string'),
+            'area-size' => array('type' => 'meta', 'field' => 'property_size', 'check' => 'not_empty_string'),
+            'land-area' => array('type' => 'meta', 'field' => 'property_land', 'check' => 'not_empty_string'),
+            'year-built' => array('type' => 'meta', 'field' => 'property_year', 'check' => 'not_empty'),
+            'type' => array('type' => 'taxonomy', 'field' => 'property_type', 'check' => 'not_empty')
         );
-        return $array;
+        return $field_mapping;
     }
 }
 
@@ -1100,18 +1064,18 @@ if( !function_exists('houzez_dock_search_class')) {
         if( $dock_search_enable != 0 ) {
             if( $search_over_header_pages == 'only_home' ) {
                 if (is_front_page()) {
-                    $return_class = 'top-banner-wrap-dock-search';
+                    $return_class = 'top-banner-wrap-dock-search top-banner-expandable';
                 }
             } else if( $search_over_header_pages == 'all_pages' ) {
-                    $return_class = 'top-banner-wrap-dock-search';
+                    $return_class = 'top-banner-wrap-dock-search top-banner-expandable';
 
             } else if ( $search_over_header_pages == 'only_innerpages' ){
                 if (!is_front_page()) {
-                     $return_class = 'top-banner-wrap-dock-search';
+                     $return_class = 'top-banner-wrap-dock-search top-banner-expandable';
                 }
             } else if( $search_over_header_pages == 'specific_pages' ) {
                 if( is_page( $search_selected_pages ) ) {
-                     $return_class = 'top-banner-wrap-dock-search';
+                     $return_class = 'top-banner-wrap-dock-search top-banner-expandable';
                 }
             }
         }
@@ -1192,6 +1156,11 @@ if( !function_exists('houzez_hide_calculator')) {
     function houzez_hide_calculator() {
         $post_id = get_the_ID();
         $term_status = wp_get_post_terms( $post_id, 'property_status', array("fields" => "all"));
+        $listing_price = get_post_meta( $post_id, 'fave_property_price', true );
+        
+        if( empty($listing_price) ) {
+            return false;
+        }
 
         if ( ! empty( $term_status ) && ! is_wp_error( $term_status ) ) {
             $cal_where = houzez_option('cal_where');
@@ -1626,14 +1595,6 @@ if(!function_exists('houzez_hide_empty_taxonomies')) {
     }
 }
 
-if(!function_exists('houzez_enable_svg_type')) {
-    function houzez_enable_svg_type($mimes) {
-      $mimes['svg'] = 'image/svg+xml';
-      return $mimes;
-    }
-}
-add_filter('upload_mimes', 'houzez_enable_svg_type');
-
 if( !function_exists('houzez_listing_data')) {
     function houzez_listing_data($field) {
         echo houzez_get_listing_data($field);
@@ -1693,7 +1654,7 @@ if( !function_exists('houzez_wpml_translate_single_string') ) {
 if( !function_exists('houzez_banner_fullscreen') ) {
     function houzez_banner_fullscreen() {
         $banner_height = get_post_meta(get_the_ID(), 'fave_header_full_screen', true);
-        if( $banner_height != 0 ) {
+        if( $banner_height == 1 ) {
             echo 'top-banner-wrap-fullscreen';
         }
         return '';
@@ -1725,20 +1686,6 @@ if(!function_exists('houzez_form_type')) {
     }
 }
 
-if( !function_exists('houzez_get_map_system') ) {
-    function houzez_get_map_system() {
-        $houzez_map_system = houzez_option('houzez_map_system');
-
-        if($houzez_map_system == 'osm' || $houzez_map_system == 'mapbox') {
-            $map_system = 'osm';
-        } elseif($houzez_map_system == 'google' && houzez_option('googlemap_api_key') != "") {
-            $map_system = 'google';
-        } else {
-            $map_system = 'osm';
-        }
-        return $map_system;
-    }
-}
 
 if( !function_exists('houzez_load_ui_slider') ) {
     function houzez_load_ui_slider() {
@@ -1775,39 +1722,6 @@ if( !function_exists('houzez_get_all_countries') ):
     }
 endif;
 
-if( !function_exists('houzez_metabox_map_type') ) {
-    function houzez_metabox_map_type() {
-        $houzez_map_system = houzez_option('houzez_map_system');
-
-        if($houzez_map_system == 'osm' || $houzez_map_system == 'mapbox') {
-            $map_system = 'osm';
-        } elseif($houzez_map_system == 'google') {
-            $map_system = 'map';
-        } else {
-            $map_system = 'osm';
-        }
-        return $map_system;
-    }
-}
-
-if( !function_exists('houzez_map_api_key') ) {
-
-    function houzez_map_api_key() {
-
-        $houzez_map_system = houzez_get_map_system();   
-        $mapbox_api_key = houzez_option('mapbox_api_key');   
-        $googlemap_api_key = houzez_option('googlemap_api_key'); 
-
-        if($houzez_map_system == 'google') {
-            $googlemap_api_key = urlencode( $googlemap_api_key );
-            return $googlemap_api_key;
-
-        } elseif($houzez_map_system == 'osm') {
-            $mapbox_api_key = urlencode( $mapbox_api_key );
-            return $mapbox_api_key;
-        }
-    }
-}
 
 if(!function_exists('houzez_map_in_section')) {
     function houzez_map_in_section() {
@@ -1817,7 +1731,7 @@ if(!function_exists('houzez_map_in_section')) {
         } elseif(isset($_GET['map_in_section']) && $_GET['map_in_section'] == 'yes') {
             return true;
 
-        } elseif( houzez_option('prop-top-area') == 'v6' ) {
+        } elseif( houzez_option('prop-top-area') == 'v6' || houzez_option('prop-top-area') == 'v7' ) {
 
             return true;
         }
@@ -1901,6 +1815,7 @@ if( !function_exists('houzez_is_dashboard') ) {
     function houzez_is_dashboard() {
 
         $files = apply_filters( 'houzez_is_dashboard_filter', array(
+            'template/user_dashboard.php',
             'template/user_dashboard_profile.php',
             'template/user_dashboard_insight.php',
             'template/user_dashboard_crm.php',
@@ -2069,9 +1984,14 @@ if(!function_exists('houzez_map_needed')) {
         } elseif(is_page_template('template/template-search.php') && houzez_option('search_result_page') == 'half_map') {
             return true;
 
-        } elseif ( is_singular( 'property' ) || is_singular( 'houzez_agent' ) || is_singular( 'houzez_agency' ) ) {
+        } elseif ( is_singular( 'property' ) || is_singular( 'houzez_agent' ) || is_singular( 'houzez_agency' ) || is_singular('fts_builder') ) {
+            return true;
+            
+        } elseif( houzez_is_taxonomy_map() ) {
             return true;
         }
+
+        //elseif (isset($_GET['elementor-preview']))
 
         return false;
     }
@@ -2118,6 +2038,17 @@ if( !function_exists( 'houzez_browser_body_class' ) ) {
 
 if( !function_exists('houzez_search_needed') ) {
     function houzez_search_needed() {
+        global $post;
+
+        $post_id = isset($post->ID) ? $post->ID : 0;
+
+        if ($post_id) {
+            $post_type = get_post_type($post_id);
+            $fts_template_type = get_post_meta($post_id, 'fts_template_type', true);
+            if ($post_type == 'fts_builder') {
+                return false;
+            }
+        }
 
         $files = apply_filters( 'houzez_search_needed_filter', array(
             'template/property-listings-map.php',
@@ -2177,6 +2108,7 @@ if( !function_exists('houzez_search_needed') ) {
         } elseif(houzez_is_splash()) {
             return false;
         }
+        
         return true;
     }
 }
@@ -2252,19 +2184,6 @@ if( !function_exists('houzez_is_footer') ) {
     }
 }
 
-if(!function_exists('houzez_enqueue_maps_api')) {
-    function houzez_enqueue_maps_api() {
-        if(houzez_get_map_system() == 'google') {
-
-            houzez_enqueue_google_api(); 
-            houzez_enqueue_geo_location_js();
-
-        } else {
-            houzez_enqueue_osm_api();
-            houzez_enqueue_osm_location_js();
-        }
-    }
-}
 
 if(!function_exists('houzez_area_unit_label')) {
     function houzez_area_unit_label() {
@@ -2975,15 +2894,16 @@ if( !function_exists('houzez_remove_recent_comments_style') ) {
 if (!function_exists('houzez_get_excerpt')) {
     function houzez_get_excerpt($limit, $id = '')
     {
-        $excerpt = explode(' ', get_the_excerpt($id ?: get_the_ID()), $limit);
-        if (count($excerpt) >= $limit) {
-            array_pop($excerpt);
-            $excerpt = implode(" ", $excerpt) . '...';
+
+        if( ! empty($id) ) {
+            $content = wp_trim_words(get_the_excerpt($id), $limit, '...');
         } else {
-            $excerpt = implode(" ", $excerpt);
+            $content = wp_trim_words(get_the_excerpt(), $limit, '...');
         }
-        $excerpt = wp_strip_all_tags($excerpt);
-        return $excerpt;
+        $content = strip_shortcodes($content);
+        $content = wpautop($content);
+        return $content;
+        
     }
 }
 
@@ -3466,9 +3386,14 @@ if ( ! function_exists( 'houzez_taxonomy_simple' ) ) {
      *
      * @return string A comma-separated list of taxonomy terms, or an empty string if no terms are found.
      */
-    function houzez_taxonomy_simple( $tax_name ) {
+    function houzez_taxonomy_simple( $tax_name, $listing_id = null ) {
+
+        if( empty( $listing_id ) ) {
+            $listing_id = get_the_ID();
+        }
+
         // Get the terms for the given taxonomy
-        $terms = get_the_terms( get_the_ID(), $tax_name );
+        $terms = get_the_terms( $listing_id, $tax_name );
         
         if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
             // Sort terms array by parent ID in ascending order (i.e., children first)
@@ -3721,133 +3646,132 @@ if ( ! function_exists( 'houzez_get_pagination_type' ) ) {
  *   Houzez Pagination
  *   -------------------------------------------------------------
  */
-if( !function_exists( 'houzez_pagination' ) ){
-    function houzez_pagination( ?int $pages = null, ?int $total_listings = null, ?int $listings_per_page = null, ?string $pagi_type = null ) {
-        $paged = 1;
-        if ( get_query_var( 'paged' ) ) {
-            $paged = get_query_var( 'paged' );
-        } elseif ( get_query_var( 'page' ) ) { // if is static front page
-            $paged = get_query_var( 'page' );
-        }
-
+if (!function_exists('houzez_pagination')) {
+    /**
+     * Generates pagination HTML based on the provided parameters and pagination type
+     * 
+     * @param int|null $pages Total number of pages
+     * @param int|null $total_listings Total number of listings
+     * @param int|null $listings_per_page Number of listings per page
+     * @param string|null $pagi_type Pagination type override
+     */
+    function houzez_pagination(?int $pages = null, ?int $total_listings = null, ?int $listings_per_page = null, ?string $pagi_type = null) {
+        // Get current page number
+        $paged = get_query_var('paged') ?: (get_query_var('page') ?: 1);
+        
         $prev = $paged - 1;
         $next = $paged + 1;
-        $range = 2; // change it to show more links
-        $showitems = ( $range * 2 )+1;
+        $range = 2;
+        $showitems = ($range * 2) + 1;
 
-        if( $pages == '' ){
+        // Get total pages if not provided
+        if (empty($pages)) {
             global $wp_query;
-            $pages = $wp_query->max_num_pages;
-            if( !$pages ){
-                $pages = 1;
-            }
+            $pages = $wp_query->max_num_pages ?: 1;
         }
 
-        $pagination_type = houzez_get_pagination_type();
+        // Determine pagination type
+        $pagination_type = !empty($pagi_type) && $pagi_type !== '_global' 
+            ? $pagi_type 
+            : houzez_get_pagination_type();
 
-        if( !empty($pagi_type) && $pagi_type != "_global" ) {
-            $pagination_type = $pagi_type;
-        }
-
-        if( $pagination_type == '_infinite' ) {
+        // Handle infinite scroll pagination
+        if ($pagination_type === '_infinite') {
             ?>
             <div id="fave-pagination-loadmore" class="load-more-wrap mb-4">
                 <div id="houzez-infinite-load" class="houzez-infinite-load"  
-                data-page="<?php echo $next; ?>" 
-                data-total="<?php echo intval($total_listings);?>" 
-                data-per-page="<?php echo intval($listings_per_page);?>"
-                data-pagi-type="<?php echo esc_attr($pagination_type);?>"
-                href="<?php echo get_pagenum_link($next); ?>">
+                    data-page="<?php echo esc_attr($next); ?>" 
+                    data-total="<?php echo intval($total_listings); ?>" 
+                    data-per-page="<?php echo intval($listings_per_page); ?>"
+                    data-pagi-type="<?php echo esc_attr($pagination_type); ?>"
+                    href="<?php echo esc_url(get_pagenum_link($next)); ?>">
                     <?php get_template_part('template-parts/loader-dots'); ?>   
                 </div>               
             </div>
-
             <?php
-        } else if( $pagination_type == '_loadmore' ) {
+            return;
+        }
+
+        // Handle load more pagination
+        if ($pagination_type === '_loadmore') {
             ?>
             <div id="fave-pagination-loadmore" class="load-more-wrap mb-4 fave-load-more">
                 <a class="houzez-infinite-load btn btn-primary-outlined btn-load-more"  
-                data-page="<?php echo $next; ?>" 
-                data-total="<?php echo intval($total_listings);?>" 
-                data-per-page="<?php echo intval($listings_per_page);?>"
-                data-pagi-type="<?php echo esc_attr($pagination_type);?>"
-                href="<?php echo get_pagenum_link($next); ?>">
+                    data-page="<?php echo esc_attr($next); ?>" 
+                    data-total="<?php echo intval($total_listings); ?>" 
+                    data-per-page="<?php echo intval($listings_per_page); ?>"
+                    data-pagi-type="<?php echo esc_attr($pagination_type); ?>"
+                    href="<?php echo esc_url(get_pagenum_link($next)); ?>">
                     <?php get_template_part('template-parts/loader'); ?>
                     <?php esc_html_e('Load More', 'houzez'); ?>   
                 </a>               
             </div>
-
             <?php
-        } else {
+            return;
+        }
 
+        // Handle standard pagination
+        if ($pages > 1) {
+            $output = '';
+            $inner = '';
+            
+            // Build pagination HTML
+            $output .= '<div class="pagination-wrap" role="navigation">';
+            $output .= '<nav>';
+            $output .= '<ul class="pagination justify-content-center" role="list">';
 
-            if( 1 != $pages && $pages) {
-
-                $output = "";
-                $inner = "";
-                $output .= '<div class="pagination-wrap">';
-                    $output .= '<nav>';
-                        $output .= '<ul class="pagination justify-content-center">';
-                            
-                            if( $paged > 2 && $paged > $range+1 && $showitems < $pages ) { 
-                                $output .= '<li class="page-item">';
-                                    $output .= '<a class="page-link" href="'.get_pagenum_link(1).'" aria-label="Previous">';
-                                        $output .= '<i class="houzez-icon icon-arrow-button-left-1"></i>';
-                                    $output .= '</a>';
-                                $output .= '</li>';
-                            }
-
-                            if( $paged > 1 ) { 
-                                $output .= '<li class="page-item">';
-                                    $output .= '<a class="page-link" href="'.get_pagenum_link($prev).'" aria-label="Previous">';
-                                        $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
-                                    $output .= '</a>';
-                                $output .= '</li>';
-                            } else {
-                                $output .= '<li class="page-item disabled">';
-                                    $output .= '<a class="page-link" aria-label="Previous">';
-                                        $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
-                                    $output .= '</a>';
-                                $output .= '</li>';
-                            }
-
-                            for ( $i = 1; $i <= $pages; $i++ ) {
-                                if ( 1 != $pages &&( !( $i >= $paged+$range+1 || $i <= $paged-$range-1 ) || $pages <= $showitems ) )
-                                {
-                                    if ( $paged == $i ){
-                                        $inner .= '<li class="page-item active"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.' <span class="sr-only"></span></a></li>';
-                                    } else {
-                                        $inner .= '<li class="page-item"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
-                                    }
-                                }
-                            }
-                            $output .= $inner;
-                            
-
-                            if($paged < $pages) {
-                                $output .= '<li class="page-item">';
-                                    $output .= '<a class="page-link" href="'.get_pagenum_link($next).'" aria-label="Next">';
-                                        $output .= '<i class="houzez-icon icon-arrow-right-1"></i>';
-                                    $output .= '</a>';
-                                $output .= '</li>';
-                            }
-
-                            if( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) {
-                                $output .= '<li class="page-item">';
-                                    $output .= '<a class="page-link" href="'.get_pagenum_link( $pages ).'" aria-label="Next">';
-                                        $output .= '<i class="houzez-icon icon-arrow-button-right-1"></i>';
-                                    $output .= '</a>';
-                                $output .= '</li>';
-                            }
-
-
-                        $output .= '</ul>';
-                    $output .= '</nav>';
-                $output .= '</div>';
-
-                echo $output;
-
+            // First page link
+            if ($paged > 2 && $paged > $range + 1 && $showitems < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item" role="listitem"><a class="page-link" href="%s"><i class="houzez-icon icon-arrow-button-left-1"></i></a></li>',
+                    esc_url(get_pagenum_link(1))
+                );
             }
+
+            // Previous page link
+            if ($paged > 1) {
+                $output .= sprintf(
+                    '<li class="page-item" role="listitem"><a class="page-link" href="%s"><i class="houzez-icon icon-arrow-left-1"></i></a></li>',
+                    esc_url(get_pagenum_link($prev))
+                );
+            } else {
+                $output .= sprintf(
+                    '<li class="page-item disabled" role="listitem"><a class="page-link" aria-disabled="true"><i class="houzez-icon icon-arrow-left-1"></i></a></li>'
+                );
+            }
+
+            // Page numbers
+            for ($i = 1; $i <= $pages; $i++) {
+                if (1 != $pages && (!($i >= $paged + $range + 1 || $i <= $paged - $range - 1) || $pages <= $showitems)) {
+                    $inner .= sprintf(
+                        '<li class="page-item%s" role="listitem"><a class="page-link" href="%s">%d%s</a></li>',
+                        $paged == $i ? ' active' : '',
+                        esc_url(get_pagenum_link($i)),
+                        $i,
+                        $paged == $i ? ' <span class="sr-only"></span>' : ''
+                    );
+                }
+            }
+            $output .= $inner;
+
+            // Next page link
+            if ($paged < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item" role="listitem"><a class="page-link" href="%s"><i class="houzez-icon icon-arrow-right-1"></i></a></li>',
+                    esc_url(get_pagenum_link($next))
+                );
+            }
+
+            // Last page link
+            if ($paged < $pages - 1 && $paged + $range - 1 < $pages && $showitems < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item" role="listitem"><a class="page-link" href="%s"><i class="houzez-icon icon-arrow-button-right-1"></i></a></li>',
+                    esc_url(get_pagenum_link($pages))
+                );
+            }
+
+            $output .= '</ul></nav></div>';
+            echo $output;
         }
     }
 }
@@ -3883,28 +3807,87 @@ if( !function_exists( 'houzez_ajax_pagination' ) ){
         }
 
         if( 1 != $pages && $pages){
+            $is_rtl = is_rtl();
+            $prev_icon = 'icon-arrow-left-1';
+            $next_icon = 'icon-arrow-right-1';
+            $first_icon = 'icon-arrow-button-left-1';
+            $last_icon = 'icon-arrow-button-right-1';
 
-            echo '<div class="pagination-wrap houzez_ajax_pagination">';
-            echo '<nav>';
-            echo '<ul class="pagination justify-content-center">';
-            echo ( $paged > 2 && $paged > $range+1 && $showitems < $pages ) ? '<li class="page-item"><a class="page-link" data-houzepagi="1" rel="First" href="'.get_pagenum_link(1).'"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>' : '';
-            echo ( $paged > 1 ) ? '<li class="page-item"><a class="page-link" data-houzepagi="'.$prev.'" rel="Prev" href="'.get_pagenum_link($prev).'"><i class="houzez-icon icon-arrow-left-1"></i></a></li>' : '<li class="page-item disabled"><a class="page-link" aria-label="Previous"><i class="houzez-icon icon-arrow-left-1"></i></a></li>';
-            for ( $i = 1; $i <= $pages; $i++ ) {
-                if ( 1 != $pages &&( !( $i >= $paged+$range+1 || $i <= $paged-$range-1 ) || $pages <= $showitems ) )
-                {
-                    if ( $paged == $i ){
-                        echo '<li class="page-item active"><a class="page-link" data-houzepagi="'.$i.'" href="'.get_pagenum_link($i).'">'.$i.' <span class="sr-only"></span></a></li>';
+            $output = '<div class="pagination-wrap houzez_ajax_pagination">';
+            $output .= '<nav aria-label="' . esc_attr__('Pagination', 'houzez') . '">';
+            $output .= '<ul class="pagination justify-content-center">';
+
+            // First page link
+            if ($paged > 2 && $paged > $range+1 && $showitems < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item"><a class="page-link" data-houzepagi="1" rel="First" href="%s"><span aria-hidden="true"><i class="houzez-icon %s"></i></span></a></li>',
+                    esc_url(get_pagenum_link(1)),
+                    esc_attr($first_icon)
+                );
+            }
+
+            // Previous page link
+            if ($paged > 1) {
+                $output .= sprintf(
+                    '<li class="page-item"><a class="page-link" data-houzepagi="%d" rel="Prev" href="%s"><i class="houzez-icon %s"></i></a></li>',
+                    $prev,
+                    esc_url(get_pagenum_link($prev)),
+                    esc_attr($prev_icon)
+                );
+            } else {
+                $output .= sprintf(
+                    '<li class="page-item disabled"><a class="page-link" aria-label="%s"><i class="houzez-icon %s"></i></a></li>',
+                    esc_attr__('Previous', 'houzez'),
+                    esc_attr($prev_icon)
+                );
+            }
+
+            // Page numbers
+            for ($i = 1; $i <= $pages; $i++) {
+                if (1 != $pages && (!($i >= $paged+$range+1 || $i <= $paged-$range-1) || $pages <= $showitems)) {
+                    if ($paged == $i) {
+                        $output .= sprintf(
+                            '<li class="page-item active"><a class="page-link" data-houzepagi="%d" href="%s">%d</a></li>',
+                            $i,
+                            esc_url(get_pagenum_link($i)),
+                            $i
+                        );
                     } else {
-                        echo '<li class="page-item"><a class="page-link" data-houzepagi="'.$i.'" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
+                        $output .= sprintf(
+                            '<li class="page-item"><a class="page-link" data-houzepagi="%d" href="%s">%d</a></li>',
+                            $i,
+                            esc_url(get_pagenum_link($i)),
+                            $i
+                        );
                     }
                 }
             }
-            echo ( $paged < $pages ) ? '<li class="page-item"><a class="page-link" data-houzepagi="'.$next.'" rel="Next" href="'.get_pagenum_link($next).'"><i class="houzez-icon icon-arrow-right-1"></i></a></li>' : '';
-            echo ( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) ? '<li class="page-item"><a class="page-link" data-houzepagi="'.$pages.'" rel="Last" href="'.get_pagenum_link( $pages ).'"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>' : '';
-            echo '</ul>';
-            echo '</nav>';
-            echo '</div>';
 
+            // Next page link
+            if ($paged < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item"><a class="page-link" data-houzepagi="%d" rel="Next" href="%s"><i class="houzez-icon %s"></i></a></li>',
+                    $next,
+                    esc_url(get_pagenum_link($next)),
+                    esc_attr($next_icon)
+                );
+            }
+
+            // Last page link
+            if ($paged < $pages-1 && $paged+$range-1 < $pages && $showitems < $pages) {
+                $output .= sprintf(
+                    '<li class="page-item"><a class="page-link" data-houzepagi="%d" rel="Last" href="%s"><span aria-hidden="true"><i class="houzez-icon %s"></i></span></a></li>',
+                    $pages,
+                    esc_url(get_pagenum_link($pages)),
+                    esc_attr($last_icon)
+                );
+            }
+
+            $output .= '</ul>';
+            $output .= '</nav>';
+            $output .= '</div>';
+
+            echo $output;
         }
     }
 }
@@ -3931,51 +3914,99 @@ if( !function_exists( 'houzez_loadmore' ) ) {
 }
 
 /**
- *   ---------------------------------------------------------
- *   Include simple pagination - deprecated
- *   ---------------------------------------------------------
+ *   -------------------------------------------------------------
+ *   Houzez Dashboard Pagination
+ *   -------------------------------------------------------------
  */
-if ( !function_exists( 'houzez_pagination_deprecated' ) ):
-    function houzez_pagination_deprecated() {
-        global $wp_query, $wp_rewrite;
-        $allowed_html_array = array(
-            'i' => array(
-                'class' => array()
-            ),
-            'span' => array(
-                'aria-hidden' => array()
-            )
-        );
+if( !function_exists( 'houzez_pagination_dashboard' ) ){
+    function houzez_pagination_dashboard( ?int $pages = null, ?int $total_listings = null, ?int $listings_per_page = null ) {
+        $paged = 1;
+        if ( get_query_var( 'paged' ) ) {
+            $paged = get_query_var( 'paged' );
+        } elseif ( get_query_var( 'page' ) ) { // if is static front page
+            $paged = get_query_var( 'page' );
+        }
 
-        $wp_query->query_vars['paged'] > 1 ? $current = $wp_query->query_vars['paged'] : $current = 1;
-        $pagination = array(
-            'base' => @add_query_arg( 'paged', '%#%' ),
-            'format' => '',
-            'total' => $wp_query->max_num_pages,
-            'current' => $current,
-            'prev_text' => wp_kses(__( '<span aria-hidden="true"><i class="fa fa-angle-left"></i></span>', 'houzez' ), $allowed_html_array),
-            'next_text' => wp_kses(__( '<span aria-hidden="true"><i class="fa fa-angle-right"></i></span>', 'houzez' ), $allowed_html_array),
-            'type' => 'array'
-        );
-        if ( $wp_rewrite->using_permalinks() )
-            $pagination['base'] = user_trailingslashit( trailingslashit( remove_query_arg( 's', get_pagenum_link( 1 ) ) ) . 'page/%#%/', 'paged' );
+        $prev = $paged - 1;
+        $next = $paged + 1;
+        $range = 2; // change it to show more links
+        $showitems = ( $range * 2 )+1;
 
-        if ( !empty( $wp_query->query_vars['s'] ) )
-            $pagination['add_args'] = array( 's' => str_replace( ' ', '+', get_query_var( 's' ) ) );
-
-        $links = paginate_links( $pagination );
-
-        if( is_array( $links ) ) {
-            $paged = ( get_query_var('paged') == 0 ) ? 1 : get_query_var('paged');
-            echo '<div class="pagination-main"><ul class="pagination">';
-
-            foreach ( $links as $link ) {
-                echo "<li>$link</li>";
+        if( $pages == '' ){
+            global $wp_query;
+            $pages = $wp_query->max_num_pages;
+            if( !$pages ){
+                $pages = 1;
             }
-            echo '</ul></div>';
+        }
+
+        if( 1 != $pages && $pages) {
+
+            $output = "";
+            $inner = "";
+            $output .= '<div class="pagination">';
+                $output .= '<ul class="pagination list-unstyled d-flex align-items-center justify-content-center gap-1 m-0">';
+                    
+                    if( $paged > 2 && $paged > $range+1 && $showitems < $pages ) { 
+                        $output .= '<li class="page-item" role="listitem">';
+                            $output .= '<a class="page-link" href="'.get_pagenum_link(1).'">';
+                            $output .= '<i class="houzez-icon icon-arrow-button-left-1"></i>';
+                            $output .= '</a>';
+                        $output .= '</li>';
+                    }
+
+                    if( $paged > 1 ) { 
+                        $output .= '<li class="page-item" role="listitem">';
+                            $output .= '<a class="page-link" href="'.get_pagenum_link($prev).'">';
+                            $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
+                            $output .= '</a>';
+                        $output .= '</li>';
+                    } else {
+                        $output .= '<li class="page-item disabled" role="listitem">';
+                            $output .= '<a class="page-link" aria-disabled="true">';
+                            $output .= '<i class="houzez-icon icon-arrow-left-1"></i>';
+                            $output .= '</a>';
+                        $output .= '</li>';
+                    }
+
+                    for ( $i = 1; $i <= $pages; $i++ ) {
+                        if ( 1 != $pages &&( !( $i >= $paged+$range+1 || $i <= $paged-$range-1 ) || $pages <= $showitems ) )
+                        {
+                            if ( $paged == $i ){
+                                $inner .= '<li class="page-item active" role="listitem"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
+                            } else {
+                                $inner .= '<li class="page-item" role="listitem"><a class="page-link" href="'.get_pagenum_link($i).'">'.$i.'</a></li>';
+                            }
+                        }
+                    }
+                    $output .= $inner;
+                    
+
+                    if($paged < $pages) {
+                        $output .= '<li class="page-item" role="listitem">';
+                            $output .= '<a class="page-link" href="'.get_pagenum_link($next).'">';
+                            $output .= '<i class="houzez-icon icon-arrow-right-1"></i>';
+                            $output .= '</a>';
+                        $output .= '</li>';
+                    }
+
+                    if( $paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages ) {
+                        $output .= '<li class="page-item" role="listitem">';
+                            $output .= '<a class="page-link" href="'.get_pagenum_link( $pages ).'">';
+                            $output .= '<i class="houzez-icon icon-arrow-button-right-1"></i>';
+                            $output .= '</a>';
+                        $output .= '</li>';
+                    }
+
+
+                $output .= '</ul>';
+            $output .= '</div>';
+
+            echo $output;
+
         }
     }
-endif;
+}
 
 
 if( !function_exists('houzez_listing_meta_v1') ) {
@@ -4570,7 +4601,7 @@ if( !function_exists('houzez_get_dummy_placeholder_link')){
         }
 
         if( intval( $img_width ) > 0 && intval( $img_height ) > 0 ) {
-            return $protocol.'://placehold.it/' . $img_width . 'x' . $img_height . '&text=' . urlencode( $img_text ) . '';
+            return HOUZEZ_IMAGE.'placeholder.png';
         }
 
         return '';
@@ -4637,6 +4668,22 @@ if( !function_exists('houzez_get_required_field_2') ) {
 if( !function_exists('houzez_required_field_2') ) {
     function houzez_required_field_2( $field ) {
         echo houzez_get_required_field_2($field);
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
+// Check if profile field should be displayed
+/*-----------------------------------------------------------------------------------*/
+if( !function_exists('houzez_show_profile_field') ) {
+    function houzez_show_profile_field( $field ) {
+        $field_option = houzez_option('profile_field_' . $field, 1);
+        return $field_option == 1;
+    }
+}
+
+if( !function_exists('houzez_get_profile_field_visibility') ) {
+    function houzez_get_profile_field_visibility( $field ) {
+        return houzez_show_profile_field($field) ? 'show' : 'hide';
     }
 }
 
@@ -5555,9 +5602,10 @@ class houzez_property_area_slug_array_walker extends Walker {
 
 /**
  *   ----------------------------------------------------------------------------------------------------------------------------------------------------
- *   property post type property area tree
+ *   property post type property label tree
  *   ----------------------------------------------------------------------------------------------------------------------------------------------------
  */
+
 if ( ! function_exists( 'houzez_get_property_label_slug_array' ) ) {
     function houzez_get_property_label_slug_array($add_all_category = true) {
 
@@ -5834,7 +5882,7 @@ if(!function_exists('houzez_taxonomy_by_postID')){
         if( !empty($tax_terms) ){
             foreach( $tax_terms as $tax_term ){
                 $tax_name = $tax_term->name;
-                break;
+                    break;
             }
         }
         return $tax_name;
@@ -5883,20 +5931,6 @@ if( !function_exists('houzez_get_current_featured_listings') ):
     }
 endif;
 
-if(!function_exists('houzez_theme_activate')) {
-    function houzez_theme_activate() {
-
-        if(isset($_GET['houzez'])) {
-            update_option( 'houzez_activation', $_GET['houzez'] );
-        }
-
-        if(isset($_GET['houzez_code'])) {
-            update_option( 'houzez_purchase_code', $_GET['houzez_code'] );
-        }
-    }
-}
-houzez_theme_activate();
-
 if(!function_exists('houzez_theme_verified')) {
     function houzez_theme_verified() {
 
@@ -5906,16 +5940,6 @@ if(!function_exists('houzez_theme_verified')) {
         return false;
     }
 }
-
-if(!function_exists('houzez_set_demo_mode')) {
-    function houzez_set_demo_mode() {
-
-        if(isset($_GET['houzez_demo_mode'])) {
-            update_option( 'houzez_demo_mode', $_GET['houzez_demo_mode'] );
-        }
-    }
-}
-houzez_set_demo_mode();
 
 if(!function_exists('houzez_is_demo')) {
     function houzez_is_demo() {
@@ -6015,7 +6039,7 @@ if(!function_exists('houzez_get_taxonomies_for_edit_listing')){
         if( !empty($taxonomy_terms) ){
             foreach( $taxonomy_terms as $term ){
                 $taxonomy_id = $term->term_id;
-                break;
+                    break;
             }
         }
 
@@ -6070,7 +6094,7 @@ if(!function_exists('houzez_get_taxonomies_with_id_value____')){
 // Generate Hirarchical terms
 /*-----------------------------------------------------------------------------------*/
 if(!function_exists('houzez_get_search_taxonomies')){
-    function houzez_get_search_taxonomies($taxonomy_name, $searched_data = "", $args = array() ){
+    function houzez_get_search_taxonomies($taxonomy_name, $searched_data = [], $args = array() ){
          
         $hide_empty = false;
         if($taxonomy_name == 'property_city' || $taxonomy_name == 'property_area' || $taxonomy_name == 'property_country' || $taxonomy_name == 'property_state') {
@@ -6295,227 +6319,6 @@ if(!function_exists('houzez_get_search_taxonomies')){
  
     }
 }
-if(!function_exists('houzez_get_search_taxonomies_old_19_january_2023')){
-    function houzez_get_search_taxonomies_old_19_january_2023($taxonomy_name, $searched_data = "", $args = array() ){
-        
-        $hide_empty = false;
-        if($taxonomy_name == 'property_city' || $taxonomy_name == 'property_area' || $taxonomy_name == 'property_country' || $taxonomy_name == 'property_state') {
-            $hide_empty = houzez_hide_empty_taxonomies();
-        }
-        
-        $defaults = array(
-            'taxonomy' => $taxonomy_name,
-            'orderby'       => 'name',
-            'order'         => 'ASC',
-            'hide_empty'    => $hide_empty,
-        );
-
-        $args       = wp_parse_args( $args, $defaults );
-        $taxonomies = get_terms( $args );
-
-        if ( empty( $taxonomies ) || is_wp_error( $taxonomies ) ) {
-            return false;
-        }
-
-        $output = '';
-        foreach( $taxonomies as $category ) {
-            if( $category->parent == 0 ) {
-
-                $data_attr = $data_subtext = '';
-
-                if( $taxonomy_name == 'property_city' ) {
-                    $term_meta= get_option( "_houzez_property_city_$category->term_id");
-                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                    $parent_state = sanitize_title($parent_state);
-                    $data_attr = 'data-belong="'.esc_attr($parent_state).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_state, 'property_state').'"';
-
-                } elseif( $taxonomy_name == 'property_area' ) {
-                    $term_meta= get_option( "_houzez_property_area_$category->term_id");
-                    $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                    $parent_city = sanitize_title($parent_city);
-                    $data_attr = 'data-belong="'.esc_attr($parent_city).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_city, 'property_city').'"';
-
-                } elseif( $taxonomy_name == 'property_state' ) {
-                    $term_meta = get_option( "_houzez_property_state_$category->term_id");
-                    $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                    $parent_country = sanitize_title($parent_country);
-                    $data_attr = 'data-belong="'.esc_attr($parent_country).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_country, 'property_country').'"';
-
-                }
-
-                if ( !empty($searched_data) && in_array( $category->slug, $searched_data ) ) {
-                    $output.= '<option data-ref="'.esc_attr($category->slug).'" '.$data_attr.' '.$data_subtext.' value="' . esc_attr($category->slug) . '" selected="selected">'. esc_attr($category->name) . '</option>';
-                } else {
-                    $output.= '<option data-ref="'.esc_attr($category->slug).'" '.$data_attr.' '.$data_subtext.' value="' . esc_attr($category->slug) . '">' . esc_attr($category->name) . '</option>';
-                }
-
-                foreach( $taxonomies as $subcategory ) {
-                    if($subcategory->parent == $category->term_id) {
-
-                        $data_attr_child = '';
-                        if( $taxonomy_name == 'property_city' ) {
-                            $term_meta= get_option( "_houzez_property_city_$subcategory->term_id");
-                            $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                            $parent_state = sanitize_title($parent_state);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
-
-                        } elseif( $taxonomy_name == 'property_area' ) {
-                            $term_meta= get_option( "_houzez_property_area_$subcategory->term_id");
-                            $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                            $parent_city = sanitize_title($parent_city);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
-
-                        } elseif( $taxonomy_name == 'property_state' ) {
-                            $term_meta= get_option( "_houzez_property_state_$subcategory->term_id");
-                            $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                            $parent_country = sanitize_title($parent_country);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
-                        }
-
-                        if ( !empty($searched_data) && in_array( $subcategory->slug, $searched_data ) ) {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '" selected="selected"> - '. esc_attr($subcategory->name) . '</option>';
-                        } else {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '"> - ' . esc_attr($subcategory->name) . '</option>';
-                        }
-
-                        foreach( $taxonomies as $subsubcategory ) {
-                            if($subsubcategory->parent == $subcategory->term_id) {
-
-                                $data_attr_child = '';
-                                if( $taxonomy_name == 'property_city' ) {
-                                    $term_meta= get_option( "_houzez_property_city_$subsubcategory->term_id");
-                                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                                    $parent_state = sanitize_title($parent_state);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
-
-                                } elseif( $taxonomy_name == 'property_area' ) {
-                                    $term_meta= get_option( "_houzez_property_area_$subsubcategory->term_id");
-                                    $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                                    $parent_city = sanitize_title($parent_city);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
-
-                                } elseif( $taxonomy_name == 'property_state' ) {
-                                    $term_meta= get_option( "_houzez_property_state_$subsubcategory->term_id");
-                                    $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                                    $parent_country = sanitize_title($parent_country);
-                                    $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
-                                }
-
-                                if ( !empty($searched_data) && in_array( $subsubcategory->slug, $searched_data ) ) {
-                                    $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '" selected="selected"> - '. esc_attr($subsubcategory->name) . '</option>';
-                                } else {
-                                    $output.= '<option data-ref="'.esc_attr($subsubcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subsubcategory->slug) . '"> -- ' . esc_attr($subsubcategory->name) . '</option>';
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        echo $output;
-
-    }
-}
-
-/*-----------------------------------------------------------------------------------*/
-// Generate Hirarchical terms
-/*-----------------------------------------------------------------------------------*/
-if(!function_exists('houzez_get_search_taxonomies_old')){
-    function houzez_get_search_taxonomies_old($taxonomy_name, $searched_data = "", $args = array() ){
-        
-        $hide_empty = false;
-        if($taxonomy_name == 'property_city' || $taxonomy_name == 'property_area' || $taxonomy_name == 'property_country' || $taxonomy_name == 'property_state') {
-            $hide_empty = houzez_hide_empty_taxonomies();
-        }
-        
-        $defaults = array(
-            'taxonomy' => $taxonomy_name,
-            'orderby'       => 'name',
-            'order'         => 'ASC',
-            'hide_empty'    => $hide_empty,
-        );
-
-        $args       = wp_parse_args( $args, $defaults );
-        $taxonomies = get_terms( $args );
-
-        if ( empty( $taxonomies ) || is_wp_error( $taxonomies ) ) {
-            return false;
-        }
-
-        $output = '';
-        foreach( $taxonomies as $category ) {
-            if( $category->parent == 0 ) {
-
-                $data_attr = $data_subtext = '';
-
-                if( $taxonomy_name == 'property_city' ) {
-                    $term_meta= get_option( "_houzez_property_city_$category->term_id");
-                    $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                    $parent_state = sanitize_title($parent_state);
-                    $data_attr = 'data-belong="'.esc_attr($parent_state).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_state, 'property_state').'"';
-
-                } elseif( $taxonomy_name == 'property_area' ) {
-                    $term_meta= get_option( "_houzez_property_area_$category->term_id");
-                    $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                    $parent_city = sanitize_title($parent_city);
-                    $data_attr = 'data-belong="'.esc_attr($parent_city).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_city, 'property_city').'"';
-
-                } elseif( $taxonomy_name == 'property_state' ) {
-                    $term_meta = get_option( "_houzez_property_state_$category->term_id");
-                    $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                    $parent_country = sanitize_title($parent_country);
-                    $data_attr = 'data-belong="'.esc_attr($parent_country).'"';
-                    $data_subtext = 'data-subtext="'.houzez_get_term_name_by_slug($parent_country, 'property_country').'"';
-
-                }
-
-                if ( !empty($searched_data) && in_array( $category->slug, $searched_data ) ) {
-                    $output.= '<option data-ref="'.esc_attr($category->slug).'" '.$data_attr.' '.$data_subtext.' value="' . esc_attr($category->slug) . '" selected="selected">'. esc_attr($category->name) . '</option>';
-                } else {
-                    $output.= '<option data-ref="'.esc_attr($category->slug).'" '.$data_attr.' '.$data_subtext.' value="' . esc_attr($category->slug) . '">' . esc_attr($category->name) . '</option>';
-                }
-
-                foreach( $taxonomies as $subcategory ) {
-                    if($subcategory->parent == $category->term_id) {
-
-                        $data_attr_child = '';
-                        if( $taxonomy_name == 'property_city' ) {
-                            $term_meta= get_option( "_houzez_property_city_$subcategory->term_id");
-                            $parent_state = isset($term_meta['parent_state']) ? $term_meta['parent_state'] : '';
-                            $parent_state = sanitize_title($parent_state);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_state).'"';
-
-                        } elseif( $taxonomy_name == 'property_area' ) {
-                            $term_meta= get_option( "_houzez_property_area_$subcategory->term_id");
-                            $parent_city = isset($term_meta['parent_city']) ? $term_meta['parent_city'] : '';
-                            $parent_city = sanitize_title($parent_city);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_city).'"';
-
-                        } elseif( $taxonomy_name == 'property_state' ) {
-                            $term_meta= get_option( "_houzez_property_state_$subcategory->term_id");
-                            $parent_country = isset($term_meta['parent_country']) ? $term_meta['parent_country'] : '';
-                            $parent_country = sanitize_title($parent_country);
-                            $data_attr_child = 'data-belong="'.esc_attr($parent_country).'"';
-                        }
-
-                        if ( !empty($searched_data) && in_array( $subcategory->slug, $searched_data ) ) {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '" selected="selected"> - '. esc_attr($subcategory->name) . '</option>';
-                        } else {
-                            $output.= '<option data-ref="'.esc_attr($subcategory->slug).'" '.$data_attr_child.' value="' . esc_attr($subcategory->slug) . '"> - ' . esc_attr($subcategory->name) . '</option>';
-                        }
-                    }
-                }
-            }
-        }
-        echo $output;
-
-    }
-}
 
 /*-----------------------------------------------------------------------------------*/
 // Property edit taxonomy for multiple
@@ -6657,13 +6460,13 @@ if(!function_exists('houzez_taxonomy_edit_hirarchical_options_for_search')){
         if( !empty($taxonomy_terms) ){
             foreach( $taxonomy_terms as $tax_term ){
                 $existing_term_name = $tax_term->slug;
-                break;
+                    break;
             }
-        }
+            }
 
         if( empty($existing_term_name) ){
             echo '<option value="" selected="selected">'.houzez_option('cl_none', 'None').'</option>';
-        } else {
+            } else {
             echo '<option value="">'.houzez_option('cl_none', 'None').'</option>';
         }
 
@@ -6725,9 +6528,9 @@ if ( ! function_exists( 'houzez_clean_excerpt' ) ) {
             $fave_excerpt_output = substr( $fave_excerpt_output, 0, strripos($fave_excerpt_output, " ") );
             $fave_excerpt_output = trim( preg_replace( '/\s+/', ' ', $fave_excerpt_output) );
 
-            if ( $fave_read_more != "false" ) {
+            if ( $fave_read_more != false ) {
                 $fave_excerpt_output = $fave_excerpt_output.'. <a class="continue-reading" href="'. get_permalink() .'">'.esc_html__( "Continue reading", "houzez").' <i class="fa fa-angle-double-right"></i></a>';
-            } else {
+        } else {
                 $fave_excerpt_output = $fave_excerpt_output . '...';
             }
         }
@@ -7469,30 +7272,6 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
         // regex replacement
         $replace = $link_before . '<a' . esc_attr( $link_attr ) . '\\1>' . $link_in_before . '\\2' . $link_in_after . '</a>' . $link_after;
 
-        /*
-         * Use bbPress's breadcrumbs when available
-         */
-        if (function_exists('bbp_breadcrumb') && is_bbpress()) {
-
-            $bbp_crumbs =
-                bbp_get_breadcrumb(array(
-                    'home_text' => $text['home'],
-                    'sep' => '',
-                    'sep_before' => '',
-                    'sep_after'  => '',
-                    'pad_sep' => 0,
-                    'before' => $home_before,
-                    'after' => $home_after,
-                    'current_before' => $before,
-                    'current_after'  => $after,
-                ));
-
-            if ($bbp_crumbs) {
-                echo '<ul class="breadcrumb favethemes_bbpress_breadcrumb">' .$bbp_crumbs. '</ul>';
-                return;
-            }
-        }
-
         // normal breadcrumbs
         if ((is_home() || is_front_page())) {
 
@@ -7544,7 +7323,7 @@ if ( ! function_exists( 'houzez_breadcrumbs' ) ) {
                             if ( is_wp_error( $term_link ) ) {
                                 continue;
                             }
-                            echo '<li class="breadcrumb-item"><a href="'.$term_link.'">'.$item->name.'</a></li>';
+                            echo '<li class="breadcrumb-item"><a href="' . esc_url($term_link) . '">'.$item->name.'</a></li>';
                         endforeach;
                     endif;
 
@@ -8287,4 +8066,96 @@ if( ! function_exists('houzez_ensure_iframe_closing_tag') ) {
         
         return $html;
     }
+}
+
+/**
+ * Check if User Dashboard page exists with template/user_dashboard.php template
+ * Create it if it doesn't exist, but only run once
+ */
+if( ! function_exists('houzez_create_user_dashboard_page') ) {
+	function houzez_create_user_dashboard_page() {
+		// Check if this function has already been run
+		if (get_option('houzez_user_dashboard_page_created')) {
+			return;
+		}
+
+		// Check if a page with the user_dashboard.php template already exists
+		$existing_page = get_posts(array(
+			'post_type' => 'page',
+			'meta_query' => array(
+				array(
+					'key' => '_wp_page_template',
+					'value' => 'template/user_dashboard.php',
+					'compare' => '='
+				)
+			),
+			'post_status' => array('publish', 'private', 'draft'),
+			'numberposts' => 1
+		));
+
+		// If no page exists with this template, create one
+		if (empty($existing_page)) {
+			$page_data = array(
+				'post_title' => 'User Dashboard',
+				'post_content' => '',
+				'post_status' => 'publish',
+				'post_type' => 'page',
+				'post_author' => 1, // Admin user
+				'comment_status' => 'closed',
+				'ping_status' => 'closed'
+			);
+
+			// Insert the page
+			$page_id = wp_insert_post($page_data);
+
+			// Set the page template
+			if ($page_id && !is_wp_error($page_id)) {
+				update_post_meta($page_id, '_wp_page_template', 'template/user_dashboard.php');
+			}
+		}
+
+		// Set flag to indicate this function has been run
+		update_option('houzez_user_dashboard_page_created', true);
+	}
+
+	// Hook to run after theme setup
+	add_action('after_setup_theme', 'houzez_create_user_dashboard_page');
+}
+
+/**
+ * WPML Fix: Property Media Images Not Showing Translated ALT Text
+ * This fix ensures that property media images display translated ALT text on translated property pages
+ * Reference: https://wpml.org/errata/houzez-property-media-images-not-showing-translated-alt-text/
+ */
+if( ! function_exists('wpml_compsupp7300_filter_fave_property_images') ) {
+	// Only add the filter if WPML is active
+	if ( defined( 'ICL_SITEPRESS_VERSION' ) || function_exists( 'wpml_object_id_filter' ) ) {
+		add_filter('get_post_metadata', 'wpml_compsupp7300_filter_fave_property_images', 10, 4);
+		
+		function wpml_compsupp7300_filter_fave_property_images($null, $object_id, $meta_key, $single) {
+			// Target the specific meta key
+			if ($meta_key !== 'fave_property_images') {
+				return $null;
+			}
+			
+			// Prevent recursion by temporarily removing the filter
+			remove_filter('get_post_metadata', 'wpml_compsupp7300_filter_fave_property_images', 10);
+			
+			// Fetch the original meta value
+			$images = get_post_meta($object_id, $meta_key, $single);
+			
+			// Re-add the filter
+			add_filter('get_post_metadata', 'wpml_compsupp7300_filter_fave_property_images', 10, 4);
+			
+			// Check if we actually got an array
+			if (is_array($images)) {
+				foreach ($images as &$image_id) {
+					// Apply the WPML filter to each item (image ID)
+					$image_id = apply_filters('wpml_object_id', $image_id, 'attachment', true);
+				}
+			}
+			
+			return $images;
+		}
+	}
 }

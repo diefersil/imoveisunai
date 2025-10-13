@@ -7,8 +7,8 @@ if (houzez_edit_property()) {
 	$city = houzez_get_post_term_slug($property_data->ID, 'property_city');
 }
 ?>
-<div class="form-group">
-	<label for="locality"><?php echo houzez_option( 'cl_city', 'City' ).houzez_required_field('city'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="locality"><?php echo houzez_option( 'cl_city', 'City' ).houzez_required_field('city'); ?></label>
 	
 	<?php
 	if(houzez_option('location_dropdowns') == 'yes') { ?>

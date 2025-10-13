@@ -150,10 +150,12 @@ class Autoloader {
 			'TemplateLibrary\Source_Base' => 'includes/template-library/sources/base.php',
 			'TemplateLibrary\Source_Local' => 'includes/template-library/sources/local.php',
 			'TemplateLibrary\Source_Remote' => 'includes/template-library/sources/remote.php',
+			'TemplateLibrary\Source_Cloud' => 'includes/template-library/sources/cloud.php',
 			'Tools' => 'includes/settings/tools.php',
 			'Container\Container' => 'includes/container/container.php',
 			'Tracker' => 'includes/tracker.php',
 			'User' => 'includes/user.php',
+			'User_Data' => 'includes/user-data.php',
 			'Utils' => 'includes/utils.php',
 			'Widget_WordPress' => 'includes/widgets/wordpress.php',
 			'Widgets_Manager' => 'includes/managers/widgets.php',
@@ -187,7 +189,7 @@ class Autoloader {
 	 *
 	 * Used to convert control names to class names.
 	 *
-	 * @param $string
+	 * @param string $string
 	 * @param string $delimiter
 	 *
 	 * @return mixed
@@ -319,7 +321,7 @@ class Autoloader {
 
 		$has_class_alias = isset( $classes_aliases[ $relative_class_name ] );
 
-		// Backward Compatibility: Save old class name for set an alias after the new class is loaded
+		// Backward Compatibility: Save old class name for set an alias after the new class is loaded.
 		if ( $has_class_alias ) {
 			$alias_data = $classes_aliases[ $relative_class_name ];
 

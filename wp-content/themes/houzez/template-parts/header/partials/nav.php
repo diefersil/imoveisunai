@@ -1,5 +1,4 @@
 <?php
-//use Houzez\Classes;
 $header_style = houzez_option('header_style', 4);
 $alignClass = '';
 
@@ -25,7 +24,7 @@ if ( has_nav_menu( 'main-menu' ) ) :
 		'theme_location' => 'main-menu',
 		'container' => '',
 		'container_class' => '',
-		'menu_class' => 'navbar-nav '.$alignClass,
+		'menu_class' => 'navbar-nav h-100 '.$alignClass,
 		'menu_id' => 'main-nav',
 		'depth' => 4,
 		'walker' => new houzez_nav_walker()

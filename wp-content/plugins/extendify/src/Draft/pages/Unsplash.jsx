@@ -19,7 +19,7 @@ export const Unsplash = () => {
 	const [search, setSearch] = useState('');
 	const [searchDebounced, setSearchDebounced] = useState('');
 	const [searching, setSearching] = useState(false);
-	const { data: images, loading } = useUnsplashImages(searchDebounced);
+	const { data: images, loading } = useUnsplashImages(searchDebounced, 'user');
 	const [isInsertingImage, setIsInsertingImage] = useState(null);
 
 	const selectedBlock = useSelect(
@@ -60,7 +60,7 @@ export const Unsplash = () => {
 		<>
 			<div className="flex h-12 items-center gap-1 pl-1">
 				<button
-					className="h-9 w-9 cursor-pointer border-0 bg-transparent"
+					className="h-9 w-9 border-0 bg-transparent"
 					onClick={goBack}
 					type="button"
 					aria-label={__('Go Back', 'extendify-local')}>

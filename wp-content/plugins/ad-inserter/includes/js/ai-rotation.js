@@ -771,9 +771,11 @@ if (typeof ai_rotation_triggers != 'undefined') {
   ai_process_rotations_in_element = function (el) {
 //    $("div.ai-rotate", el).each (function (index, element) {
 //      ai_process_rotation (this);
-    el.querySelectorAll ("div.ai-rotate").forEach ((element, index) => {
-      ai_process_rotation (element);
-    });
+    if (el != null) {
+      el.querySelectorAll ("div.ai-rotate").forEach ((element, index) => {
+        ai_process_rotation (element);
+      });
+    }
   }
 
   // ***

@@ -2,6 +2,7 @@
 global $post;
 $image_id = get_post_meta($post->ID, 'fave_page_header_image', true);
 $img_url = wp_get_attachment_image_src( $image_id, 'full' );
+$img_url = $img_url[0] ?? '';
 $is_dock_search = '';
 if(houzez_option('adv_search_which_header_show')['header_image'] != 0) {
 	$is_dock_search = houzez_dock_search_class();
@@ -11,7 +12,7 @@ if(houzez_option('adv_search_which_header_show')['header_image'] != 0) {
 	
 	<?php houzez_banner_search_autocomplete_html(); ?>
 	
-	<div class="banner-inner parallax d-flex" data-parallax-bg-image="<?php echo esc_url($img_url[0]); ?>">
+	<div class="banner-inner houzez-parallax d-flex" data-parallax-bg-image="<?php echo esc_url($img_url); ?>">
 		<div class="align-self-center flex-fill">
 			<div class="banner-caption">
 				

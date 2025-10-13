@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -391,6 +390,62 @@ class Houzez_Elementor_Agents_Grid extends Widget_Base {
         $this->end_controls_section();
 
         $this->start_controls_section(
+            'image_section',
+            [
+                'label'     => esc_html__( 'Image', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'image_radius',
+            [
+                'label'     => esc_html__( 'Image Radius', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::SLIDER,
+                'size_units' => [ '%' ],
+                'range'     => [
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'default'   => [
+                    'unit' => '%',
+                    'size' => 50,
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .agent-v2-grid-module .agent-grid-image img' => 'border-radius: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'agents_layout' => 'agent-grid'
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'image_radius_v2',
+            [
+                'label'     => esc_html__( 'Image Radius', 'houzez-theme-functionality' ),
+                'type'      => Controls_Manager::SLIDER,
+                'size_units' => [ '%' ],
+                'range'     => [
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .agent-v3-grid-module .agent-grid-image img' => 'border-radius: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'agents_layout' => 'agent-grid-v2'
+                ]
+            ]
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
             'typo_section',
             [
                 'label'     => esc_html__( 'Typography', 'houzez-theme-functionality' ),
@@ -579,13 +634,20 @@ class Houzez_Elementor_Agents_Grid extends Widget_Base {
         $args['agent_category']   =  $agent_category;
         $args['agent_city']   =  $agent_city;
 
-        $args['agents_layout'] =  $settings['agents_layout'];
+        // Sanitize agents_layout before passing to shortcode
+        $allowed_layouts = array( 'agent-grid', 'agent-grid-v2' );
+        $agents_layout = $settings['agents_layout'];
+        if ( ! in_array( $agents_layout, $allowed_layouts, true ) ) {
+            $agents_layout = 'agent-grid'; // Default fallback
+        }
+
+        $args['agents_layout'] =  $agents_layout;
         $args['orderby'] =  $settings['orderby'];
         $args['posts_limit'] =  $settings['posts_limit'];
         $args['columns'] =  $settings['columns'];
         $args['order'] =  $settings['order'];
         $args['offset'] =  $settings['offset'];
-        
+
         if( function_exists( 'houzez_agents_grid' ) ) {
             echo houzez_agents_grid( $args );
         }

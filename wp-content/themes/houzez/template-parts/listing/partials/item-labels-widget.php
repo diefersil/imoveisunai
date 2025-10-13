@@ -1,6 +1,7 @@
 <?php
+global $post;
 $term_id = '';
-$term_status = wp_get_post_terms( get_the_ID(), 'property_status', array("fields" => "all"));
+$term_status = wp_get_post_terms( $post->ID, 'property_status', array("fields" => "all"));
 ?>
 <div class="labels-wrap labels-right"> 
 

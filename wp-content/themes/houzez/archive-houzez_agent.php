@@ -65,7 +65,7 @@ query_posts( $args );
         <div class="row">
             <div class="col-lg-8 col-md-12 bt-content-wrap right-bt-content-wrap">
 
-                <div class="agents-list-view">
+                <div class="agents-list-view" role="list">
                     <?php
                     if ( have_posts() ) :
                     while ( have_posts() ) : the_post();
@@ -75,7 +75,7 @@ query_posts( $args );
                     endwhile;
                     
                     else:
-                        get_template_part('template-parts/realtors/agent/none');
+                        get_template_part('template-parts/realtors/realtor-none');
                     endif;
                     ?>
                 </div>

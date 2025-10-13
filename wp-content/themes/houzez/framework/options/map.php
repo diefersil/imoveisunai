@@ -1,61 +1,165 @@
 <?php
 global $houzez_opt_name, $allowed_html_array, $Option_Countries;
+
+// Define map choices for reuse
+$map_choices = array(
+    'osm' => 'Open Street Map',
+    'mapbox' => 'Mapbox',
+    'google' => 'Google Maps',
+);
+
 Redux::setSection( $houzez_opt_name, array(
     'title'  => esc_html__( 'Map Settings', 'houzez' ),
-    'id'     => 'houzez-googlemap-settings',
+    'id'     => 'houzez-map-settings', // Changed ID slightly for clarity
     'desc'   => '',
     'icon'   => 'el-icon-globe el-icon-small',
     'fields' => array(
         array(
+            'id'       => 'map_selection_mode',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Map Selection Mode', 'houzez'),
+            'subtitle' => esc_html__('Choose how to select the map system.', 'houzez'),
+            'options'  => array(
+                'global' => esc_html__('Global', 'houzez'),
+                'specific' => esc_html__('Specific Areas', 'houzez'),
+            ),
+            'default'  => 'global'
+        ),
+
+        // --- Global Settings (Visible when map_selection_mode is 'global') ---
+        array(
             'id'       => 'houzez_map_system',
             'type'     => 'button_set',
-            'title'    => esc_html__('Map System', 'houzez'),
-            'subtitle' => esc_html__('Select the map system that you want to use', 'houzez'),
+            'title'    => esc_html__('Global Map System', 'houzez'),
+            'subtitle' => esc_html__('Select the map system to use everywhere.', 'houzez'),
             'desc'     => '',
-            'options' => array(
+            'required' => array('map_selection_mode', '=', 'global'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+
+        // --- Specific Area Settings (Visible when map_selection_mode is 'specific') ---
+        array(
+            'id'     => 'specific_map_settings_info',
+            'type'   => 'info',
+            'title'  => esc_html__('Specific Map Settings', 'houzez'),
+            'desc'   => esc_html__('Select the map system for each specific area of the website. If a specific map system requires an API key (Mapbox, Google Maps), ensure the key is entered below.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'style'  => 'info',
+        ),
+        array(
+            'id'       => 'map_system_header',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Header Map', 'houzez'),
+            'subtitle' => esc_html__('Map used in page headers (e.g., "Property Map" header type).', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+        array(
+            'id'       => 'map_system_listing', // Renamed for clarity (was implicit before)
+            'type'     => 'button_set',
+            'title'    => esc_html__('Listing Taxonomy Maps', 'houzez'),
+            'subtitle' => esc_html__('Map used on property taxonomy pages with map headers.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+        array(
+            'id'       => 'map_system_halfmap',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Half Map Template', 'houzez'),
+            'subtitle' => esc_html__('Map used on the Half Map listing/search results template.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+        array(
+            'id'       => 'map_system_detail',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Property Detail Page', 'houzez'),
+            'subtitle' => esc_html__('Map displayed on the single property detail page.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+         array(
+            'id'       => 'map_system_submit',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Submit Property Form', 'houzez'),
+            'subtitle' => esc_html__('Map used when adding or editing a property in frontend.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+        array(
+            'id'       => 'map_system_agent',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Agent/Agency Detail Page', 'houzez'),
+            'subtitle' => esc_html__('Map used on single agent and agency pages.', 'houzez'),
+            'required' => array('map_selection_mode', '=', 'specific'),
+            'options'  => $map_choices,
+            'default'  => 'osm'
+        ),
+
+        array(
+            'id'       => 'map_system_backend',
+            'type'     => 'button_set',
+            'title'    => esc_html__('Submit Property Form - WP Admin', 'houzez'),
+            'subtitle' => esc_html__('Map used when adding or editing a property in backend.', 'houzez'),
+            'options'  => array(
+                'google' => 'Google Maps',
                 'osm' => 'Open Street Map',
-                'mapbox' => 'Map Box',
-                'google' => 'Google',
-             ), 
-            'default' => 'osm'
+            ),
+            'default'  => 'google'
+        ),
+
+
+        // --- API Keys & Common Settings (Always visible, but apply based on selection) ---
+         array(
+            'id'     => 'api_keys_info',
+            'type'   => 'info',
+            'title'  => esc_html__('API Keys & Common Settings', 'houzez'),
+            'desc'   => esc_html__('Enter API keys required by the selected map systems. Other settings below apply based on the map system chosen (globally or specifically).', 'houzez'),
+            'style'  => 'info',
         ),
         array(
             'id'       => 'googlemap_api_key',
             'type'     => 'text',
             'title'    => esc_html__( 'Google Maps API KEY', 'houzez' ),
-            'desc'     => wp_kses(__( 'We strongly encourage you to get an APIs Console key and post the code in Theme Options. You can get it from <a target="_blank" href="https://developers.google.com/maps/documentation/javascript/tutorial#api_key">here</a>.', 'houzez' ), $allowed_html_array),
+            'desc'     => wp_kses(__( 'Required if using Google Maps globally or specifically. Get key from <a target="_blank" href="https://developers.google.com/maps/documentation/javascript/tutorial#api_key">here</a>.', 'houzez' ), $allowed_html_array),
             'subtitle' => esc_html__( 'Enter your google maps api key', 'houzez' ),
-            'required'  => array('houzez_map_system', '=', 'google')
+            // Removed 'required' as it depends on actual usage now
         ),
         array(
             'id'       => 'mapbox_api_key',
             'type'     => 'text',
             'title'    => esc_html__( 'Mapbox API KEY', 'houzez' ),
-            'desc'     => wp_kses(__( 'Please enter the Mapbox API key, you can get from <a target="_blank" href="https://account.mapbox.com/">here</a>.', 'houzez' ), $allowed_html_array),
-            'required'  => array('houzez_map_system', '=', 'mapbox')
+            'desc'     => wp_kses(__( 'Required if using Mapbox globally or specifically. Get key from <a target="_blank" href="https://account.mapbox.com/">here</a>.', 'houzez' ), $allowed_html_array),
+             // Removed 'required'
         ),
         array(
-            'id'       => 'houzez_map_type',
+            'id'       => 'houzez_map_type', // Google Specific Map Type
             'type'     => 'button_set',
-            'title'    => esc_html__('Map Type', 'houzez'),
-            'subtitle' => '',
-            'desc'     => esc_html__( 'Select the map type', 'houzez' ),
-            'required'  => array('houzez_map_system', '=', 'google'),
+            'title'    => esc_html__('Google Map Type', 'houzez'),
+            'subtitle' => esc_html__( 'Select the default map type for Google Maps.', 'houzez' ),
+            'desc'     => '',
+            //'required'  => array('houzez_map_system', '=', 'google'), // Keep this linked to global for simplicity? Or remove requirement? Let's remove for now.
             'options' => array(
                 'roadmap' => 'Road Map',
                 'satellite' => 'Satellite',
                 'hybrid' => 'Hybrid',
                 'terrain' => 'Terrain',
-             ), 
+             ),
             'default' => 'roadmap'
         ),
-        
+
 
         array(
             'id'       => 'markerPricePins',
             'type'     => 'select',
             'title'    => esc_html__( 'Marker Type', 'houzez' ),
-            'desc' => esc_html__( 'Select marker type for Google Maps', 'houzez' ),
+            'desc' => esc_html__( 'Select marker type for maps (affects Google Maps and Mapbox).', 'houzez' ),
             //'desc'     => '',
             'options'  => array(
                 'no'   => esc_html__( 'Marker Icon', 'houzez' ),
@@ -66,31 +170,38 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'short_prices_pins',
             'type'     => 'switch',
-            'title'    => esc_html__( 'Short Price', 'houzez' ),
-            'subtitle'     => esc_html__( 'Please note that the currency switcher will not work if the short price functionality is enabled.', 'houzez' ),
-            'desc' => esc_html__( 'Enable or disable the short price numbers like 12K, 10M, 10B.', 'houzez' ),
-            'default'  => 0,
+            'title'    => esc_html__( 'Short Price on Pins', 'houzez' ),
+            'subtitle'     => esc_html__( 'Note: Currency switcher might not work with short prices.', 'houzez' ),
+            'desc' => esc_html__( 'Enable short prices like 12K, 10M, 10B on price pins.', 'houzez' ),
+            'default'  => 1,
             'on'       => esc_html__( 'Enabled', 'houzez' ),
             'off'      => esc_html__( 'Disabled', 'houzez' ),
             'required'  => array('markerPricePins', '=', 'yes'),
         ),
+
         array(
-            'id'       => 'marker_spiderfier',
-            'type'     => 'switch',
-            'title'    => esc_html__( 'Overlapping Marker Spiderfier', 'houzez' ),
-            'desc' => esc_html__( 'Do you want to display the Overlapping Marker Spiderfier?', 'houzez' ),
-            //'desc'     => '',
-            'on'       => 'Yes',
-            'off'      => 'No',
-            'default'  => 0,
-            'required'  => array('houzez_map_system', '=', 'google')
+            'id'       => 'map_default_zoom',
+            'type'     => 'text',
+            'title'    => esc_html__( 'Default Zoom', 'houzez' ),
+            'subtitle' => esc_html__( 'Default zoom level for Maps.', 'houzez' ),
+            'default'  => '12',
+            'validate' => 'numeric'
+        ),
+
+        array(
+            'id'       => 'map_max_zoom',
+            'type'     => 'text',
+            'title'    => esc_html__( 'Maximum Zoom Level', 'houzez' ),
+            'subtitle' => esc_html__( 'Maximum zoom level for Maps.', 'houzez' ),
+            'default'  => '18',
+            'validate' => 'numeric'
         ),
 
         array(
             'id'       => 'map_default_lat',
             'type'     => 'text',
-            'title'    => esc_html__( 'Default Latitude', 'houzez' ),
-            'subtitle' => esc_html__( 'Enter default latitude for maps', 'houzez' ),
+            'title'    => esc_html__( 'Default Fallback Latitude', 'houzez' ),
+            'subtitle' => esc_html__( 'Used if a property/agent has no coordinates.', 'houzez' ),
             'default'  => '25.686540',
             'validate' => 'numeric'
         ),
@@ -98,8 +209,8 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'map_default_long',
             'type'     => 'text',
-            'title'    => esc_html__( 'Default Longitude', 'houzez' ),
-            'subtitle' => esc_html__( 'Enter default longitude for maps', 'houzez' ),
+            'title'    => esc_html__( 'Default Fallback Longitude', 'houzez' ),
+            'subtitle' => esc_html__( 'Used if a property/agent has no coordinates.', 'houzez' ),
             'default'  => '-80.431345',
             'validate' => 'numeric'
         ),
@@ -107,9 +218,9 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'geo_country_limit',
             'type'     => 'switch',
-            'title'    => esc_html__( 'Limit to Country', 'houzez' ),
+            'title'    => esc_html__( 'Limit Geocoding/Autocomplete to Country', 'houzez' ),
             'desc'     => '',
-            'subtitle' => esc_html__( 'Geo autocomplete limit to specific country', 'houzez' ),
+            'subtitle' => esc_html__( 'Limit address search suggestions to a specific country.', 'houzez' ),
             'default'  => 0,
             'on'       => 'Enabled',
             'off'      => 'Disabled',
@@ -118,105 +229,54 @@ Redux::setSection( $houzez_opt_name, array(
             'id'		=> 'geocomplete_country',
             'type'		=> 'select',
             'required'  => array('geo_country_limit', '=', '1'),
-            'title'		=> esc_html__( 'Geo Auto Complete Country', 'houzez' ),
-            'subtitle'	=> esc_html__( 'Limit Geo auto complete to specific country', 'houzez' ),
+            'title'		=> esc_html__( 'Select Country for Geocoding Limit', 'houzez' ),
+            'subtitle'	=> '',
             'options'	=> $Option_Countries,
             'default' => ''
         ),
 
-        /*array(
-            'id'       => 'map_fullscreen',
-            'type'     => 'switch',
-            'title'    => esc_html__( 'Map Fullscreen', 'houzez' ),
-            'desc'     => '',
-            'subtitle' => esc_html__( 'Enable/Disable map fullscreen button on half map.', 'houzez' ),
-            'default'  => 1,
-            'on'       => 'Enabled',
-            'off'      => 'Disabled',
-        ),
-
-        array(
-            'id'       => 'geo_location',
-            'type'     => 'switch',
-            'title'    => esc_html__( 'Geo Location', 'houzez' ),
-            'desc'     => '',
-            'subtitle' => esc_html__( 'Enable/Disable geo location.', 'houzez' ),
-            'default'  => 0,
-            'on'       => 'Enabled',
-            'off'      => 'Disabled',
-            'required'  => array('houzez_map_system', '=', 'google')
-        ),
-
-        array(
-            'id' => 'geo_location_info',
-            'type' => 'info',
-            'required' => array('geo_location', '=', '1'),
-            'title' => '',
-            'style' => 'info',
-            'desc' => __('Note: Google Geo location not work in chrome without SSL (https://), you can enable IPINFO location below for Google chrome if you don not have SSL. ', 'houzez')
-        ),
-
-        array(
-            'id'       => 'ipinfo_location',
-            'type'     => 'switch',
-            'title'    => esc_html__( 'IPINFO Location', 'houzez' ),
-            'desc'     => '',
-            'subtitle' => esc_html__( 'Enable/Disable Ip info location, only work with chrome withour SSL.', 'houzez' ),
-            'default'  => 0,
-            'on'       => 'Enabled',
-            'off'      => 'Disabled',
-            'required'  => array('houzez_map_system', '=', 'google')
-        ),
-        array(
-            'id'       => 'googlemap_zoom_level',
-            'type'     => 'text',
-            'title'    => esc_html__( 'Default Map Zoom', 'houzez' ),
-            'desc'     => '',
-            'subtitle' => esc_html__( '1 to 20', 'houzez' ),
-            'default'  => '12',
-            'required'  => array('houzez_map_system', '=', 'google')
-        ),*/
     ),
 ));
 
+// Cluster subsection remains mostly the same, but might need notes about compatibility
 Redux::setSection( $houzez_opt_name, array(
-    'title'  => esc_html__( 'Cluster', 'houzez' ),
+    'title'  => esc_html__( 'Cluster Settings', 'houzez' ),
     'id'     => 'map-cluster',
-    'desc'   => '',
+    'desc'   => esc_html__('Marker clustering settings. Applies to Google Maps and OpenStreetMap/Mapbox.', 'houzez'),
     'icon'   => '',
     'subsection' => true,
     'fields'    => array(
         array(
             'id'       => 'map_cluster_enable',
             'type'     => 'switch',
-            'title'    => esc_html__( 'Markers cluster', 'houzez' ),
+            'title'    => esc_html__( 'Enable Markers Clustering', 'houzez' ),
             'subtitle' => '',
-            'desc'     => esc_html__( 'enable or disable the marker cluster', 'houzez' ),
+            'desc'     => '',
             'on'       => esc_html__('Enabled', 'houzez'),
             'off'      => esc_html__('Disabled', 'houzez'),
-            'default'  => 1
+            'default'  => 0
         ),
         array(
-            'id'        => 'map_cluster',
+            'id'        => 'map_cluster', // Used for Google Maps & OSM
             'type'      => 'media',
-            'title'     => esc_html__( 'Map Cluster', 'houzez' ),
+            'title'     => esc_html__( 'Map Cluster Icon', 'houzez' ),
             'read-only' => false,
             'default'   => array( 'url' => HOUZEZ_IMAGE . 'map/cluster-icon.png' ),
-            'desc'  => esc_html__( 'Upload the map cluster icon.', 'houzez' ),
+            'desc'  => esc_html__( 'Upload the map cluster icon (used for Google Maps and OSM/Mapbox).', 'houzez' ),
         ),
         array(
-            'id'       => 'googlemap_zoom_cluster',
+            'id'       => 'googlemap_zoom_cluster', // Google Specific
             'type'     => 'text',
-            'title'    => esc_html__( 'Cluster Zoom Level', 'houzez' ),
-            //'desc'     => '',
-            'desc' => esc_html__( 'Enter the maximum zoom level for the cluster to appear. From 1 to 20 the fefault is 12', 'houzez' ),
+            'title'    => esc_html__( 'Google Maps - Cluster Max Zoom Level', 'houzez' ),
+            'desc' => esc_html__( 'Max zoom level for clustering to appear on Google Maps (1-20, default 12).', 'houzez' ),
             'default'  => '12',
-            'required'  => array('houzez_map_system', '=', 'google')
+            // Required only if Google Maps is used somewhere and clustering is enabled
         ),
     )
-        
+
 ));
 
+// Single Listing Map subsection remains mostly the same
 Redux::setSection( $houzez_opt_name, array(
     'title'  => esc_html__( 'Single Listing Map', 'houzez' ),
     'id'     => 'map-single-listing',
@@ -228,7 +288,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'detail_map_pin_type',
             'type'     => 'select',
             'title'    => esc_html__('Pin or Circle', 'houzez'),
-            'desc' => esc_html__('Select what to show on map, Marker or Circle', 'houzez'),
+            'desc' => esc_html__('Show a marker pin or a radius circle on the single property map.', 'houzez'),
             'options'  => array(
                 'marker'   => esc_html__( 'Marker Pin', 'houzez' ),
                 'circle'   => esc_html__( 'Circle', 'houzez' ),
@@ -239,29 +299,65 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'single_mapzoom',
             'type'     => 'text',
             'title'    => esc_html__( 'Single Listing Map Zoom', 'houzez' ),
-            'desc'     => '',
-            'desc' => esc_html__( 'Enter a number from 1 to 20 the fefault is 12', 'houzez' ),
+            'desc'     => esc_html__( 'Default zoom level (1-20, default 14).', 'houzez' ),
             'default'  => '14',
             'validate' => 'numeric'
         )
     )
 ));
 
+// Map Style subsection remains the same (primarily for Google Maps)
 Redux::setSection( $houzez_opt_name, array(
     'title'  => esc_html__( 'Map Style', 'houzez' ),
     'id'     => 'map-style',
-    'desc'   => '',
+    'desc'   => esc_html__('Configure map styling options for your preferred map provider.', 'houzez'),
     'icon'   => '',
     'subsection' => true,
     'fields'    => array(
         array(
-            'id'       => 'googlemap_stype',
-            'type'     => 'ace_editor',
-            'title'    => esc_html__( 'Style for Google Map', 'houzez' ),
-            'subtitle' => esc_html__( 'Use https://snazzymaps.com/ to create styles', 'houzez' ),
-            'desc'     => '',
+            'id'       => 'googlemap_map_id',
+            'type'     => 'text',
+            'title'    => esc_html__('Google Cloud Map ID', 'houzez'),
+            'subtitle' => wp_kses(__('Create custom map styles in the <a href="https://console.cloud.google.com/google/maps-apis/studio" target="_blank">Google Cloud Console</a>.', 'houzez'), $allowed_html_array),
+            'desc'     => esc_html__('Enter your Map ID from Google Maps Cloud Customization (e.g., "12345ab67c890de1f").', 'houzez'),
             'default'  => '',
-            'mode'     => 'plain',
-        )
+        ),
+        array(
+            'id'       => 'mapbox_style',
+            'type'     => 'select',
+            'title'    => esc_html__('Mapbox Style', 'houzez'),
+            'subtitle' => esc_html__('Select a pre-defined Mapbox style or enter your own custom style URL.', 'houzez'),
+            'options'  => array(
+                'mapbox://styles/mapbox/streets-v11' => 'Streets',
+                'mapbox://styles/mapbox/outdoors-v11' => 'Outdoors',
+                'mapbox://styles/mapbox/light-v10' => 'Light',
+                'mapbox://styles/mapbox/dark-v10' => 'Dark',
+                'mapbox://styles/mapbox/satellite-v9' => 'Satellite',
+                'mapbox://styles/mapbox/satellite-streets-v11' => 'Satellite Streets',
+                'custom' => 'Custom Style URL',
+            ),
+            'default'  => 'mapbox://styles/mapbox/streets-v11',
+        ),
+        array(
+            'id'       => 'mapbox_custom_style_url',
+            'type'     => 'text',
+            'title'    => esc_html__('Custom Mapbox Style URL', 'houzez'),
+            'subtitle' => esc_html__('Enter your custom Mapbox style URL.', 'houzez'),
+            'required' => array('mapbox_style', '=', 'custom'),
+            'desc'     => 'Example: mapbox://styles/mapbox/streets-v11',
+            'default'  => '',
+        ),
+        array(
+            'id'     => 'mapbox_custom_style_info',
+            'type'   => 'info',
+            'title'  => esc_html__('Instructions for Custom Mapbox Style URL', 'houzez'),
+            'desc'   => esc_html__('To create a custom Mapbox style URL, follow these steps:
+1. Select "Custom Style URL" from the Mapbox Style dropdown above.
+2. Go to the Mapbox Studio (https://studio.mapbox.com/).
+3. Create a new style or edit an existing one.
+4. Once you have your style, click on "Share" and copy the style URL.
+5. Paste the URL in the "Custom Mapbox Style URL" field above.', 'houzez'),
+            'style'  => 'info',
+        ),
     )
 ));

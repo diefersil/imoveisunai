@@ -1,5 +1,5 @@
 <?php
-global $sticky_hidden, $sticky_data, $hidden_data;
+global $sticky_hidden, $desktop_sticky_data, $mobile_sticky_data, $hidden_data;
 $search_builder = houzez_search_builder();
 $layout = $search_builder['enabled'];
 if(empty($layout)) {
@@ -21,7 +21,7 @@ if(!taxonomy_exists('property_city')) {
 if(!taxonomy_exists('property_area')) {
     unset($layout['areas']);
 }
-
+unset($layout['price']);
 unset($layout['placebo']);
 
 $layout = array_slice($layout, 0, houzez_search_builder_first_row());
@@ -43,9 +43,9 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 	$width_needed = true;
 }
 ?>
-<section id="desktop-header-search" class="advanced-search advanced-search-nav <?php echo esc_attr($sticky_hidden); ?>" data-hidden="<?php echo esc_attr($hidden_data); ?>" data-sticky='<?php echo esc_attr( $sticky_data ); ?>'>
+<section id="desktop-header-search" class="advanced-search advanced-search-nav desktop-search-nav <?php echo esc_attr($sticky_hidden); ?>" data-hidden="<?php echo esc_attr($hidden_data); ?>" data-sticky='<?php echo esc_attr( $desktop_sticky_data ); ?>'>
 	<div class="<?php echo houzez_header_search_width(); ?>">
-		<form class="houzez-search-form-js <?php houzez_search_filters_class(); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
+		<form id="desktop-search-form" class="houzez-search-form-js <?php houzez_search_filters_class(); ?>" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
 
 			<?php do_action('houzez_search_hidden_fields'); ?>
 			
@@ -84,12 +84,10 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 						} else {
 
 							echo '<div class="'.$common_class.' '.$class_flex_grow.'">';
-								houzez_get_custom_search_field($key);
+								Houzez_Property_Search::get_custom_search_field($key);
 							echo '</div>';
 							
 						}
-						/*if($i == houzez_search_builder_first_row())
-							break;*/
 					}
 				}
 				?>
@@ -99,6 +97,8 @@ if(!array_key_exists('geolocation', $layout) && !array_key_exists('keyword', $la
 					<?php get_template_part('template-parts/search/fields/advanced-button'); ?>
 				</div>	
 				<?php } ?>
+
+				<?php get_template_part('template-parts/search/fields/reset-btn'); ?>
 
 				<button type="submit" class="btn btn-search btn-secondary <?php if( houzez_is_half_map() ) { echo 'half-map-search-js-btn'; }?>"><?php esc_html_e('Go', 'houzez'); ?></button>		
 			</div><!-- d-flex -->

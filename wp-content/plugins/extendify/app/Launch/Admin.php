@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin.
  */
@@ -13,6 +14,7 @@ use Extendify\PartnerData;
 /**
  * This class handles any file loading for the admin area.
  */
+
 class Admin
 {
     /**
@@ -67,19 +69,33 @@ class Admin
         \wp_add_inline_script(
             Config::$slug . '-launch-scripts',
             'window.extOnbData = ' . \wp_json_encode([
-                'editorStyles' => \wp_json_encode(\get_block_editor_settings([], new \stdClass())),
+                'editorStyles' => \wp_json_encode(\get_block_editor_settings([], new \WP_Block_Editor_Context())),
                 'wpRoot' => \esc_url_raw(\rest_url()),
                 'activeTests' => array_map('esc_attr', \get_option('extendify_active_tests', [])),
                 'resetSiteInformation' => [
                     'pagesIds' => array_map('esc_attr', $this->getLaunchCreatedPages()),
                     'navigationsIds' => array_map('esc_attr', $this->getLaunchCreatedNavigations()),
                     'templatePartsIds' => array_map('esc_attr', $this->getTemplatePartIds()),
+                    'pageWithTitleTemplateId' => esc_attr($this->getPageWithTitleTemplateId()),
                 ],
-                'helloWorldPostSlug' => \esc_attr(\_x('hello-world', 'Default post slug')), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+                'helloWorldPostSlug' => \esc_attr(
+                    // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+                    \_x(
+                        'hello-world',
+                        'Default post slug'
+                    )
+                ),
+                'redirectToWebsite' => (bool) PartnerData::setting('launchRedirectWebsite'),
             ]),
             'before'
         );
-        \wp_set_script_translations(Config::$slug . '-launch-scripts', 'extendify-local', EXTENDIFY_PATH . 'languages/js');
+
+        \wp_set_script_translations(
+            Config::$slug . '-launch-scripts',
+            'extendify-local',
+            EXTENDIFY_PATH . 'languages/js'
+        );
+
         \wp_enqueue_style(
             Config::$slug . '-launch-styles',
             EXTENDIFY_BASE_URL . 'public/build/' . Config::$assetManifest['extendify-launch.css'],
@@ -139,5 +155,17 @@ class Admin
             (get_block_template(get_stylesheet() . '//header', 'wp_template_part')->id ?? ''),
             (get_block_template(get_stylesheet() . '//footer', 'wp_template_part')->id ?? ''),
         ];
+    }
+
+
+    /**
+     * Returns the id of the page-with-title template for the current theme.
+     *
+     * @return string
+     */
+    public static function getPageWithTitleTemplateId()
+    {
+        $template = get_block_template(get_stylesheet() . '//page-with-title', 'wp_template');
+        return $template && !empty($template->id) ? $template->id : '';
     }
 }

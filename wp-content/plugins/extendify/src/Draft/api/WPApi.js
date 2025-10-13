@@ -39,7 +39,7 @@ export const importImage = async (imageUrl, metadata = {}) => {
 export const importImageServer = async (src, metadata = {}) => {
 	const formData = new FormData();
 	formData.append('source', src);
-	// Fallback doesn't suppport custom file_name
+	// Fallback doesn't support custom file_name
 	formData.append('alt_text', metadata.alt ?? '');
 	formData.append('caption', metadata.caption ?? '');
 
@@ -116,16 +116,6 @@ export const addImageToBlock = (
 			id: image.id,
 			url: image.source_url,
 			alt: image.alt_text,
-			backgroundType: 'image',
-			dimRatio: 50,
-			hasParallax: false,
-			isDark: true,
-			isRepeated: false,
-			layout: {
-				type: 'constrained',
-			},
-			tagName: 'div',
-			useFeaturedImage: false,
 		});
 	}
 };

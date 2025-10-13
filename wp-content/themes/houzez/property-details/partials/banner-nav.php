@@ -46,7 +46,7 @@ if ($active_tab == 'map_view') {
 }
 
 ?>
-<ul class="nav nav-pills" id="pills-tab" role="tablist">
+<ul class="nav nav-pills gap-1" id="pills-tab" role="tablist">
 	
 	<?php 
 	if ($media_tabs): foreach ($media_tabs as $key=>$value) {
@@ -55,7 +55,7 @@ if ($active_tab == 'map_view') {
         case 'gallery': 
             if(in_array('gallery', $available_tabs)) { ?>
             <li class="nav-item">
-				<a class="nav-link <?php echo esc_attr($gallery_active); ?>" id="pills-gallery-tab" data-toggle="pill" href="#pills-gallery" role="tab" aria-controls="pills-gallery" aria-selected="true">
+				<a class="nav-link <?php echo esc_attr($gallery_active); ?> p-0 text-center" id="pills-gallery-tab" data-bs-toggle="pill" href="#pills-gallery" role="tab" aria-controls="pills-gallery" aria-selected="true">
 					<i class="houzez-icon icon-picture-sun"></i>
 				</a>
 			</li>
@@ -65,7 +65,7 @@ if ($active_tab == 'map_view') {
         case 'map':
             if(in_array('map_view', $available_tabs)) { ?>
         	<li class="nav-item">
-				<a class="nav-link <?php echo esc_attr($map_active); ?>" id="pills-map-tab" data-toggle="pill" href="#pills-map" role="tab" aria-controls="pills-map" aria-selected="true">
+				<a class="nav-link map-media-tab <?php echo esc_attr($map_active); ?> p-0 text-center" id="pills-map-tab" data-bs-toggle="pill" href="#pills-map" role="tab" aria-controls="pills-map" aria-selected="true">
 					<i class="houzez-icon icon-maps"></i>
 				</a>
 			</li>
@@ -75,7 +75,7 @@ if ($active_tab == 'map_view') {
         case 'street_view':
             if(in_array('street_view', $available_tabs)) { ?>
         	<li class="nav-item">
-				<a class="nav-link <?php echo esc_attr($street_active); ?>" id="pills-street-view-tab" data-toggle="pill" href="#pills-street-view" role="tab" aria-controls="pills-street-view" aria-selected="false">
+				<a class="nav-link <?php echo esc_attr($street_active); ?> p-0 text-center" id="pills-street-view-tab" data-bs-toggle="pill" href="#pills-street-view" role="tab" aria-controls="pills-street-view" aria-selected="false">
 					<i class="houzez-icon icon-location-user"></i>
 				</a>
 			</li>
@@ -85,7 +85,7 @@ if ($active_tab == 'map_view') {
         case '360_virtual_tour': 
             if(in_array('360_virtual_tour', $available_tabs)) { ?>
 			<li class="nav-item">
-				<a class="nav-link <?php echo esc_attr($virtual_active); ?>" id="pills-360tour-tab" data-toggle="pill" href="#pills-360tour" role="tab" aria-controls="pills-360tour" aria-selected="true">
+				<a class="nav-link houzez-360-virtual-media-tab <?php echo esc_attr($virtual_active); ?> p-0 text-center" id="pills-360-virtual-tour-view-tab" data-bs-toggle="pill" href="#pills-360tour" role="tab" aria-controls="pills-360-virtual-tour-view" aria-selected="false">
 					<i class="houzez-icon icon-surveillance-360-camera"></i>
 				</a>
 			</li>
@@ -95,7 +95,7 @@ if ($active_tab == 'map_view') {
         case 'video': 
             if(in_array('video', $available_tabs)) { ?>
 			<li class="nav-item">
-				<a class="nav-link <?php echo esc_attr($video_active); ?>" id="pills-video-tab" data-toggle="pill" href="#pills-video" role="tab" aria-controls="pills-video" aria-selected="true">
+				<a class="nav-link <?php echo esc_attr($video_active); ?> p-0 text-center" id="pills-video-view-tab" data-bs-toggle="pill" href="#pills-video" role="tab" aria-controls="pills-video-view" aria-selected="false">
 					<i class="houzez-icon icon-video-player-movie-1"></i>
 				</a>
 			</li>
@@ -103,6 +103,5 @@ if ($active_tab == 'map_view') {
         	break;
     }
 }
-endif;
-?>
+endif;?>
 </ul><!-- nav -->	

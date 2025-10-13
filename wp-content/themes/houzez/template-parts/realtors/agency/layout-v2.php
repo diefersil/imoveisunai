@@ -71,7 +71,7 @@ $agencies_query = new WP_Query( $qry_args );
                         }
                     } 
                 }?>
-                <div class="agencies-grid-view agencies-grid-view-4cols">
+                <div class="agencies-grid-view row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3" role="list">
                     <?php
                     if ( $agencies_query->have_posts() ) :
                     while ( $agencies_query->have_posts() ) : $agencies_query->the_post();
@@ -81,7 +81,7 @@ $agencies_query = new WP_Query( $qry_args );
                     endwhile;
                     
                     else:
-                        get_template_part('template-parts/realtors/agency/none');
+                        get_template_part('template-parts/realtors/realtor-none');
                     endif;
                     ?>
                 </div><!-- listing-view -->

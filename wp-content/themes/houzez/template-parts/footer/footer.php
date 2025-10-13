@@ -6,13 +6,6 @@ if ( !is_active_sidebar( 'footer-sidebar-1' )
     return;
 
 $footer_cols = houzez_option('footer_cols');
-if( $footer_cols == 'three_cols' ) {
-    $f_3_classes = 'col-md-6 col-sm-12';
-    $footer = 'footer footer-v2';
-} else {
-    $f_3_classes = 'col-md-3 col-sm-6';
-    $footer = 'footer';
-}
 ?>
 <div class="footer-top-wrap">
 	<div class="container">
@@ -20,45 +13,45 @@ if( $footer_cols == 'three_cols' ) {
 			<?php
 			if( $footer_cols === 'one_col' ) {
                 if ( is_active_sidebar( 'footer-sidebar-1' ) ) {
-                    echo '<div class="col-md-12">';
+                    echo '<div class="col-12">';
                         dynamic_sidebar( 'footer-sidebar-1' );
                     echo '</div>';
                 }
             } elseif( $footer_cols === 'two_col' ) {
                 if ( is_active_sidebar( 'footer-sidebar-1' ) ) {
-                    echo '<div class="col-md-6 col-sm-6">';
+                    echo '<div class="col-lg-4 col-md-4">';
                         dynamic_sidebar( 'footer-sidebar-1' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-2' ) ) {
-                    echo '<div class="col-md-6 col-sm-6">';
+                    echo '<div class="col-lg-8 col-md-8">';
                         dynamic_sidebar( 'footer-sidebar-2' );
                     echo '</div>';
                 }
             } elseif( $footer_cols === 'three_cols_middle' ) {
                 if ( is_active_sidebar( 'footer-sidebar-1' ) ) {
-                    echo '<div class="col-lg-3 col-md-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-1' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-2' ) ) {
-                    echo '<div class="col-lg-6 col-md-6">';
+                    echo '<div class="col-lg-6 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-2' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-3' ) ) {
-                    echo '<div class="col-lg-3 col-md-6">';
+                    echo '<div class="col-lg-3 col-md-12">';
                         dynamic_sidebar( 'footer-sidebar-3' );
                     echo '</div>';
                 }
             } elseif( $footer_cols === 'three_cols' ) {
                 if ( is_active_sidebar( 'footer-sidebar-1' ) ) {
-                    echo '<div class="col-lg-3 col-md-6 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-1' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-2' ) ) {
-                    echo '<div class="col-lg-3 col-md-6 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-2' );
                     echo '</div>';
                 }
@@ -69,22 +62,22 @@ if( $footer_cols == 'three_cols' ) {
                 }
             } elseif( $footer_cols === 'four_cols' ) {
                 if ( is_active_sidebar( 'footer-sidebar-1' ) ) {
-                    echo '<div class="col-md-3 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-1' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-2' ) ) {
-                    echo '<div class="col-md-3 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-2' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-3' ) ) {
-                    echo '<div class="col-md-3 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6 mb-4 mb-lg-0">';
                         dynamic_sidebar( 'footer-sidebar-3' );
                     echo '</div>';
                 }
                 if ( is_active_sidebar( 'footer-sidebar-4' ) ) {
-                    echo '<div class="col-md-3 col-sm-6">';
+                    echo '<div class="col-lg-3 col-md-6">';
                         dynamic_sidebar( 'footer-sidebar-4' );
                     echo '</div>';
                 }

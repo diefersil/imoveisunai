@@ -1,11 +1,10 @@
 <?php
-$prop_id = houzez_get_listing_data('property_id');
+$property_id = houzez_get_listing_data('property_id');
 
-if(!empty($prop_id)) {
-	echo '<ul class="list-unstyled flex-fill">
-			<li class="property-overview-item">
-				<strong>'.houzez_propperty_id_prefix($prop_id).'</strong> 
-			</li>
-			<li class="hz-meta-label h-prop-id">'.houzez_option('spl_prop_id', 'Property ID').'</li>
-		</ul>';
+if( !empty( $property_id ) ) {
+	// Get the version from the parameter or use default
+	$version = isset($args['overview']) ? $args['overview'] : '';
+	
+	// Use the helper function to generate the HTML
+	echo houzez_get_overview_item('property-id', $property_id, houzez_option('spl_prop_id', 'Property ID'), $version);
 }

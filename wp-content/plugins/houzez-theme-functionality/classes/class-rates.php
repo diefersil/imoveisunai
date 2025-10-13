@@ -43,7 +43,8 @@ class FCC_Rates {
     public static function update() {
 
         $option = get_option( 'fcc_api_settings' );
-        if ( ! isset( $option['api_key'] ) ) {
+
+        if ( ! $option || ! isset( $option['api_key'] ) ) {
             return null;
         }
 
@@ -56,15 +57,56 @@ class FCC_Rates {
         // Get the currencies rates (default base currency is US dollars).
         $response = wp_remote_get( static::$currencies_rates . $api_key );
 
-        $json = isset( $response['body'] ) ? json_decode( $response['body'] ) : $response;
-        $new_rates = isset( $json->rates ) ? (array) $json->rates : $json;
+        // Check if the response is a WP_Error
+        if ( is_wp_error( $response ) ) {
+            trigger_error(
+                esc_html__( 'There was a problem connecting to the exchange rates API. Please check your internet connection.', 'favethemes-currency-converter' ),
+                E_USER_WARNING
+            );
+            return $response;
+        }
 
-        // Check for request errors.
-        if ( ! $new_rates instanceof \WP_Error ) {
+        // Check if we have a valid response body
+        if ( ! isset( $response['body'] ) || empty( $response['body'] ) ) {
+            trigger_error(
+                esc_html__( 'Empty response received from the exchange rates API.', 'favethemes-currency-converter' ),
+                E_USER_WARNING
+            );
+            return null;
+        }
 
-            if ( is_array( $new_rates ) && count( $new_rates ) > 99 ) {
+        $json = json_decode( $response['body'] );
+        
+        // Check if JSON decoding was successful
+        if ( json_last_error() !== JSON_ERROR_NONE ) {
+            trigger_error(
+                esc_html__( 'Invalid JSON response received from the exchange rates API.', 'favethemes-currency-converter' ),
+                E_USER_WARNING
+            );
+            return null;
+        }
 
-                // Check if there is already values exist in database 
+        // Check if we have rates in the response
+        if ( ! isset( $json->rates ) || ! is_object( $json->rates ) ) {
+            trigger_error(
+                esc_html__( 'No exchange rates found in the API response. Please check your API key is valid and you have usage quota.', 'favethemes-currency-converter' ),
+                E_USER_WARNING
+            );
+            return null;
+        }
+
+        $new_rates = (array) $json->rates;
+
+        // Validate that we have a reasonable number of rates
+        if ( ! is_array( $new_rates ) || count( $new_rates ) < 99 ) {
+            trigger_error(
+                esc_html__( 'Insufficient exchange rates received from the API. Please check your API key is valid and you have usage quota.', 'favethemes-currency-converter' ),
+                E_USER_WARNING
+            );
+            return null;
+        }
+
+        // Check if there are already values in database 
                 $old_rates  = self::get_rates();
                 $action     = ! $old_rates || is_null( $old_rates ) ? 'insert' : 'update';
 
@@ -74,17 +116,35 @@ class FCC_Rates {
                 // Make currencies meta.
                 $data = self::make_currency_data();
 
-                // Traverse rates and put in database
-                foreach ( $new_rates as $currency_code => $rate_usd ) :
+        // If we couldn't get currency data, use basic data
+        if ( empty( $data ) || ! is_array( $data ) ) {
+            $data = array();
+        }
 
-                    if ( is_string( $currency_code ) && $rate_usd && isset( $data[ $currency_code ] ) ) {
+                // Traverse rates and put in database
+        foreach ( $new_rates as $currency_code => $rate_usd ) {
+
+            if ( ! is_string( $currency_code ) || ! is_numeric( $rate_usd ) || $rate_usd <= 0 ) {
+                continue;
+            }
                 
                         $currency_code = strtoupper( substr( sanitize_key( $currency_code ), 0, 3 ) );
                         $rate_usd      = floatval( $rate_usd );
+            
+            // Use existing currency data if available, otherwise create basic data
+            if ( isset( $data[ $currency_code ] ) ) {
                         $currency_data = json_encode( (array) $data[ $currency_code ] );
-
                     } else {
-                        continue;
+                // Create basic currency data if not found
+                $basic_data = array(
+                    'name'          => $currency_code,
+                    'symbol'        => $currency_code,
+                    'position'      => 'before',
+                    'decimals'      => 2,
+                    'thousands_sep' => ',',
+                    'decimals_sep'  => '.'
+                );
+                $currency_data = json_encode( $basic_data );
                     }
 
                     if ( $action == 'update' ) {
@@ -123,19 +183,10 @@ class FCC_Rates {
                             )
                         );
                     }
-
-                endforeach;
-
-            }
-
-        } else {
-
-            trigger_error(
-                esc_html__( 'There was a problem to update currencies and exchange rates, Please check your API key is valid and you have usage quota.', 'favethemes-currency-converter' ),
-                E_USER_WARNING
-            );
-
         }
+
+        // Update the last update time
+        update_option( 'fcc_last_update_time', current_time( 'timestamp' ) );
 
         return $new_rates;
     }

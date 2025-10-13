@@ -10,16 +10,14 @@ $role              = $user_data->roles[0];
 $show_hide_roles = houzez_option('show_hide_roles');
 
 if( ( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() && ! houzez_is_manager() && ! $edit_flag ) ) { ?>
-<div class="dashboard-content-block">
-    <div class="row">
-        <div class="col-md-3 col-sm-12">
-            <h2><?php esc_html_e( 'Account Role', 'houzez' ); ?></h2>
-        </div><!-- col-md-3 col-sm-12 -->
-
-        <div class="col-md-9 col-sm-12">
+<div class="block-wrap">
+    <div class="block-title-wrap">
+        <h2><?php esc_html_e( 'Account Role', 'houzez' ); ?></h2>
+    </div>
+    <div class="block-content-wrap">
+        <form>
             <div class="row">
-                
-                <div class="form-group">
+                <div class="col-md-6 mb-3">
                     <?php wp_nonce_field( 'houzez_role_pass_ajax_nonce', 'houzez-role-security-pass' );   ?>
                     <select name="houzez_user_role" id="houzez_user_role" class="selectpicker form-control" data-live-search="false" data-live-search-style="begins" title="">
                         <option value=""><?php esc_html_e( 'Select Role', 'houzez' )?></option>
@@ -42,9 +40,8 @@ if( ( houzez_option('user_show_roles_profile') != 0 && !houzez_is_admin() && ! h
                         ?>
                     </select>
                 </div>
-
-            </div><!-- row -->
-        </div><!-- col-md-9 col-sm-12 -->
-    </div><!-- row -->
-</div><!-- dashboard-content-block -->
+            </div>
+        </form>
+    </div>
+</div>
 <?php } ?>

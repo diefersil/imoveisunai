@@ -37,6 +37,7 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
             add_action( 'elementor/frontend/before_enqueue_scripts', array( $this, 'houzez_enqueue_scripts' ) );
             add_action( 'elementor/frontend/after_enqueue_styles', array( $this, 'enqueue_frontend_styles' ) );
             add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'enqueue_editor_styles' ), 0 );
+            add_action( 'elementor/frontend/after_enqueue_scripts', array( $this, 'enqueue_editor_scripts' ), 0 );
 
             add_action( 'elementor/dynamic_tags/register', array( $this, 'register_tags' ) );
             add_action( 'elementor/controls/register', array( $this, 'register_controls' ) );
@@ -85,15 +86,94 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
                 ]
             );
 
-            //if( did_action( 'elementor_pro/init' ) ) {
-                $elements_manager->add_category(
-                    'houzez-single-property',
-                    [
-                        'title' => esc_html__( 'Houzez Single Property', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-plug',
-                    ]
-                );
-            //}
+            $elements_manager->add_category(
+                'houzez-header-footer-builder',
+                [
+                    'title' => esc_html__( 'Houzez Header & Footer', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+            
+            $elements_manager->add_category(
+                'houzez-single-property',
+                [
+                    'title' => esc_html__( 'Houzez Single Property', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-property-builder',
+                [
+                    'title' => esc_html__( 'Houzez Single Property', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-agent',
+                [
+                    'title' => esc_html__( 'Houzez Single Agent', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-agent-builder',
+                [
+                    'title' => esc_html__( 'Houzez Single Agent', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-agency',
+                [
+                    'title' => esc_html__( 'Houzez Single Agency', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-agency-builder',
+                [
+                    'title' => esc_html__( 'Houzez Single Agency', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-loop-builder',
+                [
+                    'title' => esc_html__( 'Houzez Loop Builder', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-post-builder',
+                [
+                    'title' => esc_html__( 'Houzez Single Post', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-single-post',
+                [
+                    'title' => esc_html__( 'Houzez Single Post', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+
+            $elements_manager->add_category(
+                'houzez-sidebar-widgets',
+                [
+                    'title' => esc_html__( 'Houzez Sidebar/Footer Widgets ', 'houzez-theme-functionality' ),
+                    'icon' => 'fa fa-plug',
+                ]
+            );
+            
         }
 
         /**
@@ -104,7 +184,7 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
          */
         public function elementor_widgets( $widgets_manager ) {
 
-            if( class_exists('houzez_data_source') ) {
+            if( class_exists('Houzez_Data_Source') ) {
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-title.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/space.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/search-builder.php';
@@ -141,6 +221,8 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/taxonomies-list.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/properties-slider.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/banner-image.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/custom-carousel.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/mapbox.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/google-map.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/open-street-map.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/agents.php';
@@ -149,6 +231,7 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/inquiry-form.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/testimonials.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/testimonials-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/testimonials-v3.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/team-member.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/partners.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/icon-box.php';
@@ -165,59 +248,137 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/header-footer/area-switcher.php';
                 require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/header-footer/lang.php';
 
-                //if( did_action( 'elementor_pro/init' ) ) {
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/breadcrumb.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-title.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-price.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-address.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/item-tools.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/status-label.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/item-label.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/featured-label.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-content.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-excerpt.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/featured-image.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v1.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v2.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v3.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v5.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v6.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-toparea-v7.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-overview.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-overview-v2.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-description.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-details.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-address.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-block-gallery.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-google-map.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-open-street-map.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-features.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-attachments.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-video.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-floorplan.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-floorplan-v2.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-360-virtual.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-energy.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-calculator.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-nearby.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-walkscore.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-contact-bottom.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-contact-2.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-schedule-tour.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-schedule-tour-v2.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-similar.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-sublistings.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-review.php';
-                    require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/section-calendar.php';
-                //}
+                // Single Property widgets
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/breadcrumb.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-title.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-title-area.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-price.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-address.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/property-meta-data.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/agent-card.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/item-tools.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/status-label.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/item-label.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/featured-label.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-content.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/property-excerpt.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/featured-image.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v1.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v3.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v5.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v6.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-toparea-v7.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/images-gallery-v1.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/images-gallery-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/images-gallery-v3.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/images-gallery-v4.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/images-gallery-v5.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-block-gallery.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-overview.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-overview-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-description.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-details.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-address.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-google-map.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-map.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-open-street-map.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-features.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-attachments.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-video.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-floorplan.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-floorplan-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-360-virtual.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-energy.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-calculator.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-nearby.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-walkscore.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-contact-bottom.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-contact-2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-schedule-tour.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-schedule-tour-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-similar.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-sublistings.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-review.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-property/section-calendar.php';
+
+                //Single Agent Widgets
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-name.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-image.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-content.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-excerpt.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-rating.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-position.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-meta.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-contact-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-contact-form.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-whatsapp-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-call-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-telegram-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-line-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-listings.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-review.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-map.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-profile-v1.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-profile-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-stats.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-single-stats.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-about.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-listings-review.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-contact.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agent/agent-search.php';
+
+                //Single Agency Widgets
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-profile-v1.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-profile-v2.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-stats.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-single-stats.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-about.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-listings-review.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-listings.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-agents.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-review.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-contact.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-search.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-meta.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-name.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-image.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-content.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-excerpt.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-rating.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-address.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-contact-form.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-contact-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-call-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-whatsapp-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-telegram-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-line-btn.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-agency/agency-map.php';
+
+                //Single Post Widgets
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-title.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-info.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-content.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-excerpt.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-image.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/author-box.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-navigation.php';
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/single-post/post-comments.php';
+
+                //Sidebar widgets
+                require_once HOUZEZ_PLUGIN_PATH . '/elementor/widgets/sidebar/code-banner.php';
 
             }
         }
 
         public function houzez_register_traits() {
-            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Property_Card_Common_Filters.php';
-            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Property_Taxonomies.php';
-            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Filters_2.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Button_Traits.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Form_Traits.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Preview_Query.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Filters_Traits.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Style_Traits.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Property_Cards_Traits.php';
+            require_once HOUZEZ_PLUGIN_PATH . '/elementor/traits/Houzez_Testimonials_Traits.php';
         }
 
         public function houzez_wpml_elementor_translation() {
@@ -301,7 +462,33 @@ if( ! class_exists( 'Houzez_Elementor_Extensions' ) ) {
          */
         public function houzez_enqueue_scripts() {
             $js_path = 'assets/frontend/js/';
-        
+            wp_register_script( 'houzez-validate-js', HOUZEZ_PLUGIN_URL . $js_path . 'houzez-validate.js', array( 'jquery' ), '1.0.0' );
+        }
+
+        public function enqueue_editor_scripts() {
+            $js_path = 'assets/frontend/js/';
+
+            // Check if we're in Elementor edit mode
+            $is_edit_mode = false;
+
+            // Method 1: Standard check
+            if (\Elementor\Plugin::$instance->editor->is_edit_mode()) {
+                $is_edit_mode = true;
+            }
+            
+            // Method 2: Through preview or request
+            if (!$is_edit_mode) {
+                if (\Elementor\Plugin::$instance->preview->is_preview_mode()) {
+                    $is_edit_mode = true;
+                } elseif (isset($_GET['elementor-preview'])) {
+                    $is_edit_mode = true;
+                }
+            }
+
+            // Enqueue script if in Elementor edit mode
+            if ($is_edit_mode) {
+                wp_enqueue_script('houzez-widgets-hooks', HOUZEZ_PLUGIN_URL.$js_path . 'widgets-hooks.js', [], '1.0.0', true);
+            }
         }
 
         /**

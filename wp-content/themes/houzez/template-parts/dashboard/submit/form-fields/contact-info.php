@@ -27,7 +27,7 @@ if(houzez_is_agency()) {
 }
 
 ?>
-<div class="form-group">
+<div class="mb-3">
 
 	<?php if ( ! houzez_is_agency() ) { ?>
 	<label class="control control--checkbox ">
@@ -41,7 +41,7 @@ if(houzez_is_agency()) {
 		<span class="control__indicator"></span>
 	</label>
 
-	<div class="agents-dropdown <?php echo esc_attr($agent_hidden_class); ?> form-group ml-2 form-group col-sm-12 col-md-5">
+	<div class="agents-dropdown <?php echo esc_attr($agent_hidden_class); ?> form-group ms-2 form-group col-sm-12 col-md-5">
 		<select name="fave_agents[]" class="selectpicker form-control bs-select-hidden" title="<?php echo houzez_option('cl_agent_info_plac', 'Select an Agent'); ?>" data-live-search="true" data-selected-text-format="count > 2"  data-actions-box="false" multiple>
 			<?php
 
@@ -97,13 +97,16 @@ if(houzez_is_agency()) {
 		</select>
 	</div>
 
+	
+
+	<?php if ( ! houzez_is_agency() && houzez_check_post_types_plugin('houzez_agencies_post') ) { ?>
+
 	<label class="control control--checkbox">
 		<input <?php checked($agent_display_option, 'agency_info', true); ?> type="radio" value="agency_info" name="fave_agent_display_option"> <?php echo $agency_info_text; ?>
 		<span class="control__indicator"></span>
 	</label>
-
-	<?php if ( ! houzez_is_agency() ) { ?>
-	<div class="agencies-dropdown <?php echo esc_attr($agency_hidden_class); ?> listform-group ml-2 form-group col-sm-12 col-md-5">
+	
+	<div class="agencies-dropdown <?php echo esc_attr($agency_hidden_class); ?> listform-group ms-2 form-group col-sm-12 col-md-5">
 		<select name="fave_property_agency[]" class="selectpicker form-control bs-select-hidden" title="<?php echo houzez_option('cl_agency_info_plac', 'Select an Agency'); ?>" data-live-search="true" data-selected-text-format="count > 2"  data-actions-box="false" multiple>
             <?php
             if (!empty($agency_posts)) {

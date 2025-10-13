@@ -1,13 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Waqas Riaz
- * Date: 22/12/16
- * Time: 5:15 PM
- * Since v1.5.0
+ * Taxonomy Property Label
+ * Created by Waqas Riaz
+ * Date: 08/01/16
+ * Time: 4:26 PM
+ * Updated: 06/03/25
  */
 get_header();
 
-get_template_part("template-parts/common-taxonomy");
+get_template_part('template-parts/taxonomy/taxonomy', 'common');
 
 get_footer();

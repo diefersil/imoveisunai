@@ -1,168 +1,114 @@
 <?php
+/**
+ * Normal Page Search Results Template
+ * Updated to match taxonomy-common.php structure
+ * Date: 06/03/25
+ */
 global $post, $paged, $listing_founds, $search_qry;
+
+// Set up the default view
+$default_view_option = houzez_option('search_result_posts_layout', 'list-view-v1');
+
+// Determine if we should show the view switcher based on version
+$show_switch = true;
+if (in_array($default_view_option, array('grid-view-v3', 'grid-view-v4', 'grid-view-v5', 'grid-view-v6', 'list-view-v4', 'list-view-v7'))) {
+    $show_switch = false;
+}
+
+// Default arguments
+$args = array(
+    'default_view' => $default_view_option,
+    'layout' => houzez_option('search_result_layout', 'right-sidebar'),
+    'grid_columns' => houzez_option('search_grid_columns', '3'),
+    'content_position' => houzez_get_listing_data('listing_page_content_area'),
+    'show_switch' => $show_switch,
+);
+
+// Get view settings
+$view_settings = houzez_get_listing_view_settings($args['default_view']);
+$current_view = $view_settings['current_view'];
+$current_item_template = $view_settings['current_item_template'];
+$item_version = $view_settings['item_version'];
+
+// Force no sidebar for list-v4
+if ($current_item_template == 'list-v4') {
+    $args['layout'] = 'no-sidebar';
+}
+
+// Set container class based on layout
+$container_class = 'container';
+$container_class = apply_filters('houzez_search_container_class', $container_class, $args['layout']);
+
+// Set up sidebar and content classes
+$show_sidebar = ($args['layout'] != 'no-sidebar');
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
-if( $sticky_sidebar['search_sidebar'] != 0 ) { 
-    $is_sticky = 'houzez_sticky'; 
+if (isset($sticky_sidebar['search_sidebar']) && $sticky_sidebar['search_sidebar'] != 0) {
+    $is_sticky = 'houzez_sticky';
 }
 
-$listing_view = houzez_option('search_result_posts_layout', 'list-view-v1');
-$search_result_layout = houzez_option('search_result_layout');
-$search_num_posts = houzez_option('search_num_posts');
+// Set content column class based on layout and sidebar
+$content_col_class = $show_sidebar ? 'col-lg-8 col-md-12 bt-content-wrap' : 'col-lg-12 col-md-12';
+if ($args['layout'] == 'left-sidebar') {
+    $content_col_class .= ' order-lg-2 order-1 wrap-order-first'; // Right side on desktop (lg), first on mobile
+}
+$content_col_class = apply_filters('houzez_search_content_class', $content_col_class, $show_sidebar);
+
+// Get listing view class
+$listing_view_class = houzez_get_listing_view_class($current_view, $item_version, $args['layout'], $args['grid_columns']);
+
+// Search settings
 $enable_save_search = houzez_option('enable_disable_save_search');
+$search_num_posts = houzez_option('search_num_posts');
+$number_of_prop = $search_num_posts ? $search_num_posts : 9;
 
-$have_switcher = true;
-$card_deck = 'card-deck';
-
-$wrap_class = $item_layout = $view_class = $cols_in_row = '';
-
-if($listing_view == 'list-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'list-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v3') {
-    $wrap_class = 'listing-v3';
-    $item_layout = 'v3';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'grid-view-v4') {
-    $wrap_class = 'listing-v4';
-    $item_layout = 'v4';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'list-view-v4') {
-    $wrap_class = 'listing-list-v4';
-    $item_layout = 'list-v4';
-    $view_class = 'list-view listing-view-v4';
-    $have_switcher = false;
-    $card_deck = '';
-    $search_result_layout = 'no-sidebar';
-
-} elseif($listing_view == 'list-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v6') {
-    $wrap_class = 'listing-v6';
-    $item_layout = 'v6';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'grid-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'v7';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'list-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'list-v7';
-    $view_class = 'list-view';
-    $have_switcher = false;
-    $card_deck = '';
-
-} else {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
-}
-
-if($view_class == 'grid-view' && $search_result_layout == 'no-sidebar') {
-    $cols_in_row = 'grid-view-3-cols';
-}
-
-$page_content_position = houzez_get_listing_data('listing_page_content_area');
-
-
-if( $search_result_layout == 'no-sidebar' ) {
-    $content_classes = 'col-lg-12 col-md-12';
-} else if( $search_result_layout == 'left-sidebar' ) {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap wrap-order-first';
-} else if( $search_result_layout == 'right-sidebar' ) {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap';
-} else {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap';
-}
-
-$number_of_prop = $search_num_posts;
-if(!$number_of_prop){
-    $number_of_prop = 9;
-}
-
-if ( is_front_page()  ) {
+if (is_front_page()) {
     $paged = (get_query_var('page')) ? get_query_var('page') : 1;
 }
 
+// Set up query arguments
 $search_qry = array(
     'post_type' => 'property',
     'posts_per_page' => $number_of_prop,
     'paged' => $paged,
     'post_status' => 'publish'
-
 );
 
-$search_qry = apply_filters( 'houzez20_search_filters', $search_qry );
-$search_qry = apply_filters( 'houzez_sold_status_filter', $search_qry );
-$search_qry = houzez_prop_sort ( $search_qry );
-$search_query = new WP_Query( $search_qry );
+$search_qry = apply_filters('houzez20_search_filters', $search_qry);
+$search_qry = apply_filters('houzez_sold_status_filter', $search_qry);
+$search_qry = houzez_prop_sort($search_qry);
+$search_query = new WP_Query($search_qry);
 
+// Get total records found
 $total_records = $search_query->found_posts;
 
 $record_found_text = esc_html__('Result Found', 'houzez');
-if( $total_records > 1 ) {
+if ($total_records > 1) {
     $record_found_text = esc_html__('Results Found', 'houzez');
 }
 ?>
-<section class="listing-wrap <?php echo esc_attr($wrap_class); ?>">
-    <div class="container">
-
+<section class="listing-wrap listing-<?php echo esc_attr($item_version); ?>" role="region">
+    <div class="<?php echo esc_attr($container_class); ?>">
         <div class="page-title-wrap">
-
             <?php get_template_part('template-parts/page/breadcrumb'); ?> 
             <div class="d-flex align-items-center">
                 <div class="page-title flex-grow-1">
                     <h1><?php the_title(); ?></h1>
                 </div><!-- page-title -->
                 <?php 
-                if($have_switcher) {
+                if ($args['show_switch']) {
                     get_template_part('template-parts/listing/listing-switch-view'); 
                 }?> 
             </div><!-- d-flex -->  
-
         </div><!-- page-title-wrap -->
 
         <div class="row">
-            <div class="<?php echo esc_attr($content_classes); ?>">
-
+            <div class="<?php echo esc_attr($content_col_class); ?>">
                 <?php
-                if ( $page_content_position !== '1' ) {
-                    if ( have_posts() ) {
-                        while ( have_posts() ) {
+                if ($args['content_position'] !== '1') {
+                    if (have_posts()) {
+                        while (have_posts()) {
                             the_post();
                             ?>
                             <article <?php post_class(); ?>>
@@ -180,65 +126,58 @@ if( $total_records > 1 ) {
                         </div>
                         <?php get_template_part('template-parts/listing/listing-sort-by'); ?>   
                         <?php
-                        if( $enable_save_search != 0 ) {
+                        if ($enable_save_search != 0) {
                             get_template_part('template-parts/search/save-search-btn');
                         }?> 
                     </div><!-- d-flex -->
-                    
-                    
-
                 </div><!-- listing-tools-wrap -->
 
-                <div class="listing-view <?php echo esc_attr($view_class).' '.esc_attr($cols_in_row).' '.esc_attr($card_deck); ?>">
+                <div class="<?php echo esc_attr($listing_view_class); ?>" role="list" data-view="<?php echo esc_attr($current_view); ?>">
                     <?php
-                    if ( $search_query->have_posts() ) :
-                        while ( $search_query->have_posts() ) : $search_query->the_post();
-
-                            get_template_part('template-parts/listing/item', $item_layout);
-
+                    if ($search_query->have_posts()) :
+                        while ($search_query->have_posts()) : $search_query->the_post();
+                            get_template_part('template-parts/listing/item', $current_item_template);
                         endwhile;
                     else:
-                        
                         echo '<div class="search-no-results-found-wrap">';
                             echo '<div class="search-no-results-found">';
                                 esc_html_e('No results found', 'houzez');
                             echo '</div>';
                         echo '</div>';
-                        
                     endif;
                     wp_reset_postdata();
                     ?> 
                 </div><!-- listing-view -->
 
-                <?php houzez_pagination( $search_query->max_num_pages, $total_records, $number_of_prop ); ?>
+                <?php houzez_pagination($search_query->max_num_pages, $total_records, $number_of_prop); ?>
 
             </div><!-- bt-content-wrap -->
 
-            <?php if( $search_result_layout != 'no-sidebar' ) { ?>
-            <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
+            <?php if ($show_sidebar) : ?>
+            <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo $args['layout'] == 'left-sidebar' ? 'order-lg-1 order-2' : ''; ?> <?php echo esc_attr($is_sticky); ?>">
                 <aside class="sidebar-wrap">
                     <?php
-                    if( is_active_sidebar( 'search-sidebar' ) ) {
-                        dynamic_sidebar( 'search-sidebar' );
+                    if (is_active_sidebar('search-sidebar')) {
+                        dynamic_sidebar('search-sidebar');
                     }
                     ?>
                 </aside>
             </div><!-- bt-sidebar-wrap -->
-            <?php } ?>
-
+            <?php endif; ?>
         </div><!-- row -->
-
     </div><!-- container -->
 </section><!-- listing-wrap -->
 
 <?php
-if ('1' === $page_content_position ) {
-    if ( have_posts() ) {
-        while ( have_posts() ) {
+if ('1' === $args['content_position']) {
+    if (have_posts()) {
+        while (have_posts()) {
             the_post();
             ?>
             <section class="content-wrap">
-                <?php the_content(); ?>
+                <div class="container">
+                    <?php the_content(); ?>
+                </div>
             </section>
             <?php
         }

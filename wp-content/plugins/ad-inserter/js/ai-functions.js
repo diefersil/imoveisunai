@@ -2178,6 +2178,154 @@ ai_ready (ai_configure_sticky_widgets);
 }
 if (typeof ai_cookie_js !== 'undefined') {
 
+/*! js-cookie v3.0.5 | MIT */
+;
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, (function () {
+    var current = global.Cookies;
+    var exports = global.Cookies = factory();
+    exports.noConflict = function () { global.Cookies = current; return exports; };
+  })());
+})(this, (function () { 'use strict';
+
+  /* eslint-disable no-var */
+  function assign (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        target[key] = source[key];
+      }
+    }
+    return target
+  }
+  /* eslint-enable no-var */
+
+  /* eslint-disable no-var */
+  var defaultConverter = {
+    read: function (value) {
+      if (value[0] === '"') {
+        value = value.slice(1, -1);
+      }
+      return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
+    },
+    write: function (value) {
+      return encodeURIComponent(value).replace(
+        /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
+        decodeURIComponent
+      )
+    }
+  };
+  /* eslint-enable no-var */
+
+  /* eslint-disable no-var */
+
+  function init (converter, defaultAttributes) {
+    function set (name, value, attributes) {
+      if (typeof document === 'undefined') {
+        return
+      }
+
+      attributes = assign({}, defaultAttributes, attributes);
+
+      if (typeof attributes.expires === 'number') {
+        attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
+      }
+      if (attributes.expires) {
+        attributes.expires = attributes.expires.toUTCString();
+      }
+
+      name = encodeURIComponent(name)
+        .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+        .replace(/[()]/g, escape);
+
+      var stringifiedAttributes = '';
+      for (var attributeName in attributes) {
+        if (!attributes[attributeName]) {
+          continue
+        }
+
+        stringifiedAttributes += '; ' + attributeName;
+
+        if (attributes[attributeName] === true) {
+          continue
+        }
+
+        // Considers RFC 6265 section 5.2:
+        // ...
+        // 3.  If the remaining unparsed-attributes contains a %x3B (";")
+        //     character:
+        // Consume the characters of the unparsed-attributes up to,
+        // not including, the first %x3B (";") character.
+        // ...
+        stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
+      }
+
+      return (document.cookie =
+        name + '=' + converter.write(value, name) + stringifiedAttributes)
+    }
+
+    function get (name) {
+      if (typeof document === 'undefined' || (arguments.length && !name)) {
+        return
+      }
+
+      // To prevent the for loop in the first place assign an empty array
+      // in case there are no cookies at all.
+      var cookies = document.cookie ? document.cookie.split('; ') : [];
+      var jar = {};
+      for (var i = 0; i < cookies.length; i++) {
+        var parts = cookies[i].split('=');
+        var value = parts.slice(1).join('=');
+
+        try {
+          var found = decodeURIComponent(parts[0]);
+          jar[found] = converter.read(value, found);
+
+          if (name === found) {
+            break
+          }
+        } catch (e) {}
+      }
+
+      return name ? jar[name] : jar
+    }
+
+    return Object.create(
+      {
+        set,
+        get,
+        remove: function (name, attributes) {
+          set(
+            name,
+            '',
+            assign({}, attributes, {
+              expires: -1
+            })
+          );
+        },
+        withAttributes: function (attributes) {
+          return init(this.converter, assign({}, this.attributes, attributes))
+        },
+        withConverter: function (converter) {
+          return init(assign({}, this.converter, converter), this.attributes)
+        }
+      },
+      {
+        attributes: { value: Object.freeze(defaultAttributes) },
+        converter: { value: Object.freeze(converter) }
+      }
+    )
+  }
+
+  var api = init(defaultConverter, { path: '/' });
+  /* eslint-enable no-var */
+
+  return api;
+
+}));
+
 /*!
  * JavaScript Cookie v2.2.0
  * https://github.com/js-cookie/js-cookie
@@ -2185,6 +2333,7 @@ if (typeof ai_cookie_js !== 'undefined') {
  * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
  * Released under the MIT license
  */
+/*
 ;(function (factory) {
   var registeredInModuleLoader;
   if (typeof define === 'function' && define.amd) {
@@ -2322,10 +2471,10 @@ if (typeof ai_cookie_js !== 'undefined') {
 
     api.set = set;
     api.get = function (key) {
-      return get(key, false /* read as raw */);
+      return get(key, false /* read as raw * /);
     };
     api.getJSON = function (key) {
-      return get(key, true /* read as json */);
+      return get(key, true /* read as json * /);
     };
     api.remove = function (key, attributes) {
       set(key, '', extend(attributes, {
@@ -2342,10 +2491,26 @@ if (typeof ai_cookie_js !== 'undefined') {
 
   return init(function () {});
 }));
-
+*/
 
 AiCookies = Cookies.noConflict();
 
+
+function ai_json_data (cookie) {
+  if (cookie == null) {
+    return cookie;
+  }
+
+  if (cookie.charAt (0) === '"') {
+    cookie = cookie.slice (1, -1);
+  }
+
+  try {
+    cookie = JSON.parse (cookie);
+  } catch (e) {}
+
+  return cookie;
+}
 
 ai_check_block = function (block) {
 //  var ai_debug = typeof ai_debugging !== 'undefined'; // 1
@@ -2356,7 +2521,10 @@ ai_check_block = function (block) {
   }
 
   var ai_cookie_name = 'aiBLOCKS';
-  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+//  ###
+//  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+  var ai_cookie = ai_json_data (AiCookies.get (ai_cookie_name));
+
   ai_debug_cookie_status = '';
 
   if (ai_cookie == null) {
@@ -2670,7 +2838,10 @@ ai_load_cookie = function () {
   var ai_debug = false;
 
   var ai_cookie_name = 'aiBLOCKS';
-  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+
+//  ###
+//  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+  var ai_cookie = ai_json_data (AiCookies.get (ai_cookie_name));
 
   if (ai_cookie == null) {
     ai_cookie = {};
@@ -2739,11 +2910,16 @@ ai_set_cookie = function (block, property, value) {
 
     if (ai_debug) console.log ('AI COOKIE REMOVED');
   } else {
-      AiCookies.set (ai_cookie_name, ai_cookie, {expires: 365, path: '/'});
+//    ###
+//      AiCookies.set (ai_cookie_name, ai_cookie, {expires: 365, path: '/'});
+      AiCookies.set (ai_cookie_name, JSON.stringify (ai_cookie), {expires: 365, path: '/'});
     }
 
   if (ai_debug) {
-    var ai_cookie_test = AiCookies.getJSON (ai_cookie_name);
+//    ###
+//    var ai_cookie_test = AiCookies.getJSON (ai_cookie_name);
+    var ai_cookie_test = ai_json_data (AiCookies.get (ai_cookie_name));
+
     if (typeof (ai_cookie_test) != 'undefined') {
       console.log ('AI COOKIE NEW', ai_cookie_test);
 
@@ -2812,7 +2988,9 @@ ai_set_cookie = function (block, property, value) {
 
 ai_get_cookie_text = function (block) {
   var ai_cookie_name = 'aiBLOCKS';
-  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+//  ###
+//  var ai_cookie = AiCookies.getJSON (ai_cookie_name);
+  var ai_cookie = ai_json_data (AiCookies.get (ai_cookie_name));
 
   if (ai_cookie == null) {
     ai_cookie = {};
@@ -3273,6 +3451,17 @@ function ai_tracking () {
       if (ai_debug) console.log ("AI TRACKING Google Universal Analytics by MonsterInsights:", non_interaction);
     }
 //    else
+
+    if (typeof window.dataLayer == 'object') {
+      window.dataLayer.push ({
+          'event': 'tracking',
+          'eventCategory': category,
+          'eventAction': action,
+          'eventLabel': label
+      });
+
+      if (ai_debug) console.log ("AI TRACKING Google Tag Manager:", non_interaction);
+    }
 
     if (typeof _gaq == 'object') {
 //      _gaq.push (['_trackEvent', category, action, label]);
@@ -5239,11 +5428,14 @@ function ai_check_close_buttons () {
     var ai_close_button = element.querySelector ('.ai-close-button.ai-close-unprocessed');
 
     if (ai_close_button != null) {
+      var block = ai_close_button.dataset.aiBlock;
+
       ai_close_button.addEventListener ('click', (event) => {
+
         ai_close_block (ai_close_button);
 
         if (typeof ai_close_button_action == 'function') {
-          var block = ai_close_button.dataset.aiBlock;
+//          var block = ai_close_button.dataset.aiBlock;
 
           if (ai_debug) console.log ('AI CLOSE BUTTON ai_close_button_action (' + block + ') CALLED');
 
@@ -5251,10 +5443,20 @@ function ai_check_close_buttons () {
         }
       });
 
+      var min_block_height = 0;
+      if (typeof ai_close_min_block_height !== 'undefined' && ai_close_min_block_height.constructor === Array) {
+        if (typeof ai_close_min_block_height [block] !== 'undefined') {
+          min_block_height = ai_close_min_block_height [block];
+
+          if (ai_debug) console.log ('AI CLOSE BUTTON ai_close_min_block_height [' + block + '] =', min_block_height);
+        }
+      }
+
 
 //      if ($(element).outerHeight () !== 0) {
       // ***
-      if (element.offsetHeight !== 0) {
+//      if (element.offsetHeight !== 0) {
+      if (element.offsetHeight !== 0 && element.offsetHeight >= min_block_height) {
 //        if (!$(element).find ('.ai-parallax').length) {
         // ***
         if (element.querySelector ('.ai-parallax') == null) {
@@ -5273,7 +5475,7 @@ function ai_check_close_buttons () {
       } else {
 //          if (ai_debug) console.log ('AI CLOSE BUTTON outerHeight 0', $(element).attr ('class'));
           // ***
-          if (ai_debug) console.log ('AI CLOSE BUTTON outerHeight 0', element.hasAttribute ("class") ? element.getAttribute ('class') : '');
+          if (ai_debug) console.log ('AI CLOSE BUTTON element.offsetHeight:', element.offsetHeight, element.hasAttribute ("class") ? element.getAttribute ('class') : '');
 
 //          var ai_close_button = $(element);
           // ***
@@ -5283,7 +5485,8 @@ function ai_check_close_buttons () {
 
 //            if (ai_close_button.outerHeight () !== 0) {
             // ***
-            if (ai_close_button.offsetHeight !== 0) {
+//            if (ai_close_button.offsetHeight !== 0) {
+            if (ai_close_button.offsetHeight !== 0 && ai_close_button.offsetHeight >= min_block_height) {
 //              if (!ai_close_button.find ('.ai-parallax').length) {
               // ***
 //              if (!ai_close_button.find ('.ai-parallax').length) {
@@ -5303,7 +5506,7 @@ function ai_check_close_buttons () {
               if (ai_debug) console.log ('AI DELAYED CLOSE BUTTON ', ai_close_button.hasAttribute ("class") ? ai_close_button.getAttribute ('class') : '');
 //            } else if (ai_debug) console.log ('AI DELAYED CLOSE BUTTON outerHeight 0', ai_close_button.attr ('class'));
             // ***
-            } else if (ai_debug) console.log ('AI DELAYED CLOSE BUTTON outerHeight 0', ai_close_button.hasAttribute ("class") ? ai_close_button.getAttribute ('class') : '');
+            } else if (ai_debug) console.log ('AI DELAYED CLOSE BUTTON element.offsetHeight:', element.offsetHeight, ai_close_button.hasAttribute ("class") ? ai_close_button.getAttribute ('class') : '');
           }, 4000);
         }
 
@@ -5968,8 +6171,6 @@ function ai_process_element (element) {
 
 }
 
-// ***
-//jQuery (function ($) {
 
 if (typeof ai_ip != 'undefined') {
 
@@ -5994,8 +6195,6 @@ if (typeof ai_ip != 'undefined') {
     var ai_debug = typeof ai_debugging !== 'undefined'; // 1
 //    var ai_debug = false;
 
-    // ***
-//    ai_ip_data_blocks.removeClass ('ai-ip-data');
     ai_ip_data_blocks.forEach ((element, i) => {
       element.classList.remove ('ai-ip-data');
     });
@@ -6045,30 +6244,19 @@ if (typeof ai_ip != 'undefined') {
     if (subdivision == null) subdivision = '';
     if (city == null) city = '';
 
-    // ***
-//    if (ip_data_array != null) ai_ip_data_blocks.each (function () {
     if (ip_data_array != null) ai_ip_data_blocks.forEach ((el, i) => {
 
-    // ***
-//      var block_wrapping_div = $(this).closest ('div.AI_FUNCT_GET_BLOCK_CLASS_NAME');
       var block_wrapping_div = el.closest ('div.' + ai_block_class_def);
 
-    // ***
-//      if (ai_debug) console.log ('AI LISTS BLOCK', block_wrapping_div.attr ('class'));
       if (ai_debug) console.log ('AI LISTS BLOCK', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.getAttribute ('class') : '');
-//
+
       enable_block = true;
       var ip_addresses_processed = false;
 
-      // ***
-//      var ip_addresses_list = $(this).attr ("ip-addresses");
-//      if (typeof ip_addresses_list != "undefined") {
       if (el.hasAttribute ("ip-addresses")) {
         var ip_addresses_list = el.getAttribute ("ip-addresses");
 
         var ip_address_array      = ip_addresses_list.split (",");
-        // ***
-//        var ip_address_list_type  = $(this).attr ("ip-address-list");
         var ip_address_list_type  = el.getAttribute ("ip-address-list");
 
         if (ai_debug) console.log ("AI LISTS ip address:     ", ip_address);
@@ -6076,8 +6264,6 @@ if (typeof ai_ip != 'undefined') {
 
         var found = false;
 
-        // ***
-//        $.each (ip_address_array, function (index, list_ip_address) {
         ip_address_array.every ((list_ip_address, index) => {
 
           if (list_ip_address.charAt (0) == "*") {
@@ -6137,15 +6323,10 @@ if (typeof ai_ip != 'undefined') {
       }
 
       if (enable_block) {
-        // ***
-//        var countries_list = $(this).attr ("countries");
-//        if (typeof countries_list != "undefined") {
         if (el.hasAttribute ("countries")) {
           var countries_list = el.getAttribute ("countries");
 
           var country_array     = countries_list.split (",");
-          // ***
-//          var country_list_type = $(this).attr ("country-list");
           var country_list_type = el.getAttribute ("country-list");
 
             if (ai_debug && ip_addresses_processed) console.log ('');
@@ -6153,8 +6334,6 @@ if (typeof ai_ip != 'undefined') {
             if (ai_debug) console.log ("AI LISTS country list:", countries_list, country_list_type);
 
           var found = false;
-          // ***
-//          $.each (country_array, function (index, list_country) {
           country_array.every ((list_country, index) => {
 
             var list_country_data = list_country.trim ().split (":");
@@ -6188,18 +6367,12 @@ if (typeof ai_ip != 'undefined') {
         }
       }
 
-      // ***
-//      $(this).css ({"visibility": "", "position": "", "width": "", "height": "", "z-index": ""});
       el.style.visibility = '';
       el.style.position = '';
       el.style.width = '';
       el.style.height = '';
       el.style.zIndex = '';
 
-      // ***
-//      var debug_bar = $(this).prev ('.ai-debug-bar');
-//      debug_bar.find ('.ai-debug-name.ai-ip-country').text (ip_data_text);
-//      debug_bar.find ('.ai-debug-name.ai-ip-status').text (enable_block ? ai_front.visible : ai_front.hidden);
       var debug_bar = el.previousElementSibling;
       while (debug_bar) {
         if (debug_bar.matches ('.ai-debug-bar')) break;
@@ -6217,87 +6390,50 @@ if (typeof ai_ip != 'undefined') {
       }
 
       if (!enable_block) {
-        // ***
-//        $(this).hide (); // .ai-list-data
         el.style.display = 'none';
 
-        // ***
-//        if (block_wrapping_div.length) {
         if (block_wrapping_div != null) {
-          // ***
-//          block_wrapping_div.removeAttr ('data-ai').removeClass ('ai-track');
           block_wrapping_div.removeAttribute ('data-ai');
           block_wrapping_div.classList.remove ('ai-track');
 
-          // ***
-//          if (block_wrapping_div.find ('.ai-debug-block').length) {
           if (block_wrapping_div.querySelector (".ai-debug-block") != null) {
 
-            // ***
-//            block_wrapping_div.css ({"visibility": ""}).removeClass ('ai-close');
             block_wrapping_div.style.visibility = '';
             block_wrapping_div.classList.remove ('ai-close');
 
-            // ***
-//            if (block_wrapping_div.hasClass ('ai-remove-position')) {
             if (block_wrapping_div.classList.contains ('ai-remove-position')) {
-              // ***
-//              block_wrapping_div.css ({"position": ""});
               block_wrapping_div.style.position = '';
             }
 
             // In case client-side insert is used and lists will not be processed
-            // ***
-//            if (typeof $(this).data ('code') != 'undefined') {
             if (el.hasAttribute ('data-code')) {
 
               // Remove ai-list-block to show debug info
-              // ***
-//              block_wrapping_div.removeClass ('ai-list-block');
-//              block_wrapping_div.removeClass ('ai-list-block-filter');
               block_wrapping_div.classList.remove ('ai-list-block');
               block_wrapping_div.classList.remove ('ai-list-block-filter');
 
               // Remove also 'NOT LOADED' bar if it is there
-              // ***
-//              if (block_wrapping_div.prev ().hasClass ('ai-debug-info')) {
               if (block_wrapping_div.previousElementSibling != null && block_wrapping_div.previousElementSibling.classList.contains ('ai-debug-info')) {
-                // ***
-//                block_wrapping_div.prev ().remove ();
                 block_wrapping_div.previousElementSibling.remove ();
               }
             }
 
           } else
-          // ***
-//          if (block_wrapping_div [0].hasAttribute ('style') && block_wrapping_div.attr ('style').indexOf ('height:') == - 1) {
           if (block_wrapping_div.hasAttribute ('style') && block_wrapping_div.getAttribute ('style').indexOf ('height:') == - 1) {
-            // ***
-//            block_wrapping_div.hide ();
             block_wrapping_div.style.display = 'none';
           }
         }
       } else {
           if (block_wrapping_div != null) {
-            // ***
-  //          block_wrapping_div.css ({"visibility": ""});
             block_wrapping_div.style.visibility = '';
 
-            // ***
-  //          if (block_wrapping_div.hasClass ('ai-remove-position')) {
             if (block_wrapping_div.classList.contains ('ai-remove-position')) {
-            // ***
-  //            block_wrapping_div.css ({"position": ""});
               block_wrapping_div.style.position = '';
             }
           }
 
-          // ***
-//          if (typeof $(this).data ('code') != 'undefined') {
           if (el.hasAttribute ('data-code')) {
 
-            // ***
-//            var block_code = b64d ($(this).data ('code'));
             var block_code = b64d (el.dataset.code);
 
             var range = document.createRange ();
@@ -6311,39 +6447,22 @@ if (typeof ai_ip != 'undefined') {
             }
 
             if (fragment_ok) {
-              // ***
-  //            if ($(this).closest ('head').length != 0) {
               if (el.closest ('head') != null) {
-                // ***
-  //              $(this).after (block_code);
                 el.parentNode.insertBefore (fragment, el.nextSibling);
 
-                // ***
-  //              if (!ai_debug) $(this).remove ();
                 if (!ai_debug) el.remove ();
-              // ***
-  //            } else $(this).append (block_code);
               } else el.append (fragment);
             }
 
-//                if (!ai_debug)
-            // ***
-//            $(this).attr ('data-code', '');
             el.removeAttribute ('data-code');
 
-            // ***
-//            if (ai_debug) console.log ('AI INSERT CODE', $(block_wrapping_div).attr ('class'));
             if (ai_debug) console.log ('AI INSERT CODE', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.getAttribute ('class') : '');
             if (ai_debug) console.log ('');
 
-            // ***
-//            ai_process_element (this);
             ai_process_element (el);
           }
         }
 
-      // ***
-//      block_wrapping_div.removeClass ('ai-list-block-ip');
       if (block_wrapping_div != null) {
         block_wrapping_div.classList.remove ('ai-list-block-ip');
       }
@@ -6356,19 +6475,14 @@ if (typeof ai_ip != 'undefined') {
 //    var ai_debug = false;
 
     if (ai_ip_data_blocks == null) {
-      // ***
-//      ai_ip_data_blocks = $("div.ai-ip-data, meta.ai-ip-data");
       ai_ip_data_blocks = document.querySelectorAll ("div.ai-ip-data, meta.ai-ip-data");
     } else {
         // Temp fix for jQuery elements
-        // ***
         if (window.jQuery && window.jQuery.fn && ai_ip_data_blocks instanceof jQuery) {
           // Convert jQuery object to array
           ai_ip_data_blocks = Array.prototype.slice.call (ai_ip_data_blocks);
         }
 
-        // ***
-//        ai_ip_data_blocks = ai_ip_data_blocks.filter ('.ai-ip-data');
         var filtered_elements = [];
         ai_ip_data_blocks.forEach ((element, i) => {
           if (element.matches ('.ai-ip-data')) {
@@ -6405,26 +6519,14 @@ if (typeof ai_ip != 'undefined') {
 
     ai_ip_data_requested = true;
 
-//    var site_url = "AI_SITE_URL";
-//    var page = site_url+"/wp-admin/admin-ajax.php?action=ai_ajax&ip-data=ip-address-country-city";
-    var page = ai_ajax_url + "?action=ai_ajax&ip-data=ip-address-country-city";
+    if (ai_debug && ai_use_maxmind == '1') console.log ("USING MAXMIND DB");
+
+    var page = ai_ajax_url + "?action=ai_ajax&ip-data=" + (ai_use_maxmind == '1' ? "ip-address-country-city" : "ip-address-country");
 
     var debug_ip_address = getParameterByName ("ai-debug-ip-address");
     if (debug_ip_address != null) page += "&ai-debug-ip-address=" + debug_ip_address;
     var debug_ip_address = getParameterByName ("ai-debug-country");
     if (debug_ip_address != null) page += "&ai-debug-country=" + debug_ip_address;
-
-      // ***
-//    $.get (page, function (ip_data) {
-//    $.ajax ({
-//        url: page,
-//        type: "post",
-//        data: {
-//          ai_check: ai_data_id,
-//          ai_version: ai_random_parameter ()
-//        },
-//        async: true
-//    }).done (function (ip_data) {
 
     var url_data = {
       ai_check: ai_data_id,
@@ -6480,8 +6582,6 @@ if (typeof ai_ip != 'undefined') {
       if (ai_debug) console.log ("AI IP RETURNED DATA:", ai_ip_data);
 
       // Check blocks again - some blocks might get inserted after the IP data was requested
-      // ***
-//      ai_ip_data_blocks = $("div.ai-ip-data, meta.ai-ip-data");
       ai_ip_data_blocks = document.querySelectorAll ("div.ai-ip-data, meta.ai-ip-data");
 
       if (ai_debug) console.log ("AI IP DATA BLOCKS:", ai_ip_data_blocks.length);
@@ -6489,20 +6589,11 @@ if (typeof ai_ip != 'undefined') {
       if (!ai_ip_data_blocks.length) return;
 
       process_ip_data (ai_ip_data_blocks);
-    // ***
-//    }).fail (function(jqXHR, status, err) {
     })
     .catch ((error) => {
-//      console.error (e.message); // "oh, no!"
-      // ***
-//      if (ai_debug) console.log ("Ajax call failed, Status: " + status + ", Error: " + err);
       if (ai_debug) console.error ("Ajax call failed, error:", error);
-      // ***
-//      $("div.ai-ip-data").each (function () {
       document.querySelectorAll ('div.ai-ip-data').forEach ((el, index) => {
 
-        // ***
-//        $(this).css ({"display": "none", "visibility": "", "position": "", "width": "", "height": "", "z-index": ""}).removeClass ('ai-ip-data').hide ();
         el.style.display = 'none';
         el.style.visibility = '';
         el.style.position = '';
@@ -6524,10 +6615,6 @@ function ai_ready (fn) {
   }
 }
 
-  // ***
-//  $(document).ready (function($) {
-//    setTimeout (function () {ai_process_ip_addresses ()}, 5);
-//  });
 
 function ai_check_ip_addresses () {
   setTimeout (function () {ai_process_ip_addresses ()}, 5);
@@ -6535,8 +6622,6 @@ function ai_check_ip_addresses () {
 
 ai_ready (ai_check_ip_addresses);
 
-
-//});
 
 function ai_process_element (element) {
   setTimeout (function() {
@@ -6603,17 +6688,6 @@ function nextAll (element, selector) {
   return result;
 }
 
-// ***
-//jQuery (function ($) {
-
-  // ***
-//  if (!Array.prototype.includes) {
-//    //or use Object.defineProperty
-//    Array.prototype.includes = function(search){
-//     return !!~this.indexOf(search);
-//    }
-//  }
-
   // To prevent replacement of regexp pattern with CDN url (CDN code bug)
   var host_regexp = new RegExp (':' + '\\/' + '\\/(.[^/:]+)', 'i');
 
@@ -6667,8 +6741,6 @@ function nextAll (element, selector) {
     var ai_debug = typeof ai_debugging !== 'undefined'; // 1
 //    var ai_debug = false;
 
-    // ***
-//    if ((jQuery('#ai-iab-tcf-bar').length || jQuery('.ai-list-manual').length) && typeof __tcfapi == 'function' && typeof ai_load_blocks == 'function' && typeof ai_iab_tcf_callback_installed == 'undefined') {
     if ((document.querySelector ('#ai-iab-tcf-bar') != null || document.querySelector ('.ai-list-manual') != null) && typeof __tcfapi == 'function' && typeof ai_load_blocks == 'function' && typeof ai_iab_tcf_callback_installed == 'undefined') {
 
       function ai_iab_tcf_callback (tcData, success) {
@@ -6682,9 +6754,6 @@ function nextAll (element, selector) {
 
             ai_load_blocks ();
 
-            // ***
-//            jQuery('#ai-iab-tcf-status').text ('IAB TCF 2.0 DATA LOADED');
-//            jQuery('#ai-iab-tcf-bar').addClass ('status-ok').removeClass ('status-error');
             var iab_tcf_status = document.querySelector ('#ai-iab-tcf-status');
             if (iab_tcf_status != null) {
               iab_tcf_status.textContent = 'IAB TCF 2.0 DATA LOADED';
@@ -6790,8 +6859,6 @@ function nextAll (element, selector) {
 
         if (ai_debug) console.log ("AI LISTS COOKIE tcf-v2: calling __tcfapi getTCData");
 
-        // ***
-//        $('#ai-iab-tcf-status').text ('IAB TCF 2.0 DETECTED');
         var iab_tcf_status = document.querySelector ('#ai-iab-tcf-status');
         var iab_tcf_bar    = document.querySelector ('#ai-iab-tcf-bar');
         if (iab_tcf_status != null) {
@@ -6800,9 +6867,8 @@ function nextAll (element, selector) {
 
         __tcfapi ('getTCData', 2, function (tcData, success) {
           if (success) {
-            // ***
-//            $('#ai-iab-tcf-bar').addClass ('status-ok');
             if (iab_tcf_bar != null) {
+              iab_tcf_bar.classList.remove ('status-error');
               iab_tcf_bar.classList.add ('status-ok');
             }
 
@@ -6810,20 +6876,14 @@ function nextAll (element, selector) {
               ai_tcData = tcData;
 
               if (!tcData.gdprApplies) {
-                // ***
-//                jQuery('#ai-iab-tcf-status').text ('IAB TCF 2.0 GDPR DOES NOT APPLY');
                 if (iab_tcf_status != null) {
                   iab_tcf_status.textContent = 'IAB TCF 2.0 GDPR DOES NOT APPLY';
                 }
               } else {
-                  // ***
-//                  $('#ai-iab-tcf-status').text ('IAB TCF 2.0 DATA LOADED');
                   if (iab_tcf_status != null) {
                     iab_tcf_status.textContent = 'IAB TCF 2.0 DATA LOADED';
                   }
                 }
-              // ***
-//              $('#ai-iab-tcf-bar').addClass ('status-ok').removeClass ('status-error');
               if (iab_tcf_bar != null) {
                 iab_tcf_bar.classList.remove ('status-error');
                 iab_tcf_bar.classList.add ('status-ok');
@@ -6838,9 +6898,6 @@ function nextAll (element, selector) {
 
               if (ai_debug) console.log ("AI LISTS COOKIE __tcfapi cmpuishown");
 
-              // ***
-//              $('#ai-iab-tcf-status').text ('IAB TCF 2.0 CMP UI SHOWN');
-//              $('#ai-iab-tcf-bar').addClass ('status-ok').removeClass ('status-error');
               if (iab_tcf_status != null) {
                 iab_tcf_status.textContent = 'IAB TCF 2.0 CMP UI SHOWN';
               }
@@ -6855,9 +6912,6 @@ function nextAll (element, selector) {
           } else {
               if (ai_debug) console.log ("AI LISTS COOKIE tcf-v2: __tcfapi getTCData failed");
 
-              // ***
-//              $('#ai-iab-tcf-status').text ('IAB TCF 2.0 __tcfapi getTCData failed');
-//              $('#ai-iab-tcf-bar').removeClass ('status-ok').addClass ('status-error');
               if (iab_tcf_status != null) {
                 iab_tcf_status.textContent = 'IAB TCF 2.0 __tcfapi getTCData failed';
               }
@@ -6902,9 +6956,6 @@ function nextAll (element, selector) {
               setTimeout (function () {ai_process_lists ();}, 10);
             }
 
-            // ***
-//            $('#ai-iab-tcf-bar').addClass ('status-error').removeClass ('status-ok');
-//            $('#ai-iab-tcf-status').text ('IAB TCF 2.0 MISSING: __tcfapi function not found');
             var iab_tcf_status = document.querySelector ('#ai-iab-tcf-status');
             if (iab_tcf_status != null) {
               iab_tcf_status.textContent = 'IAB TCF 2.0 MISSING: __tcfapi function not found';
@@ -6920,8 +6971,6 @@ function nextAll (element, selector) {
     }
 
     if (ai_list_blocks == null) {
-      // ***
-//      ai_list_blocks = $("div.ai-list-data, meta.ai-list-data");
       ai_list_blocks = document.querySelectorAll ("div.ai-list-data, meta.ai-list-data");
     } else {
         // Temp fix for jQuery elements
@@ -6931,8 +6980,6 @@ function nextAll (element, selector) {
           ai_list_blocks = Array.prototype.slice.call (ai_list_blocks);
         }
 
-        // ***
-//        ai_list_blocks = ai_list_blocks.filter ('.ai-list-data');
         var filtered_elements = [];
         ai_list_blocks.forEach ((element, i) => {
           if (element.matches ('.ai-list-data')) {
@@ -6957,7 +7004,6 @@ function nextAll (element, selector) {
     if (ai_debug) console.log ("AI LISTS:", ai_list_blocks.length, 'blocks');
 
     // Mark lists as processed
-//    ai_list_blocks.removeClass ('ai-list-data');
     ai_list_blocks.forEach ((element, i) => {
       element.classList.remove ('ai-list-data');
     });
@@ -6981,8 +7027,6 @@ function nextAll (element, selector) {
       var md = new MobileDetect (user_agent);
     }
 
-    // ***
-//    ai_list_blocks.each (function () {
     ai_list_blocks.forEach ((el, i) => {
 
       // Reload cookies as pervious blocks might create some
@@ -6994,21 +7038,14 @@ function nextAll (element, selector) {
 //      var block_wrapping_div = $(this).closest ('div.AI_FUNCT_GET_BLOCK_CLASS_NAME');
       var block_wrapping_div = el.closest ('div.' + ai_block_class_def);
 
-      // ***
-//      if (ai_debug) console.log ('AI LISTS BLOCK', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.attr ('class'));
       if (ai_debug) console.log ('AI LISTS BLOCK', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.getAttribute ('class') : '');
 
       var enable_block = true;
 
-      // ***
-//      var referer_list = $(this).attr ("referer-list");
-//      if (typeof referer_list != "undefined") {
       if (el.hasAttribute ("referer-list")) {
         var referer_list = el.getAttribute ("referer-list");
 
         var referer_list_array  = b64d (referer_list).split (",");
-        // ***
-//        var referers_list_type  = $(this).attr ("referer-list-type");
         var referers_list_type  = el.getAttribute ("referer-list-type");
 
         if (ai_debug) console.log ("AI LISTS referer:     ", referrer);
@@ -7016,8 +7053,6 @@ function nextAll (element, selector) {
 
         var referrer_found = false;
 
-        // ***
-//        $.each (referer_list_array, function (index, list_referer) {
         referer_list_array.every ((list_referer, index) => {
 
           list_referer = list_referer.trim ();
@@ -7077,15 +7112,10 @@ function nextAll (element, selector) {
       }
 
       if (enable_block) {
-        // ***
-//        var client_list = $(this).attr ("client-list");
-//        if (typeof client_list != "undefined" && typeof md !== "undefined") {
         if (el.hasAttribute ("client-list") && typeof md !== "undefined") {
           var client_list = el.getAttribute ("client-list");
 
           var client_list_array  = b64d (client_list).split (",");
-          // ***
-//          var clients_list_type  = $(this).attr ("client-list-type");
           var clients_list_type  = el.getAttribute ("client-list-type");
 
           if (ai_debug) console.log ("AI LISTS client:     ", window.navigator.userAgent);
@@ -7093,15 +7123,11 @@ function nextAll (element, selector) {
           if (ai_debug) console.log ("AI LISTS client list:", b64d (client_list), clients_list_type);
 
           list_passed = false;
-          // ***
-//          $.each (client_list_array, function (index, list_client_term) {
           client_list_array.every ((list_client_term, index) => {
 
             if (list_client_term.trim () == '') return true;
 
             var client_list_array_term = list_client_term.split ("&&");
-            // ***
-//            $.each (client_list_array_term, function (index, list_client) {
             client_list_array_term.every ((list_client, index) => {
 
               var result = true;
@@ -7243,31 +7269,21 @@ function nextAll (element, selector) {
         if (enable_block) {
           switch (list) {
             case 1:
-              // ***
-//              var cookie_list = $(this).attr ("cookie-list");
               var cookie_list = el.getAttribute ("cookie-list");
               break
             case 2:
-              // ***
-//              var cookie_list = $(this).attr ("parameter-list");
               var cookie_list = el.getAttribute ("parameter-list");
               break
           }
 
-          // ***
-//          if (typeof cookie_list != "undefined") {
           if (cookie_list != null) {
             var cookie_list = b64d (cookie_list);
 
             switch (list) {
               case 1:
-                // ***
-//                var cookie_list_type  = $(this).attr ("cookie-list-type");
                 var cookie_list_type  = el.getAttribute ("cookie-list-type");
                 break
               case 2:
-                // ***
-//                var cookie_list_type  = $(this).attr ("parameter-list-type");
                 var cookie_list_type  = el.getAttribute ("parameter-list-type");
                 break
             }
@@ -7319,16 +7335,10 @@ function nextAll (element, selector) {
             if (ai_debug) console.log ("AI LISTS COOKIE ARRAY", cookie_array);
 
             var list_passed = false;
-            // ***
-//            var block_div = $(this);
             var block_div = el;
-            // ***
-//            $.each (cookie_list_array, function (index, list_cookie_term) {
             cookie_list_array.every ((list_cookie_term, index) => {
 
               var cookie_list_array_term = list_cookie_term.split ("&&");
-              // ***
-//              $.each (cookie_list_array_term, function (index, list_cookie) {
               cookie_list_array_term.every ((list_cookie, index) => {
 
                 var result = true;
@@ -7368,8 +7378,6 @@ function nextAll (element, selector) {
                   // IAB Europe Transparency and Consent Framework (TCF v2)
                   if (ai_debug) console.log ("AI LISTS COOKIE tcf-v2");
 
-                  // ***
-//                  $('#ai-iab-tcf-bar').show ();
                   var iab_tcf_status = document.querySelector ('#ai-iab-tcf-status');
                   var iab_tcf_bar = document.querySelector ('#ai-iab-tcf-bar');
                   if (iab_tcf_bar != null) {
@@ -7391,9 +7399,8 @@ function nextAll (element, selector) {
                   if (typeof ai_tcData == 'object') {
                     if (ai_debug) console.log ("AI LISTS COOKIE tcf-v2: ai_tcData set");
 
-                    // ***
-//                    $('#ai-iab-tcf-bar').addClass ('status-ok');
                     if (iab_tcf_bar != null) {
+                      iab_tcf_bar.classList.remove ('status-error');
                       iab_tcf_bar.classList.add ('status-ok');
                     }
 
@@ -7415,8 +7422,6 @@ function nextAll (element, selector) {
                       // Wait only when __tcfapi staus is unknown
                       if (typeof ai_tcfapi_found == 'undefined') {
                         // Mark this list as unprocessed - will be processed later when __tcfapi callback function is called
-                        // ***
-  //                      block_div.addClass ('ai-list-data');
                         block_div.classList.add ('ai-list-data');
 
                         cookies_no_ai_tcData_yet = true;
@@ -7539,45 +7544,27 @@ function nextAll (element, selector) {
       } // for list
 
 
-      // ***
-//      if ($(this).hasClass ('ai-list-manual')) {
       if (el.classList.contains ('ai-list-manual')) {
 
         if (!enable_block) {
           // Manual load AUTO
           cookies_manual_loading = true;
-          // ***
-//          block_div.addClass ('ai-list-data');
           block_div.classList.add ('ai-list-data');
         } else {
-            // ***
-//            block_div.removeClass ('ai-list-data');
-//            block_div.removeClass ('ai-list-manual');
             block_div.classList.remove ('ai-list-data');
             block_div.classList.remove ('ai-list-manual');
           }
       }
 
       if (enable_block || !cookies_manual_loading && !cookies_no_ai_tcData_yet) {
-        // ***
-//        var debug_info = $(this).data ('debug-info');
-//        if (typeof debug_info != 'undefined') {
         if (el.hasAttribute ('data-debug-info')) {
           var debug_info = el.dataset.debugInfo;
 
-          // ***
-//          var debug_info_element = $('.' + debug_info);
           var debug_info_element = document.querySelector ('.' + debug_info);
 
-          // ***
-//          if (debug_info_element.length != 0) {
           if (debug_info_element != null) {
-            // ***
-//            var debug_bar = debug_info_element.parent ();
             var debug_bar = debug_info_element.parentElement;
 
-            // ***
-//            if (debug_bar.hasClass ('ai-debug-info')) {
             if (debug_bar != null && debug_bar.classList.contains ('ai-debug-info')) {
               debug_bar.remove ();
             }
@@ -7592,14 +7579,9 @@ function nextAll (element, selector) {
         return true; // Continue ai_list_blocks.each
       }
 
-      // ***
-//      var debug_bar = $(this).prevAll ('.ai-debug-bar.ai-debug-lists');
       var debug_bars = prevAll (el, '.ai-debug-bar.ai-debug-lists');
 
       var referrer_text = referrer == '' ? '#' : referrer;
-      // ***
-//      debug_bar.find ('.ai-debug-name.ai-list-info').text (referrer_text).attr ('title', user_agent + "\n" + language);
-//      debug_bar.find ('.ai-debug-name.ai-list-status').text (enable_block ? ai_front.visible : ai_front.hidden);
 
       if (debug_bars.length != 0) {
         debug_bars.forEach ((debug_bar, i) => {
@@ -7617,11 +7599,6 @@ function nextAll (element, selector) {
 
       var scheduling = false;
       if (enable_block) {
-        // ***
-//        var scheduling_start = $(this).attr ("scheduling-start");
-//        var scheduling_end   = $(this).attr ("scheduling-end");
-//        var scheduling_days  = $(this).attr ("scheduling-days");
-//        if (typeof scheduling_start != "undefined" && typeof scheduling_end != "undefined" && typeof scheduling_days != "undefined") {
         if (el.hasAttribute ("scheduling-start") && el.hasAttribute ("scheduling-end") && el.hasAttribute ("scheduling-days")) {
           var scheduling_start = el.getAttribute ('scheduling-start');
           var scheduling_end   = el.getAttribute ('scheduling-end');
@@ -7632,11 +7609,7 @@ function nextAll (element, selector) {
           var scheduling_start_string = b64d (scheduling_start);
           var scheduling_end_string   = b64d (scheduling_end);
 
-          // ***
-//          var scheduling_fallback = parseInt ($(this).attr ("scheduling-fallback"));
           var scheduling_fallback = parseInt (el.getAttribute ("scheduling-fallback"));
-          // ***
-//          var gmt = parseInt ($(this).attr ("gmt"));
           var gmt = parseInt (el.getAttribute ("gmt"));
 
           if (!scheduling_start_string.includes ('-') && !scheduling_end_string.includes ('-')) {
@@ -7652,8 +7625,6 @@ function nextAll (element, selector) {
             }
 
           var scheduling_days_array = b64d (scheduling_days).split (',');
-          // ***
-//          var scheduling_type  = $(this).attr ("scheduling-type");
           var scheduling_type  = el.getAttribute ("scheduling-type");
 
           var current_time = new Date ().getTime () + gmt;
@@ -7695,8 +7666,6 @@ function nextAll (element, selector) {
           var date_time_string = date.toISOString ().split ('.');
           var date_time = date_time_string [0].replace ('T', ' ');
 
-          // ***
-//          var debug_bar = $(this).prevAll ('.ai-debug-bar.ai-debug-scheduling');
           var debug_bars = prevAll (el, '.ai-debug-bar.ai-debug-scheduling');
 
 //          debug_bar.find ('.ai-debug-name.ai-scheduling-info').text (date_time + ' ' + current_day +
@@ -7729,9 +7698,6 @@ function nextAll (element, selector) {
               }
 
               if (!enable_block && scheduling_fallback != 0) {
-                // ***
-    //            debug_bar.removeClass ('ai-debug-scheduling').addClass ('ai-debug-fallback');
-    //            debug_bar.find ('.ai-debug-name.ai-scheduling-status').text (ai_front.fallback + ' = ' + scheduling_fallback);
 
                 debug_bar.classList.remove ('ai-debug-scheduling');
                 debug_bar.classList.add ('ai-debug-fallback');
@@ -7748,9 +7714,6 @@ function nextAll (element, selector) {
           if (ai_debug) console.log ("AI LISTS list pass", enable_block);
 
           if (!enable_block && scheduling_fallback != 0) {
-            // ***
-//            debug_bar.removeClass ('ai-debug-scheduling').addClass ('ai-debug-fallback');
-//            debug_bar.find ('.ai-debug-name.ai-scheduling-status').text (ai_front.fallback + ' = ' + scheduling_fallback);
             // Above in the loop
 
             if (ai_debug) console.log ("AI SCHEDULING fallback block", scheduling_fallback);
@@ -7772,7 +7735,6 @@ function nextAll (element, selector) {
 
 
       //
-//      $(this).css ({"visibility": "", "position": "", "width": "", "height": "", "z-index": ""});
       el.style.visibility = '';
       el.style.position = '';
       el.style.width = '';
@@ -7790,20 +7752,13 @@ function nextAll (element, selector) {
       if (!enable_block) {
         if (scheduling && !scheduling_ok && scheduling_fallback != 0) {
           if (block_wrapping_div != null) {
-            // ***
-  //          block_wrapping_div.css ({"visibility": ""});
             block_wrapping_div.style.visibility = '';
 
-            // ***
-//            if (block_wrapping_div.hasClass ('ai-remove-position')) {
             if (block_wrapping_div.classList.contains ('ai-remove-position')) {
               block_wrapping_div.css ({"position": ""});
             }
           }
 
-          // ***
-//          var fallback_div = $(this).next ('.ai-fallback');
-//          fallback_div.removeClass ('ai-fallback');  // Make it visible
           var fallback_divs = nextAll (el, '.ai-fallback');
           if (fallback_divs.length != 0) {
             fallback_divs.forEach ((fallback_div, i) => {
@@ -7811,14 +7766,8 @@ function nextAll (element, selector) {
             });
           }
 
-          // ***
-//          if (typeof $(this).data ('fallback-code') != 'undefined') {
           if (el.hasAttribute ('data-fallback-code')) {
-            // ***
-//            var block_code = b64d ($(this).data ('fallback-code'));
             var block_code = b64d (el.dataset.fallbackCode);
-            // ***
-//            $(this).append (block_code);
 
             var range = document.createRange ();
             var fragment_ok = true;
@@ -7834,102 +7783,59 @@ function nextAll (element, selector) {
               el.append (fragment);
             }
 
-            // ***
-//            if (ai_debug) console.log ('AI INSERT CODE', block_wrapping_div.attr ('class'));
             if (ai_debug) console.log ('AI INSERT CODE', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.getAttribute ('class') : '');
             if (ai_debug) console.log ('');
 
-            // ***
-//            ai_process_element_lists (this);
             ai_process_element_lists (el);
           }  else {
-                // ***
-//               $(this).hide (); // .ai-list-data
                el.style.display = 'none'; // .ai-list-data
 
-               // ***
-//               if (!block_wrapping_div.find ('.ai-debug-block').length && block_wrapping_div [0].hasAttribute ('style') && block_wrapping_div.attr ('style').indexOf ('height:') == - 1) {
                if (block_wrapping_div != null && block_wrapping_div.querySelector ('.ai-debug-block') == null && block_wrapping_div.hasAttribute ('style') && block_wrapping_div.getAttribute ('style').indexOf ('height:') == - 1) {
-                  // ***
-//                 block_wrapping_div.hide ();
                  block_wrapping_div.style.display = 'none';
                }
              }
 
-          // ***
-//          var tracking_data = block_wrapping_div.attr ('data-ai');
-//          if (typeof tracking_data !== typeof undefined && tracking_data !== false) {
           if (block_wrapping_div != null && block_wrapping_div.hasAttribute ('data-ai')) {
             var tracking_data = block_wrapping_div.getAttribute ('data-ai');
 
-            // ***
-//            var fallback_tracking_data = $(this).attr ('fallback-tracking');
-//            if (typeof fallback_tracking_data !== typeof undefined && fallback_tracking_data !== false) {
             if (el.hasAttribute ('fallback-tracking')) {
               var fallback_tracking_data = el.getAttribute ('fallback-tracking');
-              // ***
-//              block_wrapping_div.attr ('data-ai-' + $(this).attr ('fallback_level'), fallback_tracking_data);
               block_wrapping_div.setAttribute ('data-ai-' + el.getAttribute ('fallback_level'), fallback_tracking_data);
 
               if (ai_debug) console.log ("AI SCHEDULING tracking updated to fallback block", b64d (fallback_tracking_data));
             }
           }
         } else {
-//            $(this).hide (); // .ai-list-data
             el.style.display = 'none';  // .ai-list-data
 
-//            if (block_wrapping_div.length) {
             if (block_wrapping_div != null) {
-              // ***
-//              block_wrapping_div.removeAttr ('data-ai').removeClass ('ai-track');
               block_wrapping_div.removeAttribute ('data-ai');
               block_wrapping_div.classList.remove ('ai-track');
 
-//              if (block_wrapping_div.find ('.ai-debug-block').length) {
               if (block_wrapping_div.querySelector (".ai-debug-block") != null) {
-                // ***
-//                block_wrapping_div.css ({"visibility": ""}).removeClass ('ai-close');
                 block_wrapping_div.style.visibility = '';
                 block_wrapping_div.classList.remove ('ai-close');
 
-                // ***
-//                if (block_wrapping_div.hasClass ('ai-remove-position')) {
                 if (block_wrapping_div.classList.contains ('ai-remove-position')) {
-                  // ***
-//                  block_wrapping_div.css ({"position": ""});
                   block_wrapping_div.style.position = '';
                 }
               } else
-              // ***
-//              if (block_wrapping_div [0].hasAttribute ('style') && block_wrapping_div.attr ('style').indexOf ('height:') == - 1) {
               if (block_wrapping_div.hasAttribute ('style') && block_wrapping_div.getAttribute ('style').indexOf ('height:') == - 1) {
-                // ***
-//                block_wrapping_div.hide ();
                 block_wrapping_div.style.display = 'none';
               }
             }
           }
       } else {
-          // ***
-//          block_wrapping_div.css ({"visibility": ""});
           if (block_wrapping_div != null) {
             block_wrapping_div.style.visibility = '';
 
-            // ***
-  //          if (block_wrapping_div.hasClass ('ai-remove-position')) {
             if (block_wrapping_div.classList.contains ('ai-remove-position')) {
-              // ***
-  //            block_wrapping_div.css ({"position": ""});
               block_wrapping_div.style.position = '';
             }
           }
 
-          // ***
-//          if (typeof $(this).data ('code') != 'undefined') {
           if (el.hasAttribute ('data-code')) {
 
-            // ***
-//            var block_code = b64d ($(this).data ('code'));
             var block_code = b64d (el.dataset.code);
 
             var range = document.createRange ();
@@ -7954,28 +7860,19 @@ function nextAll (element, selector) {
               } else el.append (fragment);
             }
 
-            // ***
-//            if (ai_debug) console.log ('AI INSERT CODE', block_wrapping_div.attr ('class'));
             if (ai_debug) console.log ('AI INSERT CODE', block_wrapping_div != null && block_wrapping_div.hasAttribute ("class") ? block_wrapping_div.getAttribute ('class') : '');
 
             if (ai_debug) console.log ('');
 
-            // ***
-//            ai_process_element_lists (this);
             ai_process_element_lists (el);
           }
         }
 
       if (!ai_debug) {
-        // ***
-//        $(this).attr ('data-code', '');
-//        $(this).attr ('data-fallback-code', '');
         el.setAttribute ('data-code', '');
         el.setAttribute ('data-fallback-code', '');
       }
 
-      // ***
-//      block_wrapping_div.removeClass ('ai-list-block');
       if (block_wrapping_div != null) {
         block_wrapping_div.classList.remove ('ai-list-block');
       }
@@ -8018,7 +7915,6 @@ function ai_ready (fn) {
 }
 
 
-//  $(document).ready(function($) {
 function ai_configure_tcf_events () {
 
     var ai_debug = typeof ai_debugging !== 'undefined'; // 6
@@ -8032,13 +7928,9 @@ function ai_configure_tcf_events () {
 
         if (typeof ai_load_blocks == 'function') {
           // https://adinserter.pro/faq/gdpr-compliance-cookies-consent#manual-loading
-          // ***
-//          jQuery(document).on ("cmplzEnableScripts", ai_cmplzEnableScripts);
           document.addEventListener ('cmplzEnableScripts', ai_cmplzEnableScripts);
 
           // Complianz Privacy Suite
-          // ***
-//          jQuery(document).on ("cmplz_event_marketing", ai_cmplzEnableScripts);
           document.addEventListener ('cmplz_event_marketing', ai_cmplzEnableScripts);
 
           function ai_cmplzEnableScripts (consentData) {
@@ -8050,14 +7942,20 @@ function ai_configure_tcf_events () {
               ai_load_blocks ();
             }
           }
+
+          document.addEventListener ("cmplz_enable_category", function (consentData) {
+            if (ai_debug) console.log ("AI LISTS cmplz_enable_category", consentData);
+
+            var category = consentData.detail.category;
+            if (category === 'marketing'){
+              if (ai_debug) console.log ("AI LISTS ai_load_blocks ()");
+
+              ai_load_blocks ();
+            }
+          });
         }
       }, 50);
 
-      // ***
-//      jQuery(".ai-debug-page-type").dblclick (function () {
-//        jQuery('#ai-iab-tcf-status').text ('CONSENT COOKIES');
-//        jQuery("#ai-iab-tcf-bar").show ();
-//      });
 
       var debug_bar = document.querySelector ('.ai-debug-page-type');
       if (debug_bar != null)
@@ -8072,8 +7970,6 @@ function ai_configure_tcf_events () {
           }
         });
 
-      // ***
-//      jQuery("#ai-iab-tcf-bar").click (function () {
       debug_bar = document.querySelector ('#ai-iab-tcf-bar');
       if (debug_bar != null)
         debug_bar.addEventListener ('click', (e) => {
@@ -8115,8 +8011,6 @@ function ai_configure_tcf_events () {
 
           if (ai_debug) console.log ("AI LISTS clear consent cookies", window.location.hostname);
 
-          // ***
-//          jQuery('#ai-iab-tcf-status').text ('CONSENT COOKIES DELETED');
           var iab_tcf_status = document.querySelector ('#ai-iab-tcf-status');
           if (iab_tcf_status != null) {
             iab_tcf_status.textContent = 'CONSENT COOKIES DELETED';
@@ -8124,11 +8018,7 @@ function ai_configure_tcf_events () {
         });
 
     }, 5);
-// ***
-//  });
   }
-// ***
-//});
 
 
 ai_ready (ai_configure_tcf_events);
@@ -8141,17 +8031,14 @@ function ai_process_element_lists (element) {
     }
 
     if (typeof ai_process_lists == 'function') {
-//      ai_process_lists (jQuery (".ai-list-data", element));
       ai_process_lists ();
     }
 
     if (typeof ai_process_ip_addresses == 'function') {
-//      ai_process_ip_addresses (jQuery (".ai-ip-data", element));
       ai_process_ip_addresses ();
     }
 
     if (typeof ai_process_filter_hooks == 'function') {
-//      ai_process_filter_hooks (jQuery (".ai-filter-check", element));
       ai_process_filter_hooks ();
     }
 
@@ -9570,9 +9457,11 @@ if (typeof ai_rotation_triggers != 'undefined') {
   ai_process_rotations_in_element = function (el) {
 //    $("div.ai-rotate", el).each (function (index, element) {
 //      ai_process_rotation (this);
-    el.querySelectorAll ("div.ai-rotate").forEach ((element, index) => {
-      ai_process_rotation (element);
-    });
+    if (el != null) {
+      el.querySelectorAll ("div.ai-rotate").forEach ((element, index) => {
+        ai_process_rotation (element);
+      });
+    }
   }
 
   // ***
@@ -9677,6 +9566,8 @@ function ai_scroll_update () {
     }
   }
 }
+
+setTimeout (function() {ai_scroll_update ();}, 100);
 
 if (typeof ai_process_sticky_elements_on_ready != 'undefined') {
 
@@ -9818,7 +9709,7 @@ ai_process_sticky_elements = function () {
           // ***
 //          if (typeof main_element.prop ("tagName") != 'undefined') {
 //            var outer_width = main_element.outerWidth ();
-          if (typeof main_element.tagName != 'undefined') {
+          if (main_element != null && typeof main_element.tagName != 'undefined') {
             var outer_width = main_element.offsetWidth;
 
             if (ai_debug) {
@@ -9836,7 +9727,8 @@ ai_process_sticky_elements = function () {
             if (outer_width != 0 && outer_width <= client_width && outer_width >= main_width) {
               main_width = outer_width;
             }
-          }
+          } else
+              if (ai_debug) console.log ("AI STICKY CUSTOM MAIN CONTENT ELEMENT ERROR:", main_element);
         }
       }
   }
@@ -10122,6 +10014,10 @@ if (typeof ai_selection_block != 'undefined') {
   }
 
   function getElementSelector (el) {
+    if (! (el instanceof HTMLElement)) {
+      return '';
+    }
+
     var selector = el.nodeName.toLowerCase ();
 
     if (el.hasAttribute ('id') && el.id != '') {

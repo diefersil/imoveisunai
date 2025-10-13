@@ -1,8 +1,7 @@
 <?php
 /**
  * Partners
- * Created by PhpStorm.
- * User: waqasriaz
+ * Created by Waqas Riaz.
  * Date: 07/01/16
  * Time: 7:00 PM
  */

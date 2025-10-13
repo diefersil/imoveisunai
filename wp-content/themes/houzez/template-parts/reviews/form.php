@@ -11,8 +11,8 @@ $allowed_html_array = array(
         'href' => array(),
         'title' => array(),
         'target' => array(),
-        'data-toggle' => array(),
-        'data-target' => array(),
+        'data-bs-toggle' => array(),
+        'data-bs-target' => array(),
         'class' => array(),
     )
 );
@@ -37,14 +37,14 @@ if( houzez_option('login_for_review', 0) == 1 && !is_user_logged_in() ) {
 
 	echo '<div class="login-link">';
 	if( houzez_option('header_login') ) { 
-        echo wp_kses(__( 'Review this listing <a class="hhh_login" href="#" data-toggle="modal" data-target="#login-register-form">sign in</a>.', 'houzez' ), $allowed_html_array); 
+        echo wp_kses(__( 'Review this listing <a class="hhh_login" href="#" data-bs-toggle="modal" data-bs-target="#login-register-form">sign in</a>.', 'houzez' ), $allowed_html_array); 
         echo ' ';
     } else {
         echo wp_kses(__( 'To review this listing please sign in.', 'houzez' ), $allowed_html_array); 
     }
 
     if( houzez_option('header_register') ) { 
-        echo wp_kses(__( 'Don’t you have an account? <a class="hhh_regis" href="#" data-toggle="modal" data-target="#login-register-form">Register</a>', 'houzez' ), $allowed_html_array); 
+        echo wp_kses(__( "Don't you have an account? <a class=\"hhh_regis\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#login-register-form\">Register</a>", 'houzez' ), $allowed_html_array); 
     }
     echo '</div>';
 
@@ -61,27 +61,29 @@ if( houzez_option('login_for_review', 0) == 1 && !is_user_logged_in() ) {
         <input type="hidden" name="action" value="houzez_submit_review">
         <input type="hidden" name="is_update" value="<?php echo esc_attr($is_update); ?>">
 
+		<?php do_action('houzez_review_form_fields'); ?>
+
 		<div class="form_messages"></div>
 		<div class="row">
 			
 			<?php if( ! is_user_logged_in() ): ?>
 			<div class="col-md-12 col-sm-12">
-				<div class="form-group">
-					<label><?php esc_html_e('Email', 'houzez'); ?></label>
+				<div class="form-group mb-3">
+					<label class="form-label"><?php esc_html_e('Email', 'houzez'); ?></label>
 					<input class="form-control" name="review_email" placeholder="<?php esc_html_e('you@example.com', 'houzez'); ?>" type="text">
 				</div>
 			</div>
 			<?php endif; ?>
 
 			<div class="col-md-6 col-sm-12">
-				<div class="form-group">
-					<label><?php esc_html_e('Title', 'houzez'); ?></label>
+				<div class="form-group mb-3">
+					<label class="form-label"><?php esc_html_e('Title', 'houzez'); ?></label>
 					<input class="form-control" name="review_title" value="<?php echo esc_attr($review_title); ?>" placeholder="<?php esc_html_e('Enter a title', 'houzez'); ?>" type="text">
 				</div>
 			</div>
 			<div class="col-md-6 col-sm-12">
-				<div class="form-group">
-					<label><?php esc_html_e('Rating', 'houzez'); ?></label>
+				<div class="form-group mb-3">
+					<label class="form-label"><?php esc_html_e('Rating', 'houzez'); ?></label>
 					<select name="review_stars" class="selectpicker form-control bs-select-hidden" title="<?php esc_html_e('Select', 'houzez'); ?>" data-live-search="false">
 						<option value=""><?php esc_html_e('Select', 'houzez'); ?></option>
 						<option <?php selected($rating, 1, true); ?> value="1"><?php esc_html_e('1 Star - Poor', 'houzez'); ?></option>
@@ -93,13 +95,16 @@ if( houzez_option('login_for_review', 0) == 1 && !is_user_logged_in() ) {
 				</div>
 			</div>
 			<div class="col-sm-12 col-xs-12">
-				<div class="form-group form-group-textarea">
-					<label><?php esc_html_e('Review', 'houzez'); ?></label>
+				<div class="form-group mb-3">
+					<label class="form-label"><?php esc_html_e('Review', 'houzez'); ?></label>
 					<textarea class="form-control" name="review" rows="5" placeholder="<?php esc_html_e('Write a review', 'houzez'); ?>"><?php echo esc_attr($review_content); ?></textarea>
 				</div>
 			</div><!-- col-sm-12 col-xs-12 -->
+
+			<?php do_action('houzez_after_review_form_fields'); ?>
+
 			<div class="col-sm-12 col-xs-12">
-				<button id="submit-review" class="houzez-ele-button btn btn-secondary btn-sm-full-width">
+				<button id="submit-review" class="houzez-ele-button btn btn-secondary w-100 ajax-btn">
 					<?php get_template_part('template-parts/loader'); ?>
 					<?php echo esc_attr($submit_review); ?>
 				</button>

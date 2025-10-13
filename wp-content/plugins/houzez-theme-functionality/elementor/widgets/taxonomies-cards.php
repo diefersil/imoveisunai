@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 3.0
  */
 class Houzez_Taxonomies_Cards extends Widget_Base {
-    use Houzez_Property_Taxonomies;
+    use Houzez_Filters_Traits;
 
     /**
      * Get widget name.
@@ -96,12 +95,12 @@ class Houzez_Taxonomies_Cards extends Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
+        $this->add_control(
+            'tax_thumb_size',
             [
-                'name' => 'tax_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
+                'label' => esc_html__( 'Image Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
                 'default' => 'houzez-top-v7',
             ]
         );
@@ -140,7 +139,7 @@ class Houzez_Taxonomies_Cards extends Widget_Base {
         );
 
 
-        $this->register_houzez_taxonomies_controls();
+        $this->listing_taxonomies_controls();
 
         
         $this->end_controls_section();
@@ -271,7 +270,7 @@ class Houzez_Taxonomies_Cards extends Widget_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%', 'em' ],
                 'selectors'  => [
-                    '{{WRAPPER}} .taxonomy-cards-module .taxonomy-item-card-image' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};'
+                    '{{WRAPPER}} .taxonomy-cards-module .taxonomy-item-card-image img' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};'
                 ],
             ]
         );
@@ -427,7 +426,7 @@ class Houzez_Taxonomies_Cards extends Widget_Base {
         $args['order'] =  $settings['order'];
         $args['houzez_hide_empty'] =  $settings['houzez_hide_empty'];
         $args['no_of_terms'] =  $settings['no_of_terms'];
-        $args['thumb_size'] = $settings['tax_thumb_size'];
+        $args['thumb_size'] = $settings['tax_thumb_size'] === 'global' ? 'houzez-top-v7' : $settings['tax_thumb_size'];
 
         $args['property_type']   =  $property_type;
         $args['property_status']   =  $property_status;

@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { LaunchDemoSitesMarkup } from '@assist/tasks/images/LaunchDemoSitesMarkup';
 
 const { launchCompleted } = window.extAssistData;
-const { themeSlug } = window.extSharedData;
+const { themeSlug, showLaunch } = window.extSharedData;
 
 export default {
 	slug: 'site-builder-launcher',
@@ -17,10 +17,9 @@ export default {
 	},
 	link: 'admin.php?page=extendify-launch',
 	type: 'site-launcher-task',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: () => {
-		// This only runs if launch wasn't finished and they have extendable
-		return themeSlug === 'extendable' && !launchCompleted;
+		return themeSlug === 'extendable' && !launchCompleted && showLaunch;
 	},
 	backgroundImage: null,
 	htmlBefore: () => (

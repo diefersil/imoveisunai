@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -149,7 +148,7 @@ class Houzez_Elementor_Team_Member extends Widget_Base {
         $this->add_control(
             'team_social_twitter',
             [
-                'label'     => esc_html__( 'Twitter Profile Link', 'houzez-theme-functionality' ),
+                'label'     => esc_html__( 'X Profile Link', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::TEXT,
                 'description'   => '',
             ]
@@ -157,7 +156,7 @@ class Houzez_Elementor_Team_Member extends Widget_Base {
         $this->add_control(
             'team_social_twitter_target',
             [
-                'label'     => esc_html__( 'Twitter Target', 'houzez-theme-functionality' ),
+                'label'     => esc_html__( 'X Target', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::SELECT,
                 'options'   => [
                     "_self" => "Self",
@@ -210,29 +209,79 @@ class Houzez_Elementor_Team_Member extends Widget_Base {
                 'default' => '',
             ]
         );
-        $this->add_control(
-            'team_social_googleplus',
-            [
-                'label'     => esc_html__( 'Google Plus Profile Link', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::TEXT,
-                'description'   => '',
-            ]
-        );
-        $this->add_control(
-            'team_social_googleplus_target',
-            [
-                'label'     => esc_html__( 'Google Plus Target', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => [
-                    "_self" => "Self",
-                    "_blank" => "Blank",
-                    "_parent" => "Parent"
-                ],
-                'default' => '',
-            ]
-        );
         
         $this->end_controls_section();
+
+        /*----------------------------------------------------------
+        * Styling
+        **---------------------------------------------------------*/
+        $this->start_controls_section(
+            'styling_section',
+            [
+                'label'     => esc_html__( 'Box', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+
+        $this->add_control(
+            'agent_box_border_radius',
+            [
+                'label' => esc_html__( 'Radius', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}} .team-module' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'agent_box_shadow',
+                'selector' => '{{WRAPPER}} .team-module',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'typo_section',
+            [
+                'label'     => esc_html__( 'Typography', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'team_tname',
+                'label'    => esc_html__( 'Name', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .team-name strong',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'team-title',
+                'label'    => esc_html__( 'Position', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .team-title',
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'team_content',
+                'label'    => esc_html__( 'Content', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .team-description',
+            ]
+        );
+
+        $this->end_controls_section(); 
 
     }
 
@@ -258,13 +307,11 @@ class Houzez_Elementor_Team_Member extends Widget_Base {
         $args['team_social_twitter']  =  $settings['team_social_twitter'];
         $args['team_social_linkedin']  =  $settings['team_social_linkedin'];
         $args['team_social_pinterest']  =  $settings['team_social_pinterest'];
-        $args['team_social_googleplus']  =  $settings['team_social_googleplus'];
 
         $args['team_social_facebook_target']  =  $settings['team_social_facebook_target'];
         $args['team_social_twitter_target']  =  $settings['team_social_twitter_target'];
         $args['team_social_linkedin_target']  =  $settings['team_social_linkedin_target'];
         $args['team_social_pinterest_target']  =  $settings['team_social_pinterest_target'];
-        $args['team_social_googleplus_target']  =  $settings['team_social_googleplus_target'];
        
         if( function_exists( 'houzez_team' ) ) {
             echo houzez_team( $args );

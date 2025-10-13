@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 use Elementor\Controls_Manager;
 use Elementor\Core\Schemes;
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 3.0
  */
 class Houzez_Taxonomies_List extends Widget_Base {
-    use Houzez_Property_Taxonomies;
+    use Houzez_Filters_Traits;
 
     /**
      * Get widget name.
@@ -116,7 +115,7 @@ class Houzez_Taxonomies_List extends Widget_Base {
             ]
         );
 
-        $this->register_houzez_taxonomies_controls();
+        $this->listing_taxonomies_controls();
 
         $this->add_control(
             'count_position',
@@ -441,7 +440,7 @@ class Houzez_Taxonomies_List extends Widget_Base {
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
                 'default' => [
-                    'size' => 14,
+                    'size' => 12,
                 ],
                 'range' => [
                     'px' => [
@@ -457,6 +456,8 @@ class Houzez_Taxonomies_List extends Widget_Base {
                 'separator' => 'before',
                 'selectors' => [
                     '{{WRAPPER}}' => '--hz-icon-list-icon-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .hz-list-icon svg' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .hz-list-icon i' => 'font-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );

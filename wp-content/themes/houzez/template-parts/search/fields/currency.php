@@ -7,7 +7,7 @@ if($multi_currency == 1 ) {
 
         $currencies = Houzez_Currencies::get_currency_codes();
         if($currencies) {
-            echo '<div class="flex-search">';
+            echo '<div class="col">';
             echo '<div class="form-group">';
             echo '<select name="currency" class="selectpicker form-control bs-select-hidden" data-live-search="false" data-live-search-style="begins" title="">';
             echo '<option value="">'.houzez_option('srh_currency', 'Currency').'</option>';

@@ -2,20 +2,20 @@
 
 Contributors: adinserter, spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
-Tags: ads, adsense, ad rotation, ad manager, amp, amazon, ad blocking detection, header code, banners, in-feed ads, sticky fixed widgets, hooks
-Requires at least: 4.9
-Tested up to: 6.3
-Requires PHP: 7.2
-Stable tag: 2.7.32
+Tags: ads, adsense, amp, ad rotation, ad manager
+Requires at least: 5.0
+Tested up to: 6.8
+Requires PHP: 7.4
+Stable tag: 2.8.7
 License: GPLv3
 
-Manage Google AdSense, Media.net, Amazon banners, ads.txt, ad rotation, sticky widgets, AMP ads, DFP, tracking, AdSense header and footer code
+Manage Google AdSense ads, Amazon banners, ad rotation, sticky widgets, AMP ads, DFP, ads.txt, tracking, header and footer code, PHP code
 
 == Description ==
 
 Ad management plugin with many advanced advertising features to insert ad codes at optimal positions.
 
-Supports all kinds of ads including **Google AdSense**, **Google Ad Manager** (DFP - DoubleClick for publishers), contextual **Amazon Native Shopping Ads**, **Media.net** , **Infolinks** and **rotating banners.**
+Supports all kinds of ads including **Google AdSense**, **Google Ad Manager** (DFP - DoubleClick for publishers), Media.net , Infolinks and **rotating banners.**
 
 This plugin is more than AdSense plugin or plugin for ads. It provides many advanced options to insert opt-in forms, header scripts, Javascript, CSS, HTML, PHP, analytics, tracking or advert code anywhere on the page.
 
@@ -66,6 +66,7 @@ It's all about the [settings](https://adinserter.pro/documentation).
 *   Insert raw HTTP response header lines
 *   Insert Google Analytics, Matomo (Piwik) or any other tracking code
 *   Insert images, HTML, CSS, Javascript or PHP code
+*   Insert into Ajax, RSS and REST requests
 *   Code generator for banners and placeholders
 *   AdSense code generator
 *   Support to detect, hide or replace blank AdSense blocks
@@ -98,10 +99,6 @@ It's all about the [settings](https://adinserter.pro/documentation).
 *   Function to visualize HTML tags
 *   You name it :)
 
-
-👉  TEST the plugin on a [demo website](https://tastewp.com/template/AdInserterDemo?redirect=options-general.php%3Fpage%3Dad-inserter.php%26ai-demo%3D1&ni=true)
-
-
 [Review on WP Mayor](https://wpmayor.com/ad-inserter-review-the-best-wordpress-ad-management-plugin/)
 
 > The Best WordPress Ad Management Plugin?
@@ -118,7 +115,7 @@ It's all about the [settings](https://adinserter.pro/documentation).
 
 > Native Shopping Ads provide highly relevant and dynamic product recommendations in a stylishly designed and responsive ad unit that can be placed at the end or within your content to create a more compelling visitor experience and shopping opportunity.
 
-**Pro version** supports additional [advanced features](https://adinserter.pro/documentation/features):
+👉  **Pro version** supports additional [advanced features](https://adinserter.pro/documentation/features):
 
 *   Geolocation using internal or [MaxMind](http://www.maxmind.com/) databases (works also with caching)
 *   Country, state, region and city level geotargeting
@@ -315,6 +312,12 @@ If you see any report (for example from GTmetrix) suggesting to minimize redirec
 
 For details please check this page: [How to optimize plugin settings](https://adinserter.pro/faq/how-to-optimize-plugin-settings)
 
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities.
+[Report a security vulnerability for Ad Inserter.](https://patchstack.com/database/vdp/ad-inserter)
+[Report a security vulnerability for Ad Inserter Pro.](https://patchstack.com/database/vdp/ad-inserter-pro)
+
 = What is plugin usage tracking? =
 
 When enabled, the information regarding WordPress environment and Ad Inserter usage will be collected and sent to plugin developers (once per month and on events like plugin activation/deactivation). See detailed explanation below.
@@ -361,6 +364,77 @@ If you are not happy to reveal this information and you have opted in, simply di
 
 == Changelog ==
 
+= 2.8.7 =
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.6 =
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.5 =
+- Support for individual virtual ads.txt files on multisite sites
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.4 =
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.3 =
+- Added support to override dynamic blocks setting for each rotation
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.2 =
+- Fix for ad blocking detection with AdBlock
+- Added support for any post tag list check
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.1 =
+- Updated depercated backend jQuery code
+- Fix for reflected cross-site scripting (XSS)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.0 =
+- Replaced placeholder image generator service - changed to dummyimage.com
+- Fix for false ad blocking detection when using external scripts
+- Security fix for potential cross site scripting (Pro only)
+- Added support to show rotation options in the list of blocks
+- Added support for custom reports for clients (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.39 =
+- Improved frontend code
+- Fix for warning "Function _load_textdomain_just_in_time was called incorrectly"
+- Updated Maxmind library (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.38 =
+- Security fix for potential cross site scripting
+
+= 2.7.37 =
+- Removed deprecated setting Wait for jQuery
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.36 =
+- Added support for WPML languages in the taxonomy list
+- Added support to disable caching for LiteSpeed Cache and WP Fastest Cache plugins
+- Added support to define the minimal block height for the close button to appear (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.35 =
+- Added support for Simple History plugin
+- Added support for external tracking for Google Tag Manager code (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.34 =
+- Added support for ^ character to invert viewports in the VIEWPORT separator
+- Added support for index parameter for counter shortcodes
+- Changed text for content marker
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.33 =
+- Changed widget class name
+- Added option to define maximum number of list selection items
+- Fix for Amazon external script causing false ad blocking detection
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.7.32 =
 - Added experimental support for REST requests
 - Added support for data shortcode for url parameters
@@ -377,183 +451,81 @@ If you are not happy to reveal this information and you have opted in, simply di
 - Improved debugging
 - Few minor bug fixes, cosmetic changes and code improvements
 
-= 2.7.29 =
-- Added support for shortcode for reusable blocks by name
-- Added support to force using get_queried_object function to get post id
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.28 =
-- Added support for shortcode for reusable blocks
-- Fix for PDF reports when site_url is different from home_url (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.27 =
-- Fix for ad blocking detection external script trying to download a file
-
-= 2.7.26 =
-- Improved compatibility with PHP 8.2
-- Security fix for deserialization
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.25 =
-- Improved theme compatibility for sticky widgets with CSS mode
-- Improved tracking for Google Analytics (Pro only)
-- Added information bar when Wait for jQuery is enabled
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.24 =
-- Added CSS Push mode for sticky widgets
-- Added support for sticky ads (push mode) inside post/page content (Pro only)
-- Added support for multiple activations of rotation groups
-- Added support for %N@M format for filter counting
-- Added support to prepend and append code to rotation option codes
-- Added hook for click on the close button (Pro only)
-- Improved front-end code
-- Fix for client-side device detection on AMP pages
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.23 =
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.22 =
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.21 =
-- Added support for Ad Inserter menu position
-- Added support for random paragraph ranges
-- Added support for default waiting time for user interaction (Pro only)
-- Improved front-end code
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.20 =
-- Fix for front-end translation
-
-= 2.7.19 =
-- Added constant to disable AdSense API
-- Fix for rotation code editor
-- Fix for advaced click tracker for banners (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.18 =
-- Added support to hide ad label when unfilled AdSense block is hidden
-- Simplified AdSense API authorization process
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.17 =
-- Fixed bug for url parameters check
-- Added support for reCaptcha v3 score check (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.16 =
-- Added support for adb redirection page with url queries
-- Added support for tcf-no-google shortcut
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.15 =
-- Added filter hooks for ad labels
-- Added support for constants
-- Added support for rotation option index attribute
-- Added shortcodes for block number and block name
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.14 =
-- Added support for demo settings
-- Added support for background transparency
-- Added support for background for sticky ads (Pro only)
-- Added support for statistics for check options (Pro only)
-- Added support for individual rotation option statistics (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.13 =
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.12 =
-- Security fix for settings page save url
-- Added support to disable ad blocking detection for specific devices
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.11 =
-- Security fix for sites using constants to prevent file editing or unfiltered HTML
-- Added filters before the options are saved
-- Added support for a shortcode for comma separated list of categories with quotes (for Google Ad Manager)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.10 =
-- Security fix for XSS (Reported by Krzysztof Zajac via WPScan)
-- Added support to detect and replace blank AdSense blocks
-- Added support to load and save plugins settings to a file (Pro only)
-- Added support for parallax ads (Pro only)
-- Few fixes
-
-= 2.7.9 =
-- Bug fix for timed rotations
-- Bug fix for tr_TR translation
-- Improved checks for cookies
-- Improved compatibility with PHP 8.1
-- Added separate list for cookies
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.8 =
-- Bug fix for paragraph counting and clearance
-- Bug fix for undefined constant error
-
-= 2.7.7 =
-- Few bug fixes
-
-= 2.7.6 =
-- Improved compatibility with PHP 8
-- Added translation for tr_TR
-- Added support to wait for an interaction before the block is loaded (Pro only)
-- Added support to delay insertion of the block (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.5 =
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.4 =
-- Updated Google API
-- Improved labels for AdSense Auto ads
-- Added external tracking support for WP username (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.3 =
-- Improved ad blocking detection
-- Improved compatibility with PHP 8
-- Improved check for update server accessibility (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.2 =
-- Added shortcuts for TCF v2 consent cookie checks
-- Added support for adinserter shortcode to get post ID
-- Improved ad blocking detection
-- Changed internal IP to country database (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.1 =
-- Added shortcuts for TCF v2 consent cookie checks
-- Improved ad blocking detection
-- Changed internal IP to country database (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.1 =
-- Improved ad blocking detection
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.0 =
-- Added support to list range of post IDs
-- Added support for browser language in client lists
-- Added support for client-side checks for filter hook ai_block_insertion_check
-- Added support for remote plugin managenent (Pro only)
-- Added support for scheduling check shortcode (Pro only)
-- Added support for daily scheduling time (Pro onlyl)
-- Added support for css attribute in check options (Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
 = Earlier versions =
 
 For the changelog of earlier versions, please refer to the separate changelog.txt file.
 
 == Upgrade Notice ==
+
+= 2.8.7 =
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.6 =
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.5 =
+Support for individual virtual ads.txt files on multisite sites;
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.4 =
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.3 =
+Added support to override dynamic blocks setting for each rotation;
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.2 =
+Fix for ad blocking detection with AdBlock;
+Added support for any post tag list check;
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.8.1 =
+Updated depercated backend jQuery code;
+Fix for reflected cross-site scripting (XSS);
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.8.0 =
+Replaced placeholder image generator service - changed to dummyimage.com;
+Fix for false ad blocking detection when using external scripts;
+Security fix for potential cross site scripting (Pro only);
+Added support to show rotation options;
+Added support for custom reports(Pro only)
+
+= 2.7.39 =
+Improved frontend code;
+Fix for warning "Function _load_textdomain_just_in_time was called incorrectly";
+Updated Maxmind library (Pro only);
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.7.38 =
+Security fix for potential cross site scripting
+
+= 2.7.37 =
+Removed deprecated setting Wait for jQuery;
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.36 =
+Added support for WPML languages in the taxonomy list;
+Added support to disable caching for LiteSpeed Cache and WP Fastest Cache plugins;
+Added support to define the minimal block height for the close button to appear (Pro only);
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.35 =
+Added support for Simple History plugin;
+Added support for external tracking for Google Tag Manager code (Pro only);
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.7.34 =
+Added support for ^ character to invert viewports in the VIEWPORT separator;
+Added support for index parameter for counter shortcodes;
+Changed text for content marker;
+Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.7.33 =
+Changed widget class name;
+Added option to define maximum number of list selection items;
+Fix for Amazon external script causing false ad blocking detection;
+Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.7.32 =
 Added experimental support for REST requests;
@@ -570,177 +542,3 @@ Few minor bug fixes, cosmetic changes and code improvements
 = 2.7.30 =
 Improved debugging;
 Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.29 =
-Added support for shortcode for reusable blocks by name;
-Added support to force using get_queried_object function to get post id;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.28 =
-Added support for shortcode for reusable blocks;
-Fix for PDF reports when site_url is different from home_url (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.27 =
-Fix for ad blocking detection external script trying to download a file
-
-= 2.7.26 =
-Improved compatibility with PHP 8.2;
-Security fix for deserialization;
-Few minor bug fixes, cosmetic changes and code improvements;
-
-= 2.7.25 =
-Improved theme compatibility for sticky widgets with CSS mode;
-Improved tracking for Google Analytics (Pro only);
-Added information bar when Wait for jQuery is enabled;
-Few minor bug fixes, cosmetic changes and code improvements;
-
-= 2.7.24 =
-Added CSS Push mode for sticky widgets;
-Added support for sticky ads (push mode) inside post/page content (Pro only);
-Added support for frontend JavaScript code in external file;
-Added support for multiple activations of rotation groups;
-Added support for %N@M format for filter counting;
-Added support to prepend and append code to rotation option codes;
-Added hook for click on the close button (Pro only);
-Improved front-end code;
-Fix for client-side device detection on AMP pages;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.23 =
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.22 =
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.21 =
-Added support for Ad Inserter menu position;
-Added support for random paragraph ranges;
-Added support for default waiting time for user interaction (Pro only);
-Improved front-end code;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.20 =
-Fix for front-end translation
-
-= 2.7.19 =
-Added constant to disable AdSense API;
-Fix for rotation code editor;
-Fix for advaced click tracker for banners (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements;
-
-= 2.7.18 =
-Added support to hide ad label when unfilled AdSense block is hidden;
-Simplified AdSense API authorization process;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.17 =
-Fixed bug for url parameters check;
-Added support for reCaptcha v3 score check (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.16 =
-Added support for adb redirection page with url queries
-Added support for tcf-no-google shortcut
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.15 =
-Added filter hooks for ad labels;
-Added support for constants;
-Added support for rotation option index attribute;
-Added shortcodes for block number and block name;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.14 =
-Added support for demo settings;
-Added support for background transparency;
-Added support for background for sticky ads (Pro only);
-Added support for statistics for check options (Pro only);
-Added support for individual rotation option statistics (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.13 =
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.12 =
-Security fix for settings page save url;
-Added support to disable ad blocking detection for specific devices;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.11 =
-Security fix for sites using constants to prevent file editing or unfiltered HTML;
-Added filters before the options are saved;
-Added support for a shortcode for comma separated list of categories with quotes (for Google Ad Manager);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.10 =
-Security fix for XSS (Reported by Krzysztof Zajac via WPScan);
-Added support to detect and replace blank AdSense blocks;
-Added support to load and save plugins settings to a file (Pro only);
-Added support for parallax ads (Pro only);
-Few fixes
-
-= 2.7.9 =
-Bug fix for timed rotations;
-Bug fix for tr_TR translation;
-Improved checks for cookies;
-Improved compatibility with PHP 8.1;
-Added separate list for cookies;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.8 =
-Bug fix for paragraph counting and clearance;
-Bug fix for undefined constant error
-
-= 2.7.7 =
-Few bug fixes
-
-= 2.7.6 =
-Improved compatibility with PHP 8;
-Added translation for tr_TR;
-Added support to wait for an interaction before the block is loaded (Pro only);
-Added support to delay insertion of the block (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.5 =
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.4 =
-Updated Google API;
-Improved labels for AdSense Auto ads;
-Added external tracking support for WP username (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.3 =
-Improved ad blocking detection;
-Improved compatibility with PHP 8;
-Improved check for update server accessibility (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.2 =
-Added shortcuts for TCF v2 consent cookie checks;
-Added support for adinserter shortcode to get post ID;
-Improved ad blocking detection;
-Changed internal IP to country database (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.1 =
-Added shortcuts for TCF v2 consent cookie checks;
-Improved ad blocking detection;
-Changed internal IP to country database (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements;
-
-= 2.7.1 =
-Improved ad blocking detection;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.7.0 =
-Added support to list range of post IDs;
-Added support for browser language in client lists;
-Added support for client-side checks for filter hook ai_block_insertion_check;
-Added support for remote plugin managenent (Pro only);
-Added support for scheduling check shortcode (Pro only);
-Added support for daily scheduling time (Pro onlyl);
-Added support for css attribute in check options (Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-

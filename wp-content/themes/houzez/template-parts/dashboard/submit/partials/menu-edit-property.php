@@ -2,10 +2,10 @@
     
     <?php get_template_part( 'template-parts/dashboard/submit/partials/author'); ?>
 
-    <div class="menu-title">
+    <div class="menu-title fw-bold mb-3 text-uppercase">
         <?php esc_html_e('Menu', 'houzez'); ?> 
     </div><!-- menu-title -->
-    <ul class="menu-edit-property list-unstyled">
+    <ul class="menu-edit-property list-unstyled d-flex flex-column gap-3">
         <?php
         $layout = houzez_option('property_form_sections');
         $layout = $layout['enabled'];

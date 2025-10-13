@@ -9,13 +9,13 @@ if( !empty( $prop_video_url ) ) {
 
     endif;
 ?>
-<div class="property-video-wrap property-section-wrap" id="property-video-wrap">
+<div class="property-video-wrap property-section-wrap" id="property-video-wrap" role="region">
 	<div class="block-wrap">
 		<div class="block-title-wrap d-flex justify-content-between align-items-center">
 			<h2><?php echo houzez_option('sps_video', 'Video'); ?></h2>
 		</div><!-- block-title-wrap -->
-		<div class="block-content-wrap">
-			<div class="block-video-wrap">
+		<div class="block-content-wrap" role="presentation">
+			<div class="block-video-wrap" role="presentation">
 				<?php $embed_code = wp_oembed_get($prop_video_url); echo $embed_code; ?>
 			</div>
 		</div><!-- block-content-wrap -->

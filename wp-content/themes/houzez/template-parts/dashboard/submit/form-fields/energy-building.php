@@ -1,5 +1,5 @@
-<div class="form-group">
-	<label for="energy_performance"><?php echo houzez_option('cl_energy_build_performance', 'Energy performance of the building'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="energy_performance"><?php echo houzez_option('cl_energy_build_performance', 'Energy performance of the building'); ?></label>
 
 	<input class="form-control" id="energy_performance" name="energy_performance" value="<?php
     if (houzez_edit_property()) {

@@ -107,15 +107,15 @@ function houzez_agency_search_widget() {
 
  ?>
 
-    <div class="widget-body">
+    <div class="widget-body" role="region">
         <div class="widget-content">
             <form method="get" action="<?php echo esc_url($purl); ?>">
-                <div class="form-group">
+                <div class="form-group mb-2">
                     <div class="search-icon">
                         <input type="text" class="form-control" value="<?php echo esc_html($agency_name); ?>" name="agency_name" placeholder="<?php echo $houzez_local['search_agency_name']?>">
                     </div><!-- search-icon -->
                 </div>
-                <button type="submit" class="btn btn-search btn-secondary btn-full-width"><?php echo $houzez_local['search_agency_btn']; ?></button>
+                <button type="submit" class="btn btn-search btn-secondary w-100"><?php echo $houzez_local['search_agency_btn']; ?></button>
             </form>
         </div><!-- widget-content -->
     </div><!-- widget-body -->

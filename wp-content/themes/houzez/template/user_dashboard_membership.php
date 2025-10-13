@@ -7,80 +7,76 @@ if ( !is_user_logged_in() ) {
 }
 
 global $houzez_local;
-$userID = get_current_user_id();
+$user_id = get_current_user_id();
 $dashboard_membership = houzez_get_template_link_2('template/user_dashboard_membership.php');
-$packages_page_link = houzez_get_template_link('template/template-packages.php');
-$agent_agency_id = houzez_get_agent_agency_id( $userID );
+$packages_page_link = houzez_get_template_link_2('template/template-packages.php');
+$agent_agency_id = houzez_get_agent_agency_id( $user_id );
 
 if( $agent_agency_id ) {
-    $userID = $agent_agency_id;
+    $user_id = $agent_agency_id;
 }
-$package_id = houzez_get_user_package_id( $userID );
+$package_id = houzez_get_user_package_id( $user_id );
 
-get_header(); ?>
+get_header('dashboard'); ?>
 
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_membership', 'Membership'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
-                
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
-            
-            <?php
-            if( !empty($package_id) ) {
-                ?>
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-                <div class="dashboard-content-block">
-                    <ul class="list-unstyled mebership-list-info">
-                        <?php houzez_get_user_current_package( $userID ); ?>
-                    </ul>
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
+
+    <div class="dashboard-content">
+        <div class="heading d-flex align-items-center justify-content-between">
+            <div class="heading-text">
+                <h2><?php echo houzez_option('dsh_membership', 'Membership'); ?></h2> 
+            </div> 
+        </div> 
+
+        <?php if( !empty($package_id) ) { ?>
+                <div class="houzez-membership">
+                    <?php houzez_get_user_current_package( $user_id ); ?>
                 </div>
 
                 <?php
                 if( ! $agent_agency_id ) {
-                    echo '<a href="' . esc_url($packages_page_link) . '" class="btn btn-primary mb-2"> ' . esc_html__('Change Membership Plan', 'houzez') . ' </a>';
-                    $stripe_profile_user    =   get_user_meta($userID,'fave_stripe_user_profile',true);
-                    $subscription_id        =   get_user_meta( $userID, 'houzez_stripe_subscription_id', true );
-                    $paypal_subscription_id =   get_user_meta( $userID, 'houzez_paypal_recurring_profile_id', true );
-                    $is_recurring_membership =   get_user_meta( $userID, 'houzez_is_recurring_membership', true );
+                    $stripe_profile_user    =   get_user_meta($user_id,'fave_stripe_user_profile',true);
+                    $subscription_id        =   get_user_meta($user_id, 'houzez_stripe_subscription_id', true );
+                    $paypal_subscription_id =   get_user_meta($user_id, 'houzez_paypal_recurring_profile_id', true );
+                    $is_recurring_membership =   get_user_meta($user_id, 'houzez_is_recurring_membership', true );
                     $enable_stripe_status   =   houzez_option('enable_stripe');
                     $enable_paypal_status   =   houzez_option('enable_paypal');
-
-                
-                    if( $subscription_id != '' && $enable_stripe_status != 0 ) {
-                        echo '<a style="margin-left:10px;" id="houzez_stripe_cancel" data-message="'.esc_html__('Done: Subscription will be cancelled at the end of current period', 'houzez').'" class="btn btn-primary-outlined mb-2">'.esc_html__('Cancel Stripe Subscription', 'houzez').'</a>';
-                        echo '<span style="margin-left:10px; color:green" id="stripe_cancel_success"></span>';
-                    }
-
-                    if( $paypal_subscription_id != '' && $enable_paypal_status != 0 ) {
-                        echo '<a style="margin-left:10px;" id="houzez_paypal_cancel" data-message="'.esc_html__('Done: Subscription will be cancelled at the end of current period', 'houzez').'" class="btn btn-primary-outlined mb-2">'.esc_html__('Cancel PayPal Subscription', 'houzez').'</a>';
-                        echo '<span style="margin-left:10px; color:green" id="paypal_cancel_success"></span>';
-                    }
+                    
+                    ?>
+                    <div class="houzez-membership-btn mt-3">
+                        <ul class="d-flex align-items-center gap-2">
+                            <li><a href="<?php echo esc_url($packages_page_link); ?>" class="btn btn-primary"><?php esc_html_e('Change Membership Plan', 'houzez'); ?></a></li>
+                            <?php if( $subscription_id != '' && $enable_stripe_status != 0 ) { ?>
+                                <li><a href="#" id="houzez_stripe_cancel" data-message="<?php echo esc_html__('Done: Subscription will be cancelled at the end of current period', 'houzez'); ?>" class="btn btn-primary-outlined"><?php esc_html_e('Cancel Stripe Subscription', 'houzez'); ?></a></li>
+                                <li><span id="stripe_cancel_success" class="text-success"></span></li>
+                            <?php } ?>
+                            
+                            <?php if( $paypal_subscription_id != '' && $enable_paypal_status != 0 ) { ?>
+                                <li><a href="#" id="houzez_paypal_cancel" data-message="<?php echo esc_html__('Done: Subscription will be cancelled at the end of current period', 'houzez'); ?>" class="btn btn-primary-outlined"><?php esc_html_e('Cancel PayPal Subscription', 'houzez'); ?></a></li>
+                                <li><span id="paypal_cancel_success" class="text-success"></span></li>
+                            <?php } ?>
+                        </ul>
+                    </div>
+                    <?php
                 }
             } else { ?>
 
-                <div class="dashboard-content-block">
-                    <?php esc_html_e("You don't have any membership.", 'houzez'); ?>
+                <div class="houzez-membership">
+                    <div class="membership-inner d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex flex-column">
+                            <p class="mb-3"><?php esc_html_e("You don't have any membership.", 'houzez'); ?></p>
+                            <a href="<?php echo esc_url($packages_page_link); ?>" class="btn btn-primary"><?php esc_html_e('Get Membership Plan', 'houzez'); ?></a>
+                        </div>
+                    </div>
                 </div>
+                
+        <?php }  ?>
+    </div>
+</div>
 
-                <?php
-                echo '<a href="' . esc_url($packages_page_link) . '" class="btn btn-primary mb-2"> ' . esc_html__('Get Membership Plan', 'houzez') . ' </a>';
-            }
-            ?>                
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
-
-<?php get_footer(); ?>
+<?php get_footer('dashboard'); ?>

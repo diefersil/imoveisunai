@@ -13,14 +13,19 @@ class RevSliderFront extends RevSliderFrontGlobal {
 
 	public function __construct(){
 		parent::__construct();
-		$this->add_actions();
+		add_action('wp_enqueue_scripts', array($this, 'add_actions'));
 	}
 
 	/**
 	 * Add all actions that the frontend needs here
 	 **/
 	public function add_scripts(){
-		wp_enqueue_script('_tpt', RS_PLUGIN_URL_CLEAN . 'public/js/libs/tptools.js', '', RS_REVISION, ['strategy' => 'async']);
+		global $wp_scripts;
+		if(version_compare($this->get_val($wp_scripts, array('registered', 'tp-tools', 'ver'), '1.0'), RS_TP_TOOLS, '<')){
+			wp_deregister_script('tp-tools');
+			wp_dequeue_script('tp-tools');
+		}
+		wp_enqueue_script('tp-tools', RS_PLUGIN_URL_CLEAN . 'public/js/libs/tptools.js', '', RS_REVISION, ['strategy' => 'async']);
 		wp_enqueue_script('sr7', RS_PLUGIN_URL_CLEAN . 'public/js/sr7.js', '', RS_REVISION, ['strategy' => 'async']);			
 		wp_enqueue_style('sr7css', RS_PLUGIN_URL_CLEAN . 'public/css/sr7.css', '', RS_REVISION);
 		
@@ -45,7 +50,30 @@ class RevSliderFront extends RevSliderFrontGlobal {
 	}
 	  
 	public function add_actions(){
-		add_action('wp_enqueue_scripts', array($this, 'add_scripts'));
+		global $SR_GLOBALS;
+
+		$global	 	= $this->get_global_settings();
+		$inc_global	= $this->_truefalse($this->get_val($global, 'allinclude', true));		
+		$inc_footer = $this->_truefalse($this->get_val($global, array('script', 'footer'), true));
+		$widget	 	= is_active_widget(false, false, 'rev-slider-widget', true);
+		
+		$load = false;
+		$load = apply_filters('revslider_include_libraries', $load);
+		$load = ($SR_GLOBALS['preview_mode'] === true) ? true : $load;
+		$load = ($inc_global === true) ? true : $load;
+		$load = (self::has_shortcode('rev_slider') === true || self::has_shortcode('sr7') === true) ? true : $load;
+		$load = ($widget !== false) ? true : $load;
+		
+		if($inc_global === false){
+			$output = new RevSliderOutput();
+			$output->set_add_to($this->get_val($global, 'includeids', ''));
+			$add_to = $output->check_add_to(true);
+			$load	= ($add_to === true) ? true : $load;
+		}
+		
+		if($load === false) return false;
+
+		$this->add_scripts();
 		add_action('wp_head', array($this, 'js_add_header_scripts'), 99);
 		add_action('wp_head', array($this, 'load_header_fonts'));
 		add_filter('style_loader_tag', array($this, 'add_html_to_style_tags'), 10, 2);
@@ -65,7 +93,9 @@ class RevSliderFront extends RevSliderFrontGlobal {
 		$breakpoints[] = intval($this->get_val($global, array('size', 'notebook'), '1024'));
 		$breakpoints[] = intval($this->get_val($global, array('size', 'tablet'), '778'));
 		$breakpoints[] = intval($this->get_val($global, array('size', 'mobile'), '480'));
+		$fSUVW	 = $this->_truefalse($this->get_val($global, 'fSUVW', false));
 
+		$ytnc	 = $this->_truefalse($this->get_val($global, 'ytnc', false));
 		$libs	 = array();
 		$css	 = array();
 		$modules = array('module','page','slide','layer','draw','animate','srtools','canvas','defaults','carousel','navigation','media','modifiers');
@@ -102,12 +132,14 @@ class RevSliderFront extends RevSliderFrontGlobal {
 		$script .= "	SR7.E.plugin_url	= '". str_replace(array("\n", "\r"), '', RS_PLUGIN_URL) ."';" . "\n";
 		$script .= "	SR7.E.wp_plugin_url = '". str_replace(array("\n", "\r"), '', WP_PLUGIN_URL) . "/" ."';" . "\n";
 		$script .= "	SR7.E.revision		= '". RS_REVISION ."';" . "\n";
-		$script .= "	SR7.E.fontBaseUrl	= '". $this->modify_fonts_url('https://fonts.googleapis.com/css2?family=') ."';" . "\n";
+		$script .= "	SR7.E.fontBaseUrl	= '". ($this->get_val($global, 'fontdownload') === 'off' ? $this->modify_fonts_url('https://fonts.googleapis.com/css2?family=') : '') ."';" . "\n";
 		$script .= "	SR7.G.breakPoints 	= [".implode(',', $breakpoints)."];" . "\n";
+		$script .= "	SR7.G.fSUVW 		= ".(($fSUVW === true) ? 'true' : 'false').";" . "\n";
 		$script .= "	SR7.E.modules 		= ['".implode("','", $modules)."'];" . "\n";
 		if(!empty($libs))	$script .= '	SR7.E.libs 			= [' . implode(',', $libs) . '];' . "\n";
 		if(!empty($css))	$script .= '	SR7.E.css 			= [' . implode(',', $css) . '];' . "\n";
 		$script .= "	SR7.E.resources		= {};" . "\n";
+		$script .= "	SR7.E.ytnc			= ".(($ytnc === false) ? 'false' : 'true').";" . "\n";
 
 		$script = apply_filters('revslider_js_add_header_scripts_js', $script);
 		
@@ -159,7 +191,17 @@ class RevSliderFront extends RevSliderFrontGlobal {
 			
 			$slider->init_by_alias($alias, false);
 			if($slider->inited === false) continue;
-			
+
+			if($SR_GLOBALS['use_table_version'] === 7){
+				$v7sid = $slider->get_id();
+				if($this->check_if_migration_done($v7sid) === false){
+					$SR_GLOBALS['use_table_version'] = 6;
+					$slider	= new RevSliderSlider();
+					$slider->init_by_id($v7sid);
+					if($slider->inited === false) continue;
+				}
+			}
+
 			if($SR_GLOBALS['use_table_version'] === 6) $this->v6_slider = true;
 
 			$dl = $slider->get_param('deepLinks', []);
@@ -178,6 +220,7 @@ class RevSliderFront extends RevSliderFrontGlobal {
 			$html_id	= $this->set_html_id_v7($html_id, true);
 			$full		= ($slider->v7 === false || ($slider->v7 === true && ($slider->get_param('fixed', false) !== false || in_array($slider->get_param('type', ''), array('scene', 'hero', 'carousel'))))) ? true : false;
 			if($mode === 'MIX' && $SR_GLOBALS['serial'] > 2) $full = false; //we only print $forced_slides from now on
+			$full		= ($slider->is_stream_post()) ? true : $full; //check if we are stream/post, these need to always write all layers (B-7235530610)
 
 			if($SR_GLOBALS['markup_export'] === true){
 				$script .= "	SR7.JSON['".$html_id."'] = 'assets/".$html_id.".json';"."\n";
@@ -212,6 +255,10 @@ class RevSliderFront extends RevSliderFrontGlobal {
 	 * print in header
 	 **/
 	public function load_header_fonts(){
+		$global = $this->get_global_settings();
+		if($this->get_val($global, 'fontdownload', 'off') === 'disable') return;
+		if($this->_truefalse($this->get_val($global, 'dpreconnect', false)) === true) return;
+
 		echo '<link rel="preconnect" href="https://fonts.googleapis.com">'."\n";
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>'."\n";
 	}

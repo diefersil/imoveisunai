@@ -1,6 +1,8 @@
 <?php
 $price_listing_submission = houzez_option('price_listing_submission');
 $price_featured_listing_submission = houzez_option('price_featured_listing_submission');
+$tax_percentage_per_listing = floatval(houzez_option('tax_percentage_per_listing'));
+$tax_percentage_featured = floatval(houzez_option('tax_percentage_featured'));
 $property_id = isset( $_GET['prop-id'] ) ? $_GET['prop-id'] : '';
 $upgrade_id = isset( $_GET['upgrade_id'] ) ? $_GET['upgrade_id'] : '';
 
@@ -40,40 +42,39 @@ if($enable_paypal != 0 ) {
 <div class="payment-method">
     
     <?php if( $enable_paypal != 0 ) { ?>
-    <div class="payment-method-block paypal-method">
+    <div class="payment-method-block paypal-method mb-2">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
+            <label class="control control--radio radio-tab d-flex align-items-center">
                 <input type="radio" class="payment-paypal" name="houzez_payment_type" value="paypal" <?php echo $checked_paypal;?>>
-                <span class="control-text"><?php esc_html_e( 'Paypal', 'houzez'); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Paypal', 'houzez'); ?></strong></span>
+                <img class="img-fluid ms-4" src="<?php echo HOUZEZ_IMAGE; ?>cc-cards.png" alt="Accepted credit cards">
+                <span class="control__indicator start-0 end-auto"></span>
             </label>
         </div>
     </div>
     <?php } ?>
 
     <?php if( $enable_stripe != 0 ) { ?>
-    <div class="payment-method-block stripe-method">
+    <div class="payment-method-block stripe-method mb-2">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
+            <label class="control control--radio radio-tab d-flex align-items-center">
                 <input type="radio" class="payment-stripe" name="houzez_payment_type" value="stripe" <?php echo $checked_stripe;?>>
-                <span class="control-text"><?php esc_html_e( 'Stripe', 'houzez'); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Stripe', 'houzez'); ?></strong></span>
+                <img class="img-fluid ms-4" src="<?php echo HOUZEZ_IMAGE; ?>cc-cards.png" alt="Accepted credit cards">
+                <span class="control__indicator start-0 end-auto"></span>
             </label>
         </div>
     </div>
     <?php } ?>
 
     <?php if( $enable_wireTransfer != 0 ) { ?>
-    <div class="payment-method-block bank-method">
+    <div class="payment-method-block bank-method mb-2">
         <div class="form-group">
-            <label class="control control--radio radio-tab">
+            <label class="control control--radio radio-tab d-flex align-items-center">
                 <input type="radio" name="houzez_payment_type" value="direct_pay" <?php echo $checked_bank;?>>
-                <span class="control-text"><?php esc_html_e( 'Bank Transfer', 'houzez' ); ?></span>
-                <span class="control__indicator"></span>
-                <span class="radio-tab-inner"></span>
-                <span class="float-right"><?php esc_html_e('Payment by bank transfer. Use the order ID as a reference', 'houzez'); ?></span>
+                <span class="control-text ms-3 flex-grow-1"><strong><?php esc_html_e( 'Bank Transfer', 'houzez' ); ?></strong></span>
+                <span class="control__indicator start-0 end-auto"></span>
+                <span class="ms-auto"><?php esc_html_e('Payment by bank transfer. Use the order ID as a reference', 'houzez'); ?></span>
             </label>
         </div>
     </div>
@@ -81,11 +82,13 @@ if($enable_paypal != 0 ) {
 </div>
 <input type="hidden" id="houzez_property_id" name="houzez_property_id" value="<?php echo intval( $property_id ); ?>">
 <input type="hidden" id="houzez_listing_price" name="houzez_listing_price" value="<?php echo esc_attr($price_listing_submission); ?>">
+<input type="hidden" id="houzez_listing_tax_percent" name="houzez_listing_tax_percent" value="<?php echo esc_attr($tax_percentage_per_listing); ?>">
+<input type="hidden" id="houzez_featured_tax_percent" name="houzez_featured_tax_percent" value="<?php echo esc_attr($tax_percentage_featured); ?>">
 <input type="hidden" id="featured_pay" name="featured_pay" value="0">
 <input type="hidden" id="is_upgrade" name="is_upgrade" value="<?php echo intval($is_upgrade); ?>">
 <input type="hidden" id="relist_mode" name="relist_mode" value="<?php echo esc_attr($relist_mode); ?>">
 
-<button id="houzez_complete_order" type="button" class="btn btn-success btn-full-width mt-4 mb-4">
+<button id="houzez_complete_order" type="button" class="btn btn-success w-100 mt-4 mb-4">
     <?php esc_html_e( 'Complete Payment', 'houzez' ); ?>
 </button>
 <div class="mb-4"><?php echo sprintf(wp_kses(__('By clicking "Complete Payment" you agree to our <a target="_blank"  href="%s">Terms & Conditions</a>', 'houzez'), $allowed_html_array), get_permalink($terms_conditions)); ?></div>

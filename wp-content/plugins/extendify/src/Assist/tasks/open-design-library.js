@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { DesignLibraryMarkup } from '@assist/svg';
+import { hasPageCreatorEnabled } from '@help-center/lib/utils';
 
 export default {
 	slug: 'design-library',
@@ -13,9 +14,11 @@ export default {
 		completed: __('Revisit', 'extendify-local'),
 		notCompleted: __('Explore Design Library', 'extendify-local'),
 	},
-	link: 'post-new.php?post_type=page&ext-open=yes',
+	link: hasPageCreatorEnabled
+		? 'post-new.php?post_type=page&ext-open=1&ext-page-creator-close=1'
+		: 'post-new.php?post_type=page&ext-open=1',
 	type: 'html-text-button',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: () => true,
 	backgroundImage: null,
 	htmlBefore: () => (

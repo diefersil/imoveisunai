@@ -15,12 +15,12 @@ export default {
 		notCompleted: __('Upload', 'extendify-local'),
 	},
 	type: 'modal',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: () => {
 		if (themeSlug === 'extendable') return true;
 		if (launchCompleted) return true;
 		return false;
 	},
 	backgroundImage:
-		'https://assets.extendify.com/assist-tasks/edit-homepage.webp',
+		'https://images.extendify-cdn.com/assist-tasks/edit-homepage.webp',
 };

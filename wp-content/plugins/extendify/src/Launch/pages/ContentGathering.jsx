@@ -4,6 +4,7 @@ import { Title } from '@launch/components/Title';
 import { VideoPlayer } from '@launch/components/VideoPlayer';
 import { useHomeLayouts } from '@launch/hooks/useHomeLayouts';
 import { useSiteImages } from '@launch/hooks/useSiteImages';
+import { useSitePlugins } from '@launch/hooks/useSitePlugins';
 import { useSiteStrings } from '@launch/hooks/useSiteStrings';
 import { PageLayout } from '@launch/layouts/PageLayout';
 import { usePagesStore } from '@launch/state/Pages';
@@ -18,11 +19,21 @@ export const state = pageState('Content Gathering', () => ({
 }));
 
 export const ContentGathering = () => {
+	const showSiteQuestions = window.extSharedData?.showSiteQuestions ?? false;
+	const { loading: loadingSitePlugins, sitePlugins } = useSitePlugins();
+	const waitForPlugins = showSiteQuestions && loadingSitePlugins;
 	const { nextPage } = usePagesStore();
-	const { setSiteStrings, setSiteImages } = useUserSelectionStore();
+	const { setSiteStrings, setSiteImages, addMany } = useUserSelectionStore();
 	const { siteStrings } = useSiteStrings();
 	const { siteImages } = useSiteImages();
-	const { homeLayouts } = useHomeLayouts();
+	const { homeLayouts } = useHomeLayouts({
+		disableFetch: waitForPlugins,
+	});
+
+	useEffect(() => {
+		if (!sitePlugins) return;
+		addMany('sitePlugins', sitePlugins, { clearExisting: true });
+	}, [addMany, sitePlugins]);
 
 	useEffect(() => {
 		if (!siteStrings) return;
@@ -45,8 +56,9 @@ export const ContentGathering = () => {
 			<div className="mx-auto grow overflow-y-auto px-4 py-8 md:p-12 md:px-6 3xl:p-16">
 				<div className="mx-auto flex h-full flex-col justify-center">
 					<VideoPlayer
-						path="https://assets.extendify.com/launch/site-building.webm"
-						className="mx-auto h-auto w-[200px] md:w-[400px]"
+						poster={`${window.extSharedData.assetPath}/site-building.webp`}
+						path="https://images.extendify-cdn.com/launch/site-building.webm"
+						className="mx-auto h-auto w-[200px] md:h-[400px] md:w-[400px]"
 					/>
 
 					<Title

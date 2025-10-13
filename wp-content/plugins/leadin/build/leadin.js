@@ -68,10 +68,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "disableInternalTracking": () => (/* binding */ disableInternalTracking),
 /* harmony export */   "fetchDisableInternalTracking": () => (/* binding */ fetchDisableInternalTracking),
+/* harmony export */   "fetchProxyMappingsEnabled": () => (/* binding */ fetchProxyMappingsEnabled),
 /* harmony export */   "getBusinessUnitId": () => (/* binding */ getBusinessUnitId),
 /* harmony export */   "healthcheckRestApi": () => (/* binding */ healthcheckRestApi),
+/* harmony export */   "refreshProxyMappingsCache": () => (/* binding */ refreshProxyMappingsCache),
 /* harmony export */   "setBusinessUnitId": () => (/* binding */ setBusinessUnitId),
 /* harmony export */   "skipReview": () => (/* binding */ skipReview),
+/* harmony export */   "toggleProxyMappingsEnabled": () => (/* binding */ toggleProxyMappingsEnabled),
 /* harmony export */   "trackConsent": () => (/* binding */ trackConsent),
 /* harmony export */   "updateHublet": () => (/* binding */ updateHublet)
 /* harmony export */ });
@@ -149,6 +152,15 @@ function setBusinessUnitId(businessUnitId) {
 }
 function getBusinessUnitId() {
   return makeRequest('get', '/business-unit');
+}
+function refreshProxyMappingsCache() {
+  return makeRequest('post', '/wp-mappings-cache-reset');
+}
+function fetchProxyMappingsEnabled() {
+  return makeRequest('get', '/wp-mappings-proxy-enabled');
+}
+function toggleProxyMappingsEnabled(value) {
+  return makeRequest('put', '/wp-mappings-proxy-enabled', value);
 }
 
 /***/ }),
@@ -473,7 +485,15 @@ var PluginMessages = {
   ContentEmbedInstallError: 'CONTENT_EMBED_INSTALL_ERROR',
   ContentEmbedActivationRequest: 'CONTENT_EMBED_ACTIVATION_REQUEST',
   ContentEmbedActivationResponse: 'CONTENT_EMBED_ACTIVATION_RESPONSE',
-  ContentEmbedActivationError: 'CONTENT_EMBED_ACTIVATION_ERROR'
+  ContentEmbedActivationError: 'CONTENT_EMBED_ACTIVATION_ERROR',
+  ProxyMappingsEnabledRequest: 'PROXY_MAPPINGS_ENABLED_REQUEST',
+  ProxyMappingsEnabledResponse: 'PROXY_MAPPINGS_ENABLED_RESPONSE',
+  ProxyMappingsEnabledError: 'PROXY_MAPPINGS_ENABLED_ERROR',
+  ProxyMappingsEnabledChangeRequest: 'PROXY_MAPPINGS_ENABLED_CHANGE_REQUEST',
+  ProxyMappingsEnabledChangeError: 'PROXY_MAPPINGS_ENABLED_CHANGE_ERROR',
+  RefreshProxyMappingsRequest: 'REFRESH_PROXY_MAPPINGS_REQUEST',
+  RefreshProxyMappingsResponse: 'REFRESH_PROXY_MAPPINGS_RESPONSE',
+  RefreshProxyMappingsError: 'REFRESH_PROXY_MAPPINGS_ERROR'
 };
 
 /***/ }),
@@ -493,6 +513,7 @@ var ProxyMessages = {
   FetchForms: 'FETCH_FORMS',
   FetchForm: 'FETCH_FORM',
   CreateFormFromTemplate: 'CREATE_FORM_FROM_TEMPLATE',
+  GetTemplateAvailability: 'GET_TEMPLATE_AVAILABILITY',
   FetchAuth: 'FETCH_AUTH',
   FetchMeetingsAndUsers: 'FETCH_MEETINGS_AND_USERS',
   FetchContactsCreateSinceActivation: 'FETCH_CONTACTS_CREATED_SINCE_ACTIVATION',
@@ -530,6 +551,23 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/*
+ * We cannot postMessage error objects. We will run into serialization errors
+ * Extract some properties we care about from the errors and create an error object from these
+ */
+function createSafeErrorPayload(error) {
+  var defaultMessage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'An error occurred';
+  var safePayload = {
+    status: error && error.status || 500,
+    statusText: error && error.statusText || 'Error',
+    message: error && error.responseJSON && error.responseJSON.message || error && error.message || defaultMessage,
+    code: error && error.responseJSON && error.responseJSON.code
+  };
+  if (error && error.responseJSON && error.responseJSON.data) {
+    safePayload.data = error.responseJSON.data;
+  }
+  return safePayload;
+}
 var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.TrackConsent, function (message) {
   (0,_api_wordpressApiClient__WEBPACK_IMPORTED_MODULE_1__.trackConsent)(message.payload);
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingChangeRequest, function (message, embedder) {
@@ -538,10 +576,11 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingFetchResponse,
       payload: message.payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
+    // Extract only serializable properties from error. You cannot postMessage raw error obj with prototype methods
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingChangeError,
-      payload: payload
+      payload: createSafeErrorPayload(error)
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingFetchRequest, function (__message, embedder) {
@@ -551,10 +590,10 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingFetchResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.InternalTrackingFetchError,
-      payload: payload
+      payload: createSafeErrorPayload(error, 'Fetch error occurred')
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitFetchRequest, function (__message, embedder) {
@@ -563,10 +602,10 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitFetchResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitFetchError,
-      payload: payload
+      payload: createSafeErrorPayload(error, 'Business unit fetch error')
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitChangeRequest, function (message, embedder) {
@@ -575,10 +614,10 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitFetchResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.BusinessUnitChangeError,
-      payload: payload
+      payload: createSafeErrorPayload(error, 'Business unit change error')
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.SkipReviewRequest, function (__message, embedder) {
@@ -587,10 +626,10 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.SkipReviewResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.SkipReviewError,
-      payload: payload
+      payload: createSafeErrorPayload(error, 'Skip review error')
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.RemoveParentQueryParam, function (message) {
@@ -601,10 +640,10 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ContentEmbedInstallResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ContentEmbedInstallError,
-      payload: payload
+      payload: createSafeErrorPayload(error, 'Content embed install error')
     });
   });
 }], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ContentEmbedActivationRequest, function (message, embedder) {
@@ -613,10 +652,47 @@ var messageMapper = new Map([[_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.P
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ContentEmbedActivationResponse,
       payload: payload
     });
-  })["catch"](function (payload) {
+  })["catch"](function (error) {
     embedder.postMessage({
       key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ContentEmbedActivationError,
+      payload: createSafeErrorPayload(error, 'Content embed activation error')
+    });
+  });
+}], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.RefreshProxyMappingsRequest, function (__message, embedder) {
+  (0,_api_wordpressApiClient__WEBPACK_IMPORTED_MODULE_1__.refreshProxyMappingsCache)().then(function () {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.RefreshProxyMappingsResponse,
+      payload: {}
+    });
+  })["catch"](function (error) {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.RefreshProxyMappingsError,
+      payload: createSafeErrorPayload(error, 'Refresh proxy mappings error')
+    });
+  });
+}], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledRequest, function (__message, embedder) {
+  (0,_api_wordpressApiClient__WEBPACK_IMPORTED_MODULE_1__.fetchProxyMappingsEnabled)().then(function (payload) {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledResponse,
       payload: payload
+    });
+  })["catch"](function (error) {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledError,
+      payload: createSafeErrorPayload(error, 'Proxy mappings enabled fetch error')
+    });
+  });
+}], [_integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledChangeRequest, function (_ref2, embedder) {
+  var payload = _ref2.payload;
+  (0,_api_wordpressApiClient__WEBPACK_IMPORTED_MODULE_1__.toggleProxyMappingsEnabled)(payload).then(function () {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledResponse,
+      payload: payload
+    });
+  })["catch"](function (error) {
+    embedder.postMessage({
+      key: _integratedMessages__WEBPACK_IMPORTED_MODULE_0__.PluginMessages.ProxyMappingsEnabledChangeError,
+      payload: createSafeErrorPayload(error, 'Proxy mappings enabled change error')
     });
   });
 }]]);
@@ -862,6 +938,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function configureRaven() {
+  if (_constants_leadinConfig__WEBPACK_IMPORTED_MODULE_1__.hubspotBaseUrl.indexOf('local') !== -1) {
+    return;
+  }
   var domain = _constants_leadinConfig__WEBPACK_IMPORTED_MODULE_1__.hubspotBaseUrl.replace(/https?:\/\/app/, '');
   raven_js__WEBPACK_IMPORTED_MODULE_0___default().config("https://a9f08e536ef66abb0bf90becc905b09e@exceptions".concat(domain, "/v2/1"), {
     instrument: {

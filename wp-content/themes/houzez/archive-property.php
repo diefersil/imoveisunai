@@ -1,191 +1,162 @@
 <?php
+/**
+ * Archive Property Template
+ * Created by Waqas Riaz.
+ * Date: 06/03/25
+ * Time: 3:30 PM
+ */
 get_header();
 
-global $post, $listing_view;
+global $post, $total_listing_found;
+
+// Set up the default view
+$default_view_option = houzez_option('taxonomy_posts_layout', 'list-view-v1');
+
+// Determine if we should show the view switcher based on version
+$show_switch = true;
+if (in_array($default_view_option, array('grid-view-v3', 'grid-view-v4', 'grid-view-v5', 'grid-view-v6', 'list-view-v7'))) {
+    $show_switch = false;
+}
+
+// Default arguments
+$args = array(
+    'default_view' => $default_view_option,
+    'layout' => houzez_option('taxonomy_layout', 'right-sidebar'),
+    'grid_columns' => houzez_option('taxonomy_grid_columns', '3'),
+    'content_position' => houzez_option('taxonomy_content_position', 'above'),
+    'show_switch' => $show_switch,
+);
+
+// Get view settings
+$view_settings = houzez_get_listing_view_settings($args['default_view']);
+$current_view = $view_settings['current_view'];
+$current_item_template = $view_settings['current_item_template'];
+$item_version = $view_settings['item_version'];
+
+// Set container class based on layout
+$container_class = 'container';
+$container_class = apply_filters('houzez_taxonomy_container_class', $container_class, $args['layout']);
+
+// Set up sidebar and content classes
+$show_sidebar = ($args['layout'] != 'no-sidebar');
+
+// Force no sidebar for list-v4
+if ($current_item_template == 'list-v4') {
+    $show_sidebar = false;
+    $args['layout'] = 'no-sidebar';
+}
 
 $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
-if( isset($sticky_sidebar['property_listings']) && $sticky_sidebar['property_listings'] != 0 ) { 
-    $is_sticky = 'houzez_sticky'; 
+if (isset($sticky_sidebar['property_listings']) && $sticky_sidebar['property_listings'] != 0) {
+    $is_sticky = 'houzez_sticky';
 }
 
-$listing_view = houzez_option('taxonomy_posts_layout', 'list-view-v1');
-$taxonomy_layout = houzez_option('taxonomy_layout');
+// Set content column class based on layout and sidebar
+$content_col_class = $show_sidebar ? 'col-lg-8 col-md-12 bt-content-wrap' : 'col-lg-12 col-md-12';
+$sidebar_class = 'col-lg-4 col-md-12 bt-sidebar-wrap';
 
-$have_switcher = true;
-
-$wrap_class = $item_layout = $view_class = $cols_in_row = '';
-$card_deck = 'card-deck';
-
-if($listing_view == 'list-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'list-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v3') {
-    $wrap_class = 'listing-v3';
-    $item_layout = 'v3';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'grid-view-v4') {
-    $wrap_class = 'listing-v4';
-    $item_layout = 'v4';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'list-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v6') {
-    $wrap_class = 'listing-v6';
-    $item_layout = 'v6';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'grid-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'v7';
-    $view_class = 'grid-view';
-    $have_switcher = false;
-
-} elseif($listing_view == 'list-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'list-v7';
-    $view_class = 'list-view';
-    $have_switcher = false;
-    $card_deck = '';
-
-} else {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
+if ($args['layout'] == 'left-sidebar') {
+    $content_col_class .= ' order-lg-2'; // Right side on desktop (lg)
+    $sidebar_class .= ' order-lg-1'; // Left side on desktop (lg)
 }
+$content_col_class = apply_filters('houzez_taxonomy_content_class', $content_col_class, $show_sidebar);
 
-if($view_class == 'grid-view' && $taxonomy_layout == 'no-sidebar') {
-    $cols_in_row = 'grid-view-3-cols';
-}
+// Get listing view class
+$listing_view_class = houzez_get_listing_view_class($current_view, $item_version, $args['layout'], $args['grid_columns']);
 
-
-if( $taxonomy_layout == 'no-sidebar' ) {
-    $content_classes = 'col-lg-12 col-md-12';
-} else if( $taxonomy_layout == 'left-sidebar' ) {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap wrap-order-first';
-} else if( $taxonomy_layout == 'right-sidebar' ) {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap';
-} else {
-    $content_classes = 'col-lg-8 col-md-12 bt-content-wrap';
-}
-
-
-$taxonomy_content_position = houzez_option('taxonomy_content_position', 'above');
-
+// Set up query arguments
 $sort_args = array('post_status' => 'publish');
+$sort_args = apply_filters('houzez_sold_status_filter', $sort_args);
 $sort_args = houzez_prop_sort($sort_args);
 global $wp_query;
-$args = array_merge( $wp_query->query_vars, $sort_args );
+$args_query = array_merge($wp_query->query_vars, $sort_args);
 
-$wp_query = new WP_Query( $args );
+// Create the query
+$property_query = new WP_Query($args_query);
 
-$total_listing_found = $wp_query->found_posts;
+// Get total listings found
+$total_listing_found = $property_query->found_posts;
+
 $property_label = houzez_option('cl_property', 'Property');
-if( $total_listing_found > 1 ) {
-   $property_label = houzez_option('cl_properties', 'Properties'); 
+if ($total_listing_found > 1) {
+    $property_label = houzez_option('cl_properties', 'Properties');
 }
+
+do_action('houzez_before_taxonomy_template');
 ?>
 
-<section class="listing-wrap <?php echo esc_attr($wrap_class); ?>">
-    <div class="container">
-
+<section class="listing-wrap listing-<?php echo esc_attr($view_settings['item_version']); ?>" role="region">
+    <?php do_action('houzez_before_taxonomy_wrap'); ?>
+    <div class="<?php echo esc_attr($container_class); ?>">
         <div class="page-title-wrap">
-
+            <?php get_template_part('template-parts/page/breadcrumb'); ?> 
             <div class="d-flex align-items-center">
                 <div class="page-title flex-grow-1">
                     <h1><?php echo post_type_archive_title(); ?></h1>
                 </div><!-- page-title -->
                 <?php 
-                if($have_switcher) {
+                if ($args['show_switch']) {
                     get_template_part('template-parts/listing/listing-switch-view'); 
                 }?> 
             </div><!-- d-flex -->  
-
         </div><!-- page-title-wrap -->
 
         <div class="row">
-            <div class="<?php echo esc_attr($content_classes); ?>">
-
+            <div class="<?php echo esc_attr($content_col_class); ?>">
+                <?php do_action('houzez_before_taxonomy_content'); ?>
+                
                 <?php
-                if ( $taxonomy_content_position == 'above' ) { ?>
-                    <article>
-                        <?php echo term_description(); ?>
+                if ($args['content_position'] == 'above') { ?>
+                    <article class="taxonomy-description">
+                        <?php echo wp_kses_post(term_description()); ?>
                     </article>
                 <?php
                 }?>
+                
+                <?php get_template_part('template-parts/listing/listing-tools'); ?>
 
-                <div class="listing-tools-wrap">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="listing-tabs flex-grow-1"><?php echo esc_attr($total_listing_found).' '.$property_label; ?></div>  
-                        <?php get_template_part('template-parts/listing/listing-sort-by'); ?>    
-                    </div><!-- d-flex -->
-                </div><!-- listing-tools-wrap -->
-
-                <div class="listing-view <?php echo esc_attr($view_class).' '.esc_attr($cols_in_row).' '.esc_attr($card_deck); ?>">
+                <div class="<?php echo esc_attr($listing_view_class); ?>" role="list" data-view="<?php echo esc_attr($current_view); ?>">
+                    <?php do_action('houzez_before_taxonomy_items'); ?>
                     <?php
-                    if ( $wp_query->have_posts() ) :
-                        while ( $wp_query->have_posts() ) : $wp_query->the_post();
-
-                            get_template_part('template-parts/listing/item', $item_layout);
-
-                        endwhile;
+                    if ($property_query->posts) :
+                        foreach ($property_query->posts as $post) :
+                            setup_postdata($post);
+                            get_template_part('template-parts/listing/item', $current_item_template);
+                        endforeach;
+                        wp_reset_postdata();
                     else:
-                        get_template_part('template-parts/listing/item', 'none');
+                        get_template_part('template-parts/listing/item-none');
                     endif;
-                    wp_reset_postdata();
                     ?> 
+                    <?php do_action('houzez_after_taxonomy_items'); ?>
                 </div><!-- listing-view -->
-
-                <?php houzez_pagination( $wp_query->max_num_pages ); ?>
-
+                
+                <?php houzez_pagination($property_query->max_num_pages, $total_listing_found, houzez_option('taxonomy_num_posts')); ?>
+                
             </div><!-- bt-content-wrap -->
 
-            <?php if( $taxonomy_layout != 'no-sidebar' ) { ?>
-            <div class="col-lg-4 col-md-12 bt-sidebar-wrap <?php echo esc_attr($is_sticky); ?>">
+            <?php if ($show_sidebar) : ?>
+            <div class="<?php echo esc_attr($sidebar_class); ?> <?php echo esc_attr($is_sticky); ?>">
                 <?php get_sidebar('property'); ?>
             </div><!-- bt-sidebar-wrap -->
-            <?php } ?>
-
+            <?php endif; ?>
         </div><!-- row -->
-
-        <?php
-        if ( $taxonomy_content_position == 'bottom' ) { ?>
-            <article>
-                <?php echo term_description(); ?>
-            </article>
-        <?php
-        }?>
-
     </div><!-- container -->
+    <?php do_action('houzez_after_taxonomy_wrap'); ?>
 </section><!-- listing-wrap -->
-<?php get_footer();?>
+
+<?php
+if ($args['content_position'] == 'bottom') { ?>
+    <section class="content-wrap">
+        <div class="container">
+            <article class="taxonomy-description">
+                <?php echo wp_kses_post(term_description()); ?>
+            </article>
+        </div>
+    </section>
+<?php
+}
+
+get_footer();
+?>

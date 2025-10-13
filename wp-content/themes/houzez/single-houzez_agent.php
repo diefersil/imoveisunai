@@ -10,8 +10,9 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 
 		$agent_detail_layout = houzez_option('agent-detail-layout', 'v1');
 
-		if( isset( $_GET['single-agent-layout'] ) && $_GET['single-agent-layout'] != "" ) {
-			$agent_detail_layout = esc_html($_GET['single-agent-layout']);
+		$valid_layouts = array('v1', 'v2');
+		if( isset( $_GET['single-agent-layout'] ) && in_array($_GET['single-agent-layout'], $valid_layouts, true) ) {
+			$agent_detail_layout = $_GET['single-agent-layout'];
 		}
 		get_template_part( 'template-parts/realtors/agent/single-agent', $agent_detail_layout );
 		

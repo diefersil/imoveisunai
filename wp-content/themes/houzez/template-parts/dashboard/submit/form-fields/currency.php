@@ -9,8 +9,8 @@ if(empty($default_multi_currency)) {
 if( $is_multi_currency == 1 && class_exists('Houzez_Currencies')) { ?>
 
 <div class="col-md-6 col-sm-12">
-	<div class="form-group">
-		<label for="currency">
+	<div class="form-group mb-3">
+		<label class="form-label" for="currency">
 			<?php echo esc_html__('Currency', 'houzez'); ?>	
 		</label>
 

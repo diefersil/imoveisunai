@@ -29,23 +29,23 @@ class Houzez_Currencies {
      * @return void
      */
     public static function render() {
-    ?>
+        ?>
+        <div class="wrap houzez-template-library">
+            <div class="houzez-header">
+                <div class="houzez-header-content">
+                    <div class="houzez-logo">
+                        <h1><?php esc_html_e('Currencies Management', 'houzez-theme-functionality'); ?></h1>
+                    </div>
+                    <div class="houzez-header-actions">
+                        <a href="<?php echo esc_url(self::currency_add_link()); ?>" class="houzez-btn houzez-btn-primary">
+                            <i class="dashicons dashicons-plus"></i>
+                            <?php esc_html_e('Add New Currency', 'houzez-theme-functionality'); ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        <div class="houzez-admin-wrapper">
-            <?php
-
-            $header = get_template_directory().'/framework/admin/header.php';
-            $tabs = get_template_directory().'/framework/admin/tabs.php';
-
-            if ( file_exists( $header ) ) {
-                load_template( $header );
-            }
-
-            if ( file_exists( $tabs ) ) {
-                load_template( $tabs );
-            } ?>
-
-            <div class="admin-houzez-content"> 
+            <div class="houzez-dashboard">
                 <?php
                 if(isset($_GET['action']) && ( $_GET['action'] == 'add-new' || $_GET['action'] == 'edit-currency')) {
                     load_template( HOUZEZ_TEMPLATES . '/currency/form.php' );
@@ -54,7 +54,6 @@ class Houzez_Currencies {
                 } ?>
             </div>
         </div>
-
         <?php
     }
 
@@ -81,9 +80,13 @@ class Houzez_Currencies {
     public static function get_property_currency($property_id) {
         global $wpdb;
 
+        if(empty($property_id)) {
+            $property_id = get_the_ID();
+        }
+
         // Sanitize the property ID and get the currency code
         $property_id = intval($property_id);
-        $currency_code = get_post_meta( get_the_ID(), 'fave_currency', true);
+        $currency_code = get_post_meta( $property_id, 'fave_currency', true);
 
         // Secure the SQL query using prepare()
         $query = $wpdb->prepare("SELECT * FROM " . $wpdb->prefix . "houzez_currencies WHERE currency_code = %s", $currency_code);
@@ -207,14 +210,24 @@ class Houzez_Currencies {
             ) );
 
             if ( ! empty( $data['id'] ) ) {
-                $wpdb->update( $wpdb->prefix . 'houzez_currencies', $instance, array( 'id' => $data['id'] ) );
-                add_action( 'admin_notices', array( __CLASS__ , 'update_currency_notice' ) );
+                $updated = $wpdb->update( $wpdb->prefix . 'houzez_currencies', $instance, array( 'id' => $data['id'] ) );
+                
+                if ($updated !== false) {
+                    wp_redirect(add_query_arg(['action' => 'edit-currency', 'id' => $data['id'], 'currency_updated' => '1'], admin_url('admin.php?page=houzez_currencies')));
+                    exit;
+                } else {
+                    wp_redirect(add_query_arg(['action' => 'edit-currency', 'id' => $data['id'], 'currency_error' => '1'], admin_url('admin.php?page=houzez_currencies')));
+                    exit;
+                }
             } else {
                 $inserted = $wpdb->insert( $wpdb->prefix . 'houzez_currencies', $instance);
                 if($inserted) {
-                    add_action( 'admin_notices', array( __CLASS__ , 'add_currency_notice' ) );
+                    $new_id = $wpdb->insert_id;
+                    wp_redirect(add_query_arg(['action' => 'edit-currency', 'id' => $new_id, 'currency_added' => '1'], admin_url('admin.php?page=houzez_currencies')));
+                    exit;
                 } else {
-                    add_action( 'admin_notices', array( __CLASS__ , 'error_currency_notice' ) );
+                    wp_redirect(add_query_arg(['action' => 'add-new', 'currency_error' => '1'], admin_url('admin.php?page=houzez_currencies')));
+                    exit;
                 }
             }
 

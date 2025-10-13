@@ -15,7 +15,12 @@ class Houzez_Info_note extends \Elementor\Base_Control {
 	public function content_template() {
 		?>
 		<div class="houzez-info-control-wrap">
-			<p style="line-height: 18px;" class="houzez-info-control">{{{ data.label }}}</p>
+			<p style="font-size: 12px;
+			line-height: 18px;
+    font-style: italic;
+    background-color: #f7f6d4;
+    padding: 10px;
+    border-left: 3px solid #e0c948;" class="houzez-info-control">{{{ data.label }}}</p>
 		</div>
 		<?php
 	}

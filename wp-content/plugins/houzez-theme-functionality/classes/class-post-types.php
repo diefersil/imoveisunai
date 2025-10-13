@@ -22,32 +22,242 @@ class Houzez_Post_Type {
       
         // Flush the rewrite rules if the settings were updated.
         if ( isset( $_GET['settings-updated'] ) )
-            flush_rewrite_rules(); ?>
-
-        <div class="houzez-admin-wrapper">
-
-            <?php settings_errors(); 
-            
-            $header = get_template_directory().'/framework/admin/header.php';
-            $tabs = get_template_directory().'/framework/admin/tabs.php';
-
-            if ( file_exists( $header ) ) {
-                load_template( $header );
+            flush_rewrite_rules();
+        
+        
+        // Get current settings for statistics
+        $settings = get_option('houzez_ptype_settings', self::get_default_settings());
+        $enabled_count = 0;
+        $total_count = count($settings);
+        
+        foreach ($settings as $setting) {
+            if ($setting === 'enabled') {
+                $enabled_count++;
             }
-
-            if ( file_exists( $tabs ) ) {
-                load_template( $tabs );
-            }
-            ?>
-            <div class="admin-houzez-content">
-                <form method="post" action="options.php">
-                    <?php settings_fields( 'houzez_ptype_settings' ); ?>
-                    <?php do_settings_sections( 'houzez_post_types' ); ?>
-                    <?php submit_button( esc_attr__( 'Update Settings', 'houzez-theme-functionality' ), 'primary' ); ?>
-                </form>
+        }
+        
+        // Handle notifications
+        $notification = '';
+        $notification_type = '';
+        
+        if (isset($_GET['settings_saved'])) {
+            $notification = __('Post type settings saved successfully!', 'houzez-theme-functionality');
+            $notification_type = 'success';
+        }
+        
+        ?>
+        <div class="wrap houzez-template-library">
+            <div class="houzez-header">
+                <div class="houzez-header-content">
+                    <div class="houzez-logo">
+                        <h1><?php esc_html_e('Post Types Management', 'houzez-theme-functionality'); ?></h1>
+                    </div>
+                    <div class="houzez-header-actions">
+                        <button type="submit" form="post-types-form" class="houzez-btn houzez-btn-primary">
+                            <i class="dashicons dashicons-yes"></i>
+                            <?php esc_html_e('Save Settings', 'houzez-theme-functionality'); ?>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-        </div><!-- wrap -->
+            <div class="houzez-dashboard">
+                <!-- Notifications -->
+                <?php if ($notification): ?>
+                <div id="houzez-notification" class="houzez-notification <?php echo esc_attr($notification_type); ?>">
+                    <span class="dashicons dashicons-<?php echo $notification_type === 'success' ? 'yes-alt' : 'warning'; ?>"></span>
+                    <?php echo esc_html($notification); ?>
+                </div>
+                <?php endif; ?>
+
+                <!-- Quick Stats -->
+                <div class="houzez-stats-grid">
+                    <div class="houzez-stat-card">
+                        <div class="houzez-stat-icon">
+                            <i class="dashicons dashicons-admin-post"></i>
+                        </div>
+                        <div class="houzez-stat-content">
+                            <h3><?php echo intval($total_count); ?></h3>
+                            <p><?php esc_html_e('Total Post Types', 'houzez-theme-functionality'); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="houzez-stat-card">
+                        <div class="houzez-stat-icon">
+                            <i class="dashicons dashicons-yes-alt"></i>
+                        </div>
+                        <div class="houzez-stat-content">
+                            <h3><?php echo intval($enabled_count); ?></h3>
+                            <p><?php esc_html_e('Enabled Post Types', 'houzez-theme-functionality'); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="houzez-stat-card">
+                        <div class="houzez-stat-icon">
+                            <i class="dashicons dashicons-dismiss"></i>
+                        </div>
+                        <div class="houzez-stat-content">
+                            <h3><?php echo intval($total_count - $enabled_count); ?></h3>
+                            <p><?php esc_html_e('Disabled Post Types', 'houzez-theme-functionality'); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="houzez-stat-card">
+                        <div class="houzez-stat-icon">
+                            <i class="dashicons dashicons-admin-settings"></i>
+                        </div>
+                        <div class="houzez-stat-content">
+                            <h3><?php echo round(($enabled_count / $total_count) * 100); ?>%</h3>
+                            <p><?php esc_html_e('Activation Rate', 'houzez-theme-functionality'); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Configuration Card -->
+                <div class="houzez-main-card">
+                    <div class="houzez-card-header">
+                        <h2>
+                            <i class="dashicons dashicons-admin-post"></i>
+                            <?php esc_html_e('Custom Post Types Configuration', 'houzez-theme-functionality'); ?>
+                        </h2>
+                        <div class="houzez-status-badge <?php echo $enabled_count > 0 ? 'houzez-status-success' : 'houzez-status-warning'; ?>">
+                            <?php echo $enabled_count > 0 ? __('Active', 'houzez-theme-functionality') : __('Inactive', 'houzez-theme-functionality'); ?>
+                        </div>
+                    </div>
+                    <div class="houzez-card-body">
+                        <p class="houzez-description">
+                            <?php esc_html_e('Enable or disable custom post types for your Houzez website. Disabled post types will not appear in the admin area or frontend.', 'houzez-theme-functionality'); ?>
+                        </p>
+                        
+                        <form method="post" action="options.php" id="post-types-form">
+                    <?php settings_fields( 'houzez_ptype_settings' ); ?>
+                            
+                            <div class="houzez-form-grid">
+                                <div class="houzez-form-group">
+                                    <label for="houzez_agents_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-admin-users"></i>
+                                        <?php esc_html_e('Agents', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_agents_post" name="houzez_ptype_settings[houzez_agents_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_agents_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_agents_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage real estate agents and their profiles', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_agencies_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-building"></i>
+                                        <?php esc_html_e('Agencies', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_agencies_post" name="houzez_ptype_settings[houzez_agencies_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_agencies_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_agencies_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage real estate agencies and their information', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_packages_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-products"></i>
+                                        <?php esc_html_e('Houzez Packages', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_packages_post" name="houzez_ptype_settings[houzez_packages_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_packages_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_packages_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage subscription packages for property listings', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_invoices_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-media-spreadsheet"></i>
+                                        <?php esc_html_e('Houzez Invoices', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_invoices_post" name="houzez_ptype_settings[houzez_invoices_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_invoices_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_invoices_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage billing and invoice records', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_partners_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-groups"></i>
+                                        <?php esc_html_e('Partners', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_partners_post" name="houzez_ptype_settings[houzez_partners_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_partners_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_partners_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage business partners and collaborations', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_testimonials_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-format-quote"></i>
+                                        <?php esc_html_e('Testimonials', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_testimonials_post" name="houzez_ptype_settings[houzez_testimonials_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_testimonials_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_testimonials_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Manage customer testimonials and reviews', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+
+                                <div class="houzez-form-group">
+                                    <label for="houzez_packages_info_post" class="houzez-form-label">
+                                        <i class="dashicons dashicons-info"></i>
+                                        <?php esc_html_e('User Packages Info', 'houzez-theme-functionality'); ?>
+                                    </label>
+                                    <select id="houzez_packages_info_post" name="houzez_ptype_settings[houzez_packages_info_post]" class="houzez-form-select">
+                                        <option <?php selected(self::get_setting('houzez_packages_info_post'), 'enabled'); ?> value="enabled"><?php esc_html_e('Enabled', 'houzez-theme-functionality'); ?></option>
+                                        <option <?php selected(self::get_setting('houzez_packages_info_post'), 'disabled'); ?> value="disabled"><?php esc_html_e('Disabled', 'houzez-theme-functionality'); ?></option>
+                                    </select>
+                                    <div class="houzez-form-help">
+                                        <?php esc_html_e('Track user package information and usage', 'houzez-theme-functionality'); ?>
+                                    </div>
+                                </div>
+                            </div>
+                </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(document).ready(function($) {
+            // Auto-hide notification after 5 seconds
+            setTimeout(function() {
+                $('#houzez-notification').fadeOut();
+            }, 5000);
+
+            // Form submission with loading state
+            $('#post-types-form').on('submit', function() {
+                var $submitBtn = $('.houzez-btn-primary');
+                var originalText = $submitBtn.html();
+                
+                $submitBtn.prop('disabled', true).html('<i class="dashicons dashicons-update"></i> <?php echo esc_js(__('Saving...', 'houzez-theme-functionality')); ?>');
+                
+                // Let the form submit normally, but show loading state
+                setTimeout(function() {
+                    $submitBtn.prop('disabled', false).html(originalText);
+                }, 3000);
+            });
+        });
+        </script>
     <?php
     }
 

@@ -102,7 +102,17 @@ if( !function_exists('houzez_agent_metaboxes') ) {
                     'desc' => esc_html__('Hide agent to show on front-end', 'houzez'),
                     'type' => 'checkbox',
                     'std' => "",
-                    'columns'   => 6
+                    'columns'   => 3
+                ),
+                array(
+                    'id' => "{$houzez_prefix}agent_verified",
+                    'name' => esc_html__( 'Mark Agent as Verified', 'houzez' ),
+                    'type' => 'switch',
+                    'style' => 'rounded',
+                    'on_label'  => 'Yes',
+                    'off_label' => 'No',
+                    'std' => "",
+                    'columns'   => 3
                 ),
                 array(
                     'name'      => esc_html__('Service Areas', 'houzez'),

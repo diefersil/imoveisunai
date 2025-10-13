@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 3.0
  */
 class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
-    use Houzez_Property_Taxonomies;
+    use Houzez_Filters_Traits;
 
     /**
      * Get widget name.
@@ -96,12 +95,13 @@ class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
+
+        $this->add_control(
+            'tax_thumb_size',
             [
-                'name' => 'tax_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
+                'label' => esc_html__( 'Image Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
                 'default' => 'houzez-top-v7',
             ]
         );
@@ -125,7 +125,7 @@ class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
             ]
         );
 
-        $this->register_houzez_taxonomies_controls();
+        $this->listing_taxonomies_controls();
         
         $this->end_controls_section();
 
@@ -233,7 +233,7 @@ class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
                     
                 ],
                 "description" => '',
-                'default' => 'true',
+                'default' => 'false',
             ]
         );
         
@@ -682,7 +682,7 @@ class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
         $args['order'] =  $settings['order'];
         $args['houzez_hide_empty'] =  $settings['houzez_hide_empty'];
         $args['no_of_terms'] =  $settings['no_of_terms'];
-        $args['thumb_size'] = $settings['tax_thumb_size'];
+        $args['thumb_size'] = $settings['tax_thumb_size'] === 'global' ? 'houzez-top-v7' : $settings['tax_thumb_size'];
 
         $args['slides_to_show'] = $settings['slides_to_show'];
         $args['slides_to_scroll'] = $settings['slides_to_scroll'];
@@ -712,13 +712,13 @@ class Houzez_Taxonomies_Cards_Carousel extends Widget_Base {
                 var token = $div.data('token');
                 var obj = window['houzez_caoursel_' + token];
 
-                var slides_to_scroll = <?php echo $settings['slides_to_scroll']; ?>,
-                    slides_to_show = <?php echo $settings['slides_to_show']; ?>,
-                    navigation = <?php echo $settings['navigation']; ?>,
-                    auto_play = <?php echo $settings['slide_auto']; ?>,
-                    auto_play_speed = parseInt(<?php echo $settings['auto_speed']; ?>),
-                    dots = <?php echo $settings['slide_dots']; ?>,
-                    slide_infinite =  <?php echo $settings['slide_infinite']; ?>;
+                var slides_to_scroll = <?php echo absint($settings['slides_to_scroll']); ?>,
+                    slides_to_show = <?php echo absint($settings['slides_to_show']); ?>,
+                    navigation = <?php echo ($settings['navigation'] === 'true') ? 'true' : 'false'; ?>,
+                    auto_play = <?php echo ($settings['slide_auto'] === 'true') ? 'true' : 'false'; ?>,
+                    auto_play_speed = <?php echo absint($settings['auto_speed']); ?>,
+                    dots = <?php echo ($settings['slide_dots'] === 'true') ? 'true' : 'false'; ?>,
+                    slide_infinite =  <?php echo ($settings['slide_infinite'] === 'true') ? 'true' : 'false'; ?>;
 
                 var houzez_rtl = houzez_vars.houzez_rtl;
 

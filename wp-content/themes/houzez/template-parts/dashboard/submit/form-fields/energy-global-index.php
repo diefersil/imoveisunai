@@ -1,5 +1,5 @@
-<div class="form-group">
-	<label for="energy_global_index"><?php echo houzez_option('cl_energy_index', 'Global Energy Performance Index'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="energy_global_index"><?php echo houzez_option('cl_energy_index', 'Global Energy Performance Index'); ?></label>
 
 	<input class="form-control" id="energy_global_index" name="energy_global_index" value="<?php
     if (houzez_edit_property()) {

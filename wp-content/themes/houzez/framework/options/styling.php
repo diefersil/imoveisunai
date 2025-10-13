@@ -846,22 +846,22 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'mob_nav_bg_color',
             'type'     => 'color',
-            'title'    => esc_html__( 'Menu Tabs Background Color', 'houzez' ),
-            'desc'    => esc_html__( 'Select the background color of the menu tabs', 'houzez' ),
+            'title'    => esc_html__( 'Offcanvas menu Background Color', 'houzez' ),
+            'desc'    => esc_html__( 'Select the background color of the offcanvas menu', 'houzez' ),
             'default'  => '#ffffff',
             'transparent' => false
         ),
         array(
             'id'       => 'mob_link_color',
             'type'     => 'color',
-            'title'    => esc_html__( 'Menu Tabs Text Color', 'houzez' ),
-            'desc'    => esc_html__( 'Select the text color of the menu tabs', 'houzez' ),
+            'title'    => esc_html__( 'Offcanvas menu Text Color', 'houzez' ),
+            'desc'    => esc_html__( 'Select the text color of the offcanvas menu', 'houzez' ),
             'default'  => '#004274'
         ),
         array(
             'id'       => 'mobile_nav_border',
             'type'     => 'border',
-            'title'    => esc_html__( 'Border', 'houzez' ),
+            'title'    => esc_html__( 'Offcanvas menu Border', 'houzez' ),
             'desc'    => esc_html__( 'Select the button border options', 'houzez' ),
             'desc'     => '',
             'default'  => array(
@@ -872,6 +872,22 @@ Redux::setSection( $houzez_opt_name, array(
                 'border-bottom' => '0px',
                 'border-left'   => '0px'
             )
+        ),
+
+        array(
+            'id'       => 'offcanvas_menu_header_bg_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'Offcanvas menu header Background Color', 'houzez' ),
+            'desc'    => esc_html__( 'Select the background color of the offcanvas menu header', 'houzez' ),
+            'default'  => '#ffffff',
+            'transparent' => false
+        ),
+        array(
+            'id'       => 'offcanvas_menu_header_text_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'Offcanvas menu header Text Color', 'houzez' ),
+            'desc'    => esc_html__( 'Select the text color of the offcanvas menu header', 'houzez' ),
+            'default'  => '#333333'
         ),
     )
 ));
@@ -991,6 +1007,40 @@ Redux::setSection( $houzez_opt_name, array(
             'type'     => 'link_color',
             'title'    => esc_html__( 'Advanced Button Border Color', 'houzez' ),
             'subtitle'     => esc_html__( 'Select the advanced button border color', 'houzez' ),
+            'active'    => false,
+            'default'  => array(
+                'regular' => '#dce0e0',
+                'hover'   => '#00aeff'
+            )
+        ),
+
+        array(
+            'id'       => 'clear_button_color',
+            'type'     => 'link_color',
+            'title'    => esc_html__( 'Clear Button Text Color', 'houzez' ),
+            'subtitle'     => esc_html__( 'Select the clear button text color', 'houzez' ),
+            'active'    => false,
+            'default'  => array(
+                'regular' => '#8b9898',
+                'hover'   => '#717f7f'
+            )
+        ),
+        array(
+            'id'       => 'clear_button_bg_color',
+            'type'     => 'link_color',
+            'title'    => esc_html__( 'Clear Button Background Color', 'houzez' ),
+            'subtitle'     => esc_html__( 'Select the clear button background color', 'houzez' ),
+            'active'    => false,
+            'default'  => array(
+                'regular' => '#ffffff',
+                'hover'   => '#f7f8f8'
+            )
+        ),
+        array(
+            'id'       => 'clear_button_border_color',
+            'type'     => 'link_color',
+            'title'    => esc_html__( 'Clear Button Border Color', 'houzez' ),
+            'subtitle'     => esc_html__( 'Select the clear button border color', 'houzez' ),
             'active'    => false,
             'default'  => array(
                 'regular' => '#dce0e0',
@@ -1175,7 +1225,7 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__( 'Background Color', 'houzez' ),
             'desc'    => esc_html__( 'Select the menu background color', 'houzez' ),
             'subtitle' => '',
-            'default'  => '#002B4B',
+            'default'  => '#002b4b',
             'transparent' => true
         ),
         array(
@@ -1184,8 +1234,16 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__( 'Menu Tabs Text Color', 'houzez' ),
             'desc'    => esc_html__( 'Select the text color of the menu tabs', 'houzez' ),
             'subtitle' => '',
-            'default'  => '#839EB2',
+            'default'  => '#d1d5db',
             'transparent' => true
+        ),
+        array(
+            'id'       => 'dm_hover_bg_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'Menu Tabs Background Color On Hover', 'houzez' ),
+            'desc'    => esc_html__( 'Select the background color of the menu tabs on hover', 'houzez' ),
+            'subtitle' => '',
+            'default'  => '#003a64',
         ),
         array(
             'id'       => 'dm_hover_color',
@@ -1196,13 +1254,38 @@ Redux::setSection( $houzez_opt_name, array(
             'transparent' => true
         ),
         array(
-            'id'       => 'dm_submenu_active_color',
+            'id'       => 'dm_active_border_color',
             'type'     => 'color',
-            'title'    => esc_html__( 'Sub Menu Active Color', 'houzez' ),
-            'desc'    => esc_html__( 'Select submenu active color', 'houzez' ),
+            'title'    => esc_html__( 'Menu Tabs Border Color On Active', 'houzez' ),
+            'desc'    => esc_html__( 'Select the border color of the menu tabs on active', 'houzez' ),
             'subtitle' => '',
-            'default'  => '#00aeff'
+            'default'  => '#00aeff',
         ),
+        array(
+            'id'       => 'dm_title_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'Menu Titles Color', 'houzez' ),
+            'subtitle' => '',
+            'default'  => '#9ca3af'
+        ),
+    array(
+        'id'       => 'dm_logo_bg_color',
+        'type'     => 'color',
+        'title'    => esc_html__( 'Logo Background Color', 'houzez' ),
+        'desc'    => esc_html__( 'Select the logo background color', 'houzez' ),
+        'subtitle' => '',
+        'default'  => '#002b4b',
+        'transparent' => true
+    ),
+    array(
+        'id'       => 'dm_logo_border_color',
+        'type'     => 'color',
+        'title'    => esc_html__( 'Logo Border Color', 'houzez' ),
+        'desc'    => esc_html__( 'Select the logo border color', 'houzez' ),
+        'subtitle' => '',
+        'default'  => '#374151',
+        'transparent' => true
+    ),
     )
 ));
 

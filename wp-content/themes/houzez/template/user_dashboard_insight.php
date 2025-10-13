@@ -6,87 +6,58 @@
 if ( !is_user_logged_in() ) {
     wp_redirect(  home_url() );
 }
-get_header(); 
-
-if( !class_exists('Fave_Insights')) {
-    $msg = esc_html__('Please install and activate Favethemes Insights plugin.', 'houzez');
-    wp_die($msg);
-}
-
-$show_statistics = true;
-$author_id = 0;
-$user_id = get_current_user_id();
-
-$insights = new Fave_Insights();
-
-$listing_id = isset($_GET['listing_id']) ? $_GET['listing_id'] : '';
-
-if(!empty($listing_id)) {
-    $insights_stats = $insights->fave_listing_stats($_GET['listing_id']);
-    $author_id = get_post_field( 'post_author', $listing_id );
-} else {
-    $insights_stats = $insights->fave_user_stats($user_id);
-}
+get_header('dashboard');
 ?>
 
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_insight', 'Insight'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
-            <?php if( $show_statistics ) { ?>
-            <div class="row">
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/filter'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-            </div><!-- row -->
-            <div class="row">
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/views'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/unique-views'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-12 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/chart'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/devices'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/top-countries'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/top-platforms'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-6 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/top-browsers'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-                <div class="col-md-12 col-sm-12">
-                    <?php get_template_part('template-parts/dashboard/statistics/referrals'); ?>
-                </div><!-- col-md-6 col-sm-12 -->
-            </div><!-- row -->
-            <?php } else { ?>
-                <div class="dashboard-content-block">
-                    <?php esc_html_e("You Don't have permission to access this page.", 'houzez'); ?>
-                </div><!-- dashboard-content-block -->
-            <?php } ?>
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
 
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
+    <div class="dashboard-content">
 
-<?php get_footer(); ?>
+        <?php if( !class_exists('Fave_Insights')) { ?>
+            <div class="stats-box">
+                <?php echo esc_html__('Please install and activate Favethemes Insights plugin.', 'houzez'); ?>
+            </div>
+        <?php } else { 
+            
+            $show_statistics = true;
+            $author_id = 0;
+            $user_id = get_current_user_id();
+
+            $insights = new Fave_Insights();
+
+            $listing_id = isset($_GET['listing_id']) ? $_GET['listing_id'] : '';
+
+            if(!empty($listing_id)) {
+                $insights_stats = $insights->fave_listing_stats($_GET['listing_id']);
+                $author_id = get_post_field( 'post_author', $listing_id );
+            } else {
+                $insights_stats = $insights->fave_user_stats($user_id);
+            }
+            ?>
+            <div class="heading d-flex align-items-center justify-content-between">
+                <div class="heading-text">
+                    <h2><?php echo houzez_option('dsh_insight', 'Insights'); ?></h2> 
+                </div>
+                <div class="add-export-btn">
+                    <?php get_template_part('template-parts/dashboard/insights/filter'); ?>
+                </div>
+            </div>
+
+            <?php get_template_part('template-parts/dashboard/insights/stats'); ?>
+
+            <div class="houzez-data-content">
+                <?php get_template_part('template-parts/dashboard/insights/chart'); ?>
+                <?php get_template_part('template-parts/dashboard/insights/bottom-charts'); ?>
+                <?php get_template_part('template-parts/dashboard/insights/referrals'); ?>
+            </div>
+
+        <?php } ?>
+    </div>
+</div>
+
+<?php get_footer('dashboard'); ?>

@@ -7,14 +7,12 @@ $agent_mobile_call = $listing_agent_info['agent_mobile_call'] ?? '';
 
 if( ! empty( $agent_mobile ) ) {
 ?>
-<div class="modal fade modal-phone-number" id="call-action-<?php echo esc_attr($post->ID).'-'.$random_token; ?>" tabindex="-1" role="dialog">
+<div class="modal fade modal-phone-number" id="call-action-<?php echo esc_attr($post->ID).'-'.$random_token; ?>" tabindex="-1" aria-labelledby="phoneNumberModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><?php esc_html_e('Contact us', 'houzez'); ?></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="<?php esc_html_e('Close', 'houzez'); ?>">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="phoneNumberModalLabel"><?php esc_html_e('Contact us', 'houzez'); ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php esc_html_e('Close', 'houzez'); ?>"></button>
             </div><!-- modal-header -->
             <div class="modal-body">
                 <p class="modal-body-phone-number-text">

@@ -64,7 +64,7 @@ $records_found = $agents_query->found_posts;
                     } 
                 }?>
 
-                <div class="agents-list-view">
+                <div class="agents-list-view" role="list">
                     <?php
                     if ( $agents_query->have_posts() ) :
                     while ( $agents_query->have_posts() ) : $agents_query->the_post();
@@ -74,7 +74,7 @@ $records_found = $agents_query->found_posts;
                     endwhile;
                     
                     else:
-                        get_template_part('template-parts/realtors/agent/none');
+                        get_template_part('template-parts/realtors/realtor-none');
                     endif;
                     ?>
                 </div>

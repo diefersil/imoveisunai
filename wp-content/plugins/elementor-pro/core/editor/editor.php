@@ -14,9 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Editor extends App {
-	const EDITOR_V2_PACKAGES = [
+	const EDITOR_V4_PACKAGES = [
 		'editor-documents-extended',
+		'editor-controls-extended',
 		'editor-site-navigation-extended',
+		'editor-editing-panel-extended',
 	];
 
 	/**
@@ -118,7 +120,7 @@ class Editor extends App {
 				return ELEMENTOR_PRO_ASSETS_PATH . "js/packages/{$name}/{$name}.asset.php";
 			} );
 
-		$packages = apply_filters( 'elementor-pro/editor/v2/packages', self::EDITOR_V2_PACKAGES );
+		$packages = apply_filters( 'elementor-pro/editor/v2/packages', self::EDITOR_V4_PACKAGES );
 
 		foreach ( $packages as $package ) {
 			$assets_config->load( $package );
@@ -162,7 +164,7 @@ class Editor extends App {
 			$settings['promotionWidgets'] = License_API::get_promotion_widgets();
 		}
 
-		if ( Display_Conditions_Module::can_use_display_conditions() && Display_Conditions_Module::is_experiment_active() ) {
+		if ( Display_Conditions_Module::can_use_display_conditions() ) {
 			$settings['displayConditions'] = Display_Conditions_Module::instance()
 				->get_conditions_manager()
 				->get_conditions_config();

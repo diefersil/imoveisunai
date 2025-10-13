@@ -76,7 +76,49 @@ class Houzez_Studio_Admin {
 	private function define_hooks() {
 	    add_action( 'template_redirect', [ $this, 'restrict_template_access' ] );
 	    add_filter( 'single_template', [ $this, 'select_canvas_template' ], 10, 1 );
+	    add_action( 'plugins_loaded', [$this, 'update_block_hooks'] );
 	}
+
+	/**
+	 * Update block hook to new logic.
+	 *
+	 * @since  1.1.0
+	 */
+	public function update_block_hooks() {
+	    $logic_updated = get_option('houzez_studio_block_logic_updated');
+
+	    if (!$logic_updated) {
+	        $args = array(
+	            'post_type' => 'fts_builder',
+	            'posts_per_page' => -1, // Get all posts
+	            'post_status' => 'any'
+	        );
+	        $posts = get_posts($args);
+
+	        foreach ($posts as $post) {
+	            $post_id = $post->ID;
+	            $template_type = get_post_meta($post_id, 'fts_template_type', true);
+
+	            // Map template types to new values and hooks
+	            $template_map = array(
+	                'tmp_before_header' => array('new_type' => 'tmp_custom_block', 'hook' => 'before_header'),
+	                'tmp_after_header' => array('new_type' => 'tmp_custom_block', 'hook' => 'after_header'),
+	                'tmp_before_footer' => array('new_type' => 'tmp_custom_block', 'hook' => 'before_footer'),
+	                'tmp_after_footer' => array('new_type' => 'tmp_custom_block', 'hook' => 'after_footer'),
+	            );
+
+	            if (array_key_exists($template_type, $template_map)) {
+	                update_post_meta($post_id, 'fts_template_type', $template_map[$template_type]['new_type']);
+	                if (isset($template_map[$template_type]['hook'])) {
+	                    update_post_meta($post_id, 'fts_block_hook', $template_map[$template_type]['hook']);
+	                }
+	            }
+	        }
+
+	        update_option('houzez_studio_block_logic_updated', true);
+	    }
+	}
+
 
 	/**
 	 * Select the single template for 'fts_builder' post type.
@@ -105,6 +147,13 @@ class Houzez_Studio_Admin {
 	    global $post;
 
 	    if ( 'fts_builder' == $post->post_type ) {
+	    	$field_type = get_post_meta($post->ID, 'fts_template_type', true);
+
+	    	if( $field_type == 'single-listing' || $field_type == 'single-agent' || $field_type == 'single-agency' || $field_type == 'single-post' ) {
+	    		return FTS_DIR_PATH . 'templates/render-template.php';
+	    		//return $single_template;
+	    	}
+
 	        $template = ELEMENTOR_PATH . '/modules/page-templates/templates/canvas.php';
 	        if ( file_exists( $template ) ) {
 	            return $template;

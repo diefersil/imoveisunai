@@ -119,16 +119,6 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
-            'id'       => 'is_show_more',
-            'type'     => 'switch',
-            'title'    => esc_html__( 'Show more for description', 'houzez' ),
-            'subtitle'     => esc_html__('Enable/Disable show more for description', 'houzez'),
-            'default'  => 0,
-            'on'       => esc_html__( 'Yes', 'houzez' ),
-            'off'      => esc_html__( 'No', 'houzez' ),
-        ),
-
-        array(
             'id'       => 'prop_details_cols',
             'type'     => 'select',
             'title'    => esc_html__('Details section columns', 'houzez'),
@@ -468,7 +458,6 @@ $overview_composer = array(
     'bathrooms' => esc_html__('Bathrooms', 'houzez'),
     'garage' => esc_html__('Garage', 'houzez'),
     'area-size' => esc_html__('Area Size', 'houzez'),
-    'year-built' => esc_html__('Year Built', 'houzez'),
 
 );
 
@@ -476,6 +465,7 @@ $overview_composer_disabled = array(
     'rooms' => esc_html__('Rooms', 'houzez'),
     'land-area' => esc_html__('Land Area', 'houzez'),
     'property-id' => esc_html__('Property ID', 'houzez'),
+    'year-built' => esc_html__('Year Built', 'houzez'),
 );
 
 if( ! empty( $custom_fields_array ) ) {
@@ -510,6 +500,30 @@ Redux::setSection( $houzez_opt_name, array(
                 'disabled' => $overview_composer_disabled
             ),
         ),
+        array(
+            'id'       => 'overview_cols',
+            'type'     => 'select',
+            'title'    => esc_html__('Overview section columns in a row', 'houzez'),
+            'subtitle' => esc_html__('Select number of columns you want to show in a row for overview section', 'houzez'),
+            'desc'     => '',
+            'options'  => array(
+                '2'   => esc_html__( '2 Columns', 'houzez' ),
+                '3'   => esc_html__( '3 Columns', 'houzez' ),
+                '4'   => esc_html__( '4 Columns', 'houzez' ),
+                '5'   => esc_html__( '5 Columns', 'houzez' ),
+                '6'   => esc_html__( '6 Columns', 'houzez' ),
+            ),
+            'default'  => '6',
+        ),
+        array(
+            'id'       => 'overview_v2_height',
+            'type'     => 'text',
+            'title'    => esc_html__('Overview V2 Height', 'houzez'),
+            'subtitle' => esc_html__('Enter height in pixels (e.g. 180)', 'houzez'),
+            'default'  => '180',
+            'validate' => 'numeric',
+            'desc'     => esc_html__('Set the height for overview section when using V2 layout', 'houzez'),
+        ),
     )
 ));
 
@@ -522,11 +536,30 @@ Redux::setSection( $houzez_opt_name, array(
     'subsection' => true,
     'fields' => array(
         array(
+            'id'       => 'energy_class_mode',
+            'type'     => 'select',
+            'title'    => esc_html__( 'Energy Class Mode', 'houzez' ),
+            'subtitle' => esc_html__( 'Select energy class display mode', 'houzez' ),
+            'options'  => array(
+                'standard' => esc_html__( 'Standard (Single Column)', 'houzez' ),
+                'french_eu' => esc_html__( 'Europe/French (Dual Column - DPE & GES)', 'houzez' ),
+            ),
+            'default'  => 'standard',
+        ),
+        array(
             'id'       => 'energy_class_data',
             'type'     => 'text',
             'title'    => esc_html__( 'Energy Classes', 'houzez' ),
             'default'  => 'A+, A, B, C, D, E, F, G, H',
             'subtitle' => esc_html__( 'Enter comma separated energy classes', 'houzez' ),
+        ),
+        array(
+            'id'       => 'ghg_emissions_class_data',
+            'type'     => 'text',
+            'title'    => esc_html__( 'GHG Emissions Classes', 'houzez' ),
+            'default'  => 'A, B, C, D, E, F, G',
+            'subtitle' => esc_html__( 'Enter comma separated GHG emissions classes (for French/EU mode)', 'houzez' ),
+            'required' => array('energy_class_mode', '=', 'french_eu'),
         ),
         array(
             'id'       => 'energy_1_color',
@@ -607,6 +640,70 @@ Redux::setSection( $houzez_opt_name, array(
             'desc' => '',
             'default'  => '#cc232a',
             'transparent' => false,
+        ),
+        // GHG Emissions Colors for French/EU mode
+        array(
+            'id'       => 'ghg_1_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 1 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#5d9cd3',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_2_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 2 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#70b0d9',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_3_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 3 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#8cc4e3',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_4_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 4 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#98cdeb',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_5_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 5 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#5966ab',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_6_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 6 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#3e4795',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
+        ),
+        array(
+            'id'       => 'ghg_7_color',
+            'type'     => 'color',
+            'title'    => esc_html__( 'GHG Class 7 Color', 'houzez' ),
+            'desc' => '',
+            'default'  => '#2d2e7f',
+            'transparent' => false,
+            'required' => array('energy_class_mode', '=', 'french_eu'),
         ),
     )
 ));
@@ -1146,7 +1243,6 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
                 'grid-view-v3' => 'Grid View v3',
                 'Listings Version 5' => array(
-                    'list-view-v5' => 'List View',
                     'grid-view-v5' => 'Grid View',
                 ),
                 
@@ -1160,6 +1256,18 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
             ),
             'default' => 'list-view-v1'
+        ),
+
+        array(
+            'id'       => 'houzez_similer_properties_grid_columns',
+            'type'     => 'select',
+            'title'    => esc_html__( 'Grid Columns', 'houzez' ),
+            'desc' => esc_html__( "Select the number of columns to display for similar properties in grid view", 'houzez' ),
+            'options'  => array(
+                '3' => '3 Columns',
+                '2' => '2 Columns',
+            ),
+            'default' => '2'
         ),
 
         array(

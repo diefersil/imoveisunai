@@ -79,7 +79,7 @@ class houzez_plugin_mobile_nav_walker extends \Walker_Nav_Menu {
         if ( $is_mega_menu || $args->has_children ) {
             $classes[] = 'dropdown';
 
-            $dropdown_icon = '<span class="nav-mobile-trigger dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="false">
+            $dropdown_icon = '<span class="nav-mobile-trigger dropdown-toggle" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                 <i class="houzez-icon arrow-down-1"></i>
             </span>';
 
@@ -140,11 +140,11 @@ class houzez_plugin_mobile_nav_walker extends \Walker_Nav_Menu {
 	    }
 
         /*if( wp_is_mobile() ) {
-            $attributes .= $args->has_children ? ' data-toggle="dropdown" ' : '';
+            $attributes .= $args->has_children ? ' data-bs-toggle="dropdown" ' : '';
         }
 
         if( ! wp_is_mobile() && $behavior == 'click' ) {
-            $attributes .= ( $args->has_children || $is_mega_menu ) ? ' data-toggle="dropdown" ' : '';
+            $attributes .= ( $args->has_children || $is_mega_menu ) ? ' data-bs-toggle="dropdown" ' : '';
         }*/
 
         ! empty( $item->attr_title )

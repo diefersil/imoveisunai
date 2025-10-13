@@ -1,5 +1,5 @@
-<div class="form-group">
-	<label for="renewable_energy_global_index"><?php echo houzez_option('cl_energy_renew_index', 'Renewable energy performance index'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="renewable_energy_global_index"><?php echo houzez_option('cl_energy_renew_index', 'Renewable energy performance index'); ?></label>
 
 	<input class="form-control" id="renewable_energy_global_index" name="renewable_energy_global_index" value="<?php
     if (houzez_edit_property()) {

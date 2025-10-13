@@ -57,8 +57,6 @@
 /* ----------------------------------------------------------- */
 a,
 a:hover,
-a:active,
-a:focus,
 .primary-text,
 .btn-clear,
 .btn-apply,
@@ -84,8 +82,6 @@ a:focus,
 .board-message-icon-wrap.active,
 .post-title-wrap h2 a:hover,
 .listing-switch-view .switch-btn.active,
-.item-wrap-v6 .item-price-wrap,
-.listing-v6 .list-view .item-body .item-price-wrap,
 .property-schedule-tour-form-wrap .control input:checked ~ .control__indicator,
 .property-schedule-tour-form-wrap .control:hover,
 .activitiy-item-close-button a:hover,
@@ -93,12 +89,19 @@ a:focus,
 .property-lightbox-v2-sections-navigation .slick-prev,
 .property-lightbox-v2-sections-navigation .slick-next,
 .property-lightbox-v2-sections-navigation .slick-slide.current-section,
-.property-lightbox-v2-sections-navigation .nav-link.active {
+.property-lightbox-v2-sections-navigation .nav-link.active,
+.property-lightbox-v3-sections-navigation .slick-prev,
+.property-lightbox-v3-sections-navigation .slick-next,
+.property-lightbox-v3-sections-navigation .slick-slide.current-section,
+.property-lightbox-v3-sections-navigation .nav-link.active,
+.stats-box .icon-box i,
+.propertie-list ul li a.active,
+.propertie-list ul li a:hover,
+.nav-link {
   color: #00aeff;
 }
 
 .control input:checked ~ .control__indicator,
-.top-banner-wrap .nav-pills .nav-link,
 .btn-primary-outlined:hover,
 .page-item.active .page-link,
 .slick-prev:hover,
@@ -133,12 +136,15 @@ a:focus,
 .datepicker table tr td.active:hover:hover,
 .datepicker table tr td.active:hover[disabled],
 .datepicker table tr td.active[disabled],
-.ui-slider-horizontal .ui-slider-range {
+.ui-slider-horizontal .ui-slider-range,
+.houzez-search-form-js .nav-pills .nav-link,
+.top-banner-wrap .nav-pills .nav-link {
   background-color: #00aeff;
 }
 
 .control input:checked ~ .control__indicator,
 .btn-primary-outlined,
+.btn-primary-outlined:hover,
 .page-item.active .page-link,
 .mobile-property-tools .nav-pills .nav-link.active,
 .agent-nav-wrap .nav-pills .nav-link,
@@ -149,15 +155,23 @@ a:focus,
 .fc-event-dot,
 .save-search-form-wrap,
 .property-schedule-tour-form-wrap .control input:checked ~ .control__indicator,
-.property-tabs-module.property-nav-tabs-v5 .nav-link.active {
+.property-tabs-module.property-nav-tabs-v5 .nav-link.active,
+.price-table-button .control--radio input:checked + .control__indicator + .control__label + .control__background {
   border-color: #00aeff;
+}
+
+.stats-box .icon-box {
+  border: 1px solid #00aeff;
 }
 
 .slick-arrow:hover {
   background-color: rgba(0, 174, 255, 0.65);
 }
 
-.slick-arrow {
+.slick-arrow,
+.btn-load-more .spinner .bounce1,
+.btn-load-more .spinner .bounce2,
+.btn-load-more .spinner .bounce3 {
   background-color: #00aeff;
 }
 
@@ -169,10 +183,6 @@ a:focus,
   color: #00aeff;
   -webkit-box-shadow: inset 0 -3px #00aeff;
           box-shadow: inset 0 -3px #00aeff;
-}
-
-.table-new td {
-  background-color: rgba(0, 174, 255, 0.05);
 }
 
 .property-nav-tabs-v1 .nav-item .nav-link.active,
@@ -206,6 +216,31 @@ a:focus,
     border-color: #00aeff;
   }
 }
+.property-lightbox-nav .nav-item.nav-item-active {
+  -webkit-box-shadow: inset 0 -3px #00aeff;
+          box-shadow: inset 0 -3px #00aeff;
+}
+
+.property-lightbox-nav .nav-item.nav-item-active a {
+  color: #00aeff;
+}
+
+.deals-table-wrap {
+  scrollbar-color: #00aeff #f1f1f1;
+}
+
+.deals-table-wrap::-webkit-scrollbar-thumb {
+  background: #00aeff;
+}
+
+.deals-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #00aeff;
+}
+
+.deals-table-wrap::-webkit-scrollbar-track {
+  background: #00aeff;
+}
+
 /* buttons colors
 /* ----------------------------------------------------------- */
 .btn-primary,
@@ -321,10 +356,12 @@ a:focus,
 
 /* header v.1 height
 /* ------------------------------------------------------------------------ */
-.header-v1 .header-inner-wrap,
-.header-v1 .navbar-logged-in-wrap {
-  line-height: 60px;
-  height: 60px;
+.header-v1 .header-inner-wrap {
+  height: 70px;
+}
+
+.header-v1 .header-inner-wrap .nav-link {
+  line-height: 70px;
 }
 
 /* header v.2 height
@@ -333,10 +370,12 @@ a:focus,
   height: 110px;
 }
 
-.header-v2 .header-bottom .header-inner-wrap,
-.header-v2 .header-bottom .navbar-logged-in-wrap {
-  line-height: 54px;
+.header-v2 .header-bottom .header-inner-wrap {
   height: 54px;
+}
+
+.header-v2 .header-bottom .header-inner-wrap .nav-link {
+  line-height: 54px;
 }
 
 /* header v.3 height
@@ -347,31 +386,33 @@ a:focus,
   line-height: 80px;
 }
 
-.header-v3 .header-bottom .header-inner-wrap,
-.header-v3 .header-bottom .navbar-logged-in-wrap {
-  line-height: 54px;
+.header-v3 .header-bottom .header-inner-wrap {
   height: 54px;
 }
 
-/* header v.4 height
+.header-v3 .header-bottom .header-inner-wrap .nav-link {
+  line-height: 54px;
+}
+
+/* header v.4 height  
 /* ------------------------------------------------------------------------ */
-.header-v4 .header-inner-wrap,
-.header-v4 .navbar-logged-in-wrap {
-  line-height: 90px;
+.header-v4 .header-inner-wrap {
   height: 90px;
+}
+
+.header-v4 .header-inner-wrap .nav-link {
+  line-height: 90px;
 }
 
 /* header v.5 height
 /* ------------------------------------------------------------------------ */
-.header-v5 .header-top .header-inner-wrap,
-.header-v5 .header-top .navbar-logged-in-wrap {
-  line-height: 110px;
+.header-v5 .header-top .header-inner-wrap {
   height: 110px;
 }
 
 .header-v5 .header-bottom .header-inner-wrap {
-  line-height: 54px;
   height: 54px;
+  line-height: 54px;
 }
 
 /* header v.6 height
@@ -416,6 +457,8 @@ body,
 .login-register-form .modal-header .login-register-tabs .nav-link.active,
 .agent-list-wrap .agent-list-content h2 a,
 .agent-list-wrap .agent-list-contact li a,
+.developer-list-wrap .developer-list-content h2 a,
+.developer-list-wrap .developer-list-contact li a,
 .menu-edit-property li a,
 .statistic-referrals-list li a,
 .chart-nav .nav-pills .nav-link,
@@ -428,7 +471,8 @@ body,
 .btn-light-grey-outlined:hover,
 button:not(.bs-placeholder) .filter-option-inner-inner,
 .fw-property-floor-plans-wrap .floor-plans-tabs a,
-.activitiy-item-close-button a {
+.activitiy-item-close-button a,
+.propertie-list ul li a {
   color: #222222;
 }
 
@@ -573,7 +617,7 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
   border-color: rgba(0, 174, 239, 0.2);
 }
 
-.header-v5 a {
+.header-v5 .nav-link {
   color: #fff;
 }
 
@@ -616,6 +660,8 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 }
 
 .top-bar-wrap a,
+.top-bar-wrap .nav-link,
+.top-bar-wrap .nav-link.active,
 .top-bar-contact,
 .top-bar-slogan,
 .top-bar-wrap .btn,
@@ -632,7 +678,8 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 .top-bar-wrap .dropdown-menu li:hover,
 .top-bar-wrap .dropdown-menu li:active,
 .switcher-wrap .dropdown-menu li:hover,
-.switcher-wrap .dropdown-menu li:active {
+.switcher-wrap .dropdown-menu li:active,
+.top-bar-wrap .nav-link.show {
   color: #00aeff;
   background-color: transparent;
   /* do not include in options */
@@ -645,11 +692,14 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.header-transparent-wrap .header-v4 a {
+.header-transparent-wrap .header-v4 .nav-link,
+.header-transparent-wrap .header-v4 .login-register-nav a,
+.btn-phone-number a,
+.btn-phone-number a:hover {
   color: #fff;
 }
 
-.header-transparent-wrap .header-v4 a:hover,
+.header-transparent-wrap .header-v4 .nav-link:hover,
 .header-transparent-wrap .header-v4 a:active {
   color: #fff;
   background-color: rgba(255, 255, 255, 0.1);
@@ -667,7 +717,7 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 .header-transparent-wrap .header-v4 .btn-create-listing:active {
   color: #fff;
   border: 1px solid #00aeff;
-  background-color: rgba(0, 174, 255, 0.65);
+  background-color: #00aeff;
 }
 
 /* create listing button
@@ -800,7 +850,9 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 .overlay-search-advanced-module .form-control,
 .overlay-search-advanced-module .bootstrap-select > .btn,
 .advanced-search-v2 .advanced-search-btn,
-.advanced-search-v2 .advanced-search-btn:hover {
+.advanced-search-v2 .advanced-search-btn:hover,
+.advanced-search-v2 .reset-search-btn,
+.advanced-search-v2 .reset-search-btn:hover {
   border-color: #dce0e0;
 }
 
@@ -906,8 +958,8 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 /* splash page
 /* ----------------------------------------------------------- */
 .splash-page-wrap .banner-inner:before {
-  opacity: 0.7;
-  background: url(../img/bg.png);
+  opacity: 0.25;
+  background-color: #000;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -918,7 +970,7 @@ button:not(.bs-placeholder) .filter-option-inner-inner,
 /* body
 /* ------------------------------------------------------------------------ */
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 15px;
   line-height: 25px;
   font-weight: 400;
@@ -930,7 +982,7 @@ body {
 .btn,
 .houzez-search-button,
 .houzez-submit-button {
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 15px;
   font-weight: 500;
 }
@@ -940,7 +992,7 @@ body {
 .form-control,
 .bootstrap-select .text,
 .sort-by-title {
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 15px;
   font-weight: 400;
 }
@@ -948,7 +1000,7 @@ body {
 /* bolds
 /* ------------------------------------------------------------------------ */
 strong, b, label {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* typography - header
@@ -957,8 +1009,9 @@ strong, b, label {
 .dropdown-menu,
 .login-register,
 .btn-create-listing,
-.logged-in-nav {
-  font-family: "Inter", sans-serif;
+.logged-in-nav,
+.btn-phone-number {
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 14px;
   font-weight: 500;
   text-transform: none;
@@ -967,8 +1020,8 @@ strong, b, label {
 /* typography - headings
 /* ----------------------------------------------------------- */
 h1, h2, h3, h4, h5, h6, .item-title {
-  font-family: "Inter", sans-serif;
-  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
   text-transform: inherit;
 }
 

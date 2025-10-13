@@ -118,12 +118,12 @@ class Houzez_Elementor_Section_Title extends Widget_Base {
                 'fields_options' => [
                     'font_weight' => [
                         
-                        'default' => '500',
+                        'default' => '',
                     ],
                     'font_family' => [
-                        'default' => 'Roboto',
+                        'default' => '',
                     ],
-                    'font_size' => [ 'default' => [ 'unit' => 'px', 'size' => 24 ] ],
+                    'font_size' => [],
                 ],
             ]
         );
@@ -134,17 +134,7 @@ class Houzez_Elementor_Section_Title extends Widget_Base {
                 'name'     => 'section_subtitle_typography',
                 'label'    => esc_html__( 'Section Subtitle ', 'houzez-theme-functionality' ),
                 'selector' => '{{WRAPPER}} .houzez_section_subtitle',
-                'fields_options' => [
-                    // Inner control name
-                    'font_weight' => [
-                        // Inner control settings
-                        'default' => '300',
-                    ],
-                    'font_family' => [
-                        'default' => 'Roboto',
-                    ],
-                    'font_size' => [ 'default' => [ 'unit' => 'px', 'size' => 16 ] ],
-                ],
+                'fields_options' => [],
             ]
         );
 
@@ -156,15 +146,15 @@ class Houzez_Elementor_Section_Title extends Widget_Base {
                 'options' => [
                     'left'    => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-left',
+                        'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-center',
+                        'icon' => 'eicon-text-align-center',
                     ],
                     'right' => [
                         'title' => esc_html__( 'Right', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-right',
+                        'icon' => 'eicon-text-align-right',
                     ],
                 ],
                 'default' => 'center',

@@ -75,17 +75,20 @@ if ( ! class_exists( 'Houzez_CRM_Notes' ) ) {
             	$datetime = strtotime($result->time);
             	ob_start(); ?>
 
-            	<div id="note-<?php echo intval($note_id); ?>" class="private-note-wrap" style="display: none;">
-	                <p class="activity-time">
-	                <?php printf( __( '%s ago', 'houzez-crm' ), human_time_diff( $datetime, current_time( 'timestamp' ) ) ); ?>
-	                </p>
-	                <p><?php echo esc_attr($result->note); ?></p>
-	                <div class="text-right">
-	                    <a class="delete_note" data-id="<?php echo intval($result->note_id); ?>" href="#" class="ml-3">
-	                        <i class="houzez-icon icon-remove-circle mr-1"></i> 
-	                        <strong><?php esc_html_e('Delete', 'houzez-crm'); ?></strong>
-	                    </a>
+            	<div id="note-<?php echo intval($note_id); ?>" class="note-block border-top py-4 border-top" style="display: none;">
+	                <div class="d-flex justify-content-between align-items-start mb-3">
+	                    <div>
+	                        <p class="text-muted mb-0 activity-time">
+	                            <?php printf( __( '%s ago', 'houzez-crm' ), human_time_diff( $datetime, current_time( 'timestamp' ) ) ); ?>
+	                        </p>
+	                    </div>
+	                    <div class="d-flex gap-2">
+	                        <a href="#" class="text-muted delete_note" data-id="<?php echo intval($result->note_id); ?>">
+	                            <i class="houzez-icon icon-bin"></i>
+	                        </a>
+	                    </div>
 	                </div>
+	                <p class="mb-0"><?php echo esc_attr($result->note); ?></p>
 	            </div>
 
 

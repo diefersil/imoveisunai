@@ -94,9 +94,9 @@ class Module extends BaseModule {
 	/**
 	 * Merge new user favorites to a type.
 	 *
-	 * @param string        $type
-	 * @param array|string  $favorites
-	 * @param bool          $store
+	 * @param string       $type
+	 * @param array|string $favorites
+	 * @param bool         $store
 	 *
 	 * @return array|bool
 	 */
@@ -107,9 +107,9 @@ class Module extends BaseModule {
 	/**
 	 * Delete existing favorites from a type.
 	 *
-	 * @param string        $type
-	 * @param array|string  $favorites
-	 * @param bool          $store
+	 * @param string       $type
+	 * @param array|string $favorites
+	 * @param bool         $store
 	 *
 	 * @return array|int
 	 */
@@ -240,9 +240,9 @@ class Module extends BaseModule {
 	 * @param string $action
 	 */
 	public function action_doesnt_exists( $action ) {
-		throw new \InvalidArgumentException( sprintf(
+		throw new \InvalidArgumentException( sprintf( esc_html(
 			"Action '%s' to apply on favorites doesn't exists",
 			$action
-		) );
+		)) );
 	}
 }

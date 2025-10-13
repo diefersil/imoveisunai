@@ -28,7 +28,7 @@ class Options {
 	 * @var array Map of all the default options of the plugin.
 	 */
 	private static $map = [
-		'mail'                  => [
+		'mail'                     => [
 			'from_name',
 			'from_email',
 			'mailer',
@@ -36,7 +36,7 @@ class Options {
 			'from_name_force',
 			'from_email_force',
 		],
-		'smtp'                  => [
+		'smtp'                     => [
 			'host',
 			'port',
 			'encryption',
@@ -45,68 +45,75 @@ class Options {
 			'user',
 			'pass',
 		],
-		'gmail'                 => [
+		'gmail'                    => [
 			'one_click_setup_enabled',
 			'client_id',
 			'client_secret',
 		],
-		'outlook'               => [
+		'outlook'                  => [
 			'one_click_setup_enabled',
 			'client_id',
 			'client_secret',
 		],
-		'zoho'                  => [
+		'zoho'                     => [
 			'domain',
 			'client_id',
 			'client_secret',
 		],
-		'amazonses'             => [
+		'amazonses'                => [
 			'client_id',
 			'client_secret',
 			'region',
 		],
-		'mailgun'               => [
+		'mailgun'                  => [
 			'api_key',
 			'domain',
 			'region',
 		],
-		'mailjet'               => [
+		'mailjet'                  => [
 			'api_key',
 			'secret_key',
 		],
-		'sendgrid'              => [
+		'mailersend'               => [
+			'api_key',
+			'has_pro_plan',
+		],
+		'mandrill'                 => [
+			'api_key',
+		],
+		'sendgrid'                 => [
 			'api_key',
 			'domain',
 		],
-		'sparkpost'             => [
+		'sparkpost'                => [
 			'api_key',
 			'region',
 		],
-		'postmark'              => [
+		'postmark'                 => [
 			'server_api_token',
 			'message_stream',
 		],
-		'smtpcom'               => [
+		'smtpcom'                  => [
 			'api_key',
 			'channel',
 		],
-		'sendinblue'            => [
+		'sendinblue'               => [
 			'api_key',
 			'domain',
 		],
-		'sendlayer'             => [
+		'sendlayer'                => [
 			'api_key',
 		],
-		'elasticemail'         => [
+		'elasticemail'             => [
 			'api_key',
 		],
-		'smtp2go'               => [
+		'smtp2go'                  => [
 			'api_key',
 		],
-		'pepipostapi'           => [
+		'pepipostapi'              => [
 			'api_key',
 		],
-		'pepipost'              => [
+		'pepipost'                 => [
 			'host',
 			'port',
 			'encryption',
@@ -114,30 +121,38 @@ class Options {
 			'user',
 			'pass',
 		],
-		'license'               => [
+		'license'                  => [
 			'key',
 		],
-		'alert_email'           => [
+		'alert_email'              => [
 			'enabled',
 			'connections',
 		],
-		'alert_slack_webhook'   => [
+		'alert_slack_webhook'      => [
 			'enabled',
 			'connections',
 		],
-		'alert_discord_webhook' => [
+		'alert_discord_webhook'    => [
 			'enabled',
 			'connections',
 		],
-		'alert_twilio_sms'      => [
+		'alert_twilio_sms'         => [
 			'enabled',
 			'connections',
 		],
-		'alert_custom_webhook'  => [
+		'alert_custom_webhook'     => [
 			'enabled',
 			'connections',
 		],
-		'alert_events'          => [
+		'alert_push_notifications' => [
+			'enabled',
+			'connections',
+		],
+		'alert_whatsapp'           => [
+			'enabled',
+			'connections',
+		],
+		'alert_events'             => [
 			'email_hard_bounced',
 		],
 	];
@@ -157,6 +172,8 @@ class Options {
 		'gmail',
 		'mailgun',
 		'mailjet',
+		'mailersend',
+		'mandrill',
 		'outlook',
 		'postmark',
 		'sendgrid',
@@ -773,6 +790,8 @@ class Options {
 						break;
 				}
 
+				break; // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore,WPForms.Formatting.Switch.RemoveEmptyLineBefore
+
 			case 'alert_email':
 				switch ( $key ) {
 					case 'connections':
@@ -881,6 +900,50 @@ class Options {
 				}
 
 				break;
+
+			case 'mailersend':
+				switch ( $key ) { // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+					case 'api_key':
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_MAILERSEND_API_KEY : $value;
+						break;
+
+					case 'has_pro_plan':
+						$return = $this->is_const_defined( $group, $key ) ? $this->parse_boolean( WPMS_MAILERSEND_HAS_PRO_PLAN ) : $value;
+						break;
+				}
+				break; // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+
+			// phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+			case 'mandrill':
+				// phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+				if ( $key === 'api_key' ) {
+					/** @noinspection PhpUndefinedConstantInspection */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+					$return = $this->is_const_defined( $group, $key ) ? WPMS_MANDRILL_API_KEY : $value;
+				}
+
+				// phpcs:ignore WPForms.Formatting.Switch.RemoveEmptyLineBefore
+				break;
+
+			case 'alert_whatsapp':
+				switch ( $key ) { // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+					case 'connections':
+						if ( $this->is_const_defined( $group, $key ) ) {
+							$return = [
+								[
+									'access_token'         => WPMS_ALERT_WHATSAPP_ACCESS_TOKEN,
+									'whatsapp_business_id' => WPMS_ALERT_WHATSAPP_BUSINESS_ID,
+									'phone_number_id'      => WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID,
+									'to_phone_number'      => WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER,
+									'template_language'    => WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE,
+								],
+							];
+						} else {
+							$return = $value;
+						}
+						break;
+				}
+
+				break; // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore,WPForms.Formatting.Switch.RemoveEmptyLineBefore
 
 			default:
 				// Always return the default value if nothing from above matches the request.
@@ -1201,9 +1264,9 @@ class Options {
 				switch ( $key ) {
 					case 'connections':
 						$return = defined( 'WPMS_ALERT_TWILIO_SMS_ACCOUNT_SID' ) && WPMS_ALERT_TWILIO_SMS_ACCOUNT_SID &&
-						          defined( 'WPMS_ALERT_TWILIO_SMS_AUTH_TOKEN' ) && WPMS_ALERT_TWILIO_SMS_AUTH_TOKEN &&
-						          defined( 'WPMS_ALERT_TWILIO_SMS_FROM_PHONE_NUMBER' ) && WPMS_ALERT_TWILIO_SMS_FROM_PHONE_NUMBER &&
-						          defined( 'WPMS_ALERT_TWILIO_SMS_TO_PHONE_NUMBER' ) && WPMS_ALERT_TWILIO_SMS_TO_PHONE_NUMBER;
+											defined( 'WPMS_ALERT_TWILIO_SMS_AUTH_TOKEN' ) && WPMS_ALERT_TWILIO_SMS_AUTH_TOKEN &&
+											defined( 'WPMS_ALERT_TWILIO_SMS_FROM_PHONE_NUMBER' ) && WPMS_ALERT_TWILIO_SMS_FROM_PHONE_NUMBER &&
+											defined( 'WPMS_ALERT_TWILIO_SMS_TO_PHONE_NUMBER' ) && WPMS_ALERT_TWILIO_SMS_TO_PHONE_NUMBER;
 						break;
 				}
 
@@ -1217,6 +1280,19 @@ class Options {
 				}
 
 				break;
+
+			case 'alert_whatsapp':
+				switch ( $key ) { // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+					case 'connections':
+						$return = defined( 'WPMS_ALERT_WHATSAPP_ACCESS_TOKEN' ) && WPMS_ALERT_WHATSAPP_ACCESS_TOKEN &&
+											defined( 'WPMS_ALERT_WHATSAPP_BUSINESS_ID' ) && WPMS_ALERT_WHATSAPP_BUSINESS_ID &&
+											defined( 'WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID' ) && WPMS_ALERT_WHATSAPP_PHONE_NUMBER_ID &&
+											defined( 'WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER' ) && WPMS_ALERT_WHATSAPP_TO_PHONE_NUMBER &&
+											defined( 'WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE' ) && WPMS_ALERT_WHATSAPP_TEMPLATE_LANGUAGE;
+						break;
+				}
+
+				break; // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore,WPForms.Formatting.Switch.RemoveEmptyLineBefore
 
 			case 'license':
 				switch ( $key ) {
@@ -1252,6 +1328,29 @@ class Options {
 						break;
 				}
 
+				break;
+
+			case 'mailersend':
+				switch ( $key ) { // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+					case 'api_key':
+						$return = defined( 'WPMS_MAILERSEND_API_KEY' ) && WPMS_MAILERSEND_API_KEY;
+						break;
+
+					case 'has_pro_plan':
+						$return = defined( 'WPMS_MAILERSEND_HAS_PRO_PLAN' );
+						break;
+				}
+				break; // phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
+
+			case 'mandrill': // phpcs:ignore PSR2.ControlStructures.SwitchDeclaration.BodyOnNextLineCASE
+
+				switch ( $key ) {
+					case 'api_key':
+						$return = defined( 'WPMS_MANDRILL_API_KEY' ) && WPMS_MANDRILL_API_KEY;
+						break;
+				}
+
+				// phpcs:ignore WPForms.Formatting.Switch.AddEmptyLineBefore
 				break;
 		}
 
@@ -1449,6 +1548,10 @@ class Options {
 						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? '' : sanitize_text_field( $option_value );
 						break;
 
+					case 'has_pro_plan': // mailersend.
+						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? false : (bool) $option_value;
+						break;
+
 					case 'access_token': // gmail/outlook/zoho, is an array.
 					case 'user_details': // outlook/zoho, is an array.
 						// These options don't support constants.
@@ -1516,8 +1619,6 @@ class Options {
 	 * @since      1.0.0
 	 *
 	 * @return bool
-	 * @deprecated 2.4.0
-	 *
 	 */
 	public function is_pepipost_active() {
 
@@ -1557,6 +1658,7 @@ class Options {
 	 * @return bool
 	 */
 	public function is_mailer_smtp() {
+
 		return apply_filters( 'wp_mail_smtp_options_is_mailer_smtp', in_array( $this->get( 'mail', 'mailer' ), [ 'pepipost', 'smtp' ], true ) );
 	}
 

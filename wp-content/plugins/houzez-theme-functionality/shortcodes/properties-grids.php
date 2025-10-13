@@ -25,6 +25,10 @@ if( !function_exists('houzez_prop_grids') ) {
             'post_status' => '',
             'min_price' => '',
             'max_price' => '',
+            'min_beds' => '',
+            'max_beds' => '',
+            'min_baths' => '',
+            'max_baths' => '',
             'ele_lazyloadbg' => '',
             'properties_by_agents' => ''
         ), $atts));
@@ -44,7 +48,7 @@ if( !function_exists('houzez_prop_grids') ) {
         }
 
         //do the query
-        $the_query = houzez_data_source::get_wp_query($atts); //by ref  do the query
+        $the_query = Houzez_Data_Source::get_wp_query($atts); //by ref  do the query
         ?>
 
         <div class="property-grids-module <?php echo esc_attr($grid_class); ?>">

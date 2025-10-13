@@ -173,6 +173,24 @@ Redux::setSection( $houzez_opt_name, array(
             'desc'     => esc_html__('Enter the price to feature a property', 'houzez'),
             'default'  => '',
         ),
+        array(
+            'id'       => 'tax_percentage_per_listing',
+            'type'     => 'text',
+            'required' => array( 'enable_paid_submission', '=', 'per_listing' ),
+            'title'    => esc_html__('Tax Percentage for Per Listing', 'houzez'),
+            'subtitle' => '',
+            'desc'     => esc_html__('Enter the tax percentage for per listing submission (Only digits, e.g., 10 for 10%)', 'houzez'),
+            'default'  => '',
+        ),
+        array(
+            'id'       => 'tax_percentage_featured',
+            'type'     => 'text',
+            'required' => array( 'enable_paid_submission', '!=', 'no' ),
+            'title'    => esc_html__('Tax Percentage for Featured Listing', 'houzez'),
+            'subtitle' => '',
+            'desc'     => esc_html__('Enter the tax percentage for featured listing (Only digits, e.g., 10 for 10%)', 'houzez'),
+            'default'  => '',
+        ),
 
         array(
             'id'       => 'paypal_api',

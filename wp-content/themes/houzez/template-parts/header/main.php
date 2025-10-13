@@ -1,4 +1,5 @@
-<header class="header-main-wrap <?php houzez_transparent(); ?>">
+
+<header class="header-main-wrap <?php houzez_transparent(); ?>" role="banner">
     <?php
 		if( houzez_option('top_bar') ) {
 			get_template_part('template-parts/topbar/top', 'bar');
@@ -8,7 +9,10 @@
     	if(empty($header) || houzez_is_splash()) {
     		$header = '4';
     	}
+	
 	    get_template_part('template-parts/header/header', $header); 
+
 	    get_template_part('template-parts/header/header-mobile'); 
     ?>
 </header><!-- .header-main-wrap -->
+<?php get_template_part('template-parts/header/nav-mobile'); ?>

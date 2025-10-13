@@ -8,7 +8,7 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
     <div class="dashboard-header-wrap">
         <div class="d-flex align-items-center">
             <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo esc_html__( 'Import', 'houzez' ); ?></h1>         
+                <h2 class="mb-3"><?php echo esc_html__( 'Import', 'houzez' ); ?></h2>         
             </div><!-- dashboard-header-left -->
         </div><!-- d-flex -->
     </div><!-- dashboard-header-wrap -->
@@ -20,7 +20,7 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
             <div class="row">
                 <div class="col col-lg-8 col-sm-12">
                     <div class="dashboard-content-block">
-                        <p><?php esc_html_e('This page allows you to easily import CSV files into our system. Follow these simple steps to seamlessly transfer your data:', 'houzez'); ?></p>
+                        <p class="mb-3"><?php esc_html_e('This page allows you to easily import CSV files into our system. Follow these simple steps to seamlessly transfer your data:', 'houzez'); ?></p>
 
                         <ol class="mb-0">
                             <li><?php echo wp_kses(__( '<strong>Prepare your CSV file:</strong> Ensure your file is correctly formatted with clear column headers and accurate data.', 'houzez' ), houzez_allowed_html()); ?></li>
@@ -82,8 +82,8 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
                     } else {
                     ?>
 
-                    <h2><?php esc_html_e( 'Previous Imported Files', 'houzez' ); ?></h2>
-                    <table class="dashboard-table dashboard-table-file-import table-lined responsive-table">
+                    <h3 class="mt-5"><?php esc_html_e( 'Previous Imported Files', 'houzez' ); ?></h3>
+                    <table class="table dashboard-table dashboard-table-file-import table-lined responsive-table">
                         <thead>
                             <tr>
                                 <th><?php esc_html_e( 'File Name', 'houzez' ); ?></th>
@@ -118,8 +118,8 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
                                     <?php echo esc_html__('at', 'houzez'); ?> <?php echo esc_attr($get_time); ?></td>
                                     <td class="property-table-actions" data-label="<?php esc_html_e( 'Actions', 'houzez' ); ?>">
                                         <div class="dropdown property-action-menu">
-                                            <button class="btn btn-primary-outlined dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php esc_html_e( 'Actions', 'houzez' ); ?></button>
-                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                            <button class="btn btn-primary-outlined dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"><?php esc_html_e( 'Actions', 'houzez' ); ?></button>
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                                                 <a class="dropdown-item" data-file="<?php echo esc_html($file['name']); ?>" href="<?php echo esc_url($import_link); ?>"><?php esc_html_e('Import', 'houzez'); ?></a>
                                                 <a class="delete-lead-csv-js dropdown-item" data-nonce="<?php echo esc_attr($delete_nonce); ?>" data-file="<?php echo esc_html($file['name']); ?>" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
                                             </div>
@@ -143,11 +143,9 @@ $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
                     <div class="dashboard-content-block">
                         <form name="import-csv" action="" method="post" enctype="multipart/form-data">
                             <?php wp_nonce_field('houzez_crm_leads_upload_nonce', 'houzez_crm_leads_nonce_field'); ?>
-                            <div class="input-group">
-                                <div class="custom-file custom-file-csv-upload">
-                                    <input type="file" name="csv_import" accept=".csv">
-                                    <input type="hidden" name="action" value="houzez_crm_import_leads">
-                                </div>
+                            <div class="mb-3">
+                                <input type="file" class="form-control" name="csv_import" accept=".csv" id="csv-file-input">
+                                <input type="hidden" name="action" value="houzez_crm_import_leads">
                             </div>
                             <button class="btn btn-primary btn-full-width" type="submit" id="upload-leads-csv"><span class="btn-loader houzez-loader-js"></span><?php echo esc_html__( 'Upload', 'houzez' )?></button>
                         </form>

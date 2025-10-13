@@ -6,85 +6,98 @@
  * Date: 11/01/16
  * Time: 4:35 PM
  */
-/*if ( !is_user_logged_in() ) {
-    wp_redirect(  home_url() );
-}*/
 
-global $houzez_local, $current_user;
 
-wp_get_current_user();
-$userID         = $current_user->ID;
-$user_login     = $current_user->user_login;
-$fav_ids = 'houzez_favorites-'.$userID;
-$fav_ids = get_option( $fav_ids );
+global $houzez_local, $current_user, $favorite_properties_query;
+$userID     = get_current_user_id();
 
-if ( !is_user_logged_in() ) {
-    $fav_ids = isset($_COOKIE['houzez_favorite_listings']) ? explode(',', $_COOKIE['houzez_favorite_listings']) : '';
-
-    if( empty( $fav_ids[0] ) ) {
+// If the user is logged in, retrieve favorites from user meta.
+if ( is_user_logged_in() ) {
+    $fav_ids = get_user_meta( $userID, 'houzez_favorites', true );
+    if ( empty( $fav_ids ) || ! is_array( $fav_ids ) ) {
+        $fav_ids = array();
+    }
+} else {
+    // For non-logged-in users, use cookie or URL parameters as fallback.
+    $fav_ids = isset( $_COOKIE['houzez_favorite_listings'] ) ? explode( ',', $_COOKIE['houzez_favorite_listings'] ) : array();
+    if ( empty( $fav_ids[0] ) ) {
         $fav_ids = isset( $_GET['ids'] ) ? $_GET['ids'] : '';
-        $fav_ids = explode(',', $fav_ids);
+        $fav_ids = explode( ',', $fav_ids );
     }
 }
 
-get_header();
+// Sanitize favorite IDs: convert to integers and remove empty values.
+$fav_ids = array_map('absint', $fav_ids);
+$fav_ids = array_filter($fav_ids);
+if ( empty($fav_ids) ) {
+    // No favorites; set a non-existent ID to prevent any posts from showing.
+    $fav_ids = array( 0 );
+}
+
+$args = array(
+    'post_type' => 'property',
+    'post__in' => $fav_ids,
+    'posts_per_page' => -1
+);
+$favorite_properties_query = new WP_Query($args);
+
+get_header('dashboard');
 ?>
 
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_favorite', 'Favorites'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
-                
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
-            <?php
-            if( empty( $fav_ids ) ) { ?>
-            <div class="dashboard-content-block">
-                <?php echo esc_html__("You don't have any favorite listings yet!", 'houzez'); ?>
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
+
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
+
+    <div class="dashboard-content">
+        <div class="heading d-flex align-items-center justify-content-between">
+            <div class="heading-text">
+                <h2><?php echo houzez_option('dsh_favorite', 'Favorites'); ?></h2> 
             </div>
+        </div>
 
-            <?php 
-            } else {
-            ?>
-            <table class="dashboard-table dashboard-table-properties table-lined responsive-table">
-                <thead>
-                    <tr>
-                        <th><?php echo esc_html__('Thumbnail', 'houzez'); ?></th>
-                        <th><?php echo esc_html__('Title', 'houzez'); ?></th>
-                        <th><?php echo esc_html__('Type', 'houzez'); ?></th>
-                        <th><?php echo esc_html__('Status', 'houzez'); ?></th>
-                        <th><?php echo esc_html__('Price', 'houzez'); ?></th>
-                        <th class="action-col"><?php echo esc_html__('Actions', 'houzez'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $args = array('post_type' => 'property', 'post__in' => $fav_ids, 'numberposts' => -1 );
-                    $myposts = get_posts($args);
-                    foreach ($myposts as $post) : setup_postdata($post);
-                        
-                        get_template_part('template-parts/dashboard/property/favorite-item');
+        <?php 
+        if ( $favorite_properties_query->have_posts() ) {?>
+        <div class="houzez-data-content mt-4"> 
+            <div class="houzez-data-table">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle m-0">
+                        <thead>
+                            <tr>
+                            <th data-label="<?php echo esc_html__('Thumbnail', 'houzez'); ?>"><?php echo esc_html__('Thumbnail', 'houzez'); ?></th>
+                            <th data-label="<?php echo esc_html__('Title', 'houzez'); ?>"><?php echo esc_html__('Title', 'houzez'); ?></th>
+                            <th data-label="<?php echo esc_html__('Status', 'houzez'); ?>"><?php echo esc_html__('Status', 'houzez'); ?></th>
+                            <th data-label="<?php echo esc_html__('ID', 'houzez'); ?>"><?php echo esc_html__('ID', 'houzez'); ?></th>
+                            <th data-label="<?php echo esc_html__('Price', 'houzez'); ?>"><?php echo esc_html__('Price', 'houzez'); ?></th>
+                            <th data-label="<?php echo esc_html__('Type', 'houzez'); ?>"><?php echo esc_html__('Type', 'houzez'); ?></th>
+                            <?php if( is_user_logged_in() ): ?>
+                            <th data-label="<?php echo esc_html__('Date', 'houzez'); ?>"><?php echo esc_html__('Date', 'houzez'); ?></th>
+                            <?php endif; ?>
+                            <th data-label="<?php echo esc_html__('Actions', 'houzez'); ?>"><?php echo esc_html__('Actions', 'houzez'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                            while ($favorite_properties_query->have_posts()) : $favorite_properties_query->the_post();
+                            get_template_part('template-parts/dashboard/property/favorite-item');
+                            endwhile;
+                            wp_reset_postdata();
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div> 
+        </div> 
+        <?php
+        } else { ?>
+        <div class="stats-box">
+            <?php echo esc_html__('You don\'t have any property listed.', 'houzez'); ?>
+        </div>
+        <?php
+        }?>
+    </div>
+</div>
 
-                    endforeach;
-                    wp_reset_postdata();
-                    ?>
-                </tbody>
-            </table><!-- dashboard-table -->
-            <?php } ?>
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
-
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
-
-<?php get_footer(); ?>
+<?php get_footer('dashboard'); ?>

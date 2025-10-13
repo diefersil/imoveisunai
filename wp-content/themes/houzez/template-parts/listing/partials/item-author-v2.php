@@ -1,12 +1,12 @@
 <?php 
-global $post; 
-$listing_agent_info = houzez20_property_contact_form();
+global $post, $hide_author_date; 
+$agent_info = houzez_get_property_agent($post->ID);
 
-$agent_info = $listing_agent_info['agent_info'];
+$show_author_date = isset($hide_author_date) ? $hide_author_date : houzez_option('disable_agent', 1);
 
-if(houzez_option('disable_agent', 1) && !empty( $agent_info[0] )) { ?>
+if( $show_author_date && !empty( $agent_info )) { ?>
 <div class="item-author">
-	<img class="img-fluid" src="<?php echo $agent_info[0]['picture']; ?>" alt="">
-	<?php echo $agent_info[0]['agent_name']; ?>
+	<img class="img-fluid" src="<?php echo $agent_info['picture']; ?>" alt="">
+	<?php echo $agent_info['agent_name']; ?>
 </div><!-- item-author -->
 <?php } ?>

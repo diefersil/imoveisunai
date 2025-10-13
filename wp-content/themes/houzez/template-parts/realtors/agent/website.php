@@ -7,8 +7,8 @@ if(is_author()) {
 }
 
 if( !empty( $agent_website ) ) { ?>
-	<li>
+	<li class="d-flex align-items-center justify-content-between py-2">
 		<strong><?php esc_html_e('Website', 'houzez'); ?></strong> 
-		<a target="_blank" href="<?php echo esc_url($agent_website); ?>"><?php echo esc_attr( $agent_website ); ?></a>
+		<span><a target="_blank" href="<?php echo esc_url($agent_website); ?>"><?php echo esc_attr( $agent_website ); ?></a></span>
 	</li>
 <?php } ?>

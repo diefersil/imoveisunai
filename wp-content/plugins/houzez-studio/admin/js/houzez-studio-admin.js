@@ -96,31 +96,60 @@
 
 		const updateFieldVisibility = () => {
 		    const selectedTemplateType = $('#fts_template_type').val() || 'none';
+		    const selectedBlockHooks = $('#fts_block_hooks').val() || '';
 		    const optionsTable = $('.houzez-fts-options-table');
-		    const customBlockRow = $('.fts-row.fts-shortcode-row');
+		    const blockShortcodeRow = $('.fts-row.fts-shortcode-row');
+		    const blockHook = $('.fts-row.fts-block-hook');
+		    const rowRules = $('.fts-row.fts-row-rules');
+		    const rowRulesExclude = $('.fts-row.fts-row-rules-exclude');
+		    const excludeOnWrap = $('.fts-exclude-on-wrap');
+		    const excludeFieldWrap = excludeOnWrap.closest('tr');
 
 		    // Handle visibility of the options table
-		    if (['none', 'tmp_custom_block', 'tmp_megamenu'].includes(selectedTemplateType)) {
+		    if (['none', 'tmp_megamenu'].includes(selectedTemplateType)) {
 		        optionsTable.addClass('fts-options-none');
 		    } else {
 		        optionsTable.removeClass('fts-options-none');
 		    }
 
-		    // Handle visibility of the custom block row
+		    // Handle visibility of the custom block row and fts-row-rules
 		    if (selectedTemplateType === 'tmp_custom_block') {
-		        customBlockRow.show();
+		        blockHook.show();
+		        blockShortcodeRow.show(); // Show by default when 'tmp_custom_block' is selected, later logic may hide it
+		        rowRules.show();
 		    } else {
-		        customBlockRow.hide();
+		        blockHook.hide();
+		        blockShortcodeRow.hide();
+		        // Show fts-row-rules if template type is not empty or 'tmp_megamenu'
+		        if (selectedTemplateType !== 'none' && selectedTemplateType !== 'tmp_megamenu') {
+		            rowRules.show();
+		        } else {
+		            rowRules.hide();
+		        }
+		    }
+
+		    // Additional condition for 'fts_block_hooks' value 'shortcode'
+		    if (selectedBlockHooks === 'shortcode' && selectedTemplateType === 'tmp_custom_block') {
+		        blockShortcodeRow.show();
+		        rowRules.hide(); // Hide fts-row-rules when 'shortcode' is selected
+		        excludeFieldWrap.addClass('hidden');
+		    } else {
+		    	blockShortcodeRow.hide();
+		    	excludeFieldWrap.removeClass('hidden');
 		    }
 		};
 
-		// Attach event handler for changes in template type selection.
-		$(document).on('change', '#fts_template_type', () => {
+		// Attach event handler for changes in template type and block hooks selection.
+		$(document).on('change', '#fts_template_type, #fts_block_hooks', () => {
 		    updateFieldVisibility();
 		});
 
 		// Initialize field visibility on document load.
-		updateFieldVisibility();
+		$(document).ready(() => {
+		    updateFieldVisibility();
+		});
+
+
 
 		jQuery('.fts-rule_condition_block').each((index, element) => {
 		    const ruleBlock = jQuery(element);
@@ -150,21 +179,26 @@
 		    const excludeFieldWrap = excludeOnWrap.closest('tr');
 		    const addExcludeBlock = displayOnWrap.find('.fts-create_exclusion_rule');
 		    const excludeConditions = excludeOnWrap.find('.fts-rule_condition_block');
+		    const rowRulesExclude = $('.fts-row.fts-row-rules-exclude');
 
 		    if (forceHide) {
 		        excludeFieldWrap.addClass('hidden');
+		        excludeFieldWrap.hide();
 		        addExcludeBlock.removeClass('hidden');
 		    } else if (forceShow) {
 		        excludeFieldWrap.removeClass('hidden');
+		        excludeFieldWrap.show();
 		        addExcludeBlock.addClass('hidden');
 		    } else {
 		        const isSingleEmptyCondition = excludeConditions.length === 1 && 
 		                                        $(excludeConditions[0]).find('select.fts-selection_dropdown').val() === '';
 		        if (isSingleEmptyCondition) {
 		            excludeFieldWrap.addClass('hidden');
+		            excludeFieldWrap.hide();
 		            addExcludeBlock.removeClass('hidden');
 		        } else {
 		            excludeFieldWrap.removeClass('hidden');
+		            excludeFieldWrap.show();
 		            addExcludeBlock.addClass('hidden');
 		        }
 		    }

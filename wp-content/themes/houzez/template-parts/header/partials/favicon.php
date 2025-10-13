@@ -62,6 +62,5 @@ if ( ! function_exists( 'houzez_favicons_apple_icons' ) ) {
         }
 
         echo wp_kses( $output, $allowed_html_array);
-
     }
 }

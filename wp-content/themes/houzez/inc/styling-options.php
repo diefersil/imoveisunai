@@ -16,11 +16,11 @@ if(!function_exists('houzez_custom_styling')) {
     }
 
     $fave_header_type = get_post_meta( $pageID, 'fave_header_type', true );
-
+ 
     if( $fave_header_type == 'video' || $fave_header_type == 'static_image') {
       $parallax_opacity = get_post_meta( $pageID, 'fave_page_header_image_opacity', true );
       if( $parallax_opacity == '' ) {
-        $parallax_opacity = '0.5';
+        $parallax_opacity = '0.5'; 
       }
 
       $parallax_height = get_post_meta( $pageID, 'fave_page_header_image_height', true );
@@ -40,39 +40,33 @@ if(!function_exists('houzez_custom_styling')) {
 
     /*------------------------------------Typography-----------------------------------*/  
     $body_typo = houzez_option('typo-body');
-    $body_font_family = isset($body_typo['font-family']) ? $body_typo['font-family'] : 'Roboto';
+    $body_font_family = isset($body_typo['font-family']) ? $body_typo['font-family'] : 'Plus Jakarta Sans';
     $body_font_size = isset($body_typo['font-size']) ? $body_typo['font-size'] : '15px';
-    $body_font_weight = isset($body_typo['font-weight']) ? $body_typo['font-weight'] : '300';
+    $body_font_weight = isset($body_typo['font-weight']) ? $body_typo['font-weight'] : '400';
     $body_line_height = isset($body_typo['line-height']) ? $body_typo['line-height'] : '25px';
     $body_text_transform = isset($body_typo['text-transform']) ? $body_typo['text-transform'] : 'none';
 
     $typo_headers = houzez_option('typo-headers');
-    $nav_font_family = isset($typo_headers['font-family']) ? $typo_headers['font-family'] : 'Roboto';
-    $nav_font_size = isset($typo_headers['font-size']) ? $typo_headers['font-size'] : '15px';
+    $nav_font_family = isset($typo_headers['font-family']) ? $typo_headers['font-family'] : 'Plus Jakarta Sans';
+    $nav_font_size = isset($typo_headers['font-size']) ? $typo_headers['font-size'] : '14px';
     $nav_font_weight = isset($typo_headers['font-weight']) ? $typo_headers['font-weight'] : '500';
-    $nav_text_aline = isset($typo_headers['text-align']) ? $typo_headers['text-align'] : 'left';
-    $nav_line_height = isset($typo_headers['line-height']) ? $typo_headers['line-height'] : '25px';
     $nav_text_transform = isset($typo_headers['text-transform']) ? $typo_headers['text-transform'] : 'none';
 
     $typo_footer = houzez_option('typo-footer');
-    $footer_font_family = isset($typo_footer['font-family']) ? $typo_footer['font-family'] : 'Roboto';
+    $footer_font_family = isset($typo_footer['font-family']) ? $typo_footer['font-family'] : 'Plus Jakarta Sans';
     $footer_font_size = isset($typo_footer['font-size']) ? $typo_footer['font-size'] : '14px';
     $footer_font_weight = isset($typo_footer['font-weight']) ? $typo_footer['font-weight'] : '300';
-    $footer_text_aline = isset($typo_footer['text-align']) ? $typo_footer['text-align'] : 'left';
-    $footer_line_height = isset($typo_footer['line-height']) ? $typo_footer['line-height'] : '25px';
     $footer_text_transform = isset($typo_footer['text-transform']) ? $typo_footer['text-transform'] : 'none';
 
     $typo_topbar = houzez_option('typo-topbar');
-    $topbar_font_family = isset($typo_topbar['font-family']) ? $typo_topbar['font-family'] : 'Roboto';
+    $topbar_font_family = isset($typo_topbar['font-family']) ? $typo_topbar['font-family'] : 'Plus Jakarta Sans';
     $topbar_font_size = isset($typo_topbar['font-size']) ? $typo_topbar['font-size'] : '14px';
     $topbar_font_weight = isset($typo_topbar['font-weight']) ? $typo_topbar['font-weight'] : '300';
-    $topbar_text_aline = isset($typo_topbar['text-align']) ? $typo_topbar['text-align'] : 'left';
-    $topbar_line_height = isset($typo_topbar['line-height']) ? $typo_topbar['line-height'] : '25px';
     $topbar_text_transform = isset($typo_topbar['text-transform']) ? $typo_topbar['text-transform'] : 'none';
 
 
     $typo_headings = houzez_option('typo-headings');
-    $headings_font_family = isset($typo_headings['font-family']) ? $typo_headings['font-family'] : 'Roboto';
+    $headings_font_family = isset($typo_headings['font-family']) ? $typo_headings['font-family'] : 'Plus Jakarta Sans';
     $headings_font_weight = isset($typo_headings['font-weight']) ? $typo_headings['font-weight'] : '700';
     $headings_text_aline = isset($typo_headings['text-align']) ? $typo_headings['text-align'] : 'inherit';
     $headings_text_transform = isset($typo_headings['text-transform']) ? $typo_headings['text-transform'] : 'inherit';
@@ -107,7 +101,6 @@ if(!function_exists('houzez_custom_styling')) {
           font-family: {$nav_font_family};
           font-size: {$nav_font_size};
           font-weight: {$nav_font_weight};
-          text-align: {$nav_text_aline};
           text-transform: {$nav_text_transform};
         }
 
@@ -118,9 +111,11 @@ if(!function_exists('houzez_custom_styling')) {
         .form-control,
         .bootstrap-select .text,
         .sort-by-title,
-        .woocommerce ul.products li.product .button {
+        .woocommerce ul.products li.product .button,
+        .form-control,
+        .bootstrap-select .text,
+        .sort-by-title {
           font-family: {$body_font_family};
-          font-size: {$body_font_size}; 
         }
         
         h1, h2, h3, h4, h5, h6, .item-title {
@@ -139,23 +134,19 @@ if(!function_exists('houzez_custom_styling')) {
             font-family: {$topbar_font_family};
             font-size: {$topbar_font_size};
             font-weight: {$topbar_font_weight};
-            line-height: {$topbar_line_height};
-            text-align: {$topbar_text_aline};
             text-transform: {$topbar_text_transform};   
         }
         .footer-wrap {
             font-family: {$footer_font_family};
             font-size: {$footer_font_size};
             font-weight: {$footer_font_weight};
-            line-height: {$footer_line_height};
-            text-align: {$footer_text_aline};
             text-transform: {$footer_text_transform};
         }
         ";
     /*------------------------------------End Typography-----------------------------------*/  
 
 
-    $header_1_height = houzez_option('header_1_height', '60');
+    $header_1_height = houzez_option('header_1_height', '70');
     $header_2_height = houzez_option('header_2_height', '54');
     $header_3_top_height = houzez_option('header_3_top_height', '80');
     $header_3_bottom_height = houzez_option('header_3_bottom_height', '54');
@@ -169,19 +160,22 @@ if(!function_exists('houzez_custom_styling')) {
     /* ------------------------------------------------------------------------ */
 
     $headers_height = "
-        .header-v1 .header-inner-wrap,
-        .header-v1 .navbar-logged-in-wrap {
-            line-height: {$header_1_height}px;
+        .header-v1 .header-inner-wrap {
             height: {$header_1_height}px; 
+        }
+        .header-v1 .header-inner-wrap .nav-link {
+          line-height: {$header_1_height}px;
         }
         .header-v2 .header-top .navbar {
           height: 110px; 
         }
 
-        .header-v2 .header-bottom .header-inner-wrap,
-        .header-v2 .header-bottom .navbar-logged-in-wrap {
-          line-height: {$header_2_height}px;
-          height: {$header_2_height}px; 
+        .header-v2 .header-bottom .header-inner-wrap {
+            height: {$header_2_height}px;
+        }
+
+        .header-v2 .header-bottom .header-inner-wrap .nav-link {
+            line-height: {$header_2_height}px;
         }
 
         .header-v3 .header-top .header-inner-wrap,
@@ -189,30 +183,35 @@ if(!function_exists('houzez_custom_styling')) {
           height: {$header_3_top_height}px;
           line-height: {$header_3_top_height}px; 
         }
-        .header-v3 .header-bottom .header-inner-wrap,
-        .header-v3 .header-bottom .navbar-logged-in-wrap {
-          line-height: {$header_3_bottom_height}px;
-          height: {$header_3_bottom_height}px; 
+        .header-v3 .header-bottom .header-inner-wrap {
+            height: {$header_3_bottom_height}px;
         }
-        .header-v4 .header-inner-wrap,
-        .header-v4 .navbar-logged-in-wrap {
-          line-height: {$header_4_height}px;
-          height: {$header_4_height}px; 
+        .header-v3 .header-bottom .header-inner-wrap .nav-link {
+            line-height: {$header_3_bottom_height}px;
         }
-        .header-v5 .header-top .header-inner-wrap,
-        .header-v5 .header-top .navbar-logged-in-wrap {
-          line-height: {$header_5_top_height}px;
-          height: {$header_5_top_height}px; 
+
+        .header-v4 .header-inner-wrap {
+            height: {$header_4_height}px;
         }
+        .header-v4 .header-inner-wrap .nav-link {
+            line-height: {$header_4_height}px;
+        }
+
+        .header-v5 .header-top .header-inner-wrap {
+            height: {$header_5_top_height}px;
+        }
+
         .header-v5 .header-bottom .header-inner-wrap {
-          line-height: {$header_5_bottom_height}px;
-          height: {$header_5_bottom_height}px; 
+            height: {$header_5_bottom_height}px;
+            line-height: {$header_5_bottom_height}px;
         }
+
         .header-v6 .header-inner-wrap,
         .header-v6 .navbar-logged-in-wrap {
-          height: {$header_6_height}px;
-          line-height: {$header_6_height}px; 
+            height: {$header_6_height}px;
+            line-height: {$header_6_height}px;
         }
+
         @media (min-width: 1200px) {
             .header-v5 .header-top .container {
                 max-width: {$header_5_width}px;
@@ -262,6 +261,8 @@ if(!function_exists('houzez_custom_styling')) {
       .login-register-form .modal-header .login-register-tabs .nav-link.active,
       .agent-list-wrap .agent-list-content h2 a,
       .agent-list-wrap .agent-list-contact li a,
+      .developer-list-wrap .developer-list-content h2 a,
+      .developer-list-wrap .developer-list-contact li a,
       .agent-contacts-wrap li a,
       .menu-edit-property li a,
       .statistic-referrals-list li a,
@@ -282,7 +283,8 @@ if(!function_exists('houzez_custom_styling')) {
       .woocommerce #reviews #comments ol.commentlist li .meta,
       .woocommerce-MyAccount-navigation ul li a,
       .activitiy-item-close-button a,
-      .property-section-wrap li a {
+      .property-section-wrap li a,
+      .propertie-list ul li a {
        color: {$body_text_color}; 
      }
 
@@ -348,16 +350,26 @@ if(!function_exists('houzez_custom_styling')) {
       .property-lightbox-v2-sections-navigation .slick-next,
       .property-lightbox-v2-sections-navigation .slick-slide.current-section,
       .property-lightbox-v2-sections-navigation .nav-link.active,
-      .agent-detail-page-v2 .listing-tabs .nav-link.active {
-        color: {$primary_color}; 
-      }
-      
-      .agent-list-position a {
+      .property-lightbox-v3-sections-navigation .slick-prev,
+      .property-lightbox-v3-sections-navigation .slick-next,
+      .property-lightbox-v3-sections-navigation .slick-slide.current-section,
+      .property-lightbox-v3-sections-navigation .nav-link.active,
+      .agent-detail-page-v2 .listing-tabs .nav-link.active,
+      .taxonomy-item-list a:before,
+      .stats-box .icon-box i,
+      .propertie-list ul li a.active,
+      .propertie-list ul li a:hover,
+      .nav-link,
+      .agent-list-position a,
+      .top-banner-wrap .nav-pills .nav-link:hover {
         color: {$primary_color}; 
       }
 
+      .houzez-search-form-js .nav-pills .nav-link:hover, .top-banner-wrap .nav-pills .nav-link:hover {
+          color: #fff;
+      }
+      
       .control input:checked ~ .control__indicator,
-      .top-banner-wrap .nav-pills .nav-link,
       .btn-primary-outlined:hover,
       .page-item.active .page-link,
       .slick-prev:hover,
@@ -369,7 +381,8 @@ if(!function_exists('houzez_custom_styling')) {
       .agent-nav-wrap .nav-pills .nav-link.active,
       .board-message-icon-wrap .notification-circle,
       .primary-label,
-      .fc-event, .fc-event-dot,
+      .fc-event,
+      .fc-event-dot,
       .compare-table .table-hover > tbody > tr:hover,
       .post-tag,
       .datepicker table tr td.active.active,
@@ -393,12 +406,16 @@ if(!function_exists('houzez_custom_styling')) {
       .datepicker table tr td.active:hover[disabled],
       .datepicker table tr td.active[disabled],
       .ui-slider-horizontal .ui-slider-range,
-      .btn-bubble {
+      .slick-arrow,
+      .btn-load-more .spinner .bounce1,
+      .btn-load-more .spinner .bounce2,
+      .btn-load-more .spinner .bounce3 {
         background-color: {$primary_color}; 
       }
 
       .control input:checked ~ .control__indicator,
       .btn-primary-outlined,
+      .btn-primary-outlined:hover,
       .page-item.active .page-link,
       .mobile-property-tools .nav-pills .nav-link.active,
       .agent-nav-wrap .nav-pills .nav-link,
@@ -407,17 +424,25 @@ if(!function_exists('houzez_custom_styling')) {
       .dashaboard-snake-nav .step-block.active,
       .fc-event,
       .fc-event-dot,
+      .save-search-form-wrap,
       .property-schedule-tour-form-wrap .control input:checked ~ .control__indicator,
+      .property-tabs-module.property-nav-tabs-v5 .nav-link.active,
+      .price-table-button
+          .control--radio
+          input:checked
+          + .control__indicator
+          + .control__label
+          + .control__background,
       .agent-detail-page-v2 .agent-nav-wrap .nav-link.active {
         border-color: {$primary_color}; 
       }
 
-      .slick-arrow:hover {
-        background-color: {$primary_hover_rgba}; 
+      .stats-box .icon-box {
+        border: 1px solid {$primary_color};
       }
 
-      .slick-arrow {
-        background-color: {$primary_color}; 
+      .slick-arrow:hover {
+        background-color: {$primary_hover_rgba}; 
       }
 
       .property-banner .nav-pills .nav-link.active {
@@ -428,6 +453,63 @@ if(!function_exists('houzez_custom_styling')) {
         color: {$primary_color};
         -webkit-box-shadow: inset 0 -3px {$primary_color};
         box-shadow: inset 0 -3px {$primary_color}; 
+      }
+
+      .property-nav-tabs-v1 .nav-item .nav-link.active,
+      .property-nav-tabs-v1 .nav-item .nav-link.show,
+      .property-nav-tabs-v2 .nav-item .nav-link.active,
+      .property-nav-tabs-v2 .nav-item .nav-link.show {
+          -webkit-box-shadow: 0 3px 0 inset {$primary_color};
+          box-shadow: 0 3px 0 inset {$primary_color};
+          border-bottom: 2px solid {$body_bg_color};
+      }
+
+      .property-tabs-module.property-nav-tabs-v3 .nav-link.active::before,
+      .property-tabs-module.property-nav-tabs-v4 .nav-link.active::before {
+          border-top-color: {$primary_color};
+      }
+      
+      .property-tabs-module.property-nav-tabs-v3 .nav-link.active::after,
+      .property-tabs-module.property-nav-tabs-v4 .nav-link.active::after {
+          border-bottom-color: {$body_bg_color};
+          border-top-color: {$body_bg_color};
+      }
+
+      .property-tabs-module.property-nav-tabs-v3 .nav-link.active,
+      .property-tabs-module.property-nav-tabs-v4 .nav-link.active {
+          border-bottom: 1px solid {$primary_color};
+      }
+
+      @media (max-width: 767.98px) {
+          .product-tabs-wrap-v1 .nav-link.active {
+              background-color: {$primary_color} !important;
+              border-color: {$primary_color};
+          }
+      }
+
+      .property-lightbox-nav .nav-item.nav-item-active {
+          -webkit-box-shadow: inset 0 -3px {$primary_color};
+          box-shadow: inset 0 -3px {$primary_color};
+      }
+
+      .property-lightbox-nav .nav-item.nav-item-active a {
+          color: {$primary_color};
+      }
+
+      .deals-table-wrap {
+          scrollbar-color: {$primary_color} #f1f1f1;
+      }
+
+      .deals-table-wrap::-webkit-scrollbar-thumb {
+          background: {$primary_color};
+      }
+
+      .deals-table-wrap::-webkit-scrollbar-thumb:hover {
+          background: {$primary_color};
+      }
+
+      .deals-table-wrap::-webkit-scrollbar-track {
+          background: {$primary_color};
       }
 
       .btn-primary,
@@ -473,6 +555,12 @@ if(!function_exists('houzez_custom_styling')) {
       .woocommerce a.button, 
       .woocommerce button.button, 
       .woocommerce input.button {
+        color: #fff;
+        background-color: {$secondary_color};
+        border-color: {$secondary_color}; 
+      }
+      .btn-secondary:focus,
+      .btn-secondary:focus:active {
         color: #fff;
         background-color: {$secondary_color};
         border-color: {$secondary_color}; 
@@ -621,8 +709,17 @@ if(!function_exists('houzez_custom_styling')) {
     $adv_overlay_open_close_color = houzez_option('adv_overlay_open_close_color');
 
     $header_search_padding = houzez_option('header_search_padding');
-    $adv_padding_top = $header_search_padding['padding-top'];
-    $adv_padding_bottom = $header_search_padding['padding-bottom'];
+    $adv_padding_top = $header_search_padding['padding-top'] ?? 0;
+    $adv_padding_bottom = $header_search_padding['padding-bottom'] ?? 0;
+
+    $clear_button_color_regular = houzez_option('clear_button_color', false, 'regular');
+    $clear_button_color_hover = houzez_option('clear_button_color', false, 'hover');
+
+    $clear_button_bg_color_regular = houzez_option('clear_button_bg_color', false, 'regular');
+    $clear_button_bg_color_hover = houzez_option('clear_button_bg_color', false, 'hover');
+
+    $clear_button_border_regular = houzez_option('clear_button_border_color', false, 'regular');
+    $clear_button_border_hover = houzez_option('clear_button_border_color', false, 'hover');
 
     $search_colors = "
       .form-control::-webkit-input-placeholder,
@@ -670,6 +767,7 @@ if(!function_exists('houzez_custom_styling')) {
       .advanced-search .form-control,
       .advanced-search .bootstrap-select > .btn,
       .location-trigger,
+      .location-search .location-trigger,
       .vertical-search-wrap .form-control,
       .vertical-search-wrap .bootstrap-select > .btn,
       .step-search-wrap .form-control,
@@ -687,7 +785,9 @@ if(!function_exists('houzez_custom_styling')) {
 
       .advanced-search-nav,
       .search-expandable,
-      .overlay-search-advanced-module {
+      .overlay-search-advanced-module,
+      .advanced-search-half-map,
+      .half-map-wrap #advanced-search-filters {
         background-color: {$adv_background}; 
       }
       .btn-search {
@@ -740,6 +840,16 @@ if(!function_exists('houzez_custom_styling')) {
       .advanced-search-half-map .features-list-wrap .btn-features-list {
           color: {$adv_halfmap_other_color};
       }
+      .reset-search-btn {
+        background-color: {$clear_button_bg_color_regular};
+        color: {$clear_button_color_regular};
+        border-color: {$clear_button_border_regular}; 
+      }
+      .reset-search-btn:hover {
+        background-color: {$clear_button_bg_color_hover};
+        color: {$clear_button_color_hover};
+        border-color: {$clear_button_border_hover}; 
+      }
     ";
 
     /* header v.1 - colors
@@ -781,7 +891,8 @@ if(!function_exists('houzez_custom_styling')) {
         border-bottom: 1px solid {$header_1_bg}; 
       }
 
-      .header-v1 a.nav-link {
+      .header-v1 a.nav-link,
+      .header-v1 .btn-phone-number a {
         color: {$header_1_links_color}; 
       }
 
@@ -792,6 +903,10 @@ if(!function_exists('houzez_custom_styling')) {
       }
       .header-desktop .main-nav .nav-link {
           letter-spacing: {$navigation_letter_spacing}px;
+      }
+      .header-v1 .btn-phone-number a:hover,
+      .header-v1 .btn-phone-number a:active {
+        color: {$header_1_links_hover_color};
       }
     ";
 
@@ -928,7 +1043,8 @@ if(!function_exists('houzez_custom_styling')) {
         background-color: {$header_4_bg}; 
       }
 
-      .header-v4 a.nav-link {
+      .header-v4 a.nav-link,
+      .header-v4 .btn-phone-number a {
         color: {$header_4_links_color}; 
       }
 
@@ -936,6 +1052,11 @@ if(!function_exists('houzez_custom_styling')) {
       .header-v4 a.nav-link:active {
         color: {$header_4_links_hover_color};
         background-color: {$header_4_links_hover_bg_color}; 
+      }
+
+      .header-v4 .btn-phone-number a:hover,
+      .header-v4 .btn-phone-number a:active {
+        color: {$header_4_links_hover_color};
       }
     ";
 
@@ -975,22 +1096,37 @@ if(!function_exists('houzez_custom_styling')) {
 
     $transparent_border_bottom_color = houzez_option('header_4_transparent_border_bottom_color');
     $transparent_border_bottom_color = isset($transparent_border_bottom_color['rgba']) ? $transparent_border_bottom_color['rgba'] : '';
-    $transparent_border_bottom1 = houzez_option('header_4_transparent_border_bottom1');
+    // Improved handling for transparent header border bottom styles
+    $transparent_border_bottom1 = houzez_option('header_4_transparent_border_bottom1', array(
+        'border-bottom' => '1px',
+        'border-style' => 'solid'
+    ));
+
+    $border_bottom_width = isset($transparent_border_bottom1['border-bottom']) && !empty($transparent_border_bottom1['border-bottom']) ? $transparent_border_bottom1['border-bottom'] : '1px';
+    $border_bottom_style = isset($transparent_border_bottom1['border-style']) && !empty($transparent_border_bottom1['border-style']) ? $transparent_border_bottom1['border-style'] : 'solid';
+    $border_bottom_color = !empty($transparent_border_bottom_color) ? $transparent_border_bottom_color : 'rgba(255,255,255,0.1)';
 
     $transparent_menu = "
       .header-transparent-wrap .header-v4 {
-        background-color: transparent;
-        border-bottom: {$transparent_border_bottom1['border-bottom']} {$transparent_border_bottom1['border-style']} {$transparent_border_bottom_color}; 
+        border-bottom: {$border_bottom_width} {$border_bottom_style} {$border_bottom_color}; 
+      }
+    
+      .header-transparent-wrap .header-v4 .nav-link, 
+      .header-transparent-wrap .header-v4 .login-register-nav a, 
+      .header-transparent-wrap .btn-phone-number a {
+        color: {$transparent_links_color};
       }
 
-      .header-transparent-wrap .header-v4 a {
-        color: {$transparent_links_color}; 
+      .header-transparent-wrap .header-v4 .nav-link:hover, 
+      .header-transparent-wrap .header-v4 .nav-link:active {
+        color: {$transparent_links_hover_color}; 
       }
 
-      .header-transparent-wrap .header-v4 a:hover,
-      .header-transparent-wrap .header-v4 a:active {
+      .header-transparent-wrap .header-v4 .login-register-nav a:hover, 
+      .header-transparent-wrap .header-v4 .login-register-nav a:active,
+      .header-transparent-wrap .btn-phone-number a:hover,
+      .header-transparent-wrap .btn-phone-number a:active {
         color: {$transparent_links_hover_color};
-        background-color: rgba(255, 255, 255, 0.1); 
       }
     ";
 
@@ -1035,61 +1171,122 @@ if(!function_exists('houzez_custom_styling')) {
 
     /* create listing button
     /* ------------------------------------------------------------------------ */
+    // Improved: More robust defaults, checks, and clearer variable names
+
+    // Button text color
     $header_4_btn_color = houzez_option('header_4_btn_color', '#ffffff');
     $header_4_btn_hover_color = houzez_option('header_4_btn_hover_color', '#ffffff');
-    $header_4_btn_hover_color = isset($header_4_btn_hover_color['rgba']) ? $header_4_btn_hover_color['rgba'] : 'rgba(255, 255, 255, 0.99)';
+    if (is_array($header_4_btn_hover_color) && isset($header_4_btn_hover_color['rgba'])) {
+        $header_4_btn_hover_color_final = $header_4_btn_hover_color['rgba'];
+    } else {
+        $header_4_btn_hover_color_final = is_string($header_4_btn_hover_color) ? $header_4_btn_hover_color : 'rgba(255, 255, 255, 0.99)';
+    }
 
+    // Button background color
     $header_4_btn_bg_color = houzez_option('header_4_btn_bg_color', '#00aeff');
     $header_4_btn_bg_hover_color = houzez_option('header_4_btn_bg_hover_color');
-    $header_4_btn_bg_hover_color = isset($header_4_btn_bg_hover_color['rgba']) ? $header_4_btn_bg_hover_color['rgba'] : 'rgba(0, 174, 255, 0.65)';
+    if (is_array($header_4_btn_bg_hover_color) && isset($header_4_btn_bg_hover_color['rgba'])) {
+        $header_4_btn_bg_hover_color_final = $header_4_btn_bg_hover_color['rgba'];
+    } else {
+        $header_4_btn_bg_hover_color_final = is_string($header_4_btn_bg_hover_color) ? $header_4_btn_bg_hover_color : 'rgba(0, 174, 255, 0.65)';
+    }
 
-    $header_4_btn_border = houzez_option('header_4_btn_border');
+    // Button border
+    $header_4_btn_border = houzez_option('header_4_btn_border', [
+        'border-left' => '1px',
+        'border-style' => 'solid',
+        'border-color' => '#00aeff'
+    ]);
     $header_4_btn_border_hover_color = houzez_option('header_4_btn_border_hover_color');
-    $header_4_btn_border_hover_color = isset($header_4_btn_border_hover_color['color']) ? $header_4_btn_border_hover_color['color'] : '#00aeff';
+    if (is_array($header_4_btn_border_hover_color) && isset($header_4_btn_border_hover_color['color'])) {
+        $header_4_btn_border_hover_color_final = $header_4_btn_border_hover_color['color'];
+    } else {
+        $header_4_btn_border_hover_color_final = is_string($header_4_btn_border_hover_color) ? $header_4_btn_border_hover_color : '#00aeff';
+    }
+
+    // Defensive: ensure border keys exist
+    $border_left = isset($header_4_btn_border['border-left']) ? $header_4_btn_border['border-left'] : '1px';
+    $border_style = isset($header_4_btn_border['border-style']) ? $header_4_btn_border['border-style'] : 'solid';
+    $border_color = isset($header_4_btn_border['border-color']) ? $header_4_btn_border['border-color'] : '#00aeff';
 
     $create_listing_button = "
       .header-main-wrap .btn-create-listing {
         color: {$header_4_btn_color};
-        border: {$header_4_btn_border['border-left']} {$header_4_btn_border['border-style']} {$header_4_btn_border['border-color']};
+        border: {$border_left} {$border_style} {$border_color};
         background-color: {$header_4_btn_bg_color}; 
       }
 
       .header-main-wrap .btn-create-listing:hover,
       .header-main-wrap .btn-create-listing:active {
-        color: {$header_4_btn_hover_color};
-        border: {$header_4_btn_border['border-left']} {$header_4_btn_border['border-style']} {$header_4_btn_border_hover_color};
-        background-color: {$header_4_btn_bg_hover_color}; 
+        color: {$header_4_btn_hover_color_final};
+        border: {$border_left} {$border_style} {$header_4_btn_border_hover_color_final};
+        background-color: {$header_4_btn_bg_hover_color_final}; 
       }
     ";
 
 
-    /* create listing button - transparent header
+    /* Improved: create listing button - transparent header
     /* ------------------------------------------------------------------------ */
+
+    // Get transparent button colors with sensible defaults and RGBA support
     $transparent_btn_color = houzez_option('header_4_transparent_btn_color', '#ffffff');
+    if (is_array($transparent_btn_color) && isset($transparent_btn_color['rgba'])) {
+        $transparent_btn_color_final = $transparent_btn_color['rgba'];
+    } else {
+        $transparent_btn_color_final = is_string($transparent_btn_color) ? $transparent_btn_color : '#ffffff';
+    }
+
     $transparent_btn_hover_color = houzez_option('header_4_transparent_btn_hover_color', '#ffffff');
-    $transparent_btn_hover_color = isset($transparent_btn_hover_color['rgba']) ? $transparent_btn_hover_color['rgba'] : 'rgba(255, 255, 255, 0.2)';
+    if (is_array($transparent_btn_hover_color) && isset($transparent_btn_hover_color['rgba'])) {
+        $transparent_btn_hover_color_final = $transparent_btn_hover_color['rgba'];
+    } else {
+        $transparent_btn_hover_color_final = is_string($transparent_btn_hover_color) ? $transparent_btn_hover_color : 'rgba(255, 255, 255, 0.2)';
+    }
 
-    $transparent_btn_bg_color = houzez_option('header_4_transparent_btn_bg_color');
-    $transparent_btn_bg_color = isset($transparent_btn_bg_color['rgba']) ? $transparent_btn_bg_color['rgba'] : 'rgba(255, 255, 255, 0.99)';
-    $transparent_btn_bg_hover_color = houzez_option('header_4_transparent_btn_bg_hover_color');
-    $transparent_btn_bg_hover_color = isset($transparent_btn_bg_hover_color['rgba']) ? $transparent_btn_bg_hover_color['rgba'] : 'rgba(0, 174, 255, 0.65)';
+    $transparent_btn_bg_color = houzez_option('header_4_transparent_btn_bg_color', 'rgba(255, 255, 255, 0.99)');
+    if (is_array($transparent_btn_bg_color) && isset($transparent_btn_bg_color['rgba'])) {
+        $transparent_btn_bg_color_final = $transparent_btn_bg_color['rgba'];
+    } else {
+        $transparent_btn_bg_color_final = is_string($transparent_btn_bg_color) ? $transparent_btn_bg_color : 'rgba(255, 255, 255, 0.99)';
+    }
 
-    $transparent_btn_border = houzez_option('header_4_transparent_btn_border');
-    $transparent_btn_border_hover_color = houzez_option('header_4_transparent_btn_border_hover_color');
-    $transparent_btn_border_hover_color = isset($transparent_btn_border_hover_color['color']) ? $transparent_btn_border_hover_color['color'] : '#00aeff';
+    $transparent_btn_bg_hover_color = houzez_option('header_4_transparent_btn_bg_hover_color', 'rgba(0, 174, 255, 0.65)');
+    if (is_array($transparent_btn_bg_hover_color) && isset($transparent_btn_bg_hover_color['rgba'])) {
+        $transparent_btn_bg_hover_color_final = $transparent_btn_bg_hover_color['rgba'];
+    } else {
+        $transparent_btn_bg_hover_color_final = is_string($transparent_btn_bg_hover_color) ? $transparent_btn_bg_hover_color : 'rgba(0, 174, 255, 0.65)';
+    }
+
+    // Defensive: ensure border keys exist and set defaults
+    $transparent_btn_border = houzez_option('header_4_transparent_btn_border', [
+        'border-bottom' => '1px',
+        'border-style' => 'solid',
+        'border-color' => '#00aeff'
+    ]);
+    $border_bottom = isset($transparent_btn_border['border-bottom']) ? $transparent_btn_border['border-bottom'] : '1px';
+    $border_style = isset($transparent_btn_border['border-style']) ? $transparent_btn_border['border-style'] : 'solid';
+    $border_color = isset($transparent_btn_border['border-color']) ? $transparent_btn_border['border-color'] : '#00aeff';
+
+    $transparent_btn_border_hover_color = houzez_option('header_4_transparent_btn_border_hover_color', '#00aeff');
+    if (is_array($transparent_btn_border_hover_color) && isset($transparent_btn_border_hover_color['color'])) {
+        $border_hover_color = $transparent_btn_border_hover_color['color'];
+    } else {
+        $border_hover_color = is_string($transparent_btn_border_hover_color) ? $transparent_btn_border_hover_color : '#00aeff';
+    }
 
     $create_listing_button_transparent = "
-      .header-transparent-wrap .header-v4 .btn-create-listing {
-        color: {$transparent_btn_color};
-        border: {$transparent_btn_border['border-bottom']} {$transparent_btn_border['border-style']} {$transparent_btn_border['border-color']};
-        background-color: {$transparent_btn_bg_color}; 
+      .header-transparent-wrap .header-v4 a.btn-create-listing,
+      .header-transparent-wrap .login-register .favorite-link .btn-bubble {
+        color: {$transparent_btn_color_final};
+        border: {$border_bottom} {$border_style} {$border_color};
+        background-color: {$transparent_btn_bg_color_final}; 
       }
 
-      .header-transparent-wrap .header-v4 .btn-create-listing:hover,
-      .header-transparent-wrap .header-v4 .btn-create-listing:active {
-        color: {$transparent_btn_hover_color};
-        border: {$transparent_btn_border['border-bottom']} {$transparent_btn_border['border-style']} {$transparent_btn_border_hover_color};
-        background-color: {$transparent_btn_bg_hover_color}; 
+      .header-transparent-wrap .header-v4 a.btn-create-listing:hover,
+      .header-transparent-wrap .header-v4 a.btn-create-listing:active {
+        color: {$transparent_btn_hover_color_final};
+        border: {$border_bottom} {$border_style} {$border_hover_color};
+        background-color: {$transparent_btn_bg_hover_color_final}; 
       }
     ";
 
@@ -1099,7 +1296,25 @@ if(!function_exists('houzez_custom_styling')) {
     $mob_menu_btn_color = houzez_option('mob_menu_btn_color', '#ffffff');
     $mob_nav_bg_color = houzez_option('mob_nav_bg_color', '#ffffff');
     $mob_link_color = houzez_option('mob_link_color', '#004274');
-    $mobile_nav_border = houzez_option('mobile_nav_border');
+    $mobile_nav_border = houzez_option('mobile_nav_border', array(
+        'border-top' => '1px',
+        'border-style' => 'solid',
+        'border-color' => '#e6e6e6'
+    ));
+    // Defensive: ensure $mobile_nav_border is an array and has required keys
+    if (!is_array($mobile_nav_border)) {
+        $mobile_nav_border = array(
+            'border-top' => '1px',
+            'border-style' => 'solid',
+            'border-color' => '#e6e6e6'
+        );
+    }
+    $mobile_nav_border_top = isset($mobile_nav_border['border-top']) ? $mobile_nav_border['border-top'] : '1px';
+    $mobile_nav_border_style = isset($mobile_nav_border['border-style']) ? $mobile_nav_border['border-style'] : 'solid';
+    $mobile_nav_border_color = isset($mobile_nav_border['border-color']) ? $mobile_nav_border['border-color'] : '#e6e6e6';
+
+    $offcanvas_menu_header_bg_color = houzez_option('offcanvas_menu_header_bg_color', '#ffffff');
+    $offcanvas_menu_header_text_color = houzez_option('offcanvas_menu_header_text_color', '#333333');
 
     $mobile_menu = "
       .header-mobile {
@@ -1108,6 +1323,10 @@ if(!function_exists('houzez_custom_styling')) {
       .header-mobile .toggle-button-left,
       .header-mobile .toggle-button-right {
         color: {$mob_menu_btn_color}; 
+      }
+
+      .nav-mobile:not(.houzez-nav-menu-main-mobile-wrap) .main-nav .nav-item a {
+        border-bottom: {$mobile_nav_border_top} {$mobile_nav_border_style} {$mobile_nav_border_color};
       }
 
       .nav-mobile .logged-in-nav a,
@@ -1121,8 +1340,11 @@ if(!function_exists('houzez_custom_styling')) {
       .nav-mobile .main-nav .nav-item a,
       .navi-login-register .main-nav .nav-item a {
         color: {$mob_link_color};
-        border-bottom: {$mobile_nav_border['border-top']} {$mobile_nav_border['border-style']} {$mobile_nav_border['border-color']};
+        border-bottom: {$mobile_nav_border_top} {$mobile_nav_border_style} {$mobile_nav_border_color};
         background-color: {$mob_nav_bg_color};
+      }
+      #nav-mobile .nav-mobile-trigger {
+        color: {$mob_link_color};
       }
 
       .nav-mobile .btn-create-listing,
@@ -1138,6 +1360,13 @@ if(!function_exists('houzez_custom_styling')) {
         color: #fff;
         border: 1px solid {$primary_color};
         background-color: rgba(0, 174, 255, 0.65); 
+      }
+      .offcanvas-header {
+        background-color: {$offcanvas_menu_header_bg_color};
+        color: {$offcanvas_menu_header_text_color};
+      }
+      .offcanvas-header .btn-close {
+        color: {$offcanvas_menu_header_text_color};
       }
     ";
 
@@ -1215,38 +1444,54 @@ if(!function_exists('houzez_custom_styling')) {
     /* ------------------------------------------------------------------------ */
     $houzez_prop_details_bg =  houzez_option('houzez_prop_details_bg', '0, 174, 255, 0.1', 'rgba');
     $prop_details_border_color =  houzez_option('prop_details_border_color', '#00aeff');
+    $overview_v2_height =  houzez_option('overview_v2_height', '180');
 
     $prop_detail_color = "
       .detail-wrap {
         background-color: {$houzez_prop_details_bg};
         border-color: {$prop_details_border_color}; 
       }
+      #houzez-overview-listing-map {
+        height: {$overview_v2_height}px;
+      }
     ";
 
     /* dashaboard Menu
     /* ------------------------------------------------------------------------ */
-    $dm_background = houzez_option('dm_background', '#002B4B');
-    $dm_color = houzez_option('dm_color', '#839EB2');
+    $dm_background = houzez_option('dm_background', '#002b4b');
+    $dm_hover_bg_color = houzez_option('dm_hover_bg_color', '#003a64');
+    $dm_color = houzez_option('dm_color', '#d1d5db');
     $dm_hover_color = houzez_option('dm_hover_color', '#ffffff');
-    $dm_submenu_active_color = houzez_option('dm_submenu_active_color', '#00aeff');
+    $dm_title_color = houzez_option('dm_title_color', '#9ca3af');
+    $dm_active_border_color = houzez_option('dm_active_border_color', '#00aeff');
+    $dm_logo_bg_color = houzez_option('dm_logo_bg_color', '#002b4b');
+    $dm_logo_border_color = houzez_option('dm_logo_border_color', '#374151');
 
     $dashaboard_menu_colors = "
-    .dashboard-side-wrap {
+    .dashboard-sidebar {
       background-color: {$dm_background}; 
     }
 
-    .side-menu a {
+    .nav-box ul li a {
       color: {$dm_color}; 
     }
+    
+    .nav-box h5 {
+      color: {$dm_title_color};
+    }
 
-    .side-menu a.active,
-    .side-menu .side-menu-parent-selected > a,
-    .side-menu-dropdown a,
-    .side-menu a:hover {
+    .nav-box ul li a:hover, .nav-box ul li a.active {
+      background-color: {$dm_hover_bg_color};
       color: {$dm_hover_color}; 
     }
-    .dashboard-side-menu-wrap .side-menu-dropdown a.active {
-      color: {$dm_submenu_active_color}
+    .nav-box ul li a.active {
+      border-color: {$dm_active_border_color};
+    }
+    .sidebar-logo {
+      background-color: {$dm_logo_bg_color};
+    }
+    .sidebar-logo .logo {
+      border-color: {$dm_logo_border_color};
     }
     ";
 
@@ -1296,6 +1541,15 @@ if(!function_exists('houzez_custom_styling')) {
     $energy_8_color = houzez_option('energy_8_color', '#cc232a');
     $energy_9_color = houzez_option('energy_9_color', '#cc232a');
     $energy_10_color = houzez_option('energy_10_color', '#cc232a');
+    
+    // GHG Emissions Colors for French/EU mode
+    $ghg_1_color = houzez_option('ghg_1_color', '#5d9cd3');
+    $ghg_2_color = houzez_option('ghg_2_color', '#70b0d9');
+    $ghg_3_color = houzez_option('ghg_3_color', '#8cc4e3');
+    $ghg_4_color = houzez_option('ghg_4_color', '#98cdeb');
+    $ghg_5_color = houzez_option('ghg_5_color', '#5966ab');
+    $ghg_6_color = houzez_option('ghg_6_color', '#3e4795');
+    $ghg_7_color = houzez_option('ghg_7_color', '#2d2e7f');
 
     $energy_class_colors = "
     .class-energy-indicator:nth-child(1) {
@@ -1327,6 +1581,29 @@ if(!function_exists('houzez_custom_styling')) {
     }
     .class-energy-indicator:nth-child(10) {
         background-color: {$energy_10_color};
+    }
+    
+    /* GHG Emissions Colors for French/EU mode */
+    .class-ghg-indicator:nth-child(1) {
+        background-color: {$ghg_1_color};
+    }
+    .class-ghg-indicator:nth-child(2) {
+        background-color: {$ghg_2_color};
+    }
+    .class-ghg-indicator:nth-child(3) {
+        background-color: {$ghg_3_color};
+    }
+    .class-ghg-indicator:nth-child(4) {
+        background-color: {$ghg_4_color};
+    }
+    .class-ghg-indicator:nth-child(5) {
+        background-color: {$ghg_5_color};
+    }
+    .class-ghg-indicator:nth-child(6) {
+        background-color: {$ghg_6_color};
+    }
+    .class-ghg-indicator:nth-child(7) {
+        background-color: {$ghg_7_color};
     }
     ";
 
@@ -1424,14 +1701,26 @@ if(!function_exists('houzez_custom_styling')) {
     .footer-top-wrap a,
     .footer-bottom-wrap,
     .footer-bottom-wrap a,
-    .footer-top-wrap .property-item-widget .right-property-item-widget-wrap .item-amenities,
-    .footer-top-wrap .property-item-widget .right-property-item-widget-wrap .item-price-wrap,
+    .footer-top-wrap
+        .property-item-widget
+        .right-property-item-widget-wrap
+        .item-amenities,
+    .footer-top-wrap
+        .property-item-widget
+        .right-property-item-widget-wrap
+        .item-price-wrap,
     .footer-top-wrap .blog-post-content-widget h4 a,
     .footer-top-wrap .blog-post-content-widget,
     .footer-top-wrap .form-tools .control,
     .footer-top-wrap .slick-dots li.slick-active button:before,
     .footer-top-wrap .slick-dots li button::before,
-    .footer-top-wrap .widget ul:not(.item-amenities):not(.item-price-wrap):not(.contact-list):not(.dropdown-menu):not(.nav-tabs) li span {
+    .footer-top-wrap
+        .widget
+        ul:not(.item-amenities):not(.item-price-wrap):not(.contact-list):not(
+            .dropdown-menu
+        ):not(.nav-tabs)
+        li
+        span {
       color: {$footer_color}; 
     }
     ";
@@ -1534,45 +1823,12 @@ if(!function_exists('houzez_custom_styling')) {
 
     }
 
-    // Marker color based on type
-    if( taxonomy_exists('property_type') ) {
-
-        $marker_type = get_terms( 'property_type' );
-        $marker_type_color = '';
-
-        if( $marker_type ) {
-            foreach( $marker_type as $term ) {
-
-                $houzez_term_id = $term->term_id;
-                $meta = get_option( '_houzez_property_type_'.$houzez_term_id );
-
-                if ( isset($meta['color_type']) && $meta['color_type'] == 'custom' ) {
-
-                    $marker_type_color .= "
-                    .gm-marker-color-{$houzez_term_id} {
-                        background-color: {$meta['color']};
-                        border-color:{$meta['color']};
-                    }
-                    ";
-                    $marker_type_color .="
-                    .gm-marker-color-{$houzez_term_id}:after {
-                        border-top-color: {$meta['color']};
-                    }
-                    ";
-
-                }
-            }
-        }
-
-    }
-
     $houzez_custom_css = houzez_option('custom_css');
 
     wp_add_inline_style( 'houzez-style',
       $site_width.
       $prop_label.
       $prop_status_label.
-      $marker_type_color.
       $houzez_typography.
       $headers_height.
       $houzez_body_colors.
@@ -1582,7 +1838,6 @@ if(!function_exists('houzez_custom_styling')) {
       $houzez_3_colors.
       $houzez_4_colors.
       $houzez_6_colors.
-      $mobile_menu.
       $transparent_menu.
       $nav_submenu_colors.
       $create_listing_button.
@@ -1594,6 +1849,7 @@ if(!function_exists('houzez_custom_styling')) {
       $houzez_featured_label_colors.
       $dashaboard_menu_colors.
       $prop_detail_color.
+      $mobile_menu.
       $topbar_styling.
       $energy_class_colors.
       $agent_agency_detail_colors.
@@ -1607,4 +1863,3 @@ if(!function_exists('houzez_custom_styling')) {
   }
 }
 add_action( 'wp_enqueue_scripts', 'houzez_custom_styling', 21 );
-?>

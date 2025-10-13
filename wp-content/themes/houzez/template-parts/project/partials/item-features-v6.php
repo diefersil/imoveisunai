@@ -22,17 +22,17 @@
 				$custom_field_value = houzez_get_listing_data($key);
 				$output = '';
 				if( $custom_field_value != '' ) { 
-					$output .= '<li class="h-'.$key.'">';
+					$output .= '<li class="h-'.$key.' me-1">';
 
 						if(houzez_option('icons_type') == 'font-awesome') {
-							$output .= '<i class="'.houzez_option('fa_'.$key).' mr-1"></i>';
+							$output .= '<i class="'.houzez_option('fa_'.$key).' me-2"></i>';
 
 						} elseif (houzez_option('icons_type') == 'custom') {
 							$cus_icon = houzez_option($key);
 							if(!empty($cus_icon['url'])) {
 
 								$alt = isset($cus_icon['title']) ? $cus_icon['title'] : '';
-								$output .= '<img class="img-fluid mr-1" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
+								$output .= '<img class="img-fluid me-2" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
 							}
 						}
 						

@@ -11,12 +11,13 @@ if( $currency_switcher_enable != 0 && $is_multi_currency != 1 ) {
             $current_currency = houzez_get_wpc_current_currency();
             ?>
 			<div class="switcher-wrap currency-switcher-wrap">
-				<button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><span><?php echo esc_attr($current_currency); ?></span>
+				<button class="btn dropdown-toggle border-none" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<span><?php echo esc_attr($current_currency); ?></span>
 				</button>
-				<ul id="hz-currency-switcher-list" class="dropdown-menu" aria-labelledby="dropdown">
+				<ul id="hz-currency-switcher-list" class="dropdown-menu" role="menu">
 					<?php
 					foreach ($supported_currencies as $currency_code) {
-		                echo '<li data-currency-code="' . esc_attr($currency_code) . '">' . esc_attr($currency_code) . '</li>';
+		                echo '<li role="menuitem" data-currency-code="' . esc_attr($currency_code) . '">' . esc_attr($currency_code) . '</li>';
 		            }
 					?>
 				</ul>

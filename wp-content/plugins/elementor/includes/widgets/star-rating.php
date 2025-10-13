@@ -103,6 +103,10 @@ class Widget_Star_Rating extends Widget_Base {
 		return false;
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
 	/**
 	 * Register star rating widget controls.
 	 *
@@ -301,8 +305,7 @@ class Widget_Star_Rating extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'body:not(.rtl) {{WRAPPER}}:not(.elementor-star-rating--align-justify) .elementor-star-rating__title' => 'margin-right: {{SIZE}}{{UNIT}}',
-					'body.rtl {{WRAPPER}}:not(.elementor-star-rating--align-justify) .elementor-star-rating__title' => 'margin-left: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}}:not(.elementor-star-rating--align-justify) .elementor-star-rating__title' => 'margin-inline-end: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -362,8 +365,7 @@ class Widget_Star_Rating extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'body:not(.rtl) {{WRAPPER}} .elementor-star-rating i:not(:last-of-type)' => 'margin-right: {{SIZE}}{{UNIT}}',
-					'body.rtl {{WRAPPER}} .elementor-star-rating i:not(:last-of-type)' => 'margin-left: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .elementor-star-rating i:not(:last-of-type)' => 'margin-inline-end: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);

@@ -12,7 +12,7 @@ class Houzez_Post_Type_Reviews {
      */
     public static function init() {
         add_action( 'init', array( __CLASS__, 'definition' ) );
-        add_action( 'save_post_houzez_reviews', array( __CLASS__, 'save_reviews_meta' ), 10, 3 );
+        add_action( 'wp_after_insert_post', array( __CLASS__, 'save_reviews_meta_after_insert' ), 10, 3 );
         add_filter( 'manage_edit-houzez_reviews_columns', array( __CLASS__, 'custom_columns' ) );
         add_action( 'manage_houzez_reviews_posts_custom_column', array( __CLASS__, 'custom_columns_manage' ) );
         add_action( 'admin_action_houzez_review_accept', array( __CLASS__, 'review_accept' ) );
@@ -68,34 +68,27 @@ class Houzez_Post_Type_Reviews {
         register_post_type('houzez_reviews',$args);
     }
 
-    /**
-     * Update post meta associated info when post updated
-     *
-     * @access public
-     * @return
-     */
-    public static function save_reviews_meta($post_id, $post, $update) {
+    public static function save_reviews_meta_after_insert($post, $update, $post_before) {
+        $post = get_post( $post );
 
-        if (!is_object($post) || !isset($post->post_type)) {
+        if ( ! $post ) {
             return;
         }
 
-        if (isset($post->post_status) && 'auto-draft' == $post->post_status) return;
+        $review_id = $post->ID;
 
-        if ( wp_is_post_revision( $post_id ) ) return;
-
-        $post_type = get_post_type($post_id);
-
-        if ( "houzez_reviews" != $post_type ) return;
-        
-        $review_id = isset($_POST['post_ID']) ? $_POST['post_ID'] : '';
-        
-        if(!empty($review_id)) {
-            houzez_admin_review_meta_on_save($post_id);
+        // Proceed only if the post type is 'houzez_reviews'.
+        if ( 'houzez_reviews' !== get_post_type( $review_id ) ) {
+            return;
         }
 
-        return;
+        $review_post_type = get_post_meta($review_id, 'review_post_type', true);
+        $review_stars = get_post_meta($review_id, 'review_stars', true);
+
+        //Call your custom function to update the review meta.
+        houzez_admin_review_meta_on_save( $review_id );
     }
+
 
     /**
      * Custom admin columns for post type
@@ -147,6 +140,8 @@ class Houzez_Post_Type_Reviews {
                 } else if($review_post_type == 'houzez_author') {
                     $listing_id = get_post_meta($review_id, 'review_author_id', true);
                     $meta_key = 'review_author_id';
+                } else {
+                    $listing_id = $review_id;
                 }
 
                 echo '<a target="_blank" href="'.get_permalink( $listing_id ).'">';

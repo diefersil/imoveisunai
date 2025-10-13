@@ -9,8 +9,8 @@ if( $top_bar_mobile != 0 ) {
 ?>
 <div class="top-bar-wrap <?php echo esc_attr($hide_top_bar_mobile); ?>">
 	<div class="<?php echo esc_attr(houzez_option('top_bar_width')); ?>">
-		<div class="d-flex justify-content-between">
-			<div class="top-bar-left-wrap">
+        <div class="d-flex justify-content-between">
+			<div class="top-bar-left-wrap d-flex">
 				<?php 
 				if( $top_bar_left != 'none' ) {
 					if( $top_bar_left == 'contact_info' ) {
@@ -32,7 +32,7 @@ if( $top_bar_mobile != 0 ) {
 				}?>
 			</div><!-- top-bar-left-wrap -->
 
-			<div class="top-bar-right-wrap">
+			<div class="top-bar-right-wrap d-flex">
 				<?php 
 				if( $top_bar_right != 'none' ) {
 					if( $top_bar_right == 'contact_info' ) {

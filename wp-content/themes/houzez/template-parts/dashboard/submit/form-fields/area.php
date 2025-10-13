@@ -6,8 +6,8 @@ if (houzez_edit_property()) {
 	$area = houzez_get_post_term_slug($property_data->ID, 'property_area');
 }
 ?>
-<div class="form-group">
-	<label for="neighborhood"><?php echo houzez_option( 'cl_area', 'Area' ).houzez_required_field('area'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="neighborhood"><?php echo houzez_option( 'cl_area', 'Area' ).houzez_required_field('area'); ?></label>
 
 	<?php
 	if(houzez_option('location_dropdowns') == 'yes') { ?>

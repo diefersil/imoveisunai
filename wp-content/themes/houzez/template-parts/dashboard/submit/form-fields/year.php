@@ -1,9 +1,9 @@
-<div class="form-group">
-	<label for="prop_year_built">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_year">
 		<?php echo houzez_option('cl_year_built', 'Year Built').houzez_required_field( 'year_built' ); ?>
 	</label>
 
-	<input class="form-control" <?php houzez_required_field_2('year_built'); ?> name="prop_year_built" value="<?php
+	<input class="form-control" <?php houzez_required_field_2('year_built'); ?> name="property_year" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_year');
     }

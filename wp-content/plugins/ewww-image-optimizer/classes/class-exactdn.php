@@ -170,6 +170,14 @@ class ExactDN extends Page_Parser {
 	private $replaced_google_fonts = '';
 
 	/**
+	 * Keep track of images that have been replaced with ExactDN URLs.
+	 *
+	 * @access private
+	 * @var array $replaced_images
+	 */
+	private $replaced_images = array();
+
+	/**
 	 * Request URI.
 	 *
 	 * @var string $request_uri
@@ -194,6 +202,7 @@ class ExactDN extends Page_Parser {
 			return;
 		}
 
+		$this->validate_user_exclusions();
 		$this->request_uri = \add_query_arg( '', '' );
 		if ( false === \strpos( $this->request_uri, 'page=ewww-image-optimizer-options' ) ) {
 			$this->debug_message( "request uri is {$this->request_uri}" );
@@ -277,6 +286,8 @@ class ExactDN extends Page_Parser {
 		// Core image retrieval.
 		if ( \defined( 'EIO_DISABLE_DEEP_INTEGRATION' ) && EIO_DISABLE_DEEP_INTEGRATION ) {
 			$this->debug_message( 'deep (image_downsize) integration disabled' );
+		} elseif ( \defined( 'WPCOMSH_VERSION' ) ) {
+			$this->debug_message( 'WordPress.com, image_downsize integration disabled for crop=1 functionality' );
 		} elseif ( ! \function_exists( '\aq_resize' ) ) {
 			\add_filter( 'image_downsize', array( $this, 'filter_image_downsize' ), 10, 3 );
 		} else {
@@ -328,19 +339,21 @@ class ExactDN extends Page_Parser {
 		\add_filter( 'envira_gallery_output_item_data', array( $this, 'envira_gallery_output_item_data' ) );
 		\add_filter( 'envira_gallery_image_src', array( $this, 'plugin_get_image_url' ) );
 
-		// Filters for BuddyBoss image URLs.
-		\add_filter( 'bp_media_get_preview_image_url', array( $this, 'bp_media_get_preview_image_url' ), PHP_INT_MAX, 5 );
-		\add_filter( 'bb_video_get_thumb_url', array( $this, 'bb_video_get_thumb_url' ), PHP_INT_MAX, 5 );
-		\add_filter( 'bp_document_get_preview_url', array( $this, 'bp_document_get_preview_url' ), PHP_INT_MAX, 6 );
-		\add_filter( 'bb_video_get_symlink', array( $this, 'bb_video_get_symlink' ), PHP_INT_MAX, 4 );
-		// Filters for BuddyBoss URL symlinks.
-		\add_filter( 'bb_media_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
-		\add_filter( 'bb_document_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
-		\add_filter( 'bb_video_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
-		\add_filter( 'bb_video_create_thumb_symlinks', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
-		// Filters for BuddyBoss media access checks.
-		\add_filter( 'bb_media_check_default_access', '__return_true', PHP_INT_MAX );
-		\add_filter( 'bb_media_settings_callback_symlink_direct_access', array( $this, 'buddyboss_media_directory_allow_access' ), PHP_INT_MAX, 2 );
+		if ( ! $this->skip_page( false, 'buddyboss' ) && ! $this->exactdn_skip_user_exclusions( false, 'buddyboss' ) ) {
+			// Filters for BuddyBoss image URLs.
+			\add_filter( 'bp_media_get_preview_image_url', array( $this, 'bp_media_get_preview_image_url' ), PHP_INT_MAX, 5 );
+			\add_filter( 'bb_video_get_thumb_url', array( $this, 'bb_video_get_thumb_url' ), PHP_INT_MAX, 5 );
+			\add_filter( 'bp_document_get_preview_url', array( $this, 'bp_document_get_preview_url' ), PHP_INT_MAX, 6 );
+			\add_filter( 'bb_video_get_symlink', array( $this, 'bb_video_get_symlink' ), PHP_INT_MAX, 4 );
+			// Filters for BuddyBoss URL symlinks.
+			\add_filter( 'bb_media_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
+			\add_filter( 'bb_document_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
+			\add_filter( 'bb_video_do_symlink', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
+			\add_filter( 'bb_video_create_thumb_symlinks', array( $this, 'buddyboss_do_symlink' ), PHP_INT_MAX );
+			// Filters for BuddyBoss media access checks.
+			\add_filter( 'bb_media_check_default_access', '__return_true', PHP_INT_MAX );
+			\add_filter( 'bb_media_settings_callback_symlink_direct_access', array( $this, 'buddyboss_media_directory_allow_access' ), PHP_INT_MAX, 2 );
+		}
 
 		// Filter for NextGEN image URLs within JS.
 		\add_filter( 'ngg_pro_lightbox_images_queue', array( $this, 'ngg_pro_lightbox_images_queue' ) );
@@ -431,7 +444,6 @@ class ExactDN extends Page_Parser {
 		$this->debug_message( 'allowed domains: ' . \implode( ',', $this->allowed_domains ) );
 		$this->debug_message( 'asset domains: ' . $this->asset_domains );
 		$this->get_allowed_paths();
-		$this->validate_user_exclusions();
 	}
 
 	/**
@@ -1461,7 +1473,7 @@ class ExactDN extends Page_Parser {
 						// If present, replace the link href with an ExactDN URL for the full-size image.
 						if ( \defined( 'EIO_PRESERVE_LINKED_IMAGES' ) && EIO_PRESERVE_LINKED_IMAGES && ! empty( $images['link_url'][ $index ] ) && $this->validate_image_url( $images['link_url'][ $index ] ) ) {
 							$new_tag = \preg_replace(
-								'#(href=["|\'])' . $images['link_url'][ $index ] . '(["|\'])#i',
+								'#(href=["|\'])' . preg_quote( $images['link_url'][ $index ], '#' ) . '(["|\'])#i',
 								'\1' . $this->generate_url(
 									$images['link_url'][ $index ],
 									array(
@@ -1474,7 +1486,7 @@ class ExactDN extends Page_Parser {
 							);
 						} elseif ( ! empty( $images['link_url'][ $index ] ) && $this->validate_image_url( $images['link_url'][ $index ] ) ) {
 							$new_tag = \preg_replace(
-								'#(href=["|\'])' . $images['link_url'][ $index ] . '(["|\'])#i',
+								'#(href=["|\'])' . preg_quote( $images['link_url'][ $index ], '#' ) . '(["|\'])#i',
 								'\1' . $this->generate_url( $images['link_url'][ $index ], array( 'w' => 2560 ) ) . '\2',
 								$new_tag,
 								1
@@ -1569,6 +1581,14 @@ class ExactDN extends Page_Parser {
 					if ( $new_tag && $new_tag !== $tag ) {
 						// Replace original tag with modified version.
 						$content = \str_replace( $tag, $new_tag, $content );
+						// Check through previous replacements to see if the ExactDN URL needs to be updated.
+						foreach ( $this->replaced_images as $replaced_index => $replaced_image ) {
+							if ( $replaced_image['new'] === $src ) {
+								$this->debug_message( "updating replaced image {$replaced_image['new']} with $new_src" );
+								$this->replaced_images[ $replaced_index ]['new'] = $new_src;
+								break;
+							}
+						}
 					}
 				} elseif ( $lazy && ! empty( $placeholder_src ) && $this->validate_image_url( $placeholder_src ) ) {
 					$this->debug_message( "parsing $placeholder_src for $src" );
@@ -1645,6 +1665,9 @@ class ExactDN extends Page_Parser {
 			} // End foreach() -- of all images found in the page.
 		} // End if() -- we found images in the page at all.
 
+		// Check our preloads and see if we need to update any of them.
+		$content = $this->update_preload_images( $content );
+
 		// Process <a> elements in the page for image URLs.
 		$content = $this->filter_image_links( $content );
 
@@ -1671,7 +1694,7 @@ class ExactDN extends Page_Parser {
 		$this->debug_message( 'done parsing page' );
 		$this->filtering_the_content = false;
 
-		foreach ( $this->preload_images as $preload_index => $preload_image ) {
+		foreach ( $this->preload_images as $preload_image ) {
 			if ( ! empty( $preload_image['found'] ) ) {
 				continue;
 			}
@@ -1687,6 +1710,53 @@ class ExactDN extends Page_Parser {
 		}
 		if ( $this->filtering_the_page && $this->get_option( $this->prefix . 'debug' ) && 0 !== \strpos( $content, '{' ) && false === \strpos( '$content', '<loc>' ) ) {
 			$content .= '<!-- Easy IO processing time: ' . $this->elapsed_time . ' seconds -->';
+		}
+		return $content;
+	}
+
+	/**
+	 * Add an images to the replaced images list. Checks to see if the image is already in the list.
+	 *
+	 * @param string $orig_image The original image URL.
+	 * @param string $new_image The new image URL.
+	 */
+	public function add_image_to_replacements( $orig_image, $new_image ) {
+		if ( ! empty( $orig_image ) && ! empty( $new_image ) && $orig_image !== $new_image ) {
+			foreach ( $this->replaced_images as $replaced_image ) {
+				if ( $replaced_image['orig'] === $orig_image ) {
+					return;
+				}
+			}
+			$this->replaced_images[] = array(
+				'orig' => $orig_image,
+				'new'  => $new_image,
+			);
+		}
+	}
+
+	/**
+	 * Check the HTML to see if any <link> preload tags need to be updated still.
+	 *
+	 * @param string $content The HTML content to parse.
+	 * @return string The filtered HTML content.
+	 */
+	public function update_preload_images( $content ) {
+		$this->debug_message( '<b>' . __METHOD__ . '()</b>' );
+		foreach ( $this->preload_images as $index => $preload_image ) {
+			if ( empty( $preload_image['found'] ) ) {
+				$this->debug_message( "looking for preload image {$preload_image['url']} in replaced image list" );
+				foreach ( $this->replaced_images as $replaced_image ) {
+					if ( $replaced_image['orig'] === $preload_image['url'] ) {
+						$this->preload_images[ $index ]['found'] = true;
+						$this->debug_message( "replacing {$preload_image['url']} with {$replaced_image['new']}" );
+						$new_preload_tag = $preload_image['tag'];
+						$this->set_attribute( $new_preload_tag, 'href', \esc_url( $replaced_image['new'] ), true );
+						if ( $preload_image['tag'] !== $new_preload_tag ) {
+							$content = \str_replace( $preload_image['tag'], $new_preload_tag, $content );
+						}
+					}
+				}
+			}
 		}
 		return $content;
 	}
@@ -1968,6 +2038,17 @@ class ExactDN extends Page_Parser {
 									$this->debug_message( "replacing bg url with $bg_image" );
 									$element = \str_replace( $bg_images[ $bindex ], $bg_image, $element );
 								}
+								$preload_image = $this->is_image_preloaded( $exactdn_bg_image_url, $bg_image_url );
+								if ( $preload_image ) {
+									if ( $exactdn_bg_image_url !== $preload_image['url'] ) {
+										$this->debug_message( "replacing {$preload_image['url']} with $exactdn_bg_image_url" );
+										$new_preload_tag = $preload_image['tag'];
+										$this->set_attribute( $new_preload_tag, 'href', \esc_url( $exactdn_bg_image_url ), true );
+										if ( $preload_image['tag'] !== $new_preload_tag ) {
+											$content = \str_replace( $preload_image['tag'], $new_preload_tag, $content );
+										}
+									}
+								}
 							}
 						}
 					}
@@ -1996,6 +2077,7 @@ class ExactDN extends Page_Parser {
 		if ( $prz_match && ! empty( $prz_detail_matches[1] ) && $this->validate_image_url( $prz_detail_matches[1] ) ) {
 			$prz_thumb = $this->generate_url( $prz_detail_matches[1], \apply_filters( 'exactdn_personalizationdotcom_thumb_args', '', $prz_detail_matches[1] ) );
 			if ( $prz_thumb !== $prz_detail_matches ) {
+				$this->add_image_to_replacements( $prz_detail_matches[1], $prz_thumb );
 				$content = \str_replace( "thumbnailUrl:'{$prz_detail_matches[1]}'", "thumbnailUrl:'$prz_thumb'", $content );
 			}
 		}
@@ -2593,7 +2675,7 @@ class ExactDN extends Page_Parser {
 					} else {
 						$resize_existing = true;
 					}
-				} else {
+				} elseif ( 'full' !== $size ) {
 					$resize_existing = true;
 				}
 
@@ -2623,6 +2705,9 @@ class ExactDN extends Page_Parser {
 					$has_size_meta ? $image_args['height'] : false,
 					$intermediate,
 				);
+				if ( ! $resize_existing ) {
+					$this->add_image_to_replacements( $image_url, $image[0] );
+				}
 			} elseif ( \is_array( $size ) ) {
 				// Pull width and height values from the provided array, if possible.
 				$width  = isset( $size[0] ) && $size[0] < 9999 ? (int) $size[0] : false;
@@ -2802,12 +2887,16 @@ class ExactDN extends Page_Parser {
 				continue;
 			}
 
-			$url = $source['url'];
+			$url  = $source['url'];
+			$args = array();
+			if ( false !== strpos( $image_src, 'crop=1' ) && false === strpos( $url, 'crop=1' ) ) {
+				$args['crop'] = 1;
+			}
 
 			list( $width, $height ) = $this->get_dimensions_from_filename( $url );
 			if ( ! $resize_existing && 'w' === $source['descriptor'] && (int) $source['value'] === (int) $width ) {
 				$this->debug_message( "preventing further processing for $url" );
-				$sources[ $i ]['url'] = $this->generate_url( $source['url'] );
+				$sources[ $i ]['url'] = $this->generate_url( $source['url'], $args );
 				continue;
 			}
 
@@ -2816,7 +2905,7 @@ class ExactDN extends Page_Parser {
 					( ! $height && ! $width && (int) $image_meta['width'] === (int) $source['value'] )
 				) {
 					$this->debug_message( "preventing further processing for (detected) full-size $url" );
-					$sources[ $i ]['url'] = $this->generate_url( $source['url'] );
+					$sources[ $i ]['url'] = $this->generate_url( $source['url'], $args );
 					continue;
 				}
 			}
@@ -4253,6 +4342,11 @@ class ExactDN extends Page_Parser {
 			$more_args['sharp'] = 1;
 		} elseif ( $this->get_option( $this->prefix . 'sharpen' ) ) {
 			$more_args['sharp'] = 1;
+		}
+
+		// Support WordPress.com crop=1 query parameter.
+		if ( \strpos( $image_url, 'crop=1' ) ) {
+			$more_args['crop'] = 1;
 		}
 
 		// Merge given args with the automatic (option-based) args, and also makes sure args is an array if it was previously a string.

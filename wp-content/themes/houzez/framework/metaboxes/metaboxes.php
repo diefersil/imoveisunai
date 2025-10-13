@@ -294,7 +294,7 @@ if ( !function_exists( 'houzez_invoice_meta' ) ) :
 				<strong>
 					<?php
 					$user_info = get_userdata($fave_meta['invoice_buyer_id']);
-					echo esc_attr($user_info->display_name);
+					echo $user_info ? esc_attr($user_info->display_name) : 'N/A';
 					?>
 				</strong>
 			</div>
@@ -305,7 +305,7 @@ if ( !function_exists( 'houzez_invoice_meta' ) ) :
 			<div class="fave-inline-block-wrap">
 				<strong>
 					<?php
-					echo esc_attr($user_info->user_email);
+					echo $user_info ? esc_attr($user_info->user_email) : 'N/A';
 					?>
 				</strong>
 			</div>
@@ -486,7 +486,7 @@ if ( !function_exists( 'houzez_user_packages_meta' ) ) :
 		<div class="favethemes_meta_control">
 			<p class="fave-inline-block-wrap"><span class="fave_meta_title"><?php esc_html_e( 'Username:', 'houzez' ); ?></span></p>
 			<div class="fave-inline-block-wrap">
-				<strong> <?php echo esc_attr( $user_info->display_name ); ?> </strong>
+				<strong> <?php echo $user_info ? esc_attr($user_info->display_name) : 'N/A'; ?> </strong>
 			</div>
 		</div>
 

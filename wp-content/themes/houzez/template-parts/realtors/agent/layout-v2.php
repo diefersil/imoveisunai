@@ -65,7 +65,7 @@ $records_found = $agents_query->found_posts;
                     } 
                 }?>
 
-                <div class="agents-grid-view agents-grid-view-4cols">
+                <div class="agents-grid-view row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     <?php
                     if ( $agents_query->have_posts() ) :
                     while ( $agents_query->have_posts() ) : $agents_query->the_post();
@@ -75,7 +75,7 @@ $records_found = $agents_query->found_posts;
                     endwhile;
                     
                     else:
-                        get_template_part('template-parts/realtors/agent/none');
+                        get_template_part('template-parts/realtors/realtor-none');
                     endif;
                     ?>
                 </div><!-- listing-view -->

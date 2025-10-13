@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -320,6 +319,46 @@ class Houzez_Elementor_Grids extends Widget_Base {
             [
                 'label'     => esc_html__( 'Styling', 'houzez-theme-functionality' ),
                 'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_responsive_control(
+            'grid-gap',
+            [
+                'label' => esc_html__( 'Grid Gap', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem' ],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 50,
+                        'step' => .5,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .taxonomy-grids-module-grid' => 'grid-gap: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'image_border_radius',
+            [
+                'label' => esc_html__( 'Image Radius', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors' => [
+                    '{{WRAPPER}} .taxonomy-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'title_subtitle_styles',
+            [
+                'label' => esc_html__( 'Title & Subtitle', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
             ]
         );
 

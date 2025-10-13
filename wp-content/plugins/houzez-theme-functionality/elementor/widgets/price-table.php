@@ -180,9 +180,9 @@ class Houzez_Elementor_Price_Table extends Widget_Base {
                     'package_data' => 'custom',
                 ],
                 'default' => '<ul class="list-unstyled">
-    <li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Time Period: <strong>10 days</strong></li>
-    <li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Properties: <strong>2</strong></li>
-    <li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Featured Listings: <strong>2</strong></li>
+    <li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Time Period: <strong>10 days</strong></li>
+    <li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Properties: <strong>2</strong></li>
+    <li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Featured Listings: <strong>2</strong></li>
 </ul>',
             ]
             

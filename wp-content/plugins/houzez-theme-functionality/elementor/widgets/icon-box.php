@@ -342,7 +342,9 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .text-with-icon-item .houzez-icon' => 'font-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .text-with-icon-item .houzez-icon svg' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .text-with-icon-item .icon-thumb' => 'min-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .text-with-icon-item .icon-thumb img' => 'min-width: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -378,6 +380,8 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .text-with-icon-item .houzez-icon i' => 'transform: rotate({{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}} .text-with-icon-item .houzez-icon svg' => 'transform: rotate({{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}} .text-with-icon-item .houzez-icon img' => 'transform: rotate({{SIZE}}{{UNIT}});',
                 ],
             ]
         );
@@ -514,15 +518,13 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
         $icon_boxes_style = $settings['icon_boxes_style'];
         $icon_boxes_columns = $settings['icon_boxes_columns'];
 
-        $columns_class = "module-3cols";
+        $columns_class = "row-cols-1 row-cols-md-2 row-cols-lg-3 g-0";
         if($icon_boxes_columns == 'four_columns') {
-            $columns_class = "module-4cols";
+            $columns_class = "row-cols-1 row-cols-md-2 row-cols-lg-4 g-0";
         }
-
-        if( $icon_boxes_style == 'style3' ) { $no_margin = ''; } else { $no_margin = 'no-margin'; }
         ?>
 
-        <div class="text-with-icons-module <?php echo esc_attr($columns_class); ?> clearfix">
+        <div class="text-with-icons-module row <?php echo esc_attr($columns_class); ?>">
             <?php
             foreach (  $settings['icon_boxes'] as $index => $icon_box ) { 
                 $read_more_link = $icon_box['read_more_link']['url'];
@@ -553,30 +555,21 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
                     if($icon_boxes_style == 'style_one') {
                     ?>
 
-                        <div class="text-with-icon-item text-with-icon-item-v1">
-                            <div class="icon-thumb">
+                        <div class="text-with-icon-item text-with-icon-item-v1 text-center">
+                            <div class="houzez-icon icon-thumb">
             
                                 <?php
                                 if( $icon_type == "fontawesome_icon" ) { ?>
-                                    <div class="houzez-icon">
-                                        <i class="<?php echo esc_attr($icon_fontawesome); ?>"></i>
-                                    </div>
+                                    <i class="<?php echo esc_attr($icon_fontawesome); ?>"></i>
                                 <?php 
                                 } else if( $icon_type == "fontawesome_icon_n" ) {
                                     
                                     if ( ! empty( $icon_box['icon'] ) || ( ! empty( $icon_box['selected_icon']['value'] ) && $is_new ) ) {
 
-                                        if ( $is_new || $migrated ) { ?>
-                                            
-                                            <div class="houzez-icon">
-                                                <?php Icons_Manager::render_icon( $icon_box['selected_icon'], [ 'aria-hidden' => 'true' ] ); ?>
-                                            </div>
-
-                                        <?php
+                                        if ( $is_new || $migrated ) { 
+                                            Icons_Manager::render_icon( $icon_box['selected_icon'], [ 'aria-hidden' => 'true' ] );
                                         } else { ?>
-                                                <div class="houzez-icon">
-                                                    <i class="<?php echo esc_attr( $icon_box['icon'] ); ?>" aria-hidden="true"></i>
-                                                </div>
+                                            <i class="<?php echo esc_attr( $icon_box['icon'] ); ?>" aria-hidden="true"></i>
                                         <?php }
                                     }
 
@@ -606,27 +599,18 @@ class Houzez_Elementor_Icon_Box extends Widget_Base {
 
                     <div class="text-with-icon-item text-with-icon-item-v2">
                         <div class="d-flex">
-                            <div class="icon-thumb">
+                            <div class="houzez-icon icon-thumb">
                                 <?php
                                 if( $icon_type == "fontawesome_icon" ) { ?>
-                                    <div class="houzez-icon">
-                                        <i class="<?php echo esc_attr($icon_fontawesome); ?>"></i>
-                                    </div>
+                                    <i class="<?php echo esc_attr($icon_fontawesome); ?>"></i>
                                 <?php } else if( $icon_type == "fontawesome_icon_n" ) {
                                     
                                     if ( ! empty( $icon_box['icon'] ) || ( ! empty( $icon_box['selected_icon']['value'] ) && $is_new ) ) {
 
-                                        if ( $is_new || $migrated ) { ?>
-                                            
-                                            <div class="houzez-icon">
-                                                <?php Icons_Manager::render_icon( $icon_box['selected_icon'], [ 'aria-hidden' => 'true' ] ); ?>
-                                            </div>
-
-                                        <?php
+                                        if ( $is_new || $migrated ) { 
+                                            Icons_Manager::render_icon( $icon_box['selected_icon'], [ 'aria-hidden' => 'true' ] );
                                         } else { ?>
-                                                <div class="houzez-icon">
-                                                    <i class="<?php echo esc_attr( $icon_box['icon'] ); ?>" aria-hidden="true"></i>
-                                                </div>
+                                            <i class="<?php echo esc_attr( $icon_box['icon'] ); ?>" aria-hidden="true"></i>
                                         <?php }
                                     }
 

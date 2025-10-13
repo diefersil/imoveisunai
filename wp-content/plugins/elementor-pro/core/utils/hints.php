@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Hints extends Core_Hints {
 	public static function should_show_hint( $hint_id ): bool {
 		// Check if needed functions exists - if not, require them
-		// TODO: Remove in v3.27.0 [ED-15717]
 		if ( ! function_exists( 'get_plugins' ) || ! function_exists( 'is_plugin_active' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
@@ -70,6 +69,26 @@ class Hints extends Core_Hints {
 				self::DISMISSED => [ 'site_mailer_forms_submissions_notice', 'site_mailer_forms_email_notice' ],
 				self::CAPABILITY => 'install_plugins',
 				self::DEFINED => 'SITE_MAILER_VERSION',
+			],
+			'send_app_wc_widgets_notice' => [
+				self::DISMISSED => [ 'send_app_wc_widgets_notice' ],
+				self::CAPABILITY => 'install_plugins',
+				self::DEFINED => 'SEND_VERSION',
+			],
+			'send_app_forms_submissions_notice' => [
+				self::DISMISSED => [ 'send_app_forms_submissions_notice', 'send_app_forms_actions_notice' ],
+				self::CAPABILITY => 'install_plugins',
+				self::DEFINED => 'SEND_VERSION',
+			],
+			'send_app_forms_actions_notice' => [
+				self::DISMISSED => [ 'send_app_forms_actions_notice' ],
+				self::CAPABILITY => 'install_plugins',
+				self::DEFINED => 'SEND_VERSION',
+			],
+			'send_app_forms_triggers_notice' => [
+				self::DISMISSED => [ 'send_app_forms_triggers_notice' ],
+				self::CAPABILITY => 'install_plugins',
+				self::DEFINED => 'SEND_VERSION',
 			],
 		];
 		if ( ! $hint_key ) {

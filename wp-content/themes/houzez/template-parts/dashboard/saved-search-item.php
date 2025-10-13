@@ -1,8 +1,13 @@
 <?php
 global $houzez_search_data;
 $search_args = $houzez_search_data->query;
-$search_args_decoded = unserialize(base64_decode($search_args));
+$search_args_decoded = houzez_decode_search_data($search_args);
 $search_uri = $houzez_search_data->url;
+
+// Fix double protocol issue: Remove http:// or https:// prefix that esc_url_raw() incorrectly adds
+// The saved data should only be query parameters, not a full URL
+$search_uri = preg_replace('/^https?:\/\//', '', $search_uri);
+
 $search_page = houzez_get_template_link('template/template-search.php');
 $search_link = $search_page . '/?' . $search_uri;
 
@@ -128,15 +133,13 @@ if (!function_exists('format_range_value')) {
         }
         ?>
     </td>
-    <td class="property-table-actions" data-label="<?php esc_html_e('Actions', 'houzez'); ?>">
-        <div class="dropdown property-action-menu">
-            <button class="btn btn-primary-outlined dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <?php esc_html_e('Actions', 'houzez'); ?>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" target="_blank" href="<?php echo esc_url($search_link); ?>"><?php esc_html_e('View', 'houzez'); ?></a>
-                <a data-propertyid='<?php echo intval($houzez_search_data->id); ?>' class="remove-search dropdown-item" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
-            </div>
+    <td data-label="<?php esc_html_e('Edit','houzez'); ?>" class="text-lg-center text-start">
+        <div class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php esc_html_e('Actions','houzez'); ?>">
+            <a href="#" class="action-btn" data-bs-toggle="dropdown" aria-expanded="false"><i class="houzez-icon icon-navigation-menu-horizontal"></i></a>
+            <ul class="dropdown-menu dropdown-menu3">
+                <li><a class="dropdown-item" target="_blank" href="<?php echo esc_url($search_link); ?>"><i class="houzez-icon icon-share-2"></i> <?php esc_html_e('View','houzez'); ?></a></li>
+                <li><a class="dropdown-item remove-search" data-propertyid="<?php echo intval($houzez_search_data->id); ?>" href="#"><i class="houzez-icon icon-bin"></i> <?php esc_html_e('Delete','houzez'); ?></a></li>
+            </ul>
         </div>
     </td>
 </tr>

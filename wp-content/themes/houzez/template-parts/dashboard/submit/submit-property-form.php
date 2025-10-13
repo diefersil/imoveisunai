@@ -37,17 +37,23 @@ $allowed_html = array(
     )
 );
 
+$gallery_error_label   = esc_html__( 'Error!', 'houzez' );
+$gallery_error_message = esc_html__( 'Upload at least one image.', 'houzez' );
+
+$required_error_label   = esc_html__( 'Error!', 'houzez' );
+$required_error_message = esc_html__( 'Please fill out the following required fields.', 'houzez' );
+
 if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
 
     if (!houzez_is_admin() && $enable_paid_submission == 'membership' && $remaining_listings != -1 && $remaining_listings < 1 && is_user_logged_in() ) {
 
-        echo '<div class="dashboard-content-block-wrap">
-                <div class="dashboard-content-block">';
+        echo '<div class="block-wrap">
+                <div class="block-content-wrap">';
         if (!houzez_user_has_membership($userID)) {
-            print '<p>' . esc_html__("You don't have any package! You need to buy your package.", 'houzez') . '</p>
+            print '<p class="mb-3">' . esc_html__("You don't have any package! You need to buy your package.", 'houzez') . '</p>
                     <a class="btn btn-primary" href="' . $select_packages_link . '">' . esc_html__('Get Package', 'houzez') . '</a>';
         } else {
-            print '<p>' . esc_html__("Your current package doesn\'t let you publish more properties! You need to upgrade your membership.", 'houzez') . '</p>
+            print '<p class="mb-3">' . esc_html__("Your current package doesn't let you publish more properties! You need to upgrade your membership.", 'houzez') . '</p>
             <a class="btn btn-primary" href="' . $select_packages_link . '">' . esc_html__('Upgrade Package', 'houzez') . '</a>';
         }
         echo '</div>
@@ -58,24 +64,26 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
         <form autocomplete="off" id="submit_property_form" name="new_post" method="post" action="#" enctype="multipart/form-data"
               class="add-frontend-property" novalidate>
 
-            <div class="validate-errors alert alert-danger houzez-hidden" role="alert">
-                <?php echo wp_kses(__( '<strong>Error!</strong> Please fill out the following required fields.', 'houzez' ), $allowed_html); ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="validate-errors alert alert-danger alert-dismissible fade show houzez-hidden" role="alert">
+                <?php printf(
+                    '<strong>%s</strong> %s',
+                    $required_error_label,
+                    $required_error_message
+                ); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="validate-errors-gal alert alert-danger houzez-hidden" role="alert">
-                <?php echo wp_kses(__( '<strong>Error!</strong> Upload at least one image.', 'houzez' ), $allowed_html); ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="validate-errors-gal alert alert-danger alert-dismissible fade show houzez-hidden" role="alert">
+                <?php printf(
+                    '<strong>%s</strong> %s',
+                    $gallery_error_label,
+                    $gallery_error_message
+                ); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <div class="dashboard-mobile-edit-menu-wrap">
-                <div class="form-group">
-                    <?php get_template_part( 'template-parts/dashboard/submit/partials/author-mobile'); ?>
-                </div>
+            <div class="d-block d-lg-none">
+                <?php get_template_part('template-parts/dashboard/submit/partials/author-mobile'); ?>
             </div>
 
             <?php
@@ -165,36 +173,37 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             <?php } ?>
 
             <input type="hidden" name="prop_payment" value="not_paid"/>
-            <?php if ( !is_user_logged_in() ) { ?>
+            <?php if ( !is_user_logged_in() && $enable_paid_submission == 'membership' ) { ?>
                 <input type="hidden" name="user_submit_has_no_membership" value="yes"/>
             <?php } ?>
 
-            <div class="d-flex justify-content-between add-new-listing-bottom-nav-wrap">
+            
+            <div class="d-flex justify-content-between p-2 add-new-listing-bottom-nav-wrap">
                 <a href="<?php echo esc_url($cancel_link ); ?>" class="btn-cancel btn btn-primary-outlined">
-                    <?php echo houzez_option('fal_cancel', esc_html__('Cancel', 'houzez')); ?>    
-                </a> 
+                <?php echo houzez_option('fal_cancel', esc_html__('Cancel', 'houzez')); ?>    
+            </a> 
 
-                <?php if($show_submit_btn == 'one_step') { ?>
+            <?php if($show_submit_btn == 'one_step') { ?>
+                <button id="add_new_property" type="submit" class="btn houzez-submit-js btn-primary">
+                    <?php get_template_part('template-parts/loader'); ?>
+                    <?php echo houzez_option('fal_submit_property', esc_html__('Submit Property', 'houzez') ); ?>        
+                </button>
+            <?php } else { ?>
+                <button class="btn-back houzez-hidden btn btn-primary-outlined">
+                    <i class="houzez-icon icon-arrow-left-1 me-2"></i> <?php houzez_option('fal_back', esc_html_e('Back', 'houzez')); ?>
+                </button> 
+
+                <button class="btn-next btn btn-primary">
+                    <?php echo houzez_option('fal_next', esc_html__('Next', 'houzez')); ?> <i class="houzez-icon icon-arrow-right-1 ms-2"></i>
+                </button>   
+
+                <div class="btn-step-submit" style="display: none;">
                     <button id="add_new_property" type="submit" class="btn houzez-submit-js btn-primary">
                         <?php get_template_part('template-parts/loader'); ?>
                         <?php echo houzez_option('fal_submit_property', esc_html__('Submit Property', 'houzez') ); ?>        
                     </button>
-                <?php } else { ?>
-                    <button class="btn-back houzez-hidden btn btn-primary-outlined">
-                        <i class="houzez-icon icon-arrow-left-1 mr-2"></i> <?php houzez_option('fal_back', esc_html_e('Back', 'houzez')); ?>
-                    </button> 
-
-                    <button class="btn-next btn btn-primary">
-                        <?php echo houzez_option('fal_next', esc_html__('Next', 'houzez')); ?> <i class="houzez-icon icon-arrow-right-1 ml-2"></i>
-                    </button>   
-
-                    <div class="btn-step-submit" style="display: none;">
-                        <button id="add_new_property" type="submit" class="btn houzez-submit-js btn-primary">
-                            <?php get_template_part('template-parts/loader'); ?>
-                            <?php echo houzez_option('fal_submit_property', esc_html__('Submit Property', 'houzez') ); ?>        
-                        </button>
-                    </div>
-                <?php } ?>
+                </div>
+            <?php } ?>
             </div>
 
             

@@ -78,9 +78,9 @@ if( !function_exists('houzez_agents_grid') ) {
 
         $wp_qry = new WP_Query($args);
 
-        $columns_class = 'agents-grid-view-3cols';
+        $columns_class = 'row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-3';
         if($columns == "4") {
-            $columns_class = 'agents-grid-view-4cols';
+            $columns_class = 'row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3';
         }
 
         $main_class = 'agent-v2-grid-module';
@@ -88,15 +88,25 @@ if( !function_exists('houzez_agents_grid') ) {
             $main_class = 'agent-v3-grid-module';
         }
 
+        // Sanitize agents_layout to prevent LFI attacks
+        $allowed_layouts = array( 'agent-grid', 'agent-grid-v2' );
+        $safe_layout = houzez_sanitize_template_path( $agents_layout, $allowed_layouts );
+
+        // Fallback to default if invalid layout
+        if ( ! $safe_layout ) {
+            $safe_layout = 'agent-grid';
+        }
+
         ?>
 
         <div class="<?php echo esc_attr($main_class); ?> agents-grid-view <?php echo esc_attr($columns_class);?>">
-        
-            <?php 
-            if ($wp_qry->have_posts()): 
+
+            <?php
+            global $post;
+            if ($wp_qry->have_posts()):
                 while ($wp_qry->have_posts()): $wp_qry->the_post();
-        
-                    get_template_part('template-parts/realtors/agent/'.$agents_layout);
+
+                    get_template_part('template-parts/realtors/agent/'.$safe_layout);
 
                 endwhile;
             endif;

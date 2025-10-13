@@ -17,41 +17,29 @@ global $wpdb;
 $userID = get_current_user_id();
 
 
-get_header(); ?>
+get_header('dashboard'); ?>
 
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_messages', 'Messages'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
+<div class="dashboard-right">
 
-<section class="dashboard-content-wrap">
-    <div class="dashboard-content-inner-wrap">
-        <div class="dashboard-content-block-wrap">
-            
-            <?php
-            if ( isset( $_REQUEST['thread_id'] ) && !empty( $_REQUEST['thread_id'] ) ) {
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
 
-                get_template_part('template-parts/dashboard/messages/message-detail');
+    <div class="dashboard-content">
+        <?php
+        if ( isset( $_REQUEST['thread_id'] ) && !empty( $_REQUEST['thread_id'] ) ) {
 
-            } else {
+            get_template_part('template-parts/dashboard/messages/message-detail');
 
-                get_template_part('template-parts/dashboard/messages/messages');
+        } else {
 
-            }
+            get_template_part('template-parts/dashboard/messages/messages');
+
+        }
             ?>
+    </div>
+</div>
 
-        </div><!-- dashboard-content-block-wrap -->
-    </div><!-- dashboard-content-inner-wrap -->
-</section><!-- dashboard-content-wrap -->
-
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
-
-<?php get_footer(); ?>
+<?php get_footer('dashboard'); ?>

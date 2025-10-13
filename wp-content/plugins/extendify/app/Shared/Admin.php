@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Help Center Script loader.
  */
@@ -11,13 +12,16 @@ use Extendify\Config;
 use Extendify\PartnerData;
 use Extendify\Shared\Controllers\UserSelectionController;
 use Extendify\Shared\DataProvider\ResourceData;
+use Extendify\Shared\Services\AdminMenuList;
 use Extendify\Shared\Services\ApexDomain\ApexDomain;
 use Extendify\Shared\Services\Escaper;
+use Extendify\Shared\Services\PluginDependencies\SimplyBook;
 use Extendify\SiteSettings;
 
 /**
  * This class handles any file loading for the admin area.
  */
+
 class Admin
 {
     /**
@@ -30,8 +34,11 @@ class Admin
         \add_action('init', [$this, 'addExtraMetaFields']);
         \add_action('admin_enqueue_scripts', [$this, 'loadGlobalScripts']);
         \add_action('wp_enqueue_scripts', [$this, 'loadGlobalScripts']);
-        \add_action('admin_init', [$this, 'recordPluginsSearchTerms'], 9);
+        \add_action('wp_ajax_search-install-plugins', [$this, 'recordPluginsSearchTerms'], -1);
         \add_action('rest_api_init', [$this, 'recordBlocksSearchTerms']);
+        \add_action('wp_ajax_query-themes', [$this, 'recordThemesSearchTerms'], -1);
+        AdminMenuList::init();
+        \add_action('simplybook_activation', [SimplyBook::class, 'getIndustryCode'], 10, 0);
     }
 
     // phpcs:disable Generic.Metrics.CyclomaticComplexity.TooHigh
@@ -44,18 +51,9 @@ class Admin
     {
         \wp_enqueue_media();
 
-        $version = constant('EXTENDIFY_DEVMODE') ? uniqid() : Config::$version;
+        $this->updateUserMeta();
 
-        // Enqueue shared stylesheet if it exists in the asset manifest.
-        if (isset(Config::$assetManifest['extendify-common.css'])) {
-            \wp_enqueue_style(
-                Config::$slug . '-draft-styles',
-                EXTENDIFY_BASE_URL . 'public/build/' . Config::$assetManifest['extendify-common.css'],
-                [],
-                $version,
-                'all'
-            );
-        }
+        $version = constant('EXTENDIFY_DEVMODE') ? uniqid() : Config::$version;
 
         /**
          * Enqueue shared JavaScript files if they exist in the asset manifest
@@ -171,15 +169,19 @@ class Admin
                 'partnerLogo' => \esc_attr(PartnerData::$logo),
                 'partnerId' => \esc_attr(PartnerData::$id),
                 'partnerName' => \esc_attr(PartnerData::$name),
-                'allowedPlugins' => array_map('esc_attr', PartnerData::setting('allowedPluginsSlugs')),
-                'requiredPlugins' => Escaper::recursiveEscAttr(PartnerData::setting('requiredPlugins')),
                 'userData' => [
                     'userSelectionData' => \wp_json_encode((UserSelectionController::get()->get_data() ?? [])),
                 ],
                 'resourceData' => \wp_json_encode((new ResourceData())->getData()),
                 'showAIConsent' => isset($partnerData['showAIConsent']) ? (bool) $partnerData['showAIConsent'] : false,
-                'aiChatEnabled' => (bool) (PartnerData::setting('aiChatEnabled') || constant('EXTENDIFY_DEVMODE')),
-                'consentTermsHTML' => \wp_kses((html_entity_decode(($partnerData['consentTermsHTML'] ?? '')) ?? ''), $htmlAllowlist),
+                'showChat' => (bool) (PartnerData::setting('showChat') || constant('EXTENDIFY_DEVMODE')),
+                'showAIPageCreation' => (bool) (
+                    PartnerData::setting('showAIPageCreation') || constant('EXTENDIFY_DEVMODE')
+                ),
+                'showAILogo' => (bool) PartnerData::setting('showAILogo'),
+                'showImprint' => array_map('esc_attr', (array) PartnerData::setting('showImprint')),
+                'consentTermsCustom' => \wp_kses((html_entity_decode(($partnerData['consentTermsCustom'] ?? ''))
+                    ?? ''), $htmlAllowlist),
                 'userGaveConsent' => $userConsent ? (bool) $userConsent : false,
                 'installedPlugins' => array_map('esc_attr', array_keys(\get_plugins())),
                 'activePlugins' => array_map('esc_attr', array_values(\get_option('active_plugins', []))),
@@ -188,18 +190,45 @@ class Admin
                 'showLocalizedCopy' => (bool) array_key_exists('showLocalizedCopy', $partnerData),
                 'activity' => \wp_json_encode(\get_option('extendify_shared_activity', null)),
                 'showDraft' => isset($partnerData['showDraft']) ? (bool) $partnerData['showDraft'] : false,
-                'apexDomain' => PartnerData::setting('enableApexDomain') ? rawurlencode(ApexDomain::getApexDomain(\get_home_url())) : null,
+                'showLaunch' => Config::$showLaunch,
+                'phpVersion' => \esc_attr(PHP_VERSION),
+                'apexDomain' => PartnerData::setting('enableApexDomain')
+                    ? rawurlencode(ApexDomain::getApexDomain(\get_home_url()))
+                    : null,
+                'launchCompletedAt' => \esc_attr(\get_option('extendify_onboarding_completed', false)),
+                'showSiteQuestions' => (bool) (
+                    PartnerData::setting('showLaunchQuestions') || Config::preview('launch-questions')
+                ),
+                'showAIAgents' => (bool) (PartnerData::setting('showAIAgents') || Config::preview('ai-agent')),
+                'pluginGroupId' => Escaper::recursiveEscAttr(PartnerData::setting('pluginGroupId')),
+                'requiredPlugins' => Escaper::recursiveEscAttr(PartnerData::setting('requiredPlugins')),
+                'adminPagesMenuList' => get_option('_transient_extendify_admin_pages_menu', []),
             ]),
             'before'
         );
 
+        \wp_set_script_translations('extendify-common', 'extendify-local', EXTENDIFY_PATH . 'languages/js');
+        \wp_set_script_translations(
+            Config::$slug . '-shared-scripts',
+            'extendify-local',
+            EXTENDIFY_PATH . 'languages/js'
+        );
+
+        \wp_enqueue_style(
+            Config::$slug . '-shared-common-styles',
+            EXTENDIFY_BASE_URL . 'public/build/' . Config::$assetManifest['extendify-shared.css'],
+            [],
+            Config::$version,
+            'all'
+        );
         $cssColorVars = PartnerData::cssVariableMapping();
         $cssString = implode('; ', array_map(function ($k, $v) {
             return "$k: $v";
         }, array_keys($cssColorVars), $cssColorVars));
-        \wp_register_style(Config::$slug . '-shared-styles', '', [], $version, 'all');
-        \wp_enqueue_style(Config::$slug . '-shared-styles');
-        \wp_add_inline_style(Config::$slug . '-shared-styles', wp_strip_all_tags("body { $cssString; }"));
+        \wp_add_inline_style(
+            Config::$slug . '-shared-common-styles',
+            wp_strip_all_tags("body { $cssString; }")
+        );
     }
 
     /**
@@ -230,25 +259,17 @@ class Admin
      */
     public function recordPluginsSearchTerms()
     {
-        // Exits early if it is not an Ajax request, has no payload or invalid nonce.
-        if (!\wp_doing_ajax() || empty($_POST)) {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification.Missing
+        $searchTerm = isset($_POST['s']) ? \sanitize_text_field(\wp_unslash(urldecode($_POST['s']))) : '';
+        if (empty($searchTerm)) {
             return;
         }
 
-        if (array_key_exists( 'action', $_POST) && $_POST['action'] === 'updates' && !\check_ajax_referer('updates', '_ajax_nonce')) {
-            return;
-        }
-
-        $action = isset($_POST['action']) ? \sanitize_text_field(\wp_unslash($_POST['action'])) : '';
-        $searchTerm = isset($_POST['s']) ? \sanitize_text_field(\wp_unslash($_POST['s'])) : '';
-        // Exits early if it is not the right action or search is empty.
-        if (empty($action) || $action !== 'search-install-plugins' || empty($searchTerm)) {
-            return;
-        }
-
-        // Merges search term with existing search terms and stores it in the database.
         $searchTerms = \get_option('extendify_plugin_search_terms', []);
-        \update_option('extendify_plugin_search_terms', array_merge($searchTerms, [$searchTerm]));
+        $searchTerms[] = $searchTerm;
+        $searchTerms = array_unique($searchTerms);
+
+        \update_option('extendify_plugin_search_terms', $searchTerms);
     }
 
     /**
@@ -264,19 +285,78 @@ class Admin
             return;
         }
 
-        $wp = $GLOBALS['wp'];
-        // phpcs:ignore Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps
-        $restRoute = ($wp->query_vars['rest_route'] ?? '');
-        // phpcs:ignore Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps
-        $searchTerm = \sanitize_text_field(\wp_unslash(($wp->query_vars['term'] ?? '')));
+        // Exits early if it is not a GET request.
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] !== 'GET') {
+            return;
+        }
 
-        // Exits early if is not the blocks search route or if the search query is empty.
-        if ($restRoute !== '/wp/v2/block-directory/search' || empty($searchTerm)) {
+        $wp = $GLOBALS['wp'];
+
+        $restRoute = ($wp->query_vars['rest_route'] ?? '');
+        // Exits early if it's not the blocks search route.
+        if ($restRoute !== '/wp/v2/block-directory/search') {
+            return;
+        }
+
+        $searchTerm = \sanitize_text_field(\wp_unslash(($wp->query_vars['term'] ?? '')));
+        // Exits early if the search term is empty or is not user input.
+        if (empty($searchTerm) || str_starts_with($searchTerm, 'block:')) {
             return;
         }
 
         // Get current search term from the url and merge it with existing search terms.
         $searchTerms = \get_option('extendify_block_search_terms', []);
         \update_option('extendify_block_search_terms', array_merge($searchTerms, [$searchTerm]));
+    }
+
+    /**
+     * Updates the user meta to disable the welcome guide from the Gutenberg editor
+     * and close the pattern modal.
+     *
+     * @return void
+     */
+    public function updateUserMeta()
+    {
+        $currentPreferences = get_user_meta(get_current_user_id(), 'wp_persisted_preferences', true);
+        if (!$currentPreferences) {
+            $currentPreferences = [];
+        }
+
+        $postPreferences = array_key_exists('core/edit-post', $currentPreferences)
+            ? $currentPreferences['core/edit-post']
+            : [];
+        $corePreferences = array_key_exists('core', $currentPreferences) ? $currentPreferences['core'] : [];
+
+        $newPreferences = array_merge($currentPreferences, [
+            'core/edit-post' => array_merge($postPreferences, ['welcomeGuide' => false]),
+            'core' => array_merge($corePreferences, ['enableChoosePatternModal' => false]),
+            '_modified' => wp_date('Y-m-d\TH:i:s.v\Z'),
+        ]);
+
+        update_user_meta(get_current_user_id(), 'wp_persisted_preferences', $newPreferences);
+    }
+
+    /**
+     * Records search terms used when browsing themes in the admin interface.
+     *
+     * This method listens for the 'query-themes' AJAX action, extracts the search term
+     * from the request, and stores it in the 'extendify_theme_search_terms' option.
+     * Duplicate terms are filtered out.
+     *
+     * @return void
+     */
+    public function recordThemesSearchTerms()
+    {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.NonceVerification.Missing
+        $searchTerm = \sanitize_text_field(\wp_unslash(urldecode(($_POST['request']['search'] ?? ''))));
+        if (empty($searchTerm)) {
+            return;
+        }
+
+        $searchTerms = \get_option('extendify_theme_search_terms', []);
+        $searchTerms[] = $searchTerm;
+        $searchTerms = array_unique($searchTerms);
+
+        \update_option('extendify_theme_search_terms', $searchTerms);
     }
 }

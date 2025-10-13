@@ -1,8 +1,8 @@
 <?php global $area_prefix_default, $area_prefix_changeable; ?>
-<div class="form-group">
-	<label for="prop_land_area_prefix"><?php echo houzez_option('cl_land_size_postfix', 'Land Area Size Postfix'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="property_land_postfix"><?php echo houzez_option('cl_land_size_postfix', 'Land Area Size Postfix'); ?></label>
 
-	<input class="form-control" id="prop_land_area_prefix" name="prop_land_area_prefix" value="<?php
+	<input class="form-control" id="property_land_postfix" name="property_land_postfix" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_land_postfix');
     } else { echo esc_html($area_prefix_default); }

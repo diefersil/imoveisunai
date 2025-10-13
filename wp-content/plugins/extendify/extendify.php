@@ -1,11 +1,15 @@
 <?php
+
+// phpcs:disable Generic.Files.LineLength.TooLong
 /**
  * Plugin Name:       Extendify WordPress Onboarding and AI Assistant
  * Description:       AI-powered WordPress assistant for onboarding and ongoing editing offered exclusively through select WordPress hosting providers.
  * Plugin URI:        https://extendify.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
  * Author:            Extendify
  * Author URI:        https://extendify.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
- * Version:           1.17.1
+ * Version:           2.1.1
+ * Requires at least: 6.5
+ * Requires PHP:      7.0
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       extendify-local
@@ -21,8 +25,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
+// phpcs:enable Generic.Files.LineLength.TooLong
 
 defined('ABSPATH') || exit;
+
+use Extendify\PartnerData;
 
 /** ExtendifySdk is the previous class name used */
 if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
@@ -30,7 +37,7 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
     /**
      * The Extendify Library
      */
-    // phpcs:ignore Squiz.Classes.ClassFileName.NoMatch,Squiz.Commenting.ClassComment.Missing,PEAR.Commenting.ClassComment.Missing
+    // phpcs:ignore PSR1.Classes.ClassDeclaration.MissingNamespace
     final class Extendify
     {
         /**
@@ -47,12 +54,12 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
          */
         public function __invoke()
         {
-            // Allow users to disable the libary. The latter is left in for historical reasons.
+            // Allow users to disable the library. The latter is left in for historical reasons.
             if (!apply_filters('extendify_load_library', true) || !apply_filters('extendifysdk_load_library', true)) {
                 return;
             }
 
-            if (version_compare(PHP_VERSION, '7.0', '<') || version_compare($GLOBALS['wp_version'], '6.0', '<')) {
+            if (version_compare(PHP_VERSION, '7.0', '<') || version_compare($GLOBALS['wp_version'], '6.5', '<')) {
                 return;
             }
 
@@ -64,7 +71,6 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
                 }
             }
         }
-        // phpcs:ignore Squiz.Classes.ClassDeclaration.SpaceBeforeCloseBrace
     }
 
     add_action('plugins_loaded', function () {
@@ -77,6 +83,21 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
             \delete_transient('extendify_recommendations');
             \delete_transient('extendify_domains');
             \delete_transient('extendify_supportArticles');
+        }
+
+        // Delete the partner transient so we can fetch new data when the locale is switched.
+        if (($option === 'WPLANG') && get_transient('extendify_partner_data_cache_check')) {
+            delete_transient('extendify_partner_data_cache_check');
+            PartnerData::getPartnerData();
+        }
+    });
+
+    // Delete the partner transient so we can fetch new data when the locale is switched via WP-CLI.
+    add_action('cli_init', function () {
+        $command = sanitize_text_field(wp_unslash(($_SERVER['argv'][1] ?? '')));
+        if ($command === 'language' && get_transient('extendify_partner_data_cache_check')) {
+            delete_transient('extendify_partner_data_cache_check');
+            PartnerData::getPartnerData();
         }
     });
 
@@ -98,7 +119,12 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
     // Redirect logins to the Extendify Assist dashboard if they are an admin.
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
     \add_filter('login_redirect', function ($redirectTo, $requestedRedirectTo, $user) {
-        if (!$user || !is_a($user, 'WP_User')) {
+        // Only redirect if going to the admin page.
+        if ($redirectTo !== \admin_url()) {
+            return $redirectTo;
+        }
+
+        if (!$user || !is_a($user, 'WP_User') || !defined('EXTENDIFY_PARTNER_ID')) {
             return $redirectTo;
         }
 
@@ -110,7 +136,16 @@ if (!class_exists('ExtendifySdk') && !class_exists('Extendify')) :
         return \admin_url() . 'admin.php?page=extendify-assist';
     }, 10, 3);
 
-    // ALlow Extendify requests to have a longer timeout.
+    // Redirect to a safe place if the user doesn't have access.
+    add_action('admin_page_access_denied', function () {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if (isset($_GET['page']) && strpos(sanitize_text_field(wp_unslash($_GET['page'])), 'extendify') !== false) {
+            wp_safe_redirect(admin_url());
+            exit;
+        }
+    });
+
+    // Allow Extendify requests to have a longer timeout.
     add_filter('http_request_args', function ($args, $url) {
         if (strpos($url, 'extendify') !== false) {
             $args['timeout'] = 45;

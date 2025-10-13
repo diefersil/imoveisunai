@@ -28,7 +28,7 @@ if( !function_exists('houzez_testimonials') ) {
         );
         $testi_qry = new WP_Query($args);
 
-        $cols_class = "col-md-3";
+        $cols_class = "col-md-3 col-sm-6";
         if ($testimonials_type == 'grid_3cols') {
             $cols_class = "col-md-4";
         }
@@ -55,6 +55,7 @@ if( !function_exists('houzez_testimonials') ) {
         <?php } else { ?>
 
             <div class="testimonials-module testimonials-module-slider-v1 testimonials-module-v1">
+                <div class="testimonials-slider-wrap-v1-arrows"></div>
                 <div class="testimonials-slider-wrap-v1 houzez-all-slider-wrap">
                     <?php
                     if ($testi_qry->have_posts()): 

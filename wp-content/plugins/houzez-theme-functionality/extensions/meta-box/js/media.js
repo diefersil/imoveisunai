@@ -142,13 +142,42 @@
 		},
 
 		loadInitialAttachments: function () {
-			if ( ! this.$input.val() ) {
-				return;
-			}
-			var models = this.$input.data( 'attachments' ).map( function( attachment ) {
-				return wp.media.model.Attachment.create( attachment );
-			} );
-			this.controller.get( 'items' ).add( models );
+		    if (!this.$input.val()) {
+		        return;
+		    }
+
+		    // Get the attachments data as a string and parse it as JSON
+		    var attachmentsDataStr = this.$input.attr('data-attachments');
+		    if (!attachmentsDataStr) {
+		        console.error('Attachments data not found or is empty');
+		        return;
+		    }
+
+		    // Clean up the string to make it valid JSON
+		    attachmentsDataStr = attachmentsDataStr.replace(/"compat":\{"item":".*?"\}/g, '"compat":{"item":""}');
+
+		    // Parse the cleaned-up JSON string into an array
+		    var attachmentsData;
+		    try {
+		        attachmentsData = JSON.parse(attachmentsDataStr);
+		    } catch (e) {
+		        console.error('Error parsing attachments data as JSON:', e);
+		        return;
+		    }
+
+		    // Check if the parsed data is an array
+		    if (!Array.isArray(attachmentsData)) {
+		        console.error('Expected an array for attachments after parsing, but got:', attachmentsData);
+		        return;
+		    }
+
+		    // Map through the attachments, filtering out any that have problematic structures
+		    var models = attachmentsData.map(function (attachment) {
+		        return wp.media.model.Attachment.create(attachment);
+		    });
+
+		    // Add the valid models to the collection
+		    this.controller.get('items').add(models);
 		},
 
 		// Creates media list

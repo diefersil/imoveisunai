@@ -13,6 +13,5 @@ if (is_plugin_active('revslider/revslider.php')) {
 		}
 		?>
     </section><!-- slider-revolution-wrap -->
-    
 <?php
 }?>

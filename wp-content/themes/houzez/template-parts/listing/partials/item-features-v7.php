@@ -1,4 +1,4 @@
-<ul class="item-amenities <?php echo houzez_v1_4_meta_type(); ?>">
+<ul class="item-amenities <?php echo houzez_v1_4_meta_type(); ?> d-flex flex-wrap align-items-center gap-2" role="list">
 	<?php
 	$listing_data_composer = houzez_option('listing_data_composer');
 	// Ensure 'enabled' key exists in the array and is an array itself
@@ -16,17 +16,17 @@
 				$custom_field_value = houzez_get_listing_data($key);
 				$output = '';
 				if( $custom_field_value != '' ) { 
-					$output .= '<li class="h-'.$key.'">';
+					$output .= '<li class="h-'.$key.' d-flex align-items-center me-1" role="listitem">';
 
 						if(houzez_option('icons_type') == 'font-awesome') {
-							$output .= '<i class="'.houzez_option('fa_'.$key).' mr-1"></i>';
+							$output .= '<i class="'.houzez_option('fa_'.$key).' me-2"></i>';
 
 						} elseif (houzez_option('icons_type') == 'custom') {
 							$cus_icon = houzez_option($key);
 							if(!empty($cus_icon['url'])) {
 
 								$alt = isset($cus_icon['title']) ? $cus_icon['title'] : '';
-								$output .= '<img class="img-fluid mr-1" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
+								$output .= '<img class="img-fluid me-2" src="'.esc_url($cus_icon['url']).'" width="18" height="18" alt="'.esc_attr($alt).'">';
 							}
 						}
 						

@@ -2,6 +2,7 @@
 global $houzez_local;
 
 $userID = get_current_user_id();
+$dashboard_link = houzez_get_template_link_2('template/user_dashboard.php');
 $dash_profile_link = houzez_get_template_link_2('template/user_dashboard_profile.php');
 $dashboard_insight = houzez_get_template_link_2('template/user_dashboard_insight.php');
 $dashboard_properties = houzez_get_template_link_2('template/user_dashboard_properties.php');
@@ -14,6 +15,7 @@ $dashboard_membership = houzez_get_template_link_2('template/user_dashboard_memb
 $dashboard_gdpr = houzez_get_template_link_2('template/user_dashboard_gdpr.php');
 $dashboard_seen_msgs = add_query_arg( 'view', 'inbox', $dashboard_msgs );
 $dashboard_unseen_msgs = add_query_arg( 'view', 'sent', $dashboard_msgs );
+$dashboard_verification = add_query_arg( 'hpage', 'verification', $dash_profile_link );
 
 $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
 $crm_leads = add_query_arg( 'hpage', 'leads', $dashboard_crm );
@@ -24,31 +26,56 @@ $crm_activities = add_query_arg( 'hpage', 'activities', $dashboard_crm );
 $home_link = home_url('/');
 $enable_paid_submission = houzez_option('enable_paid_submission');
 
-$parent_crm = $parent_props = $parent_agents = $ac_crm = $ac_insight = $ac_profile = $ac_props = $ac_add_prop = $ac_fav = $ac_search = $ac_invoices = $ac_msgs = $ac_mem = $ac_gdpr = '';
-if( is_page_template( 'template/user_dashboard_profile.php' ) ) {
-    $ac_profile = 'class=active';
+// Initialize all active state variables
+$parent_crm = $parent_props = $parent_agents = '';
+$ac_crm = $ac_insight = $ac_profile = $ac_props = $ac_add_prop = $ac_fav = $ac_search = $ac_invoices = $ac_msgs = $ac_mem = $ac_gdpr = $ac_verification = '';
+$ac_dashboard = $ac_activities = $ac_deals = $ac_leads = $ac_inquiries = '';
+
+// Set active states based on current page
+if( is_page_template( 'template/user_dashboard.php' ) ) {
+    $ac_dashboard = 'active';
+} elseif( is_page_template( 'template/user_dashboard_profile.php' ) ) {
+    $ac_profile = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_properties.php' ) ) {
-    $ac_props = 'class=active';
+    $ac_props = 'active';
     $parent_props = "side-menu-parent-selected";
 } elseif ( is_page_template( 'template/user_dashboard_submit.php' ) ) {
-    $ac_add_prop = 'class=active';
+    $ac_add_prop = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_saved_search.php' ) ) {
-    $ac_search = 'class=active';
+    $ac_search = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_favorites.php' ) ) {
-    $ac_fav = 'class=active';
+    $ac_fav = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_invoices.php' ) ) {
-    $ac_invoices = 'class=active';
+    $ac_invoices = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_messages.php' ) ) {
-    $ac_msgs = 'class=active';
+    $ac_msgs = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_membership.php' ) ) {
-    $ac_mem = 'class=active';
+    $ac_mem = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_gdpr.php' ) ) {
-    $ac_gdpr = 'class=active';
+    $ac_gdpr = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_insight.php' ) ) {
-    $ac_insight = 'class=active';
+    $ac_insight = 'active';
 } elseif ( is_page_template( 'template/user_dashboard_crm.php' ) ) {
-    $ac_crm = 'class=active';
+    $ac_crm = 'active';
     $parent_crm = "side-menu-parent-selected";
+    
+    // Set active states for CRM sub-pages
+    if( isset($_GET['hpage']) ) {
+        switch($_GET['hpage']) {
+            case 'activities':
+                $ac_activities = 'active';
+                break;
+            case 'deals':
+                $ac_deals = 'active';
+                break;
+            case 'leads':
+                $ac_leads = 'active';
+                break;
+            case 'enquiries':
+                $ac_inquiries = 'active';
+                break;
+        }
+    }
 }
 
 $agency_agents = add_query_arg( 'agents', 'list', $dash_profile_link );
@@ -90,13 +117,14 @@ if( isset( $_GET['prop_status'] ) && $_GET['prop_status'] == 'approved' ) {
 
 if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
     $ac_agents = 'class=active';
-    $parent_agents = "side-menu-parent-selected";
     $ac_profile = '';
 } elseif( isset( $_GET['agents'] ) && $_GET['agents'] == 'add_new' ) {
     $ac_agents = 'class=active';
     $ac_agent_new = 'class=active';
     $ac_profile = '';
-    $parent_agents = "side-menu-parent-selected";
+} elseif( isset( $_GET['hpage'] ) && $_GET['hpage'] == 'verification' ) {
+    $ac_verification = 'active';
+    $ac_profile = '';
 }
 
 $all_post_count = houzez_user_posts_count('any');
@@ -106,215 +134,221 @@ $draft_post_count = houzez_user_posts_count('draft');
 $on_hold_post_count = houzez_user_posts_count('on_hold');
 $disapproved_post_count = houzez_user_posts_count('disapproved');
 $expired_post_count = houzez_user_posts_count('expired');
+
+$houzez_check_role = houzez_check_role();
 ?>
 
-<ul class="side-menu list-unstyled">
-	<?php
+<div class="sidebar-nav">
+    <?php if ( !is_user_logged_in() ) { ?>
 
-	$side_menu = '';
+        <div class="nav-box">
+            <ul>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_favorites); ?>" class="<?php echo esc_attr($ac_fav); ?>">
+                        <i class="houzez-icon icon-love-it"></i>
+                        <span><?php echo houzez_option('dsh_favorite', 'Favourites'); ?></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-	if ( !is_user_logged_in() ) {
+    <?php } else { ?>
 
-		if( !empty( $dashboard_favorites ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_fav ).' href="'.esc_url($dashboard_favorites).'">
-						<i class="houzez-icon icon-love-it mr-2"></i> '.houzez_option('dsh_favorite', 'Favorites').'
-					</a>
-				</li>';
-	    }
+        <?php if( $houzez_check_role ): ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_overview', 'Overview'); ?></h5>
+            <ul>
+                <?php if( !empty( $dashboard_link ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_link); ?>" class="<?php echo esc_attr($ac_dashboard); ?>">
+                        <i class="houzez-icon icon-gauge-dashboard-1"></i>
+                        <span><?php echo houzez_option('dsh_dashboard', 'Dashboard'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
+                <?php if( !empty( $dashboard_crm ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($crm_activities); ?>" class="<?php echo esc_attr($ac_activities); ?>">
+                        <i class="houzez-icon icon-list-to-do"></i>
+                        <span><?php echo houzez_option('dsh_activities', 'Activities'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
+                <?php if( !empty( $dashboard_insight ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_insight); ?>" class="<?php echo esc_attr($ac_insight); ?>">
+                        <i class="houzez-icon icon-analytics-pie-1"></i>
+                        <span><?php echo houzez_option('dsh_insight', 'Insights'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
 
-	} else {
+        <?php if( $houzez_check_role && !empty( $dashboard_crm ) ): ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_crm', 'CRM'); ?></h5>
+            <ul>
+                <li>
+                    <a href="<?php echo esc_url($crm_deals); ?>" class="<?php echo esc_attr($ac_deals); ?>">
+                        <i class="houzez-icon icon-business-contract-handshake-sign"></i>
+                        <span><?php echo houzez_option('dsh_deals', 'Deals'); ?></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo esc_url($crm_leads); ?>" class="<?php echo esc_attr($ac_leads); ?>">
+                        <i class="houzez-icon icon-single-neutral-flag-2"></i>
+                        <span><?php echo houzez_option('dsh_leads', 'Leads'); ?></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo esc_url($crm_enquiries); ?>" class="<?php echo esc_attr($ac_inquiries); ?>">
+                        <i class="houzez-icon icon-single-neutral-question"></i>
+                        <span><?php echo houzez_option('dsh_inquiries', 'Inquiries'); ?></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <?php endif; ?>
 
-		if( houzez_option('dsh_home_btn', 0) == 1 ) {
-			$side_menu .= '<li class="side-menu-item">
-				<a href="'.esc_url( home_url( '/' ) ).'"><i class="houzez-icon icon-house mr-2"></i> '.houzez_option('dsh_home', 'Home').'</a>
-			</li>';
-		}
+        <?php if( ($houzez_check_role && (!empty( $dashboard_properties ) || !empty( $dashboard_add_listing ))) || !empty( $dashboard_favorites ) ): ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_props', 'Properties'); ?></h5>
+            <ul>
+                <?php if( $houzez_check_role && !empty( $dashboard_properties ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_properties); ?>" class="<?php echo esc_attr($ac_props); ?>">
+                        <i class="houzez-icon icon-building-cloudy"></i>
+                        <span><?php echo houzez_option('dsh_props', 'Properties'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-		if( !empty( $dashboard_crm ) && houzez_check_role() ) {
-			$crm_menu = '';
-			$crm_menu .= '<li class="side-menu-item '.esc_attr($parent_crm).'">';
-					$crm_menu .= '<a '.$ac_crm.' href="'.esc_url($dashboard_crm).'">
-						<i class="houzez-icon icon-layout-dashboard mr-2"></i> '.houzez_option('dsh_board', 'Board').'
-					</a>';
+                <?php if( $houzez_check_role && !empty( $dashboard_add_listing ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_add_listing); ?>" class="<?php echo esc_attr($ac_add_prop); ?>">
+                        <i class="houzez-icon icon-add-circle"></i>
+                        <span><?php echo houzez_option('dsh_create_listing', 'Create a Listing'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-					$crm_menu .= '<ul class="side-menu-dropdown list-unstyled">';
-						
-						$crm_menu .= '<li class="side-menu-item link-activities">
-							<a href="'.esc_url($crm_activities).'"><i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_activities', 'Activities').'</a>
-						</li>';
-						$crm_menu .= '<li class="side-menu-item link-deals">
-							<a href="'.esc_url($crm_deals).'"><i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_deals', 'Deals').'</a>
-						</li>';
-						$crm_menu .= '<li class="side-menu-item link-leads">
-							<a href="'.esc_url($crm_leads).'"><i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_leads', 'Leads').'</a>
-						</li>';
+                <?php if( !empty( $dashboard_favorites ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_favorites); ?>" class="<?php echo esc_attr($ac_fav); ?>">
+                        <i class="houzez-icon icon-love-it"></i>
+                        <span><?php echo houzez_option('dsh_favorite', 'Favourites'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
 
-						$crm_menu .= '<li class="side-menu-item link-inquiries">
-							<a href="'.esc_url($crm_enquiries).'"><i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_inquiries', 'Inquiries').'</a>
-						</li>';
+        <?php if( !empty( $dash_profile_link ) && ( houzez_is_agency() ) ) : ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_team', 'Team'); ?></h5>
+            <ul>
+                <li>
+                    <a href="<?php echo esc_url($agency_agents); ?>" class="<?php echo esc_attr($ac_agents); ?>">
+                        <i class="houzez-icon icon-multiple-man-woman-1"></i>
+                        <span><?php echo houzez_option('dsh_agents', 'Agents'); ?></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo esc_url($agency_agent_add); ?>" class="<?php echo esc_attr($ac_agent_new); ?>">
+                        <i class="houzez-icon icon-single-neutral-actions-add"></i>
+                        <span><?php echo houzez_option('dsh_addnew', 'Add New Agent'); ?></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <?php endif; ?>
 
-					$crm_menu .= '</ul>';
-			$crm_menu .= '</li>';
+        <?php if( (!empty($dashboard_membership) && $enable_paid_submission == 'membership' && $houzez_check_role && ! houzez_is_admin()) || !empty($dashboard_search) || (!empty( $dashboard_invoices ) && $houzez_check_role) || !empty( $dashboard_msgs ) ): ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_other', 'Other'); ?></h5>
+            <ul>
+                <?php if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && $houzez_check_role && ! houzez_is_admin()): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_membership); ?>" class="<?php echo esc_attr($ac_mem); ?>">
+                        <i class="houzez-icon icon-task-list-text-1"></i>
+                        <span><?php echo houzez_option('dsh_membership', 'Membership'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-			$side_menu .= $crm_menu;
-		}
+                <?php if( !empty($dashboard_search) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_search); ?>" class="<?php echo esc_attr($ac_search); ?>">
+                        <i class="houzez-icon icon-search"></i>
+                        <span><?php echo houzez_option('dsh_saved_searches', 'Saved Searches'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-		if( !empty( $dashboard_insight ) && houzez_check_role() ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.$ac_insight.' href="'.esc_url($dashboard_insight).'">
-						<i class="houzez-icon icon-analytics-bars mr-2"></i> '.houzez_option('dsh_insight', 'Insight').'
-					</a>
-				</li>';
-		}
+                <?php if( !empty( $dashboard_invoices ) && $houzez_check_role ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_invoices); ?>" class="<?php echo esc_attr($ac_invoices); ?>">
+                        <i class="houzez-icon icon-accounting-document"></i>
+                        <span><?php echo houzez_option('dsh_invoices', 'Invoices'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
 
-		if( !empty( $dashboard_properties ) && houzez_check_role() ) {
-			$properties_menu = '';
-			$properties_menu .= '<li class="side-menu-item '.esc_attr($parent_props).'">
-					<a '.esc_attr( $ac_props ).' href="'.esc_url($dashboard_properties).'">
-						<i class="houzez-icon icon-building-cloudy mr-2"></i> '.houzez_option('dsh_props', 'Properties').'
-					</a>';
-					$properties_menu .= '<ul class="side-menu-dropdown list-unstyled">';
-						
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_all ).' href="'.esc_url($all).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_all', 'all').' ('.$all_post_count.')
-							</a>
-						</li>';
+                <?php if( !empty( $dashboard_msgs ) ): ?>
+                <li>
+                    <a href="<?php echo esc_url($dashboard_msgs); ?>" class="<?php echo esc_attr($ac_msgs); ?>">
+                        <i class="houzez-icon icon-messages-bubble"></i>
+                        <span><?php echo houzez_option('dsh_messages', 'Messages'); ?></span>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
 
-						if( houzez_can_manage() || houzez_is_editor() ) {
-							$mine_post_count = houzez_user_posts_count('any', $mine = true);
-							$properties_menu .= '<li class="side-menu-item">
-									<a '.esc_attr( $ac_mine ).' href="'.esc_url($mine_link).'">
-										<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_mine', 'Mine').' ('.$mine_post_count.')
-									</a>
-								</li>';
-						}
+        <?php if( !empty( $dash_profile_link ) || !empty($dashboard_gdpr) || true ): // Always show Account section because Logout is always available ?>
+        <div class="nav-box">
+            <h5><?php echo houzez_option('dsh_account', 'Account'); ?></h5>
+            <ul>
+                <?php if( !empty( $dash_profile_link ) ): ?>
+                    <li>
+                        <a href="<?php echo esc_url($dash_profile_link); ?>" class="<?php echo esc_attr($ac_profile); ?>">
+                            <i class="houzez-icon icon-single-neutral-circle"></i>
+                            <span><?php echo houzez_option('dsh_profile', 'My Profile'); ?></span>
+                        </a>
+                    </li>
 
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_approved ).' href="'.esc_url($approved).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_published', 'published').' ('.$publish_post_count.')
-							</a>
-						</li>';
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_pending ).' href="'.esc_url($pending).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_pending', 'pending').' ('.$pending_post_count.')
-							</a>
-						</li>';
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_expired ).' href="'.esc_url($expired).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_expired', 'expired').' ('.$expired_post_count.')
-							</a>
-						</li>';
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_draft ).' href="'.esc_url($draft).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_draft', 'draft').' ('.$draft_post_count.')
-							</a>
-						</li>';
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_on_hold ).' href="'.esc_url($on_hold).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_hold', 'On hold').' ('.$on_hold_post_count.')
-							</a>
-						</li>';
-						$properties_menu .= '<li class="side-menu-item">
-							<a '.esc_attr( $ac_disapproved ).' href="'.esc_url($disapproved).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_disapproved', 'Disapproved').' ('.$disapproved_post_count.')
-							</a>
-						</li>';
-					$properties_menu .= '</ul>';
-				$properties_menu .= '</li>';
+                    <?php if( (houzez_is_agency() || houzez_is_agent() || houzez_is_owner() ) && houzez_option('enable_user_verification', 0) ) : ?>
+                    <li>
+                        <a href="<?php echo esc_url($dashboard_verification); ?>" class="<?php echo esc_attr($ac_verification); ?>">
+                            <i class="houzez-icon icon-check-circle-1"></i>
+                            <span><?php echo houzez_option('dsh_verification', 'Verification'); ?></span>
+                        </a>
+                    </li>
+                    <?php endif; ?>
 
-				$side_menu .= $properties_menu;
-	    }
+                <?php endif; ?>
 
-		if( !empty( $dashboard_add_listing ) && houzez_check_role() ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_add_prop ).' href="'.esc_url($dashboard_add_listing).'">
-						<i class="houzez-icon icon-add-circle mr-2"></i> '.houzez_option('dsh_create_listing', 'Create a Listing').'
-					</a>
-				</li>';
-	    }
+                <?php if (!empty($dashboard_gdpr)) : ?>
+                    <li>
+                        <a href="<?php echo esc_url($dashboard_gdpr); ?>" class="<?php echo esc_attr($ac_gdpr); ?>">
+                            <i class="houzez-icon icon-settings-gear-64-1"></i>
+                            <span><?php echo houzez_option('dsh_gdpr', 'GDPR Data Request'); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
 
-		if( !empty( $dashboard_favorites ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_fav ).' href="'.esc_url($dashboard_favorites).'">
-						<i class="houzez-icon icon-love-it mr-2"></i> '.houzez_option('dsh_favorite', 'Favorites').'
-					</a>
-				</li>';
-	    }
-
-		if( !empty( $dashboard_search ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_search ).' href="'.esc_url($dashboard_search).'">
-						<i class="houzez-icon icon-search mr-2"></i> '.houzez_option('dsh_saved_searches', 'Saved Searches').'
-					</a>
-				</li>';
-	    }
-
-
-		if( !empty($dashboard_membership) && $enable_paid_submission == 'membership' && houzez_check_role() && ! houzez_is_admin() ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr($ac_mem).' href="'.esc_attr($dashboard_membership).'">
-						<i class="houzez-icon icon-task-list-text-1 mr-2"></i> '.houzez_option('dsh_membership', 'Membership').'
-					</a>
-				</li>';
-	    }
-
-		if( !empty( $dashboard_invoices ) && houzez_check_role() ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr(  $ac_invoices ).' href="'.esc_url($dashboard_invoices).'">
-						<i class="houzez-icon icon-accounting-document mr-2"></i> '.houzez_option('dsh_invoices', 'Invoices').'
-					</a>
-				</li>';
-	    }
-
-	    if( !empty( $dashboard_msgs ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr(  $ac_msgs ).' href="'.esc_url($dashboard_msgs).'">
-						<i class="houzez-icon icon-messages-bubble mr-2"></i> '.houzez_option('dsh_messages', 'Messages').'
-					</a>
-				</li>';
-	    }
-
-	    if( !empty( $dash_profile_link ) && ( houzez_is_agency() ) ) {
-			$side_menu .= '<li class="side-menu-item '.esc_attr($parent_agents).'">
-					<a '.esc_attr( $ac_agents ).' href="'.esc_url($agency_agents).'">
-						<i class="houzez-icon icon-single-neutral mr-2"></i> '.houzez_option('dsh_agents', 'Agents').'
-					</a>
-					<ul class="side-menu-dropdown list-unstyled">
-						<li class="side-menu-item">
-							<a '.esc_attr( $ac_agent_new ).' href="'.esc_url($agency_agent_add).'">
-								<i class="houzez-icon icon-arrow-right-1"></i> '.houzez_option('dsh_addnew', 'Add New').'
-							</a>
-						</li>
-					</ul>
-				</li>';
-	    }
-
-		if( !empty( $dash_profile_link ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_profile ).' href="'.esc_url($dash_profile_link).'">
-						<i class="houzez-icon icon-single-neutral-circle mr-2"></i> '.houzez_option('dsh_profile', 'My profile').'
-					</a>
-				</li>';	
-		}
-
-		if( !empty( $dashboard_gdpr ) ) {
-			$side_menu .= '<li class="side-menu-item">
-					<a '.esc_attr( $ac_gdpr ).' href="'.esc_url($dashboard_gdpr).'">
-						<i class="houzez-icon icon-single-neutral-circle mr-2"></i> '.houzez_option('dsh_gdpr', 'GDPR Request').'
-					</a>
-				</li>';	
-		}
-
-	    $side_menu .= '<li class="side-menu-item">
-				<a href="' . wp_logout_url( home_url() ) . '">
-					<i class="houzez-icon icon-lock-5 mr-2"></i> '.houzez_option('dsh_logout', 'Log out').'
-				</a>
-			</li>';
-
-	}
-
-	echo $side_menu;
-	?>
-</ul>
+                <li>
+                    <a href="<?php echo wp_logout_url(home_url()); ?>">
+                        <i class="houzez-icon icon-logout-1"></i>
+                        <span><?php echo houzez_option('dsh_logout', 'Logout'); ?></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <?php endif; ?>
+    <?php } ?>
+</div>

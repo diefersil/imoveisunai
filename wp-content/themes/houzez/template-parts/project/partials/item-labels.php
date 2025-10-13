@@ -1,9 +1,10 @@
 <?php
+global $post;
 $term_id = '';
-$term_status = wp_get_post_terms( get_the_ID(), 'project_status', array("fields" => "all"));
+$term_status = wp_get_post_terms( $post->ID, 'project_status', array("fields" => "all"));
 
 $label_id = '';
-$term_label = wp_get_post_terms( get_the_ID(), 'project_label', array("fields" => "all"));
+$term_label = wp_get_post_terms( $post->ID, 'project_label', array("fields" => "all"));
 
 $enable_status = houzez_option('disable_project_status', 1);
 $enable_label = houzez_option('disable_project_label', 1);

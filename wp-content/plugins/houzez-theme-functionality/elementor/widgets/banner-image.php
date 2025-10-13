@@ -118,7 +118,10 @@ class Houzez_Banner_Image extends Widget_Base {
             Group_Control_Image_Size::get_type(),
             [
                 'name' => 'image', // Usage: `{name}_size` and `{name}_custom_dimension`, in this case `image_size` and `image_custom_dimension`.
-                'exclude' => [ 'custom', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
+                'exclude' => array_merge(
+                    ['houzez-gallery', '1536x1536', '2048x2048'], // Always exclude 'houzez-gallery'
+                    \Houzez_Image_Sizes::get_disabled_sizes_for_elementor() // Get dynamically disabled sizes
+                ),
                 'default' => 'full',
                 'separator' => 'none',
             ]
@@ -521,34 +524,38 @@ class Houzez_Banner_Image extends Widget_Base {
 
         $banner_title = $settings['banner_title'];
 
-        $thumb_id = $settings['image']['id'];
-
-        $image_size = $settings['image_size'];
+        $image_id = $settings['image']['id']; // Get the image ID
+        $image_size = Group_Control_Image_Size::get_attachment_image_src($image_id, 'image', $settings); // Get the selected size
 
         $link = $this->get_link_url( $settings );
         if ( $link ) {
             $this->add_link_attributes( 'link', $link );
 
             $this->add_render_attribute( 'link', [
-                'class' => 'banner-image-module-link',
+                'class' => 'banner-image-module-link w-100 h-100 top-0 bottom-0 start-0 end-0',
             ] );
 
         }
         ?>
 
-        <div class="banner-image-module">
+        <div class="banner-image-module d-flex justify-content-center align-items-center">
             <?php if( $banner_title ) { ?>
-            <div class="banner-image-content-wrap">
+            <div class="banner-image-content-wrap p-4 text-center">
                 <a><?php echo esc_html($banner_title);?></a>
             </div>
             <?php } ?>
             
-            <?php echo wp_get_attachment_image( $thumb_id, $image_size, false, array('class' => 'img-fluid') ); ?>
+            <?php
+            if( $image_size ) {
+                // Output the image tag
+                echo '<img class="img-fluid" src="' . esc_url($image_size) . '" alt="' . esc_attr(get_post_meta($image_id, '_wp_attachment_image_alt', true)) . '">';
+            }
+            ?>
 
             <?php if ( $link ) : ?>
                 <a <?php $this->print_render_attribute_string( 'link' ); ?>></a>
             <?php else: ?>
-                <a class="banner-image-module-link"></a>
+                <a class="banner-image-module-link w-100 h-100 top-0 bottom-0 start-0 end-0"></a>
             <?php endif; ?>
         </div>
         

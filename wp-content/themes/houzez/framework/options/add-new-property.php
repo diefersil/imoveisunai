@@ -20,6 +20,17 @@ Redux::setSection( $houzez_opt_name, array(
             'default'  => 'mstep',
         ),
         array(
+            'id'       => 'create_listing_button',
+            'type'     => 'select',
+            'title'    => esc_html__( 'Login Required', 'houzez' ),
+            'desc' => esc_html__('Is the login required to create a new listing?', 'houzez'),
+            'default'  => 'no',
+            'options'  => array(
+                'no' => esc_html__('No', 'houzez'),
+                'yes' => esc_html__('Yes', 'houzez'),
+            )
+        ),
+        array(
             'id'       => 'listings_admin_approved',
             'type'     => 'select',
             'title'    => esc_html__('New Submited Listings Approval', 'houzez'),
@@ -229,10 +240,10 @@ Redux::setSection( $houzez_opt_name, array(
             'options' => array(
                 'enabled'  => array(
                     'description-price'     => esc_html__('Description & Price', 'houzez'),
-                    'media'                 => esc_html__('Property Media', 'houzez'),
+                    'media'                 => esc_html__('Media', 'houzez'),
                     'details'               => esc_html__('Property Details', 'houzez'),
-                    'features'              => esc_html__('Property Features', 'houzez'),
-                    'location'              => esc_html__('Property Location', 'houzez'),
+                    'features'              => esc_html__('Features', 'houzez'),
+                    'location'              => esc_html__('Location', 'houzez'),
                     'virtual_tour'          => esc_html__('360° Virtual Tour', 'houzez'),
                     'floorplans'            => esc_html__('Floor Plans', 'houzez'),
                     'multi-units'           => esc_html__('Multi Units / Sub Properties', 'houzez'),

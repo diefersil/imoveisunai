@@ -111,6 +111,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
          */
         $field_types = apply_filters( 'houzez/search_composer/fields', $field_types );
 
+        $field_types['clear-button'] = esc_html__( 'Clear Search Button', 'houzez-theme-functionality' ); // button
         $field_types['search-button'] = esc_html__( 'Search Button', 'houzez-theme-functionality' ); // button
 
 
@@ -119,10 +120,19 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label' => '',
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
-                'raw' => esc_html__( 'Search button settings are below under "Search Button" section', 'houzez-theme-functionality' ),
+                'raw' => esc_html__( 'Search and Clear button settings are below under "Search Button" section', 'houzez-theme-functionality' ),
                 'content_classes' => 'elementor-descriptor',
-                'condition' => [
-                    'field_type' => 'search-button'
+                'conditions' => [
+                    'terms' => [
+                        [
+                            'name' => 'field_type',
+                            'operator' => 'in',
+                            'value' => [
+                                'search-button',
+                                'clear-button',
+                            ],
+                        ],
+                    ],
                 ],
             ]
         );
@@ -159,6 +169,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                             'operator' => '!in',
                             'value' => [
                                 'price-range',
+                                'clear-button',
                             ],
                         ],
                     ],
@@ -202,30 +213,6 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             ]
         );
 
-        $repeater->add_control(
-            'price_from_text',
-            [
-                'label' => esc_html__( 'From', 'houzez' ),
-                'type' => \Elementor\Controls_Manager::TEXT,
-                'default' => 'From',
-                'condition' => [
-                    'field_type' => 'price-range'
-                ],
-            ]
-        );
-
-        $repeater->add_control(
-            'price_to_text',
-            [
-                'label' => esc_html__( 'To', 'houzez' ),
-                'type' => \Elementor\Controls_Manager::TEXT,
-                'default' => 'To',
-                'condition' => [
-                    'field_type' => 'price-range'
-                ],
-            ]
-        );
-
         $repeater->add_responsive_control(
             'width',
             [
@@ -257,6 +244,11 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     '12' => '12%',
                     '11' => '11%',
                     '10' => '10%',
+                    '9' => '9%',
+                    '8' => '8%',
+                    '7' => '7%',
+                    '6' => '6%',
+                    '5' => '5%',
                 ],
                 'default' => '100',
                 'conditions' => [
@@ -328,28 +320,28 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             ]
         );
 
-        $repeater->add_responsive_control(
-            'slider_width',
-            [
-                'label' => esc_html__( 'Slider Width(%)', 'houzez-theme-functionality' ),
-                'type' => \Elementor\Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 50,
-                ],
-                'range' => [
-                    '%' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .price-range-wrap' => 'width: {{SIZE}}%;',
-                ],
-                'condition' => [
-                    'field_type' => 'price-range'
-                ],
-            ]
-        );
+        // $repeater->add_responsive_control(
+        //     'slider_width',
+        //     [
+        //         'label' => esc_html__( 'Slider Width(%)', 'houzez-theme-functionality' ),
+        //         'type' => \Elementor\Controls_Manager::SLIDER,
+        //         'default' => [
+        //             'size' => 50,
+        //         ],
+        //         'range' => [
+        //             '%' => [
+        //                 'min' => 0,
+        //                 'max' => 100,
+        //             ],
+        //         ],
+        //         'selectors' => [
+        //             '{{WRAPPER}} .price-range-wrap' => 'width: {{SIZE}}%;',
+        //         ],
+        //         'condition' => [
+        //             'field_type' => 'price-range'
+        //         ],
+        //     ]
+        // );
 
         $repeater->add_control(
             'is_multiple',
@@ -446,7 +438,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label' => esc_html__( 'Hide On Mobile', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::SWITCHER,
-                'return_value' => 'hidden-phone',
+                'return_value' => 'hidden-mobile',
                 'default' => '',
             ]
         );
@@ -594,6 +586,18 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             ]
         );
 
+        $this->add_control(
+            'button_icon',
+            [
+                'label' => esc_html__( 'Button Icon', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Show', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'Hide', 'houzez-theme-functionality' ),
+                'return_value' => 'true',
+                'default' => '',
+            ]
+        );
+
         $this->add_responsive_control(
             'button_align',
             [
@@ -602,19 +606,19 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'options' => [
                     'start' => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-left',
+                        'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-center',
+                        'icon' => 'eicon-text-align-center',
                     ],
                     'end' => [
                         'title' => esc_html__( 'Right', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-right',
+                        'icon' => 'eicon-text-align-right',
                     ],
                     'stretch' => [
                         'title' => esc_html__( 'Justified', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-justify',
+                        'icon' => 'eicon-text-align-justify',
                     ],
                 ],
                 'default' => 'stretch',
@@ -632,6 +636,160 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'return_value' => 'true',
                 'default' => '',
                 'separator' => 'before',
+            ]
+        );
+
+        // Collapse Fields Section
+        $this->add_control(
+            'collapse_section_heading',
+            [
+                'label' => esc_html__( 'Advanced Fields Collapse', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'collapse_section_description',
+            [
+                'type' => \Elementor\Controls_Manager::RAW_HTML,
+                'raw' => esc_html__( 'Organize your search form by collapsing some fields into an expandable "Advanced" section. This helps keep the main form clean while providing access to additional search options.', 'houzez-theme-functionality' ),
+                'content_classes' => 'elementor-descriptor',
+            ]
+        );
+
+        $this->add_control(
+            'enable_collapse',
+            [
+                'label' => esc_html__( 'Enable Collapse Fields', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'yes',
+                'default' => 'no',
+                'description' => esc_html__( 'When enabled, fields after the specified number will be moved to a collapsible "Advanced" section.', 'houzez-theme-functionality' ),
+            ]
+        );
+
+        $this->add_control(
+            'collapse_fields_after',
+            [
+                'label' => esc_html__( 'Collapse Fields After', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::NUMBER,
+                'default' => 3,
+                'min' => 1,
+                'max' => 10,
+                'description' => esc_html__( 'Number of fields to show in the main form. Remaining fields will be moved to the collapsible section.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'collapse_settings_heading',
+            [
+                'label' => esc_html__( 'Collapse Button Settings', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'collapse_button_text',
+            [
+                'label' => esc_html__( 'Button Text', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => 'Advanced',
+                'description' => esc_html__( 'Text displayed on the button that toggles the collapsed fields.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'advanced_button_width',
+            [
+                'label' => esc_html__( 'Advanced Button Width', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    '' => esc_html__( 'Default', 'houzez-theme-functionality' ),
+                    '100' => '100%',
+                    '90' => '90%',
+                    '83' => '83%',
+                    '80' => '80%',
+                    '75' => '75%',
+                    '70' => '70%',
+                    '66' => '66%',
+                    '65' => '65%',
+                    '60' => '60%',
+                    '55' => '55%',
+                    '50' => '50%',
+                    '45' => '45%',
+                    '40' => '40%',
+                    '33' => '33%',
+                    '35' => '35%',
+                    '30' => '30%',
+                    '25' => '25%',
+                    '20' => '20%',
+                    '16' => '16%',
+                    '15' => '15%',
+                    '14' => '14%',
+                    '12' => '12%',
+                    '11' => '11%',
+                    '10' => '10%',
+                    '10' => '10%',
+                    '9' => '9%',
+                    '8' => '8%',
+                    '7' => '7%',
+                    '6' => '6%',
+                    '5' => '5%',
+                ],
+                'default' => '16',
+                'description' => esc_html__( 'Set the width of the Advanced button that toggles the collapsed fields. Responsive settings available.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_size',
+            [
+                'label' => esc_html__( 'Advanced Button Size', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'sm',
+                'options' => array(
+                    'xs' => esc_html__( 'Extra Small', 'houzez-theme-functionality' ),
+                    'sm' => esc_html__( 'Small', 'houzez-theme-functionality' ),
+                    'md' => esc_html__( 'Medium', 'houzez-theme-functionality' ),
+                    'lg' => esc_html__( 'Large', 'houzez-theme-functionality' ),
+                    'xl' => esc_html__( 'Extra Large', 'houzez-theme-functionality' ),
+                ),
+                'description' => esc_html__( 'Set the size of the Advanced button that toggles the collapsed fields.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'show_collapsed_initially',
+            [
+                'label' => esc_html__( 'Show Collapsed Fields Initially', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
+                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
+                'return_value' => 'yes',
+                'default' => 'no',
+                'description' => esc_html__( 'When enabled, the collapsed fields section will be visible (expanded) by default when the page loads.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
             ]
         );
 
@@ -782,8 +940,11 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group' => 'padding-right: calc( {{SIZE}}{{UNIT}}/2 ); padding-left: calc( {{SIZE}}{{UNIT}}/2 );',
-                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'margin-left: calc( -{{SIZE}}{{UNIT}}/2 ); margin-right: calc( -{{SIZE}}{{UNIT}}/2 );',
+                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'display: flex; flex-wrap: wrap; margin-left: calc(-{{SIZE}}{{UNIT}}/2); margin-right: calc(-{{SIZE}}{{UNIT}}/2);',
+                    '{{WRAPPER}} .elementor-field-group' => 'padding-left: calc({{SIZE}}{{UNIT}}/2); padding-right: calc({{SIZE}}{{UNIT}}/2);',
+                    '{{WRAPPER}} .advanced-search-filters.elementor-form-fields-wrapper' => 'margin-left: calc(-{{SIZE}}{{UNIT}}/2); margin-right: calc(-{{SIZE}}{{UNIT}}/2);',
+                    '{{WRAPPER}} .advanced-search-filters .elementor-field-group' => 'padding-left: calc({{SIZE}}{{UNIT}}/2); padding-right: calc({{SIZE}}{{UNIT}}/2);',
+                    '{{WRAPPER}} .location-search .location-trigger' => 'margin-right: calc({{SIZE}}{{UNIT}}/2);',
                 ],
             ]
         );
@@ -803,8 +964,8 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group' => 'margin-bottom: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'margin-bottom: -{{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'row-gap: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .advanced-search-filters.elementor-form-fields-wrapper' => 'row-gap: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -877,7 +1038,8 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'default' => '',
                 'selectors' => [
-                    '{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'background-color: {{VALUE}};',
+                    //'{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .houzez-search-builder-wrapper' => 'background-color: {{VALUE}};',
                 ]
             ]
         );
@@ -889,7 +1051,8 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%', 'em' ],
                 'selectors' => [
-                    '{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    //'{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .houzez-search-builder-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -899,7 +1062,8 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'name' => 'border',
                 'label' => esc_html__( 'Border', 'houzez-theme-functionality' ),
-                'selector' => '{{WRAPPER}} .houzez-ele-search-form-wrapper',
+                //'selector' => '{{WRAPPER}} .houzez-ele-search-form-wrapper',
+                'selector' => '{{WRAPPER}} .houzez-search-builder-wrapper',
             ]
         );
 
@@ -910,7 +1074,8 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%', 'em' ],
                 'selectors' => [
-                    '{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    //'{{WRAPPER}} .houzez-ele-search-form-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .houzez-search-builder-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
             ]
         );
@@ -920,11 +1085,121 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'name' => 'box_shadow',
                 'label' => esc_html__( 'Box Shadow', 'houzez-theme-functionality' ),
-                'selector' => '{{WRAPPER}} .houzez-ele-search-form-wrapper',
+                //'selector' => '{{WRAPPER}} .houzez-ele-search-form-wrapper',
+                'selector' => '{{WRAPPER}} .houzez-search-builder-wrapper',
             ]
         );
 
         $this->end_controls_section();
+
+        // $this->start_controls_section(
+        //     'section_advanced_filters_style',
+        //     [
+        //         'label' => esc_html__( 'Advanced Filters', 'houzez-theme-functionality' ),
+        //         'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+
+        // $this->add_control(
+        //     'advanced_filters_background',
+        //     [
+        //         'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+        //         'type' => \Elementor\Controls_Manager::COLOR,
+        //         'default' => '#f8f9fa',
+        //         'selectors' => [
+        //             '{{WRAPPER}} .advanced-search-filters' => 'background-color: {{VALUE}};',
+        //         ],
+        //         'description' => esc_html__( 'Background color for the collapsed fields section.', 'houzez-theme-functionality' ),
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+        // $this->add_responsive_control(
+        //     'advanced_filters_padding',
+        //     [
+        //         'label' => esc_html__( 'Padding', 'houzez-theme-functionality' ),
+        //         'type' => \Elementor\Controls_Manager::DIMENSIONS,
+        //         'size_units' => [ 'px', 'em', '%' ],
+        //         'default' => [
+        //             'top' => '0',
+        //             'right' => '0',
+        //             'bottom' => '0',
+        //             'left' => '0',
+        //             'unit' => 'px',
+        //         ],
+        //         'selectors' => [
+        //             '{{WRAPPER}} .advanced-search-filters' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+        //         ],
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+        // $this->add_responsive_control(
+        //     'advanced_filters_margin',
+        //     [
+        //         'label' => esc_html__( 'Margin', 'houzez-theme-functionality' ),
+        //         'type' => \Elementor\Controls_Manager::DIMENSIONS,
+        //         'size_units' => [ 'px', 'em', '%' ],
+        //         'default' => [
+        //             'top' => '10',
+        //             'right' => '0',
+        //             'bottom' => '0',
+        //             'left' => '0',
+        //             'unit' => 'px',
+        //             'isLinked' => false,
+        //         ],
+        //         'selectors' => [
+        //             '{{WRAPPER}} .advanced-search-filters' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+        //         ],
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+        // $this->add_group_control(
+        //     \Elementor\Group_Control_Border::get_type(),
+        //     [
+        //         'name' => 'advanced_filters_border',
+        //         'label' => esc_html__( 'Border', 'houzez-theme-functionality' ),
+        //         'selector' => '{{WRAPPER}} .advanced-search-filters',
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+        // $this->add_responsive_control(
+        //     'advanced_filters_border_radius',
+        //     [
+        //         'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
+        //         'type' => \Elementor\Controls_Manager::DIMENSIONS,
+        //         'size_units' => [ 'px', '%' ],
+        //         'default' => [
+        //             'top' => '0',
+        //             'right' => '0',
+        //             'bottom' => '0',
+        //             'left' => '0',
+        //             'unit' => 'px',
+        //         ],
+        //         'selectors' => [
+        //             '{{WRAPPER}} .advanced-search-filters' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+        //         ],
+        //         'condition' => [
+        //             'enable_collapse' => 'yes'
+        //         ],
+        //     ]
+        // );
+
+        // $this->end_controls_section();
 
         $this->start_controls_section(
             'section_field_style',
@@ -939,6 +1214,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#A1A7A8',
                 'selectors' => [
                     '{{WRAPPER}} .elementor-field-group .elementor-field, {{WRAPPER}} .location-trigger' => 'color: {{VALUE}};',
                     '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper button:not(.actions-btn)' => 'color: {{VALUE}};',
@@ -967,6 +1243,15 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper button:not(.actions-btn)' => 'background-color: {{VALUE}};',
                 ],
                 'separator' => 'before',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(),
+            [
+                'name' => 'field_border',
+                'exclude' => ['color', 'width'],
+                'selector' => '{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper), {{WRAPPER}} .elementor-field-group .elementor-select-wrapper select, {{WRAPPER}} .elementor-field-group .elementor-select-wrapper button:not(.actions-btn), {{WRAPPER}} .elementor-field-group .elementor-select-wrapper::before, {{WRAPPER}} .elementor-field-group .elementor-select-wrapper button::before, {{WRAPPER}} .location-trigger',
             ]
         );
 
@@ -1000,11 +1285,14 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                     '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper .form-control' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                     '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper button:not(.actions-btn)' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .location-trigger' => 'border-radius: 0 {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} 0;',
                 ],
             ]
         );
 
         $this->end_controls_section();
+
+
 
 
         $this->start_controls_section(
@@ -1098,7 +1386,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label'     => esc_html__( 'Tabs Color', 'houzez-theme-functionality' ),
                 'type'      => \Elementor\Controls_Manager::COLOR,
-                'default'   => '#ffffff',
+                'default'   => '',
                 'selectors' => [
                     '{{WRAPPER}} #houzez-search-tabs-wrap .nav-link' => 'color: {{VALUE}}',
                 ],
@@ -1110,7 +1398,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label'     => esc_html__( 'Tabs Active Color', 'houzez-theme-functionality' ),
                 'type'      => \Elementor\Controls_Manager::COLOR,
-                'default'   => '#000000',
+                'default'   => '',
                 'selectors' => [
                     '{{WRAPPER}} #houzez-search-tabs-wrap .nav-link.active' => 'color: {{VALUE}}',
                 ],
@@ -1122,7 +1410,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label'     => esc_html__( 'Tabs Background Color', 'houzez-theme-functionality' ),
                 'type'      => \Elementor\Controls_Manager::COLOR,
-                'default'   => '#00aeff',
+                'default'   => '',
                 'selectors' => [
                     '{{WRAPPER}} #houzez-search-tabs-wrap .nav-link' => 'background-color: {{VALUE}}',
                 ],
@@ -1134,7 +1422,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label'     => esc_html__( 'Active Tabs Background Color', 'houzez-theme-functionality' ),
                 'type'      => \Elementor\Controls_Manager::COLOR,
-                'default'   => '#ffffff',
+                'default'   => '',
                 'selectors' => [
                     '{{WRAPPER}} #houzez-search-tabs-wrap .nav-link.active' => 'background-color: {{VALUE}}',
                 ],
@@ -1186,11 +1474,11 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'options' => [
                     'left'    => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-left',
+                        'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-center',
+                        'icon' => 'eicon-text-align-center',
                     ]
                 ],
                 'default' => 'center',
@@ -1225,7 +1513,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#00aeff',
+                'default' => '',
                 'selectors' => [
                     '{{WRAPPER}} .elementor-button' => 'background-color: {{VALUE}};',
                 ],
@@ -1235,7 +1523,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->add_control(
             'button_text_color',
             [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'default' => '',
                 'selectors' => [
@@ -1274,7 +1562,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->add_responsive_control(
             'button_text_padding',
             [
-                'label' => esc_html__( 'Text Padding', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Padding', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', 'em', '%' ],
                 'selectors' => [
@@ -1297,7 +1585,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             [
                 'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
-                'default' => '#33beff',
+                'default' => '',
                 'selectors' => [
                     '{{WRAPPER}} .elementor-button:hover' => 'background-color: {{VALUE}};',
                 ],
@@ -1307,7 +1595,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->add_control(
             'button_hover_color',
             [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}} .elementor-button:hover' => 'color: {{VALUE}};',
@@ -1342,6 +1630,347 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $this->end_controls_tabs();
 
         $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_advanced_button_style',
+            [
+                'label' => esc_html__( 'Advanced Button', 'houzez-theme-functionality' ),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'enable_collapse' => 'yes'
+                ],
+            ]
+        );
+
+        $this->start_controls_tabs( 'tabs_advanced_button_style' );
+
+        $this->start_controls_tab(
+            'tab_advanced_button_normal',
+            [
+                'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_background_color',
+            [
+                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_text_color',
+            [
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'advanced_button_typography',
+                'selector' => '{{WRAPPER}} .advanced-search-btn',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(), [
+                'name' => 'advanced_button_border',
+                'selector' => '{{WRAPPER}} .advanced-search-btn',
+                'fields_options' => [
+                    'border' => [
+                        'default' => 'solid',
+                    ],
+                    'width' => [
+                        'default' => [
+                            'top' => '1',
+                            'right' => '1', 
+                            'bottom' => '1',
+                            'left' => '1',
+                            'isLinked' => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'advanced_button_border_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'advanced_button_text_padding',
+            [
+                'label' => esc_html__( 'Padding', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', 'em', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'advanced_button_margin',
+            [
+                'label' => esc_html__( 'Margin', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', 'em', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->start_controls_tab(
+            'tab_advanced_button_hover',
+            [
+                'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_background_hover_color',
+            [
+                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn:hover' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_hover_color',
+            [
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'advanced_button_hover_border_color',
+            [
+                'label' => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn:hover' => 'border-color: {{VALUE}};',
+                ],
+                'condition' => [
+                    'advanced_button_border_border!' => '',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'advanced_button_hover_animation',
+            [
+                'label' => esc_html__( 'Animation', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HOVER_ANIMATION,
+                'selectors' => [
+                    '{{WRAPPER}} .advanced-search-btn' => 'animation: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_clear_button_style',
+            [
+                'label' => esc_html__( 'Clear Button', 'houzez-theme-functionality' ),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->start_controls_tabs( 'tabs_clear_button_style' );
+
+        $this->start_controls_tab(
+            'tab_clear_button_normal',
+            [
+                'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
+            ]
+        );
+
+        $this->add_control(
+            'clear_button_background_color',
+            [
+                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'clear_button_text_color',
+            [
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'clear_button_typography',
+                'selector' => '{{WRAPPER}} .reset-search-btn',
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(), [
+                'name' => 'clear_button_border',
+                'selector' => '{{WRAPPER}} .reset-search-btn',
+                'fields_options' => [
+                    'border' => [
+                        'default' => 'solid',
+                    ],
+                    'width' => [
+                        'default' => [
+                            'top' => '1',
+                            'right' => '1', 
+                            'bottom' => '1',
+                            'left' => '1',
+                            'isLinked' => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'clear_button_border_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'clear_button_text_padding',
+            [
+                'label' => esc_html__( 'Padding', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', 'em', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'clear_button_margin',
+            [
+                'label' => esc_html__( 'Margin', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', 'em', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->start_controls_tab(
+            'tab_clear_button_hover',
+            [
+                'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
+            ]
+        );
+
+        $this->add_control(
+            'clear_button_background_hover_color',
+            [
+                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn:hover' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'clear_button_hover_color',
+            [
+                'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn:hover' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'clear_button_hover_border_color',
+            [
+                'label' => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn:hover' => 'border-color: {{VALUE}};',
+                ],
+                'condition' => [
+                    'clear_button_border_border!' => '',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'clear_button_hover_animation',
+            [
+                'label' => esc_html__( 'Animation', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HOVER_ANIMATION,
+                'selectors' => [
+                    '{{WRAPPER}} .reset-search-btn' => 'animation: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_tab();
+
+        $this->end_controls_tabs();
+
+        $this->end_controls_section();
         
     }
 
@@ -1368,6 +1997,14 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 ],
             ]
         );
+
+        if( isset($settings['form_padding']['top']) && $settings['form_padding']['top'] != '' && ( $settings['form_padding']['bottom'] == 0 || $settings['form_padding']['bottom'] == '' ) ) { ?>
+        <style>
+            #houzez-search-<?php echo $this->get_id(); ?> .houzez-ele-search-form-wrapper {
+                padding-bottom: <?php echo $settings['form_padding']['top']; ?>px;
+            }
+        </style>
+        <?php }
         
         $tabs_field =  $settings['tabs_field'];
         $show_all =  $settings['show_all'];
@@ -1397,17 +2034,23 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         if ( ! empty( $settings['form_id'] ) ) {
             $this->add_render_attribute( 'form', 'id', $settings['form_id'] );
         }
+
+        // Collapse functionality variables
+        $enable_collapse = $settings['enable_collapse'] === 'yes';
+        $collapse_after = $enable_collapse ? intval($settings['collapse_fields_after']) : 0;
+        $show_collapsed_initially = $settings['show_collapsed_initially'] === 'yes';
+        $collapse_class = $show_collapsed_initially ? 'show' : '';
         ?>
 
         <form class="houzez-search-form-js houzez-search-builder-form-js" id="houzez-search-<?php echo $this->get_id(); ?>" method="get" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>" <?php echo $this->get_render_attribute_string( 'form' ); ?>>
 
             <?php if( $settings['show_tabs'] == 'yes' ) { ?>
 
-            <ul id="houzez-search-tabs-wrap" class="houzez-status-tabs nav nav-pills" role="tablist" data-toggle="buttons">
+            <ul id="houzez-search-tabs-wrap" class="houzez-status-tabs nav nav-pills" role="tablist" data-bs-toggle="buttons">
             
                 <?php if($show_all == 'yes') { ?>
                 <li class="nav-item">
-                    <a class="nav-link active" data-val="" data-toggle="pill" href="#" role="tab" aria-selected="true">
+                    <a class="nav-link active" data-val="" data-bs-toggle="pill" href="#" role="tab" aria-bs-selected="true">
                         <?php echo esc_attr($settings['tabs_all_text']); ?>
                     </a>
                 </li>
@@ -1426,7 +2069,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                         $tabname = houzez_get_term_by( 'slug', $slug, $tabs_field );
                         if( $tabname ) {
                          echo '<li class="nav-item">
-                                <a class="status-tab-js nav-link '.esc_attr($active_class).'" data-val="'.esc_attr($slug).'" data-toggle="pill" href="#" role="tab" aria-selected="true">
+                                <a class="status-tab-js nav-link '.esc_attr($active_class).'" data-val="'.esc_attr($slug).'" data-bs-toggle="pill" href="#" role="tab" aria-bs-selected="true">
                                     '.esc_attr($tabname->name).'
                                 </a>
                             </li>';
@@ -1438,10 +2081,137 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
             </ul>
             <?php } ?>
 
-            <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+            <div class="houzez-search-builder-wrapper">
 
-                <?php
-                foreach ( $settings['form_fields'] as $item_index => $item ) :
+                <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+
+                    <?php
+                    $field_count = 0;
+                    $main_fields = array();
+                    $collapsed_fields = array();
+                    $search_button_field = null;
+                    $button_fields = array();
+
+                    // Separate fields into main and collapsed based on settings
+                    foreach ( $settings['form_fields'] as $item_index => $item ) {
+                        // Only separate button fields when collapse is enabled
+                        if ($enable_collapse && ($item['field_type'] === 'search-button' || $item['field_type'] === 'clear-button')) {
+                            $button_fields[] = array('index' => $item_index, 'item' => $item);
+                            continue;
+                        }
+                        
+                        if ($enable_collapse && $field_count >= $collapse_after && $item['field_type'] !== 'search-button' && $item['field_type'] !== 'clear-button') {
+                            $collapsed_fields[] = array('index' => $item_index, 'item' => $item);
+                        } else {
+                            $main_fields[] = array('index' => $item_index, 'item' => $item);
+                        }
+                        
+                        // Only count non-button fields for collapse position
+                        if ($item['field_type'] !== 'search-button' && $item['field_type'] !== 'clear-button') {
+                            $field_count++;
+                        }
+                    }
+
+                    // Render main fields
+                    foreach ($main_fields as $field_data) {
+                        $this->render_field($field_data['item'], $field_data['index'], $settings);
+                    }
+
+                    // Render collapse button if enabled and there are collapsed fields
+                    if ($enable_collapse && !empty($collapsed_fields)) { 
+                        // Build advanced button classes with responsive widths
+                        $advanced_button_classes = 'elementor-field-group elementor-column';
+                        
+                        // Add responsive width classes for advanced button
+                        if (!empty($settings['advanced_button_width'])) {
+                            $advanced_button_classes .= ' elementor-col-' . $settings['advanced_button_width'];
+                        } else {
+                            $advanced_button_classes .= ' elementor-col-16'; // Default width
+                        }
+                        
+                        if (!empty($settings['advanced_button_width_tablet'])) {
+                            $advanced_button_classes .= ' elementor-md-' . $settings['advanced_button_width_tablet'];
+                        }
+                        
+                        if (!empty($settings['advanced_button_width_mobile'])) {
+                            $advanced_button_classes .= ' elementor-sm-' . $settings['advanced_button_width_mobile'];
+                        }
+                        ?>
+                        <div class="<?php echo esc_attr($advanced_button_classes); ?>">
+                            <?php $advanced_btn_type = houzez_option('advanced_btn_type', 'icon'); ?>
+
+                            <?php if( $advanced_btn_type == 'icon_text') { ?>
+                            <a class="elementor-button advanced-search-btn elementor-size-<?php echo esc_attr($settings['advanced_button_size']); ?> w-100 d-block text-center" data-bs-toggle="collapse" href="#advanced-search-filters-<?php echo $this->get_id(); ?>">
+                                <i class="houzez-icon icon-cog me-1"></i> <?php echo esc_html($settings['collapse_button_text']); ?>
+                            </a>
+                            <?php } else { ?>
+                            <button class="elementor-button btn advanced-search-btn w-100 elementor-size-<?php echo esc_attr($settings['advanced_button_size']); ?>" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#advanced-search-filters-<?php echo $this->get_id(); ?>"
+                                    aria-expanded="false"
+                                    aria-controls="advanced-search-filters"
+                                    aria-label="">
+                                <i class="houzez-icon icon-Filter-Faders" aria-hidden="true"></i>
+                            </button>
+                            <?php } ?>
+                        </div>
+                    <?php }
+
+                    // Render separated button fields only when collapse is enabled
+                    if ($enable_collapse) {
+                        foreach ($button_fields as $button_field) {
+                            $this->render_field($button_field['item'], $button_field['index'], $settings);
+                        }
+                    }
+                    ?>
+
+                </div><!-- End main wrapper-->
+
+                <?php if ($enable_collapse && !empty($collapsed_fields)) { ?>
+                <div id="advanced-search-filters-<?php echo $this->get_id(); ?>" class="collapse <?php echo esc_attr($collapse_class); ?>">
+                    <div class="elementor-form-fields-wrapper elementor-labels-above advanced-search-filters">
+                        <?php
+                        // Render collapsed fields with their original width settings
+                        foreach ($collapsed_fields as $field_data) {
+                            $this->render_field($field_data['item'], $field_data['index'], $settings, true);
+                        }
+                        ?>
+                    </div>
+                </div>
+                <?php } ?>
+            </div> <!-- End houzez-search-builder-wrapper -->
+        </form>
+
+        <?php
+        if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) :   
+        ?>
+        <script>
+            jQuery('.selectpicker').selectpicker('refresh');
+        </script>
+
+        <style type="text/css">
+            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .elementor-field, 
+            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .elementor-field-label,
+            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .elementor-field, 
+            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .elementor-field-label,
+            [data-elementor-device-mode=mobile] .elementor-hidden-mobile .elementor-field, 
+            [data-elementor-device-mode=mobile] .elementor-hidden-mobile .elementor-field-label, 
+            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .houzez-search-button,
+            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .houzez-search-button,
+            [data-elementor-device-mode=mobile] .elementor-hidden-mobile .houzez-search-button { 
+                filter: opacity(.4) saturate(0); 
+            }
+        </style>
+    
+        <?php 
+        endif;
+    }
+
+    /**
+     * Render individual field
+     */
+    protected function render_field($item, $item_index, $settings, $is_collapsed = false) {
                     $item['input_size'] = $settings['input_size'];
                     $item['button_size'] = $settings['button_size'];
                     $field_name = $item['field_type'];
@@ -1450,6 +2220,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
                     if( $field_name == 'search_location' ) {
                         $this->add_render_attribute( 'field-group' . $item_index, 'class', 'hz-map-field-js' );
+            $this->add_render_attribute( 'field-group' . $item_index, 'class', 'location-search' );
                         $this->add_render_attribute( 'field-group' . $item_index, 'data-address-field', $this->houzez_get_attribute_id( $item ) );
                     }
 
@@ -1457,20 +2228,20 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                         $this->add_render_attribute( 'field-group' . $item_index, 'class', 'houzez-ele-price-slider' );
                     }
 
-                    if( $field_name != "search-button" ) {
+        // Don't wrap search button and clear button in field-group
+        $needs_wrapper = ($field_name !== "search-button" && $field_name !== "clear-button");
+        
+        if( $needs_wrapper ) {
                     ?>
                         <div <?php echo $this->get_render_attribute_string( 'field-group' . $item_index ); ?>>
                     <?php
                     }
 
-                    if ( $item['field_label'] && 'html' !== $item['field_type'] && 'search-button' !== $item['field_type'] && 'price-range' !== $item['field_type'] ) {
+        if ( $item['field_label'] && 'html' !== $item['field_type'] && 'search-button' !== $item['field_type'] && 'clear-button' !== $item['field_type'] && 'price-range' !== $item['field_type'] ) {
                         echo '<label ' . $this->get_render_attribute_string( 'label' . $item_index ) . '>' . $item['field_label'] . '</label>';
                     }
 
-
                     switch ( $item['field_type'] ) :
-                    
-
                         case 'type[]':
                             echo $this->houzez_taxonomy_field( $item, $item_index, 'property_type', 'type' );
                             break;
@@ -1561,6 +2332,26 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                             echo $this->houzez_keyword( $item, $item_index );
                             break;
 
+            case 'clear-button':
+                if ( $settings['button_hover_animation'] ) {
+                    $this->add_render_attribute( 'clear-button'. $item_index, 'class', 'elementor-animation-' . $settings['button_hover_animation'] );
+                }
+                ?>
+                <div <?php echo $this->get_render_attribute_string( 'submit-group'. $item_index ); ?>>
+                    <button type="button" class="reset-search-btn btn btn-grey-outlined elementor-button elementor-size-<?php echo esc_attr($item['button_size']); ?>" <?php echo $this->get_render_attribute_string( 'clear-button'. $item_index ); ?>>
+                        <i class="houzez-icon icon-refresh-ccw me-1"></i>
+                        <?php 
+                        if ( ! empty( $item['field_label'] ) ) {
+                            echo esc_html($item['field_label']);
+                        } else {
+                            echo esc_html__('Clear', 'houzez-theme-functionality');
+                        }
+                        ?>
+                    </button>
+                </div>
+                <?php
+                break;
+
                         case 'search-button':
                             if ( $settings['button_hover_animation'] ) {
                                 $this->add_render_attribute( 'button'. $item_index, 'class', 'elementor-animation-' . $settings['button_hover_animation'] );
@@ -1568,9 +2359,11 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                             ?>
                             <div <?php echo $this->get_render_attribute_string( 'submit-group'. $item_index ); ?>>
                                 <button type="submit" <?php echo $this->get_render_attribute_string( 'button'. $item_index ); ?>>
-                                    <?php if ( ! empty( $item['placeholder'] ) ) : ?>
+                                    <?php if( $settings['button_icon'] ) { ?>
+                                    <i class="houzez-icon icon-search"></i>
+                                    <?php } else if ( ! empty( $item['placeholder'] ) ) { ?>
                                         <?php echo esc_attr($item['placeholder']); ?>
-                                    <?php endif; ?>
+                                    <?php } ?>
                                 </button>
                             </div>
                             <?php
@@ -1612,76 +2405,13 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                                 }
                             }
                             break;
-                             
                     endswitch;
 
-                    if( $field_name != "search-button" ) { ?>
+        if( $needs_wrapper ) { 
+            ?>
                     </div>
-                    <?php } ?>
-
-                    <?php endforeach; ?>
-
-            </div><!-- End wrapper-->
-
-        </form>
-
         <?php
-        if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) :     
-        $min_price_range = houzez_option('advanced_search_widget_min_price', 0);
-        $max_price_range = houzez_option('advanced_search_widget_max_price', 2500000); 
-        ?>
-        <script>
-            jQuery('.selectpicker').selectpicker('refresh');
-
-            function addCommasEle(nStr) {
-                nStr += '';
-                var x = nStr.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return x1 + x2;
-            }
-            function price_range() {
-
-                var min_price = <?php echo $min_price_range; ?>;
-                var max_price = <?php echo $max_price_range; ?>;
-
-                jQuery(".price-range").slider({
-                    range: true,
-                    min: min_price,
-                    max: max_price,
-                    values: [min_price, max_price],
-                    slide: function (event, ui) {
-                    },
-                    stop: function( event, ui ) {
-                    }
-                });
-                jQuery(".min-price-range").text(addCommasEle(jQuery(".price-range").slider("values", 0)));
-                jQuery(".max-price-range").text(addCommasEle(jQuery(".price-range").slider("values", 1)));
-                
-            }
-            price_range();
-        </script>
-
-        <style type="text/css">
-            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .elementor-field, 
-            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .elementor-field-label,
-            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .elementor-field, 
-            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .elementor-field-label,
-            [data-elementor-device-mode=mobile] .elementor-hidden-phone .elementor-field, 
-            [data-elementor-device-mode=mobile] .elementor-hidden-phone .elementor-field-label, 
-            [data-elementor-device-mode=desktop] .elementor-hidden-desktop .houzez-search-button,
-            [data-elementor-device-mode=tablet] .elementor-hidden-tablet .houzez-search-button,
-            [data-elementor-device-mode=mobile] .elementor-hidden-phone .houzez-search-button { 
-                filter: opacity(.4) saturate(0); 
-            }
-        </style>
-    
-        <?php 
-        endif;
+        }
     }
 
 
@@ -1738,6 +2468,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                 'button' . $i => [
                     'class' => [
                         'houzez-search-button',
+                        'btn-primary',
                         'elementor-button',
                         'elementor-size-' . $item['button_size'],
                     ]
@@ -1845,6 +2576,7 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
                     'class' => [
                         'elementor-field',
                         'elementor-select-wrapper',
+                        'form-group'
                     ],
                 ],
                 'select' . $i => [
@@ -2383,16 +3115,28 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
 
     protected function houzez_price_range( $item, $i ) {
         ob_start();
+
+        $min_price = isset($_GET['min-price']) && $_GET['min-price'] != '' ? $_GET['min-price'] : '';
+        $max_price = isset($_GET['max-price']) && $_GET['max-price'] != '' ? $_GET['max-price'] : '';
+        // Generate a unique ID for this price range field
+        $unique_id = wp_generate_password(8, false, false);
         ?>
-        <div class="range-text">
-            <input type="hidden" name="min-price" class="min-price-range-hidden range-input" readonly >
-            <input type="hidden" name="max-price" class="max-price-range-hidden range-input" readonly >
-            <span class="range-title"><?php echo esc_attr($item['field_label']); ?></span> <?php echo esc_attr($item['price_from_text']); ?> <span class="min-price-range"></span> <?php echo esc_attr($item['price_to_text']); ?> <span class="max-price-range"></span>
-        </div><!-- range-text -->
-        <div class="price-range-wrap">
-            <div class="price-range"></div>
+        <div class="col-12 col-lg-12">
+            <div class="range-wrap" data-price-range-id="<?php echo esc_attr($unique_id); ?>">
+                <div class="range-text mb-3">
+                    <span class="range-title"><?php echo esc_attr($item['field_label']); ?></span><i class="houzez-icon icon-arrow-right-1"></i>
+                    <span class="min-price-range"></span>
+                    <i class="houzez-icon icon-arrow-right-1"></i>
+                    <span class="max-price-range"></span>
+                </div><!-- range-text -->
+                <div class="range-wrap">
+                    <div class="sliders_control">
+                    <input id="fromSlider_<?php echo esc_attr($unique_id); ?>" type="range" name="min-price" step="50" value="<?php echo esc_attr($min_price); ?>" min="" max="" class="hz-price-range-from"/>
+                    <input id="toSlider_<?php echo esc_attr($unique_id); ?>" type="range" name="max-price" step="50" value="<?php echo esc_attr($max_price); ?>" min="" max="" class="hz-price-range-to"/>
+                    </div>
+                </div>
+            </div><!-- range-wrap -->
         </div>
-    
         <?php
         $return = ob_get_clean();
         return $return;
@@ -2409,14 +3153,14 @@ class Houzez_Elementor_Search_Builder extends \Elementor\Widget_Base {
         $search_location = isset ( $_GET['search_location'] ) ? esc_attr($_GET['search_location']) : ''; ?>
 
         <input type="text" <?php echo $this->get_render_attribute_string( 'geo-location' . $i ); ?> value="<?php echo esc_attr($search_location); ?>">
-        <a class="btn location-trigger <?php echo esc_attr($trigger_class); ?> elementor-size-<?php echo $item['input_size']; ?>" href="#">
+        <a class="btn location-trigger <?php echo esc_attr($trigger_class); ?> elementor-size-<?php echo $item['input_size']; ?>" href="javascript:void(0)">
             <i class="houzez-icon icon-location-target"></i>
         </a>
         <input type="hidden" name="lat" value="<?php echo isset ( $_GET['lat'] ) ? esc_attr($_GET['lat']) : ''; ?>" >
         <input type="hidden" name="lng" value="<?php echo isset ( $_GET['lng'] ) ? esc_attr($_GET['lng']) : ''; ?>">
         <input type="checkbox" name="use_radius" class="hide_search_checkbox" <?php checked( true, $checked ); ?>>
         
-        <?php houzez_enqueue_maps_api();
+        <?php houzez_enqueue_maps_api_geolocation_field();
     }
 
     protected function houzez_keyword( $item, $i ) {

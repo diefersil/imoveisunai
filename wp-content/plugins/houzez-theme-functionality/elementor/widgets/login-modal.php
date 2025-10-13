@@ -510,17 +510,28 @@ class Houzez_Login_Modal extends Widget_Base {
 				<?php if( $login_type == "as_text" ) { ?>
 				<ul class="login-register-nav">
 					<li class="login-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Login', 'houzez'); ?>
+						</a>
 					</li>
 
 					<li class="register-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Register', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" role="menuitem">
+							<?php esc_html_e('Register', 'houzez'); ?>
+						</a>
 					</li>
 				</ul>
 				<?php } else { ?>
-				<div class="login-link">
-					<a class="btn btn-icon-login-register" href="#" data-toggle="modal" data-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle"></i></a>
-				</div>
+					<li class="nav-item login-link" role="none">
+						<a class="btn btn-icon-login-register dropdown-toggle" 
+						   href="#" 
+						   data-bs-toggle="modal" 
+						   data-bs-target="#login-register-form"
+						   role="menuitem">
+							<i class="houzez-icon icon-single-neutral-circle" aria-hidden="true"></i>
+						</a>
+					</li>
+				</ul>
 				<?php } ?>
 			</div>
 
@@ -535,18 +546,18 @@ class Houzez_Login_Modal extends Widget_Base {
 				<?php if( $login_type == "as_text" ) { ?>
 				<ul class="login-register-nav">
 					<li class="login-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
 					</li>
 
 					<?php if( houzez_option('header_register') ) { ?>
 					<li class="register-link">
-						<a href="#" data-toggle="modal" data-target="#login-register-form"><?php esc_html_e('Register', 'houzez'); ?></a>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form"><?php esc_html_e('Register', 'houzez'); ?></a>
 					</li>
 					<?php } ?>
 				</ul>
 				<?php } else { ?>
 				<div class="login-link">
-					<a class="btn btn-icon-login-register" href="#" data-toggle="modal" data-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle"></i></a>
+					<a class="btn btn-icon-login-register" href="#" data-bs-toggle="modal" data-bs-target="#login-register-form"><i class="houzez-icon icon-single-neutral-circle"></i></a>
 				</div>
 				<?php } ?>
 			</div>

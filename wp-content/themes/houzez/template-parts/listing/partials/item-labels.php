@@ -1,16 +1,17 @@
 <?php
+global $post;
 $term_id = '';
-$term_status = wp_get_post_terms( get_the_ID(), 'property_status', array("fields" => "all"));
+$term_status = wp_get_post_terms( $post->ID, 'property_status', array("fields" => "all"));
 
 $label_id = '';
-$term_label = wp_get_post_terms( get_the_ID(), 'property_label', array("fields" => "all"));
+$term_label = wp_get_post_terms( $post->ID, 'property_label', array("fields" => "all"));
 
 $enable_status = houzez_option('disable_status', 1);
 $enable_label = houzez_option('disable_label', 1);
 
 if( $enable_status || $enable_label ) {
 ?>
-<div class="labels-wrap labels-right"> 
+<div class="labels-wrap d-flex align-items-center gap-1" role="group"> 
 
 	<?php 
 	if( !empty($term_status) && $enable_status ) {

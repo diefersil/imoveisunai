@@ -169,6 +169,11 @@ class Houzez_Studio {
 		require_once FTS_DIR_PATH . 'elementor/class-houzez-elementor.php';
 
 		/**
+		 * The class responsible change query
+		 */
+		//require_once FTS_DIR_PATH . 'includes/class-houzez-query-switcher.php';
+
+		/**
 		 * Helper functions
 		 * core plugin.
 		 */

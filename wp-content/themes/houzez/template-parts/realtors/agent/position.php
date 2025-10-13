@@ -11,14 +11,16 @@ if(!empty($agent_agency_id)) {
 
 if(!empty($agent_position) || !empty($agent_company)) {
 ?>
-<p class="agent-list-position"> <?php echo esc_attr($agent_position); ?>
+<p class="agent-list-position mb-1"> 
+	<?php if(!empty($agent_position)) { ?>
+		<span itemprop="jobTitle"><?php echo esc_attr($agent_position); ?></span>
+	<?php } ?>
+	
 	<?php if(!empty($agent_company)) { ?>
-		
 		<?php echo $houzez_local['at']; ?>
-		<a<?php echo $href; ?>>
-			<?php echo esc_attr( $agent_company ); ?>		
+		<a<?php echo $href; ?> itemprop="worksFor" itemscope itemtype="http://schema.org/RealEstateOrganization">
+			<span itemprop="name"><?php echo esc_attr( $agent_company ); ?></span>
 		</a>
-
 	<?php } ?>
 </p>
 <?php } ?>

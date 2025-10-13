@@ -17,6 +17,7 @@ $purl = houzez_get_template_link('template/template-agents.php');
 		<button type="button" class="btn overlay-search-module-close"><i class="houzez-icon icon-close"></i></button>
 	</div>
 	<form method="get" action="<?php echo esc_url($purl); ?>">
+		<input type="hidden" name="agent-search" value="yes">
 		<div class="row">
 			<div class="col-12">
 				<div class="form-group">

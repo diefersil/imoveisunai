@@ -123,8 +123,8 @@ if ( $yelp_dist_unit == 'kilometers' ) {
                 if ( sizeof( $businesses ) != 0 ) {
     			?>
 
-    			<dl>
-    				<dt><i class="<?php echo esc_attr($term_icon); ?>"></i> <?php echo esc_attr($term_name); ?></dt>
+    			<dl class="list-lined mb-4" role="list">
+    				<dt class="mb-3" role="heading"><i class="<?php echo esc_attr($term_icon); ?>"></i> <?php echo esc_attr($term_name); ?></dt>
 
     				<?php
                     foreach ( $businesses as $data ) :
@@ -145,21 +145,22 @@ if ( $yelp_dist_unit == 'kilometers' ) {
 
                     }
                     ?>
-    				<dd>
-    					<div class="what-nearby-left">
-    						<?php echo esc_attr($data->name); ?> <?php echo $location_distance; ?>
-    					</div>
-    					<div class="what-nearby-right">
-    						<div class="rating-wrap">
-    							<div class="rating-container">
-    								<div class="rating">                                            
-    									<?php echo houzez_get_stars($data->rating); ?>
-
-    									<span class="time-review"><?php echo $data->review_count; ?> <?php esc_html_e('reviews', 'houzez');?></span>
-    								</div>
-    							</div>
-    						</div>
-    					</div>
+    				<dd class="d-flex align-items-start justify-content-between flex-column flex-sm-row align-items-sm-center" role="listitem">
+    					<div class="list-lined-item w-100 d-flex justify-content-between py-1">
+                            <div class="what-nearby-left">	
+                                <?php echo esc_attr($data->name); ?> <?php echo $location_distance; ?>
+                            </div>
+                            <div class="what-nearby-right">
+                                <div class="rating-wrap">
+                                    <div class="rating-container d-flex align-items-center gap-2">
+                                        <div class="rating star d-flex align-items-center gap-1">                                            
+                                            <?php echo houzez_get_stars($data->rating); ?>
+                                            <span class="time-review"><?php echo $data->review_count; ?> <?php esc_html_e('reviews', 'houzez');?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                        </div>
     				</dd>
     				<?php endforeach; ?>
     				

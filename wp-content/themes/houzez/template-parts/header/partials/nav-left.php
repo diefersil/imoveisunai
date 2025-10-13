@@ -5,7 +5,7 @@ if ( has_nav_menu( 'main-menu-left' ) ) :
 		'theme_location' => 'main-menu-left',
 		'container' => '',
 		'container_class' => '',
-		'menu_class' => 'navbar-nav',
+		'menu_class' => 'navbar-nav h-100',
 		'menu_id' => 'main-menu-left',
 		'depth' => 4,
 		'walker' => new houzez_nav_walker()

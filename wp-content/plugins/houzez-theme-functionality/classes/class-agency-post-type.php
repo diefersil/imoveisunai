@@ -158,7 +158,7 @@ class Houzez_Post_Type_Agency {
             case 'agents':
 
                 if( class_exists('Houzez_Query')) {
-                    $agencys_count = Houzez_Query::get_agency_agents( $post_id = get_the_ID() )->post_count;
+                    $agencys_count = Houzez_Query::loop_agency_agents( $post_id = get_the_ID() )->post_count;
                     echo esc_attr( $agencys_count );
                 }
                 break;

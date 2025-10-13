@@ -2337,7 +2337,7 @@ select {
 .ai-info-1 {background: #000; color: #fff;}
 .ai-info-2 {background: #fff; color: #000;}
 
-.highlighted #wrapper ins.adsbygoogle[data-ad-status="unfilled"] {background: url(https://via.placeholder.com/800x800/ffffff/000000.png?text=NO%20AD%20SERVED); background-size: cover; background-repeat: no-repeat; background-position: center;}
+.highlighted #wrapper ins.adsbygoogle[data-ad-status="unfilled"] {background: url(https://dummyimage.com/800x800/ffffff/000000.png?text=NO%20AD%20SERVED); background-size: cover; background-repeat: no-repeat; background-position: center;}
 
 input {
 /*  cursor: pointer;*/
@@ -2360,11 +2360,11 @@ input {
 <?php
 
     $viewport_data = array ();
-    for ($viewport = 1; $viewport <= 6; $viewport ++) {
-      $viewport_name  = get_viewport_name ($viewport);
-      $viewport_width = get_viewport_width ($viewport);
+    for ($viewport_index = 1; $viewport_index <= 6; $viewport_index ++) {
+      $viewport_name  = get_viewport_name ($viewport_index);
+      $viewport_width = get_viewport_width ($viewport_index);
       if ($viewport_name != '') {
-        $viewport_data []= array ('index' => $viewport, 'name' => $viewport_name, 'width' => $viewport_width);
+        $viewport_data []= array ('index' => $viewport_index, 'name' => $viewport_name, 'width' => $viewport_width);
       }
     }
 
@@ -2376,10 +2376,10 @@ input {
     $previous_name = '';
 
 //    for ($viewport_index = 6 - 1; $viewport_index > 0; $viewport_index --) {
-    foreach ($viewport_data as $index => $viewport) {
+    foreach ($viewport_data as $index => $viewport_element) {
 
-      $viewport_name  = $viewport ['name'];
-      $viewport_width = $viewport ['width'];
+      $viewport_name  = $viewport_element ['name'];
+      $viewport_width = $viewport_element ['width'];
       if ($viewport_name != '' && $viewport_width != 0) {
         echo "<td class='viewport-box' data='", $viewport_width, "' style='background: #eee; text-align: center; border: 1px solid #888; border-left-width: 0; min-width: ", $viewport_width - $previous_width - 1, "px'>",
           $previous_name, "<span style='float: left; margin-left: 5px;'>", $previous_width != 0 ? $previous_width . "px" : "", "</span></td>";

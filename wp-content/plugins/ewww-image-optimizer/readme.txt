@@ -2,10 +2,8 @@
 Contributors: nosilver4u
 Donate link: https://ewww.io/donate/
 Tags: compress, convert, webp, resize, lazy load
-Requires at least: 6.4
-Tested up to: 6.7
-Requires PHP: 7.4
-Stable tag: 8.1.0
+Tested up to: 6.8
+Stable tag: 8.2.1
 License: GPLv3
 
 Smaller Images, Faster Sites, Happier Visitors. Comprehensive image optimization that doesn't require a degree in rocket science.
@@ -143,6 +141,62 @@ That's not a question, but since I made it up, I'll answer it. See this resource
 
 * Feature requests can be viewed and submitted on our [feedback portal](https://feedback.ewww.io/b/features)
 * If you would like to help translate this plugin in your language, [join the team](https://translate.wordpress.org/projects/wp-plugins/ewww-image-optimizer/)
+
+= 8.2.1 =
+*Release Date - August 27, 2025*
+
+* added: filters for cloud storage plugin integration
+* fixed: Easy IO misses some preload links
+* fixed: PHP error when API quota is exhausted during single image optimization
+
+= 8.2.0 =
+*Release Date - July 15, 2025*
+
+* added: JS WebP support for HTML elements/tags added via eio_allowed_background_image_elements filter
+* added: Easy IO support for dynamic cropping (crop=1) on WordPress.com sites
+* changed: use native ImageMagick methods to detect, and correct, paletted PNG thumbnails
+* changed: use authoritative classmap via composer to speed up autoloader, props @nlemoine
+* changed: streamlined admin notices
+* fixed: indexed PNG thumbnails with 8-bit alpha are distorted by quantization
+* fixed: PHP warnings related to HTML parsing
+* fixed: missing ImageMagick information on Site Health screen
+* fixed: PHP warnings when link URLs contain special regex characters
+
+= 8.1.4 =
+*Release Date - May 15, 2025*
+
+* added: customize lossy PDF compression by defining EWWW_IMAGE_OPTIMIZER_PDF_IMAGE_DPI and/or EWWW_IMAGE_OPTIMIZER_PDF_IMAGE_QUALITY
+* fixed: WebP thumbnails have incorrect orientation when created from the original unoptimized image
+
+= 8.1.3 =
+*Release Date - March 26, 2025*
+
+* added: exclude private BuddyBoss media from Easy IO with page:buddyboss exclusion
+* changed: WebP Only mode no longer requires Force Re-optimize for already optimized images
+* fixed: Easy IO rewriting some URLs when full page exclusions are used
+* fixed: WebP rewriters alter PNG URLs when PNG to WebP conversion is unavailable
+* fixed: regression in compatibility with plugins that recreate images via WP_Image_Editor
+* fixed: previous fix to avoid translation notices caused errors with other plugins calling background processes earlier than 'init'
+
+= 8.1.2 =
+*Release Date - March 6, 2025*
+
+* changed: WebP Conversion mode configurable for API users
+* changed: combine metadata queries for faster async scanning
+* changed: Bulk Optimization no longer requires Force Re-optimization to create WebP images for previously optimized images
+* fixed: background processes trigger notice from loading translations too early
+* fixed: WooCommerce thumb regen still runs when WC sizes are disabled
+* fixed: Easy IO fails to refresh CDN domain when site URL has changed
+* fixed: Force and WebP Only options not applied when scanning additional folders in async mode
+* fixed: PDF and SVG images queued in WebP Only mode
+
+= 8.1.1 =
+*Release Date - February 26, 2025*
+
+* changed: added handling of HTTP errors to processes on Tools page
+* changed: added nonce-renewal for long-running processes on Tools page
+* changed: improved output for WebP Cleanup tool and Delete Converted Originals tool
+* fixed: queue table upgrade fails to add 'id' column
 
 = 8.1.0 =
 *Release Date - February 18, 2025*

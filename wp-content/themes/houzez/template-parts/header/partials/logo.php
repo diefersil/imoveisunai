@@ -22,7 +22,6 @@ if( is_page_template( 'template/template-splash.php' ) ) {
 
 $logo_height = houzez_option('retina_logo_height');
 $logo_width = houzez_option('retina_logo_width');
-
 ?>
 
 <?php if ( is_page_template( 'template/template-splash.php' ) || ($fave_main_menu_trans == 'yes' && houzez_option('header_style') == '4' ) && !wp_is_mobile() ) { ?>

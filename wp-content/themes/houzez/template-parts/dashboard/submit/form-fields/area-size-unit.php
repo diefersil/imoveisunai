@@ -1,8 +1,8 @@
 <?php global $area_prefix_default, $area_prefix_changeable; ?>
-<div class="form-group">
-	<label for="prop_size_prefix"><?php echo houzez_option('cl_area_size_postfix', 'Size Postfix'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="property_size_prefix"><?php echo houzez_option('cl_area_size_postfix', 'Size Postfix'); ?></label>
 
-	<input class="form-control" id="prop_size_prefix" name="prop_size_prefix" value="<?php
+	<input class="form-control" id="property_size_prefix" name="property_size_prefix" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_size_prefix');
     } else { echo esc_html($area_prefix_default); }

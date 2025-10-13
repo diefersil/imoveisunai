@@ -2,7 +2,7 @@
 global $post;
 $sidebar_meta = houzez_get_sidebar_meta($post->ID);
 ?>
-<aside id="sidebar" class="sidebar-wrap">
+<aside id="sidebar" class="sidebar-wrap mb-4">
     <?php
     if(isset($sidebar_meta['specific_sidebar']) &&  $sidebar_meta['specific_sidebar'] == 'yes' ) {
         if( is_active_sidebar( $sidebar_meta['selected_sidebar'] ) ) {

@@ -35,7 +35,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.7.32');
+  define ('AD_INSERTER_VERSION', '2.8.7');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -56,7 +56,7 @@ define ('AD_TWO',         '2');
 
 define ('AD_FLAGS_BLOCKS_STICKY',        0x01);
 define ('AD_FLAGS_SETTINGS_HIDDEN',      0x02);
-define ('AI_MAX_LIST_ITEMS',            2000);
+define ('AI_MAX_WP_QUERY_ITEMS',         500);
 
 // Old options
 define ('AD_OPTIONS',     'AdInserterOptions');   // general plugin options
@@ -932,6 +932,7 @@ define ('DEFAULT_ADB_DETECTION',                AI_ADB_DETECTION_ADVANCED);
 define ('DEFAULT_CUSTOM_HOOK_PRIORITY',         10);
 define ('DEFAULT_OUTPUT_BUFFERING',             AI_OUTPUT_BUFFERING_DISABLED);
 define ('DEFAULT_DISABLE_CACHING',              AI_DISABLE_CACHING_ENABLED);
+define ('DEFAULT_MAX_LIST_ITEMS',               5000);
 define ('DEFAULT_TAB_SETUP_DELAY',              100);
 define ('DEFAULT_WAIT_FOR_JQUERY',              AI_WAIT_FOR_JQUERY_DISABLED);
 define ('DEFAULT_JAVASCRIPT_CODE_MODE',         AI_JAVASCRIPT_CODE_INLINE);
@@ -1052,7 +1053,7 @@ define ('DEFAULT_VIEWPORT_WIDTH_3', 0);
 
 define ('AI_MARKER_START',              '%##');
 define ('AI_MARKER_END',                '##%');
-define ('AI_CONTENT_MARKER',            'AI CONTENT END');
+define ('AI_CONTENT_MARKER',            'CONTENT END');
 
 define ('CONTENT_HOOK_BLOCKS',          'content_hook');
 define ('EXCERPT_HOOK_BLOCKS',          'excerpt_hook');

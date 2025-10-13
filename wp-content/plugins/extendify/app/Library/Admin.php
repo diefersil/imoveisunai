@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin.
  */
@@ -13,6 +14,7 @@ use Extendify\PartnerData;
 /**
  * This class handles any file loading for the admin area.
  */
+
 class Admin
 {
     /**
@@ -74,7 +76,7 @@ class Admin
     {
         $userInfo = \get_user_option('extendify_library_user');
         $userInfo = $userInfo ? json_decode($userInfo, true) : [
-            'state' => ['openOnNewPage' => Config::$hasPartner && ! PartnerData::setting('disableLibraryAutoOpen')],
+            'state' => ['openOnNewPage' => Config::$partnerId && ! PartnerData::setting('disableLibraryAutoOpen')],
             'version' => 0,
         ];
         $siteInfo = \get_option('extendify_library_site_data', [
@@ -107,7 +109,11 @@ class Admin
             ]),
             'before'
         );
-        \wp_set_script_translations(Config::$slug . 'library-scripts', 'extendify-local', EXTENDIFY_PATH . 'languages/js');
+        \wp_set_script_translations(
+            Config::$slug . 'library-scripts',
+            'extendify-local',
+            EXTENDIFY_PATH . 'languages/js'
+        );
 
         // Inline the library styles to keep them out of the iframe live preview.
         // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
@@ -126,7 +132,8 @@ class Admin
      */
     public function registerUserMeta()
     {
-        register_rest_field('user',
+        register_rest_field(
+            'user',
             'extendify_library_user',
             [
                 'get_callback' => function ($user) {

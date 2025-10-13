@@ -1,8 +1,7 @@
 <?php
 /**
  * Testimonials
- * Created by PhpStorm.
- * User: waqasriaz
+ * Created by Waqas Riaz.
  * Date: 07/01/16
  * Time: 4:00 PM
  */
@@ -55,6 +54,7 @@ if( !function_exists('houzez_testimonials_v2') ) {
         <?php } else { ?>
 
             <div class="testimonials-module testimonials-module-slider-v2 testimonials-module-v2">
+                <div class="testimonials-slider-wrap-v2-arrows"></div>
                 <div class="testimonials-slider-wrap-v2 houzez-all-slider-wrap">
                     <?php
                     if ($testi_qry->have_posts()): 

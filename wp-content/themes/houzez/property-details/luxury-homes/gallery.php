@@ -1,55 +1,95 @@
 <?php
-$size = 'houzez-item-image-1';
-$properties_images = rwmb_meta( 'fave_property_images', 'type=plupload_image&size='.$size, $post->ID );
+global $post;
+
+// Get the dynamically assigned image size for this layout
+$image_size = houzez_get_image_size_for('property_detail_block_gallery');
 
 $visible_images = houzez_option('luxury_gallery_visible', 12);
-$images_in_row = houzez_option('luxury_gallery_columns', 4);;
+$images_in_row = houzez_option('luxury_gallery_columns', 4);
+$images_in_row = intval($images_in_row);
 
 if( empty($visible_images) ) {
     $visible_images = 9;
 }
 
-$percentage = 100 / $images_in_row;
+$property_gallery_popup_type = houzez_get_popup_gallery_type();
 
-if( !empty($properties_images) ) {
+$builtin_gallery_class = ' houzez-trigger-popup-slider-js';
+$dataModal = 'href="#" data-bs-toggle="modal" data-bs-target="#property-lightbox"';
+$images_ids = get_post_meta($post->ID, 'fave_property_images', false);
 
-$total_images = count($properties_images);
-$remaining_images = $total_images - $visible_images;
-?>
+// Define column classes based on $images_in_row
+$col_class = '';
+switch ($images_in_row) {
+    case 2:
+        $col_class = 'col-md-6 col-sm-6';
+        break;
+    case 3:
+        $col_class = 'col-md-4 col-sm-6';
+        break;
+    case 4:
+        $col_class = 'col-md-3 col-sm-6';
+        break;
+    case 5:
+        $col_class = 'col-md-2-4';
+        break;
+    case 6:
+        $col_class = 'col-md-2 col-sm-4';
+        break;
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        $col_class = 'col-custom-' . $images_in_row;
+        break;
+    default:
+        $col_class = 'col-md-3 col-sm-6';
+}
 
-<div class="fw-property-gallery-wrap fw-property-section-wrap" id="property-gallery-wrap">
-	<div class="row row-no-padding">
+if( !empty($images_ids) ) {
 
-		<?php 
-		$i = 0;
-		foreach( $properties_images as $prop_image_id => $prop_image_meta ) { $i++;
-            $full_image = houzez_get_image_by_id( $prop_image_id, 'full' ); ?>
+	$total_images = count($images_ids);
+    $remaining_images = $total_images - $visible_images;
+	?>
 
-	        
-				<a href="#" data-slider-no="<?php echo esc_attr($i); ?>" class="houzez-trigger-popup-slider-js gallery-grid-item swipebox hover-effect <?php if($i == $visible_images && $remaining_images > 0 ){ echo 'more-images'; } elseif($i > $visible_images) {echo 'gallery-hidden'; } ?>" data-toggle="modal" data-target="#property-lightbox">
-					<?php if( $i == $visible_images && $remaining_images > 0 ){ echo '<span>'.$remaining_images.'+</span>'; } ?>
-					<img class="img-fluid" src="<?php echo esc_url( $prop_image_meta['url'] ); ?>" width="<?php echo esc_attr( $prop_image_meta['width'] ); ?>" height="<?php echo esc_attr( $prop_image_meta['height'] ); ?>" alt="<?php echo esc_attr( $prop_image_meta['title'] ); ?>">
-				</a>
-			
+	<div class="fw-property-gallery-wrap fw-property-section-wrap" id="property-gallery-wrap" role="region">
+		<div class="row g-0">
+			<?php 
+			$i = 0;
+			foreach( $images_ids as $image_id ) { $i++; 
+				$image_data = wp_get_attachment_image_src( $image_id, $image_size );
 
-	    <?php } ?>
-	</div><!-- row -->
-	<style> 
-	    .fw-property-gallery-wrap .gallery-grid-item {
-	        max-width: calc(<?php echo $percentage; ?>% - 1px);
-	        margin-right: 1px;
-	        margin-bottom: 1px;
-	    }
-	    .fw-property-gallery-wrap .more-images span {
-		    top: 50%;
-		    left: 50%;
-		    text-align: center;
-		    transform: translate(-50%, -50%);
-		    color: #fff;
-		    font-size: 45px;
-		    font-weight: 300;
-		    position: absolute;
-		}
-	</style>
-</div><!-- fw-property-gallery-wrap -->
+				// Skip this iteration if image_data is false
+				if(!$image_data) {
+					continue;
+				}
+
+				$image_url = $image_data[0];
+				$image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+	
+				if( $property_gallery_popup_type == 'photoswipe' ) {
+					$full_image = wp_get_attachment_image_src( $image_id, 'full' );
+					$dataModal = 'href="#" data-src="'.esc_url($full_image[0]).'" data-houzez-fancybox data-fancybox="block-gallery"';
+					$builtin_gallery_class = '';
+				} ?>
+
+				<div class="<?php echo esc_attr($col_class); ?> <?php if ( $i > $visible_images || ( $i == $visible_images && $remaining_images > 0 ) ) { echo 'position-relative'; } ?>">
+					<?php if ( $i == $visible_images && $remaining_images > 0 ) {
+						$full_image_src = wp_get_attachment_image_src( $image_id, 'full' );
+						$full_url = $full_image_src[0];
+					?>
+						<div class="img-wrap-3-text"><i class="houzez-icon icon-picture-sun me-1" aria-hidden="true"></i> <?php echo '+ '.esc_html( $remaining_images ); ?></div>
+						<a <?php echo $dataModal; ?> data-slider-no="<?php echo esc_attr( $i ); ?>" class="gallery-grid-item<?php echo $builtin_gallery_class; ?><?php if ( $i > $visible_images ) { echo ' gallery-hidden'; } ?>">
+							<img class="img-fluid" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>">
+						</a>
+					<?php } else { ?>
+						<a <?php echo $dataModal; ?> data-slider-no="<?php echo esc_attr( $i ); ?>" class="gallery-grid-item<?php echo $builtin_gallery_class; ?><?php if ( $i > $visible_images ) { echo ' gallery-hidden'; } ?>">
+							<img class="img-fluid" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>">
+						</a>
+					<?php } ?>
+				</div>
+
+			<?php } ?>
+		</div><!-- row -->
+	</div><!-- fw-property-gallery-wrap -->
 <?php } ?>

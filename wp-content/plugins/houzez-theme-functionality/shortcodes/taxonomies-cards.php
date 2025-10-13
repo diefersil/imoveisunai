@@ -82,12 +82,16 @@ if( !function_exists('houzez_taxonomies_cards') ) {
 			$img_url = 'https://place-hold.it/800x800';
 			$img_width = '800';
 			$img_height = '800';
-			$card_class = 'taxonomy-item-card-vertical';
 		}
-		?>
+		if( $houzez_cards_columns == '3cols' ) {
+			$card_class = 'row-cols-1 row-cols-md-2 row-cols-lg-3 gy-4 gx-4';
+		} else if( $houzez_cards_columns == '4cols' ) {
+			$card_class = 'row-cols-1 row-cols-md-2 row-cols-lg-4 gy-4 gx-4';
+		}
+ 		?>
 
-		<div class="taxonomy-cards-module taxonomy-cards-module-<?php echo esc_attr($houzez_cards_columns);?>">
-			<div class="d-flex taxonomy-cards-module-row">
+		<div class="taxonomy-cards-module">
+			<div class="d-flex row <?php echo esc_attr($card_class);?>">
 				<?php
 				if ( !is_wp_error( $taxonomy ) ) {
 					$i = 0;
@@ -114,32 +118,63 @@ if( !function_exists('houzez_taxonomies_cards') ) {
 					} else {
 						$term_link = get_term_link($term, $tax_name);
 					}
+					
+					if($cards_layout == 'layout-v2') {
 					?>
-				    
-				        <div class="taxonomy-item-card <?php esc_attr_e($card_class);?>">
-							<div class="taxonomy-item-card-image">
-								<a href="<?php echo esc_url($term_link);?>"><img class="img-fluid" src="<?php echo esc_url($img_url); ?>" width="<?php echo $img_width; ?>" height="<?php echo $img_height; ?>" alt="<?php echo esc_attr($term->name); ?>"></a>
-							</div><!-- taxonomy-item-card-image -->
-							<div class="taxonomy-item-card-content">
-								<dl class="taxonomy-item-card-content-list">
-									<dt><a href="<?php echo esc_url($term_link);?>"><?php echo esc_attr($term->name); ?></a></dt>
-									<?php if( $houzez_hide_count != 1 ) { ?>
-									<dd>
-										<?php echo esc_attr($term->count); ?> 
-										<?php
-										if ($term->count < 2) {
-											echo houzez_option('cl_property', 'Property');
-										} else {
-											echo houzez_option('cl_properties', 'Properties');
-										}
-										?>
-									<dd>
-									<?php } ?>
-								</dl>
-							</div><!-- taxonomy-item-card-content -->
-						</div><!-- taxonomy-item-card -->
-				    
-				<?php } 
+						<div class="taxonomy-item-card-wrap">
+							<div class="taxonomy-item-card d-flex flex-column pb-3 gap-3">
+								<div class="taxonomy-item-card-image">
+									<a href="<?php echo esc_url($term_link);?>"><img class="img-fluid" src="<?php echo esc_url($img_url); ?>" width="<?php echo $img_width; ?>" height="<?php echo $img_height; ?>" alt="<?php echo esc_attr($term->name); ?>"></a>
+								</div>
+								<div class="taxonomy-item-card-content d-flex flex-column align-items-center">
+									<dl class="taxonomy-item-card-content-list mb-0 text-center">
+										<dt><a href="<?php echo esc_url($term_link);?>"><?php echo esc_attr($term->name); ?></a></dt>
+										<?php if( $houzez_hide_count != 1 ) { ?>
+										<dd class="mb-0">
+											<?php echo esc_attr($term->count); ?> 
+											<?php
+											if ($term->count < 2) {
+												echo houzez_option('cl_property', 'Property');
+											} else {
+												echo houzez_option('cl_properties', 'Properties');
+											}
+											?>
+										</dd>
+										<?php } ?>
+									</dl>
+								</div>
+							</div>
+						</div>
+					<?php
+					} else {
+					?>
+						<div class="taxonomy-item-card-wrap taxonomy-item-card-horizontal taxonomy-item-card-horizontal-<?php echo esc_attr($houzez_cards_columns);?>">
+							<div class="taxonomy-item-card d-flex gap-3">
+								<div class="taxonomy-item-card-image">
+									<a href="<?php echo esc_url($term_link);?>"><img class="img-fluid" src="<?php echo esc_url($img_url); ?>" width="<?php echo $img_width; ?>" height="<?php echo $img_height; ?>" alt="<?php echo esc_attr($term->name); ?>"></a>
+								</div>
+								<div class="taxonomy-item-card-content d-flex flex-column justify-content-center">
+									<dl class="taxonomy-item-card-content-list mb-0">
+										<dt><a href="<?php echo esc_url($term_link);?>"><?php echo esc_attr($term->name); ?></a></dt>
+										<?php if( $houzez_hide_count != 1 ) { ?>
+										<dd class="mb-0">
+											<?php echo esc_attr($term->count); ?> 
+											<?php
+											if ($term->count < 2) {
+												echo houzez_option('cl_property', 'Property');
+											} else {
+												echo houzez_option('cl_properties', 'Properties');
+											}
+											?>
+										</dd>
+										<?php } ?>
+									</dl>
+								</div>
+							</div>
+						</div>
+					<?php
+					}
+				} 
 				}?>
 			</div><!-- taxonomy-cards-module-row -->
 		</div>

@@ -140,7 +140,7 @@ class Houzez_Post_Type_Packages {
         switch ($column)
         {
             case 'package_holder':
-                echo esc_attr( $user_info->display_name );
+                echo $user_info ? esc_attr($user_info->display_name) : 'N/A';
                 break;
 
             case 'package':

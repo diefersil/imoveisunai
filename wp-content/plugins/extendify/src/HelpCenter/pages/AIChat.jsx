@@ -12,7 +12,6 @@ import { Answer } from '@help-center/components/ai-chat/Answer';
 import { History } from '@help-center/components/ai-chat/History';
 import { Nav } from '@help-center/components/ai-chat/Nav';
 import { Question } from '@help-center/components/ai-chat/Question';
-import { Support } from '@help-center/components/ai-chat/Support';
 import { getAnswer } from '@help-center/lib/api';
 import { useAIChatStore } from '@help-center/state/ai-chat';
 
@@ -23,7 +22,7 @@ export const AIChatDashboard = ({ onOpen }) => {
 				data-test="help-center-dashboard-ai-chat-button"
 				type="button"
 				onClick={onOpen}
-				className="m-0 flex w-full cursor-pointer justify-between gap-2 rounded-md border border-gray-200 bg-transparent p-2.5 text-left hover:bg-gray-100 rtl:text-right">
+				className="m-0 flex w-full justify-between gap-2 rounded-md border border-gray-200 bg-transparent p-2.5 text-left hover:bg-gray-100 rtl:text-right">
 				<Icon
 					icon={postComments}
 					className="rounded-full border-0 bg-design-main fill-design-text p-2"
@@ -92,7 +91,7 @@ export const AIChat = () => {
 				const chunk = decoder.decode(value);
 				setAnswer((v) => {
 					if (v === '...') return chunk;
-					// For bw compatability we remove the json appended to the end
+					// For backward compatibility we remove the json appended to the end
 					return (v + chunk).replace(/\{"id":"[a-zA-Z0-9]+"\}/g, '');
 				});
 			}
@@ -131,7 +130,6 @@ export const AIChat = () => {
 				<div className="flex flex-grow items-center bg-design-main p-6 text-design-text">
 					<Question onSubmit={handleSubmit} />
 				</div>
-				<Support height={'h-11'} />
 			</section>
 			<AnimatePresence>
 				{showHistory && (
@@ -170,7 +168,7 @@ const ConsentOverlay = () => {
 				/>
 				<button
 					data-test="help-center-ai-chat-consent-accept-button"
-					className="mt-4 w-full cursor-pointer rounded border-0 bg-design-main px-4 py-2 text-center text-white"
+					className="mt-4 w-full rounded border-0 bg-design-main px-4 py-2 text-center text-white"
 					type="button"
 					onClick={() => setUserGaveConsent(true)}>
 					{__('Accept', 'extendify-local')}

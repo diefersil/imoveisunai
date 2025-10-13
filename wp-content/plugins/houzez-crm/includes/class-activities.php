@@ -7,6 +7,57 @@ if ( ! class_exists( 'Houzez_Activities' ) ) {
 
 			add_action( 'houzez_record_activities', array( $this, 'save_activity' ), 10, 1 );
 			add_action( 'wp_ajax_houzez_delete_activity', array( $this, 'delete_activity' ) );
+			add_action( 'wp_ajax_houzez_delete_activities_bulk', array( $this, 'delete_activities_bulk' ) );
+		}
+
+		public function delete_activities_bulk() {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'houzez_crm_activities';
+			$user_id = get_current_user_id();
+
+			$nonce = $_POST['security'];
+			if ( ! wp_verify_nonce( $nonce, 'delete_activity_nonce' ) ) {
+				$ajax_response = array( 'success' => false , 'reason' => esc_html__( 'Security check failed!', 'houzez-crm' ) );
+				echo json_encode( $ajax_response );
+				die;
+			}
+
+			if ( !isset( $_POST['activity_ids'] ) || empty( $_POST['activity_ids'] ) ) {
+				$ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No activities selected', 'houzez-crm' ) );
+				echo json_encode( $ajax_response );
+				die;
+			}
+
+			$activity_ids = explode(',', sanitize_text_field($_POST['activity_ids']));
+			
+			if(empty($activity_ids)) {
+				$ajax_response = array( 'success' => false , 'reason' => esc_html__( 'No valid activities found', 'houzez-crm' ) );
+				echo json_encode( $ajax_response );
+				die;
+			}
+
+			// Prepare the activity IDs for the IN clause
+			$placeholder = implode(',', array_fill(0, count($activity_ids), '%d'));
+			
+			// Add user ID to the query parameters
+			$query_args = array_merge($activity_ids, array($user_id));
+			
+			$deleted = $wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$table_name}
+					WHERE activity_id IN ({$placeholder}) AND user_id = %d",
+					...$query_args
+				)
+			);
+
+			if($deleted) {
+				$ajax_response = array( 'success' => true, 'reason' => esc_html__( 'Activities deleted successfully', 'houzez-crm' ) );
+			} else {
+				$ajax_response = array( 'success' => false, 'reason' => esc_html__( "You don't have rights to perform this action or no activities were deleted", 'houzez-crm' ) );
+			}
+			
+			echo json_encode( $ajax_response );
+			die;
 		}
 
 		public function delete_activity() {
@@ -139,7 +190,7 @@ if ( ! class_exists( 'Houzez_Activities' ) ) {
 		    $table_name = $wpdb->prefix . 'houzez_crm_activities';
 
 		    // Sanitize and validate the inputs
-		    $items_per_page = isset($_GET['records']) ? intval($_GET['records']) : 15;
+		    $items_per_page = isset($_GET['records']) ? intval($_GET['records']) : 10;
 		    $page = isset($_GET['cpage']) ? abs(intval($_GET['cpage'])) : 1;
 		    $offset = ($page * $items_per_page) - $items_per_page;
 

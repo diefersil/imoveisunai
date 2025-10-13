@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -157,51 +156,6 @@ class Houzez_Elementor_Partners extends Widget_Base {
         if( function_exists( 'houzez_partners' ) ) {
             echo houzez_partners( $args );
         }
-
-        if ( Plugin::$instance->editor->is_edit_mode() ) : ?>
-
-    
-            <script>    
-            
-            var houzez_rtl = houzez_vars.houzez_rtl;
-            if( houzez_rtl == 'yes' ) {
-                houzez_rtl = true;
-            } else {
-                houzez_rtl = false;
-            }
-
-           jQuery('.partners-slider-wrap').slick({
-                rtl: houzez_rtl,
-                lazyLoad: 'ondemand',
-                infinite: true,
-                speed: 300,
-                slidesToShow: 4,
-                arrows: true,
-                adaptiveHeight: true,
-                dots: true,
-                appendArrows: '.partners-module-slider',
-                prevArrow: jQuery('.partner-prev-js'),
-                nextArrow: jQuery('.partner-next-js'),
-                responsive: [{
-                        breakpoint: 992,
-                        settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 2
-                        }
-                    },
-                    {
-                        breakpoint: 769,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1
-                        }
-                    }
-                ]
-            });
-            </script>
-        
-        <?php endif; 
-
     }
 
 }

@@ -1,14 +1,49 @@
 <?php
 
 /**
+ * Sanitize template path to prevent Local File Inclusion attacks
+ *
+ * @param string $template_path The template path to sanitize
+ * @param array $allowed_values Array of allowed template values
+ * @return string|false Sanitized template path or false if invalid
+ */
+function houzez_sanitize_template_path( $template_path, $allowed_values = array() ) {
+    // Remove any directory traversal attempts
+    $template_path = str_replace( array( '../', '..\\', './', '.\\' ), '', $template_path );
+
+    // Remove any null bytes
+    $template_path = str_replace( chr(0), '', $template_path );
+
+    // If allowed values are specified, validate against whitelist
+    if ( ! empty( $allowed_values ) && ! in_array( $template_path, $allowed_values, true ) ) {
+        // Log potential attack attempt
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            error_log( 'Potential LFI attack blocked. Invalid template path: ' . $template_path );
+        }
+        return false;
+    }
+
+    // Additional sanitization
+    $template_path = sanitize_file_name( $template_path );
+
+    return $template_path;
+}
+
+/**
  * Get template part for houzez-theme-functinality plugin.
  *
  * @access public
  *
  * @param string $name Template name (default: '').
  * @param mixed $slug Template slug.
+ * @param array $args Arguments to pass to the template (default: array()).
  */
-function htf_get_template_part( $slug, $name = '' ) {
+function htf_get_template_part( $slug, $name = '', $args = array() ) {
+    // Include security helpers if not already loaded
+    if ( ! function_exists( 'houzez_validate_template_path' ) ) {
+        require_once HOUZEZ_PLUGIN_DIR . '/functions/security-helpers.php';
+    }
+
     $template = '';
 
     // Get slug-name.php.
@@ -24,8 +59,37 @@ function htf_get_template_part( $slug, $name = '' ) {
     // filter for third party plugins
     $template = apply_filters( 'htf_get_template_part', $template, $slug, $name );
 
+    // Validate the template path after filtering to ensure it's safe
+    if ( $template && ! houzez_validate_template_path( $template ) ) {
+        // Log security event if path validation fails
+        if ( function_exists( 'houzez_log_security_event' ) ) {
+            houzez_log_security_event( 'LFI_ATTEMPT', 'Invalid template path blocked', array(
+                'template' => $template,
+                'slug' => $slug,
+                'name' => $name
+            ) );
+        }
+        return; // Don't include invalid paths
+    }
+
     if ( $template ) {
-        load_template( $template, false );
+        // Safely handle args without using extract()
+        // Protected variables that should not be overwritten
+        $protected_vars = array( 'template', 'slug', 'name', 'args', 'protected_vars' );
+
+        if ( is_array($args) && !empty($args) ) {
+            foreach ( $args as $key => $value ) {
+                // Skip protected variables
+                if ( ! in_array( $key, $protected_vars, true ) ) {
+                    // Only create variables with valid names
+                    if ( preg_match( '/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key ) ) {
+                        $$key = $value;
+                    }
+                }
+            }
+        }
+
+        include $template;
     }
 }
 
@@ -205,7 +269,7 @@ if ( ! function_exists( 'houzez_add_term_id_children' ) ) :
             foreach ( $tax_terms as $term ) {
                 if ( $term->parent == $parent_id ) {
                     $terms_array[ $term->term_id ] = $prefix . $term->name;
-                    houzez_add_term_children( $term->term_id, $tax_terms, $terms_array, $prefix . '- ' );
+                    houzez_add_term_id_children( $term->term_id, $tax_terms, $terms_array, $prefix . '- ' );
                 }
             }
         }
@@ -217,7 +281,8 @@ if ( ! function_exists( 'houzez_pagination_type' ) ) :
         $pagi = array(
             'none' => esc_html__('None', 'houzez-theme-functionality'), 
             'loadmore' => esc_html__('Load More', 'houzez-theme-functionality'), 
-            'number' => esc_html__('Number', 'houzez-theme-functionality')
+            'number' => esc_html__('Number', 'houzez-theme-functionality'),
+            'infinite_scroll' => esc_html__('Infinite Scroll', 'houzez-theme-functionality'),
         );  
 
         return $pagi; 
@@ -851,7 +916,7 @@ if( !function_exists('houzez_tfp_get_dummy_placeholder_link')){
         }
 
         if( intval( $img_width ) > 0 && intval( $img_height ) > 0 ) {
-            return $protocol.'://placehold.it/' . $img_width . 'x' . $img_height . '&text=' . urlencode( $img_text ) . '';
+            return HOUZEZ_IMAGE.'placeholder.png';
         }
 
         return '';
@@ -884,20 +949,25 @@ if (!function_exists('houzez_tfp_user_role_by_post_id')) {
 
 if (!function_exists('houzez_tfp_user_role_by_user_id')) {
     /**
-     * Get the user role associated with a given user ID.
+     * Get the primary user role associated with a given user ID.
      *
      * @param int $user_id The user ID.
-     * @return string The user role.
+     * @return string The primary user role, or 'houzez_guest' if not found.
      */
     function houzez_tfp_user_role_by_user_id($user_id) {
-        if (!is_int($user_id) || $user_id <= 0) {
+        // Validate user ID
+        if (!is_numeric($user_id) || intval($user_id) <= 0) {
             return 'houzez_guest';
         }
 
-        $user = new WP_User($user_id);
-        return $user->roles ? $user->roles[0] : 'houzez_guest';
+        // Get user data
+        $user = get_userdata($user_id);
+        
+        // Return the first role if available, otherwise default to 'houzez_guest'
+        return !empty($user->roles) ? $user->roles[0] : 'houzez_guest';
     }
 }
+
 
 if ( ! function_exists( 'houzez_get_posts' ) ) {
     
@@ -921,7 +991,7 @@ if ( ! function_exists( 'houzez_get_posts' ) ) {
         foreach ( $qry->posts as $post ) {
             $data[] = array(
                 'id'   => $post->ID,
-                'text'      => $post->post_title,
+                'text' => $post->post_title,
             );
         }
 

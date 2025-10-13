@@ -25,21 +25,34 @@ if( ( isset($_GET['code']) && isset($_GET['state']) ) ){
     }
 }
 
-get_header(); 
+get_header('dashboard');
+?> 
 
-if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
-    get_template_part('template-parts/dashboard/agents/main');
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-} elseif( isset( $_GET['agents'] ) && $_GET['agents'] == 'add_new' ) {
-    get_template_part('template-parts/dashboard/agents/add-agent');
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
 
-} else {
-    get_template_part('template-parts/dashboard/profile/profile');
-}
+    <div class="dashboard-content">
+        <?php
+        if( isset( $_GET['agents'] ) && $_GET['agents'] == 'list' ) {
+            get_template_part('template-parts/dashboard/agents/main');
 
-?>
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
+        } elseif( isset( $_GET['agents'] ) && $_GET['agents'] == 'add_new' ) {
+            get_template_part('template-parts/dashboard/agents/add-agent');
 
-<?php get_footer(); ?>
+        } elseif( isset( $_GET['hpage'] ) && $_GET['hpage'] == 'verification' ) {
+            if( (houzez_is_agency() || houzez_is_agent() || houzez_is_owner() ) && houzez_option('enable_user_verification', 0) ) {
+                get_template_part('template-parts/dashboard/verification/main');
+            }
+
+        } else {
+            get_template_part('template-parts/dashboard/profile/profile');
+        }
+        ?>
+    </div>
+</div>
+
+<?php get_footer('dashboard'); ?>

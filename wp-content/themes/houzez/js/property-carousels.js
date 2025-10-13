@@ -1,121 +1,98 @@
-jQuery(document).ready( function($){
+jQuery(document).ready(function ($) {
+    const parseBool = (str) => str === 'true';
 
-    $('.houzez-properties-carousel-js[id^="houzez-properties-carousel-"]').each(function(){
-        var $div = jQuery(this);
-        var token = $div.data('token');
-        var obj = window['houzez_prop_caoursel_' + token];
-
-        var slides_to_show = parseInt(obj.slides_to_show),
-            slides_to_scroll = parseInt(obj.slides_to_scroll),
-            navigation = parseBool(obj.navigation),
-            auto_play = parseBool(obj.slide_auto),
-            auto_play_speed = parseInt(obj.auto_speed),
-            slide_infinite = parseBool(obj.slide_infinite),
-            dots = parseBool( obj.slide_dots );
-
-        var houzez_rtl = houzez_vars.houzez_rtl;
-
-        if( houzez_rtl == 'yes' ) {
-            houzez_rtl = true;
-        } else {
-            houzez_rtl = false;
+    const initializeCarousel = (selector, token, obj) => {
+        if (!obj) {
+            console.warn(`Carousel data not found for token: ${token}`);
+            return;
         }
 
-        function parseBool(str) {
-            if( str == 'true' ) { return true; } else { return false; }
+        const slides_to_show = parseInt(obj.slides_to_show);
+        const slides_to_scroll = parseInt(obj.slides_to_scroll);
+        const navigation = parseBool(obj.navigation);
+        const auto_play = parseBool(obj.slide_auto);
+        const auto_play_speed = parseInt(obj.auto_speed);
+        const slide_infinite = parseBool(obj.slide_infinite);
+        const dots = parseBool(obj.slide_dots);
+        const houzez_rtl = houzez_vars.houzez_rtl === 'yes';
+
+        const carousel = $(`#${selector}-${token}`);
+
+        if (!carousel.length) {
+            console.warn(`Carousel element not found: ${selector}-${token}`);
+            return;
         }
 
-        var houzezPropertyCarousel = $('#houzez-properties-carousel-'+token);
+        // Store arrow references before potentially destroying the carousel
+        const prevArrow = $(`.slick-prev-js-${token}`);
+        const nextArrow = $(`.slick-next-js-${token}`);
 
-        houzezPropertyCarousel.slick({
+        // Check if slick is already initialized and destroy it if needed
+        if (carousel.hasClass('slick-initialized')) {
+            carousel.slick('unslick');
+        }
+
+        const slickConfig = {
             rtl: houzez_rtl,
             lazyLoad: 'ondemand',
             infinite: slide_infinite,
             autoplay: auto_play,
             autoplaySpeed: auto_play_speed,
-            speed: 300,
+            speed: 500,
             slidesToShow: slides_to_show,
             slidesToScroll: slides_to_scroll,
             arrows: navigation,
             adaptiveHeight: true,
             dots: dots,
-            appendArrows: '.houzez-carousel-arrows-'+token,
-            prevArrow: $('.slick-prev-js-'+token),
-            nextArrow: $('.slick-next-js-'+token),
-            responsive: [{
+            appendArrows: `.houzez-carousel-arrows-${token}`,
+            responsive: [
+                {
                     breakpoint: 992,
                     settings: {
                         slidesToShow: 2,
-                        slidesToScroll: 2
-                    }
+                        slidesToScroll: 2,
+                    },
                 },
                 {
                     breakpoint: 769,
                     settings: {
                         slidesToShow: 1,
-                        slidesToScroll: 1
-                    }
-                }
-            ]
-        });
-    });
-
-    $('.houzez-carousel-js[id^="houzez-carousel-"]').each(function(){
-        var $div = jQuery(this);
-        var token = $div.data('token');
-        var obj = window['houzez_caoursel_' + token];
-
-        var slides_to_show = parseInt(obj.slides_to_show),
-            slides_to_scroll = parseInt(obj.slides_to_scroll),
-            navigation = parseBool(obj.navigation),
-            auto_play = parseBool(obj.slide_auto),
-            auto_play_speed = parseInt(obj.auto_speed),
-            slide_infinite = parseBool(obj.slide_infinite),
-            dots = parseBool( obj.slide_dots );
-
-        var houzez_rtl = houzez_vars.houzez_rtl;
-
-        if( houzez_rtl == 'yes' ) {
-            houzez_rtl = true;
-        } else {
-            houzez_rtl = false;
-        }
-
-        function parseBool(str) {
-            if( str == 'true' ) { return true; } else { return false; }
-        }
-
-        var houzezCarousel = $('#houzez-carousel-'+token);
-
-        houzezCarousel.slick({
-            rtl: houzez_rtl,
-            lazyLoad: 'ondemand',
-            infinite: slide_infinite,
-            autoplay: auto_play,
-            autoplaySpeed: auto_play_speed,
-            speed: 300,
-            slidesToShow: slides_to_show,
-            slidesToScroll: slides_to_scroll,
-            arrows: navigation,
-            adaptiveHeight: true,
-            dots: dots,
-            appendArrows: '.houzez-carousel-arrows-'+token,
-            responsive: [{
-                    breakpoint: 992,
-                    settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 2
-                    }
+                        slidesToScroll: 1,
+                    },
                 },
-                {
-                    breakpoint: 769,
-                    settings: {
-                        slidesToShow: 1,
-                        slidesToScroll: 1
-                    }
-                }
-            ]
-        });
-    });
+            ],
+        };
 
+        if (navigation && prevArrow.length && nextArrow.length) {
+            slickConfig.prevArrow = prevArrow;
+            slickConfig.nextArrow = nextArrow;
+        }
+
+        try {
+            carousel.slick(slickConfig);
+        } catch (error) {
+            console.error(
+                `Error initializing carousel ${selector}-${token}:`,
+                error
+            );
+        }
+    };
+
+    // Initialize property carousels
+    $('.houzez-properties-carousel-js[id^="houzez-properties-carousel-"]').each(
+        function () {
+            const $div = $(this);
+            const token = $div.data('token');
+            const obj = window[`houzez_prop_carousel_${token}`];
+            initializeCarousel('houzez-properties-carousel', token, obj);
+        }
+    );
+
+    // Initialize regular carousels
+    $('.houzez-carousel-js[id^="houzez-carousel-"]').each(function () {
+        const $div = $(this);
+        const token = $div.data('token');
+        const obj = window[`houzez_caoursel_${token}`];
+        initializeCarousel('houzez-carousel', token, obj);
+    });
 });

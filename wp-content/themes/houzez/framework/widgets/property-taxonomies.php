@@ -16,7 +16,7 @@ class HOUZEZ_property_taxonomies extends WP_Widget {
         parent::__construct(
             'houzez_property_taxonomies', // Base ID
             esc_html__( 'HOUZEZ: Property Taxonomies', 'houzez' ), // Name
-            array( 'classname' => 'widget-taxonomy', 'description' => esc_html__( 'Show property type, status, features, cities, states', 'houzez' ), ) // Args
+            array( 'classname' => 'widget-taxonomy widget-list-more', 'description' => esc_html__( 'Show property type, status, features, cities, states', 'houzez' ), ) // Args
         );
 
     }
@@ -177,25 +177,40 @@ function houzez_property_taxonomies( $taxonomy, $show_child, $show_count, $item_
 
 function show_hierarchical_property_types ( $terms, $taxonomy, $show_child, $show_count ) {
     $count = count( $terms );
-    if ( $count > 0 ){
 
-        if( $show_child ) {
-            echo '<ul>';
-        } else {
-            echo '<ul class="children">';
-        }
+    if ( $count > 0 ){
+        echo '<ul class="list-unstyled mb-0" role="tree">';
 
         foreach ($terms as $term){
-            echo '<li><a href="' . esc_url( get_term_link( $term->term_id, $term->taxonomy ) ). '">' . esc_attr( $term->name ) . '</a>';
+            $has_children = $show_child && get_terms($taxonomy, array('parent' => $term->term_id));
+            $item_class = $has_children ? 'widget-taxonomy-item has-children' : 'widget-taxonomy-item';
+            
+            echo '<li class="' . esc_attr($item_class) . '">';
+            echo '<div class="widget-taxonomy-item-content">';
+            echo '<a href="' . esc_url(get_term_link($term->term_id, $term->taxonomy)) . '" role="listitem">
+                <i class="houzez-icon icon-arrow-right-1" aria-hidden="true"></i> ' . esc_attr($term->name) . '</a>';
 
             if( $show_count ) {
-                echo '<span class="cat-count">(' . esc_attr( $term->count ) . ')</span>';
+                echo ' <span>(' . esc_attr($term->count) . ')</span>';
             }
+            echo '</div>';
 
             if( $show_child ) {
-                $child_terms = get_terms( $taxonomy, array('parent' => $term->term_id));
+                $child_terms = get_terms($taxonomy, array('parent' => $term->term_id));
                 if ($child_terms) {
-                    show_hierarchical_property_types( $child_terms, $taxonomy, false, $show_count );
+                    echo '<ul class="children">';
+                    foreach ($child_terms as $child_term) {
+                        echo '<li class="widget-taxonomy-item">';
+                        echo '<div class="widget-taxonomy-item-content">';
+                        echo '<a href="' . esc_url(get_term_link($child_term->term_id, $child_term->taxonomy)) . '" role="listitem">
+                            <i class="houzez-icon icon-arrow-right-1" aria-hidden="true"></i> ' . esc_attr($child_term->name) . '</a>';
+                        if( $show_count ) {
+                            echo ' <span>(' . esc_attr($child_term->count) . ')</span>';
+                        }
+                        echo '</div>';
+                        echo '</li>';
+                    }
+                    echo '</ul>';
                 }
             }
             echo '</li>';

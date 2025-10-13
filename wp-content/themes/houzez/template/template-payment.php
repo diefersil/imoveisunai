@@ -56,51 +56,63 @@ if ( is_user_logged_in() ) {
 <section class="frontend-submission-page">
     
     <div class="container">
-         <div id="packmem-msgs"></div>
-
-         <div class="d-flex display-block-on-tablet">
-            <div class="order-2">
-                <?php
-                if( $enable_paid_submission == 'membership' ) {
-                    get_template_part('template-parts/membership/price');
-                } else if ( $enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing' ) {
-                    get_template_part('template-parts/membership/per-listing/price');
-                }
-                ?>
-            </div><!-- order-2 -->
-            <div class="order-1 flex-grow-1">
-                <form name="houzez_checkout" method="post" class="houzez_payment_form" action="<?php echo $stripe_processor_link; ?>">
-                    <?php if ( $houzez_need_register ) { ?>
-                    <div class="dashboard-content-block-wrap">
-                        <h2><?php esc_html_e('Account Information', 'houzez'); ?></h2>
-                        <div class="dashboard-content-block">
-                            <?php get_template_part('template-parts/membership/create-account-form'); ?>    
+         
+         <div class="dashboard-content-block-wrap pt-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div id="packmem-msgs"></div>
+                    <form name="houzez_checkout" method="post" class="houzez_payment_form" action="<?php echo $stripe_processor_link; ?>">
+                        <?php if ( $houzez_need_register ) { ?>
+                        <div class="block-wrap">
+                            <div class="block-title-wrap mb-3 d-flex justify-content-between align-items-center">
+                                <h2><?php esc_html_e('Account Information', 'houzez'); ?></h2>
+                                <div class="form-login-link login-link">
+                                    <?php esc_html_e('Already have an account?', 'houzez'); ?> 
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form"><?php esc_html_e('Login', 'houzez'); ?></a>
+                                </div>
+                            </div>
+                            <div class="block-content-wrap">
+                                <?php get_template_part('template-parts/membership/create-account-form'); ?>    
+                            </div>
                         </div>
-                    </div>
-                    <?php } ?>
-
-                    <div class="dashboard-content-block-wrap">
-                        <?php if( $package_price > 0 || $enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing') { ?>
-                        <h2><?php echo $houzez_local['payment_method']; ?></h2>
                         <?php } ?>
 
-                        <div class="dashboard-content-block">
+                        <div class="block-wrap">
+                            <?php if( $package_price > 0 || $enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing') { ?>
+                                <div class="block-title-wrap mb-3">
+                                    <h2><?php echo $houzez_local['payment_method']; ?></h2>
+                                </div>
+                            <?php } ?>
 
-                            <?php
-                            if( $enable_paid_submission == 'membership' ) {
-                                get_template_part('template-parts/membership/payment-method');
+                            <div class="block-content-wrap">
 
-                            } elseif($enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing') {
-                                
-                                get_template_part('template-parts/membership/per-listing/payment-method');
-                            }
-                            ?>
-                        </div><!-- dashboard-content-block -->
-                    </div><!-- dashboard-content-block-wrap -->
-                
-                </form>
-            </div><!-- order-1 -->
-        </div><!-- d-flex -->
+                                <?php
+                                if( $enable_paid_submission == 'membership' ) {
+                                    get_template_part('template-parts/membership/payment-method');
+
+                                } elseif($enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing') {
+                                    
+                                    get_template_part('template-parts/membership/per-listing/payment-method');
+                                }
+                                ?>
+                            </div><!-- block-content-wrap -->
+                        </div><!-- block-wrap -->
+                    
+                    </form>
+                </div>
+
+                <div class="col-lg-4 order-sm-first">
+                    <?php
+                    if( $enable_paid_submission == 'membership' ) {
+                        get_template_part('template-parts/membership/price');
+                    } else if ( $enable_paid_submission == 'per_listing' || $enable_paid_submission == 'free_paid_listing' ) {
+                        get_template_part('template-parts/membership/per-listing/price');
+                    }
+                    ?>
+                </div>
+        
+            </div><!-- row -->
+        </div><!-- block-content-wrap -->
     
     </div><!-- container -->
 </section><!-- frontend-submission-page -->

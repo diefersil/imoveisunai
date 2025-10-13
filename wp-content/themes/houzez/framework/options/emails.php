@@ -391,6 +391,7 @@ Thank you!', 'houzez'),
             'subtitle' => esc_html__('Email subject for new user admin notification', 'houzez'),
             'desc'     => '',
             'default'  => esc_html__('New User Registration', 'houzez'),
+            'required' => array('nru_admin_email', '=', '1'),
         ),
         array(
             'id'       => 'houzez_admin_new_user_register',
@@ -404,30 +405,37 @@ E-mail: %user_email_register', 'houzez'),
             'args' => array(
                 'teeny' => false,
                 'textarea_rows' => 10
-            )
+            ),
+            'required' => array('nru_admin_email', '=', '1'),
         ),
 
-        /*array(
-            'id'       => 'houzez_subject_user_register_verification',
-            'type'     => 'text',
-            'title'    => esc_html__('Subject for New User Verification', 'houzez'),
-            'subtitle' => esc_html__('Email subject for new user verification', 'houzez'),
-            'desc'     => '',
-            'default'  => esc_html__('Please verify your email on %website_name', 'houzez'),
-        ),
         array(
-            'id'       => 'houzez_user_register_verification',
-            'type'     => 'editor',
-            'title'    => esc_html__('Content for New User Verification', 'houzez'),
-            'subtitle' => esc_html__('Email content for new user verification', 'houzez'),
+            'id'       => 'houzez_subject_admin_user_register_approval',
+            'type'     => 'text',
+            'title'    => esc_html__('Subject for New User Approval', 'houzez'),
+            'subtitle' => esc_html__('Email subject for new user approval', 'houzez'),
             'desc'     => '',
-            'default'  => esc_html__('Hi there,
-Welcome to %website_name! Click the following link to verify your email: %email_verification_link', 'houzez'),
+            'default'  => esc_html__('New user registration on %website_name. Please approve or decline the user.', 'houzez'),
+            'required' => array('nru_admin_email', '=', '1'),
+        ),
+
+        array(
+            'id'       => 'houzez_admin_user_register_approval',
+            'type'     => 'editor',
+            'title'    => esc_html__('Content for New User Admin Approval', 'houzez'),
+            'subtitle' => esc_html__('Email content for new user admin approval', 'houzez'),
+            'desc'     => '',
+            'default'  => esc_html__('New user registration on %website_name.
+Username: %user_login_register,
+E-mail: %user_email_register
+
+Please approve or decline the user: %admin_user_link', 'houzez'),
             'args' => array(
                 'teeny' => false,
                 'textarea_rows' => 10
-            )
-        ),*/
+            ),
+            'required' => array('nru_admin_email', '=', '1'),
+        ),
     )
 ));
 

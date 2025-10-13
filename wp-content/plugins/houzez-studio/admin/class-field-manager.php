@@ -304,6 +304,10 @@ class Favethemes_Field_Manager {
 	            'value' => array(
 	                'standard-global'    => __('Entire Website', 'houzez-studio'),
 	                'standard-singulars' => __('All Singulars', 'houzez-studio'),
+	                'standard-single-listing' => __('All Single Listings', 'houzez-studio'),
+	                'standard-single-agent' => __('All Single Agents', 'houzez-studio'),
+	                'standard-single-agency' => __('All Single Agencies', 'houzez-studio'),
+	                'standard-single-post' => __('All Single Posts', 'houzez-studio'),
 	                'standard-archives'  => __('All Archives', 'houzez-studio'),
 	            ),
 	        ),
@@ -313,7 +317,7 @@ class Favethemes_Field_Manager {
 	        ),
 	        'specific-selection' => array(
 	            'label' => __('Specific Selection', 'houzez-studio'),
-	            'value' => array('specifics' => __('Specific Pages / Posts / Taxonomies, etc.', 'houzez-studio')),
+	            'value' => array('specifics' => __('Specific Pages / Listings / Posts / Taxonomies, etc.', 'houzez-studio')),
 	        ),
 	    );
 
@@ -654,6 +658,10 @@ class Favethemes_Field_Manager {
 	    $textMappings = array(
             'standard-global'    => 'Entire Site',
             'standard-singulars' => 'All Singulars',
+            'standard-single-listing' => 'All Single Listings',
+            'standard-single-agent' => 'All Single Agents',
+            'standard-single-agency' => 'All Single Agencies',
+            'standard-single-post' => 'All Single Posts',
             'standard-archives'  => 'All Archives',
             'unique-404'      	 => '404 Page',
             'unique-search'   	 => 'Blog Search Page',
@@ -742,6 +750,18 @@ class Favethemes_Field_Manager {
 	    }
 	    if ( houzez_is_agencies_template() ) {
 	        return 'is_agencies_template';
+	    }
+	    if (is_singular('property')) {
+	        return 'is_single_listing';
+	    }
+	    if (is_singular('houzez_agent')) {
+	        return 'is_single_agent';
+	    }
+	    if (is_singular('houzez_agency')) {
+	        return 'is_single_agency';
+	    }
+	    if (is_singular('post')) {
+	        return 'is_single_post';
 	    }
 	    if (is_singular()) {
 	        return 'is_singular';
@@ -986,6 +1006,26 @@ class Favethemes_Field_Manager {
 	            self::$current_page_data['current_post_id'] = $current_id;
 	            $meta_args .= $this->handle_front_page_type($current_post_type, $current_id);
 	            break;
+	        case 'is_single_listing':
+	            $current_id = get_the_ID();
+	            self::$current_page_data['current_post_id'] = $current_id;
+	            $meta_args .= $this->handle_single_listing_type($q_obj, $current_post_type, $current_id);
+	            break;
+	        case 'is_single_agent':
+	            $current_id = get_the_ID();
+	            self::$current_page_data['current_post_id'] = $current_id;
+	            $meta_args .= $this->handle_single_agent_type($q_obj, $current_post_type, $current_id);
+	            break;
+	        case 'is_single_agency':
+	            $current_id = get_the_ID();
+	            self::$current_page_data['current_post_id'] = $current_id;
+	            $meta_args .= $this->handle_single_agency_type($q_obj, $current_post_type, $current_id);
+	            break;
+	        case 'is_single_post':
+	            $current_id = get_the_ID();
+	            self::$current_page_data['current_post_id'] = $current_id;
+	            $meta_args .= $this->handle_single_post_type($q_obj, $current_post_type, $current_id);
+	            break;
 	        case 'is_singular':
 	            $current_id = get_the_ID();
 	            self::$current_page_data['current_post_id'] = $current_id;
@@ -1057,6 +1097,75 @@ class Favethemes_Field_Manager {
 	*/
 	private function handle_singular_page_type($q_obj, $current_post_type, $current_id) {
 	    $meta_args = " OR pm.meta_value LIKE '%\"standard-singulars\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"{$current_post_type}|all\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"post-{$current_id}\"%'";
+
+	    $taxonomies = get_object_taxonomies($q_obj->post_type);
+	    $terms = wp_get_post_terms($q_obj->ID, $taxonomies);
+
+	    foreach ($terms as $term) {
+	        $meta_args .= " OR pm.meta_value LIKE '%\"tax-{$term->term_id}-single-{$term->taxonomy}\"%'";
+	    }
+
+	    return $meta_args;
+	}
+
+
+	/**
+	* Builds meta arguments for the SQL query specific to singular page types.
+	* This function handles conditions related to singular pages, including taxonomy and term checks.
+	* @param object $q_obj The queried object, typically a post.
+	* @param string $current_post_type The current post type.
+	* @param int $current_id The ID of the current post.
+	* @return string A string of SQL conditions for singular page types.
+	*/
+	private function handle_single_listing_type($q_obj, $current_post_type, $current_id) {
+	    $meta_args = " OR pm.meta_value LIKE '%\"standard-single-listing\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"{$current_post_type}|all\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"post-{$current_id}\"%'";
+
+	    $taxonomies = get_object_taxonomies($q_obj->post_type);
+	    $terms = wp_get_post_terms($q_obj->ID, $taxonomies);
+
+	    foreach ($terms as $term) {
+	        $meta_args .= " OR pm.meta_value LIKE '%\"tax-{$term->term_id}-single-{$term->taxonomy}\"%'";
+	    }
+
+	    return $meta_args;
+	}
+
+	private function handle_single_agent_type($q_obj, $current_post_type, $current_id) {
+	    $meta_args = " OR pm.meta_value LIKE '%\"standard-single-agent\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"{$current_post_type}|all\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"post-{$current_id}\"%'";
+
+	    $taxonomies = get_object_taxonomies($q_obj->post_type);
+	    $terms = wp_get_post_terms($q_obj->ID, $taxonomies);
+
+	    foreach ($terms as $term) {
+	        $meta_args .= " OR pm.meta_value LIKE '%\"tax-{$term->term_id}-single-{$term->taxonomy}\"%'";
+	    }
+
+	    return $meta_args;
+	}
+
+	private function handle_single_agency_type($q_obj, $current_post_type, $current_id) {
+	    $meta_args = " OR pm.meta_value LIKE '%\"standard-single-agency\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"{$current_post_type}|all\"%'";
+	    $meta_args .= " OR pm.meta_value LIKE '%\"post-{$current_id}\"%'";
+
+	    $taxonomies = get_object_taxonomies($q_obj->post_type);
+	    $terms = wp_get_post_terms($q_obj->ID, $taxonomies);
+
+	    foreach ($terms as $term) {
+	        $meta_args .= " OR pm.meta_value LIKE '%\"tax-{$term->term_id}-single-{$term->taxonomy}\"%'";
+	    }
+
+	    return $meta_args;
+	}
+
+	private function handle_single_post_type($q_obj, $current_post_type, $current_id) {
+	    $meta_args = " OR pm.meta_value LIKE '%\"standard-single-post\"%'";
 	    $meta_args .= " OR pm.meta_value LIKE '%\"{$current_post_type}|all\"%'";
 	    $meta_args .= " OR pm.meta_value LIKE '%\"post-{$current_id}\"%'";
 

@@ -1,5 +1,9 @@
 <?php
 namespace HouzezStudio;
+use Elementor\Controls_Manager;
+/*use Elementor\Core\DynamicTags\Base_Tag;
+use Elementor\Core\DynamicTags\Dynamic_CSS;
+use Elementor\Core\Files\CSS\Post;*/
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -60,6 +64,8 @@ if( ! class_exists( 'FTS_Elementor' ) ) {
                 // Scripts and styles.
                 add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
                 add_shortcode( 'fts_template', array( $this, 'render_shortcode' ) );
+
+                //add_action( 'elementor/documents/register_controls', array( $this, 'add_preview_settings_section' ) );
             }
         }
 
@@ -75,10 +81,12 @@ if( ! class_exists( 'FTS_Elementor' ) ) {
             // Enqueue Elementor and Elementor Pro styles
             $elementor = \Elementor\Plugin::instance();
             $elementor->frontend->enqueue_styles();
-            
+
             if ( class_exists( '\ElementorPro\Plugin' ) ) {
                 $elementor_pro = \ElementorPro\Plugin::instance();
-                $elementor_pro->enqueue_styles();
+                if ( method_exists( $elementor_pro, 'enqueue_styles' ) ) {
+                    $elementor_pro->enqueue_styles();
+                }
             }
 
             // Enqueue styles for various sections if they exist
@@ -88,7 +96,11 @@ if( ! class_exists( 'FTS_Elementor' ) ) {
                 'after_header' => fts_get_after_header_id(),
                 'footer' => fts_get_footer_id(),
                 'before_footer' => fts_get_before_footer_id(),
-                'after_footer' => fts_get_after_footer_id()
+                'after_footer' => fts_get_after_footer_id(),
+                'single_listing' => fts_get_single_listing_id(),
+                'single_agent' => fts_get_single_agent_id(),
+                'single_agency' => fts_get_single_agency_id(),
+                'single_post' => fts_get_single_post_id()
             ];
 
             foreach ($section_ids as $id) {
@@ -170,6 +182,100 @@ if( ! class_exists( 'FTS_Elementor' ) ) {
             $id = !empty($id) ? intval(apply_filters('fts_render_template_id', $id)) : '';
             
             return self::$elementor_instance->frontend->get_builder_content_for_display( $id );
+        }
+
+        public function add_preview_settings_section(\Elementor\Controls_Stack $controls_stack) {
+            if(houzez_tb_get_template_type(get_the_ID()) === 'single-listing' || houzez_tb_get_template_type(get_the_ID()) === 'loop-item') {
+                $controls_stack->start_controls_section(
+                    'houzez_preview_settings',
+                    [
+                        'label' => esc_html__( 'Preview Settings', 'houzez-studio' ),
+                        'tab' => Controls_Manager::TAB_SETTINGS,
+                    ]
+                );
+
+                $post_types = [
+                    'post' => __('Post', 'houzez-studio'),
+                    'page' => __('Page', 'houzez-studio'),
+                ];
+                $post_types_data = get_post_types(array(
+                    'public' => true,
+                    '_builtin' => false
+                ), 'objects');
+
+                foreach ($post_types_data as $post_type) {
+                    if (!empty($post_type->name) && !in_array($post_type->name, ['elementor_library', 'fts_builder', 'e-landing-page', 'page'])) {
+                        $post_types[$post_type->name] = $post_type->label;
+                    }
+                }
+
+                $controls_stack->add_control(
+                    'houzez_preview_type',
+                    [
+                        'label' => __('Post Type to Preview Dynamic Content', 'houzez-studio'),
+                        'type' => \Elementor\Controls_Manager::SELECT,
+                        'label_block' => true,
+                        'options' => $post_types,
+                        'default' => 'post',
+                        'save_always' => 'true',
+                    ]
+                );
+
+                foreach ($post_types as $post_type_name => $post_type_label) {
+                    $controls_stack->add_control(
+                        'houzez_preview_post_' . $post_type_name,
+                        [
+                            'label' => __('Select Post', 'houzez-studio'),
+                            'type' => 'houzez_autocomplete',
+                            'make_search' => 'houzez_get_posts',
+                            'render_result' => 'houzez_render_posts_title',
+                            'post_type' => $post_type_name,
+                            'label_block' => true,
+                            'multiple' => false,
+                            'condition' => [
+                                'houzez_preview_type' => $post_type_name,
+                            ],
+                        ]
+                    );
+                
+                }
+
+                $controls_stack->add_control(
+                    'houzez_apply_preview',
+                    [
+                        'type' => Controls_Manager::BUTTON,
+                        'label' => esc_html__( 'Apply & Preview', 'houzez-studio' ),
+                        'label_block' => true,
+                        'show_label' => false,
+                        'text' => esc_html__( 'Apply & Preview', 'houzez-studio' ),
+                        'separator' => 'none',
+                        'event' => 'elementorThemeBuilder:ApplyPreview',
+                    ]
+                );
+
+                /*if'houzez_get_template_type(get_the_ID()) === 'loop-item') {
+                    $controls_stack->add_responsive_control(
+                        'houzez_preview_width',
+                        [
+                            'label' => esc_html__( 'Width', 'houzez-studio' ),
+                            'type' => Controls_Manager::SLIDER,
+                            'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+                            'range' => [
+                                'px' => [
+                                    'min' => 200,
+                                    'max' => 1140,
+                                ],
+                            ],
+                            'selectors' => [
+                                '{{WRAPPER}} #main-content .houzez-template-wrapper > .elementor' => 'width: {{SIZE}}{{UNIT}};',
+                            ],
+                        ]
+                    );
+                }*/
+
+                $controls_stack->end_controls_section();
+            }
+
         }
 
 

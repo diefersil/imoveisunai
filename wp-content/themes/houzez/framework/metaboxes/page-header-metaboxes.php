@@ -201,7 +201,7 @@ if( !function_exists('houzez_page_header_metaboxes') ) {
                     'id'        => $houzez_prefix . 'map_city',
                     'type'      => 'select',
                     'options'   => $prop_locations,
-                    'desc'      => esc_html__('Select a city where to start the property map on header page. You can select multiple cities or keep all un-select to display properties from all the cities', 'houzez'),
+                    'desc'      => esc_html__('Select a city where to start the property map on header page. You can select multiple cities or keep all un-select to display properties from all the cities. Note: This option is not available for listings template pages.', 'houzez'),
                     'multiple' => true,
                     'class' => 'houzez-map-cities',
                     'hidden' => array( 'fave_header_type', '!=', 'property_map' )

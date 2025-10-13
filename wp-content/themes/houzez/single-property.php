@@ -51,10 +51,15 @@ if( !empty( $single_content_area ) && $single_content_area != 'global' ) {
 }
 
 /* For demo purpose only */
-if( isset( $_GET['s_top'] ) ) {
+// Whitelist validation for s_top parameter
+$valid_top_areas = array('v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7');
+if( isset( $_GET['s_top'] ) && in_array($_GET['s_top'], $valid_top_areas, true) ) {
     $top_area = $_GET['s_top'];
 }
-if( isset( $_GET['s_layout'] ) ) {
+
+// Whitelist validation for s_layout parameter
+$valid_layouts = array('v2', 'tabs', 'tabs-vertical', 'minimal', 'boxed', 'simple');
+if( isset( $_GET['s_layout'] ) && in_array($_GET['s_layout'], $valid_layouts, true) ) {
     $property_layout = $_GET['s_layout'];
 }
 
@@ -130,7 +135,7 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                     
                     if( $property_layout == 'v2' ) { ?>
                     
-                    <div class="property-view full-width-property-view">
+                    <div class="property-view fw-full-width-property-view">
                         <?php get_template_part('property-details/mobile-view'); ?>
                         <?php get_template_part( 'property-details/single-property-luxury-homes'); ?>
                     </div>
@@ -150,7 +155,7 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                     } 
                     ?>
                     <div class="row">
-                        <div class="<?php echo esc_attr($content_classes); ?>">
+                        <div class="<?php echo esc_attr($content_classes); ?>" role="region">
                             <?php
                             if($top_area == 'v3') {
                                 get_template_part('property-details/top-area-v3-4');
@@ -201,5 +206,8 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
     } // <!-- end fts_single_listing_enabled else condition -->
  } // <!-- end elementor location -->
 } ?> <!-- end houzez_check_is_elementor -->
+
+<?php get_template_part( 'property-details/mobile-property-contact'); ?>
+<?php get_template_part( 'property-details/lightbox'); ?>
 
 <?php get_footer(); ?>

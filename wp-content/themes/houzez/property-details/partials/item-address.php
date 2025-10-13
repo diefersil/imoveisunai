@@ -55,7 +55,8 @@ if ($enabled_data) {
 	$result = join( ", ", $temp_array );
 
 	if( ! empty( $result ) ) {
-		echo '<address class="item-address"><i class="houzez-icon icon-pin mr-1"></i>';
+		echo '<address class="item-address mb-2" role="contentinfo">';
+		echo '<i class="houzez-icon icon-pin me-1" aria-hidden="true"></i>';
 			echo $result;
 		echo '</address>';
 	}

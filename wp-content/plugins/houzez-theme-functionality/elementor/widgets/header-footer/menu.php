@@ -1,12 +1,11 @@
 <?php
-namespace Houzez\Elementor\Widgets\HeaderFooter;
+namespace Elementor;
 use Houzez\Classes;
 
 use Elementor\Plugin;
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
 use Elementor\Core\Kits\Documents\Tabs\Global_Colors;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Border;
@@ -18,7 +17,7 @@ use Elementor\Core\Files\Assets\Svg\Svg_Handler;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
+ 
 /**
  * Site Menu Widget.
  * @since 1.0.0
@@ -77,7 +76,20 @@ class Houzez_Menu extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'houzez-elements', 'houzez-header-footer' ];
+        // Check if the current post type is 'fts_builder'
+	    if (get_post_type() === 'fts_builder') {
+	        // Get the template type of the current post
+	        $template_type = htb_get_template_type(get_the_ID());
+
+	        // Check if the template type is 'tmp_header' or 'tmp_footer'
+	        if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+	            // Return the specific category for header and footer builders
+	            return ['houzez-header-footer-builder'];
+	        }
+	    }
+	    
+	    // Return the default categories
+	    return ['houzez-elements', 'houzez-header-footer'];
     }
 
     /**
@@ -163,7 +175,7 @@ class Houzez_Menu extends Widget_Base {
                 'type'      => Controls_Manager::SELECT,
                 'options'   => array(
                 	'horizontal' => esc_html__('Horizontal', 'houzez-theme-functionality'),
-                	'vertical' => esc_html__('Vertical', 'houzez-theme-functionality'),
+					'vertical' => esc_html__('Vertical', 'houzez-theme-functionality'),
                 	'dropdown' => esc_html__('Dropdown', 'houzez-theme-functionality'),
                 ),
                 'description' => '',
@@ -383,61 +395,18 @@ class Houzez_Menu extends Widget_Base {
 			]
 		);
 
-		$this->add_responsive_control(
-			'mdropdown-margin-top',
-			[
-				'label' => esc_html__( 'Top', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
-				'range' => [
-					'px' => [
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .main-mobile-nav' => 'top: {{SIZE}}{{UNIT}}',
-				],
-			]
-		);
-
 		$this->add_control(
-			'full_width',
+			'mobile_offcanvas_position',
 			[
-				'label' => esc_html__( 'Full Width', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::SWITCHER,
-				'description' => esc_html__( 'Stretch the dropdown of the menu to full width.', 'houzez-theme-functionality' ),
-				'prefix_class' => 'houzez-nav-mobile-menu-',
-				'return_value' => 'fullwidth',
-				'default' => 'fullwidth',
-				'frontend_available' => true,
-				'condition' => [
-					'mobile-menu-breakpoint!' => 'none',
-				],
-			]
-		);
-
-		$this->add_control(
-			'text_align',
-			[
-				'label' => esc_html__( 'Text  Align', 'houzez-theme-functionality' ),
+				'label' => esc_html__( 'Offcanvas Position', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::SELECT,
-				'default' => 'aside',
+				'default' => 'start',
 				'options' => [
-					'aside' => esc_html__( 'Aside', 'houzez-theme-functionality' ),
-					'center' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-				],
-				'prefix_class' => 'elementor-nav-menu__text-align-',
-				'condition' => [
-					'mobile-menu-breakpoint!' => 'none',
+					'start' => esc_html__( 'Left', 'houzez-theme-functionality' ),
+					'end' => esc_html__( 'Right', 'houzez-theme-functionality' ),
 				],
 			]
 		);
-
-		$this->start_controls_tabs( 'nav_icon_options' );
-
-		$this->start_controls_tab( 'nav_icon_normal_options', [
-			'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
-		] );
 
 		$this->add_control(
 			'toggle_icon_normal',
@@ -467,71 +436,6 @@ class Houzez_Menu extends Widget_Base {
 					],
 					'fa-regular' => [
 						'plus-square',
-					],
-				],
-			]
-		);
-
-		$this->end_controls_tab();
-
-		/*$this->start_controls_tab( 'nav_icon_hover_options', [
-			'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
-			'condition' => [
-				'toggle' => 'burger',
-			],
-		] );
-
-		$this->add_control(
-			'toggle_icon_hover_animation',
-			[
-				'label' => esc_html__( 'Hover Animation', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::HOVER_ANIMATION,
-				'frontend_available' => true,
-				'render_type' => 'template',
-				'condition' => [
-					'toggle' => 'burger',
-				],
-			]
-		);
-
-		$this->end_controls_tab();*/
-
-		$this->start_controls_tab( 'nav_icon_active_options', [
-			'label' => esc_html__( 'Active', 'houzez-theme-functionality' ),
-		] );
-
-		$this->add_control(
-			'toggle_icon_active',
-			[
-				'label' => esc_html__( 'Icon', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::ICONS,
-				'fa4compatibility' => 'icon',
-				'skin' => 'inline',
-				'label_block' => false,
-				'skin_settings' => [
-					'inline' => [
-						'none' => [
-							'label' => esc_html__( 'Default', 'houzez-theme-functionality' ),
-							'icon' => 'eicon-close',
-						],
-						'icon' => [
-							'icon' => 'eicon-star',
-						],
-					],
-				],
-				'recommended' => [
-					'fa-solid' => [
-						'window-close',
-						'times-circle',
-						'times',
-						'minus-square',
-						'minus-circle',
-						'minus',
-					],
-					'fa-regular' => [
-						'window-close',
-						'times-circle',
-						'minus-square',
 					],
 				],
 			]
@@ -647,7 +551,10 @@ class Houzez_Menu extends Widget_Base {
 				'default' => '',
 				'selectors' => [
 					'{{WRAPPER}} .pointer-background .navbar-nav > .nav-item:hover > a:before' => 'background-color: {{VALUE}}',
-					'{{WRAPPER}} .pointer-underline .navbar-nav > .nav-item:hover > a:before, .pointer-overline .navbar-nav > .nav-item:hover > a:before, .pointer-doubleline .navbar-nav > .nav-item:hover > a:before, .pointer-framed .navbar-nav > .nav-item:hover > a:before' => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} .pointer-framed .navbar-nav > .nav-item:hover > a:before' => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} .pointer-doubleline .navbar-nav > .nav-item:hover > a:before' => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} .pointer-overline .navbar-nav > .nav-item:hover > a:before' => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} .pointer-underline .navbar-nav > .nav-item:hover > a:before' => 'border-color: {{VALUE}}',
 				],
 				'condition' => [
 					'pointer!' => [ 'none', 'text' ],
@@ -871,43 +778,6 @@ class Houzez_Menu extends Widget_Base {
 			]
 		);
 
-		/*$this->add_responsive_control(
-			'menu_space_between',
-			[
-				'label' => esc_html__( 'Space Between', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
-				'range' => [
-					'px' => [
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}}' => '--e-nav-menu-horizontal-menu-item-margin: calc( {{SIZE}}{{UNIT}} / 2 );',
-					'{{WRAPPER}} .elementor-nav-menu--main:not(.elementor-nav-menu--layout-horizontal) .elementor-nav-menu > li:not(:last-child)' => 'margin-bottom: {{SIZE}}{{UNIT}}',
-				],
-			]
-		);*/
-
-		/*$this->add_responsive_control(
-			'border_radius_menu_item',
-			[
-				'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
-				'selectors' => [
-					'{{WRAPPER}} .elementor-item:before' => 'border-radius: {{SIZE}}{{UNIT}}',
-					'{{WRAPPER}} .e--animation-shutter-in-horizontal .elementor-item:before' => 'border-radius: {{SIZE}}{{UNIT}} {{SIZE}}{{UNIT}} 0 0',
-					'{{WRAPPER}} .e--animation-shutter-in-horizontal .elementor-item:after' => 'border-radius: 0 0 {{SIZE}}{{UNIT}} {{SIZE}}{{UNIT}}',
-					'{{WRAPPER}} .e--animation-shutter-in-vertical .elementor-item:before' => 'border-radius: 0 {{SIZE}}{{UNIT}} {{SIZE}}{{UNIT}} 0',
-					'{{WRAPPER}} .e--animation-shutter-in-vertical .elementor-item:after' => 'border-radius: {{SIZE}}{{UNIT}} 0 0 {{SIZE}}{{UNIT}}',
-				],
-				'condition' => [
-					'pointer' => 'background',
-				],
-			]
-		);*/
-
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -943,7 +813,9 @@ class Houzez_Menu extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a, {{WRAPPER}} .houzez-menu-toggle, {{WRAPPER}} .houzez-nav-menu-layout-dropdown .mobile-navbar-nav a' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a, 
+					{{WRAPPER}} .houzez-elementor-mobile-menu .nav-mobile-trigger,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -955,7 +827,9 @@ class Houzez_Menu extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu, {{WRAPPER}} .houzez-nav-menu-layout-dropdown .mobile-navbar-nav' => 'background-color: {{VALUE}}',
+					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu, 
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a,
+					{{WRAPPER}} .houzez-elementor-mobile-menu' => 'background-color: {{VALUE}}',
 				],
 				'separator' => 'none',
 			]
@@ -981,11 +855,11 @@ class Houzez_Menu extends Widget_Base {
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a.item-active,
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a.highlighted,
 
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a:hover,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a.item-active,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a.highlighted,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a:hover,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a.item-active,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a.highlighted,
 
-					{{WRAPPER}} .houzez-menu-toggle:hover' => 'color: {{VALUE}}',
+					{{WRAPPER}} .houzez-menu-toggle-button:hover' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -997,9 +871,9 @@ class Houzez_Menu extends Widget_Base {
 				'type' => Controls_Manager::COLOR,
 				'default' => '',
 				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a:hover,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a.item-active,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a.highlighted,
+					'{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a:hover,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a.item-active,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a.highlighted,
 
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a:hover,
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu a.item-active,
@@ -1027,8 +901,8 @@ class Houzez_Menu extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li.current-menu-item a,
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li.current-menu-ancestor a,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav li.current-menu-item a,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav li.current-menu-ancestor a' => 'color: {{VALUE}}',
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav li.current-menu-item a,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav li.current-menu-ancestor a' => 'color: {{VALUE}}',
 				],
 			]
 		);
@@ -1042,8 +916,8 @@ class Houzez_Menu extends Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li.current-menu-item a,
 					{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li.current-menu-ancestor a,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav li.current-menu-item a,
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav li.current-menu-ancestor a' => 'background-color: {{VALUE}}',
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav li.current-menu-item a,
+					{{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav li.current-menu-ancestor a' => 'background-color: {{VALUE}}',
 				],
 				'separator' => 'none',
 			]
@@ -1061,48 +935,8 @@ class Houzez_Menu extends Widget_Base {
 					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
 				],
 				'exclude' => [ 'line_height' ],
-				'selector' => '{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu .dropdown-item, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a',
+				'selector' => '{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu .dropdown-item, {{WRAPPER}} .houzez-elementor-mobile-menu .mobile-navbar-nav a',
 				'separator' => 'before',
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			[
-				'name' => 'dropdown_border',
-				'selector' => '{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .dropdown-menu',
-				'separator' => 'before',
-			]
-		);
-
-		$this->add_responsive_control(
-			'dropdown_border_radius',
-			[
-				'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
-				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .dropdown-menu' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li:first-child a' => 'border-top-left-radius: {{TOP}}{{UNIT}}; border-top-right-radius: {{RIGHT}}{{UNIT}};',
-
-					'{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .dropdown-menu li:first-child a' => 'border-top-left-radius: {{TOP}}{{UNIT}}; border-top-right-radius: {{RIGHT}}{{UNIT}};',
-
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu li:last-child a' => 'border-bottom-right-radius: {{BOTTOM}}{{UNIT}}; border-bottom-left-radius: {{LEFT}}{{UNIT}};',
-
-					'{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .dropdown-menu li:last-child a' => 'border-bottom-right-radius: {{BOTTOM}}{{UNIT}}; border-bottom-left-radius: {{LEFT}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			[
-				'name' => 'dropdown_box_shadow',
-				'exclude' => [
-					'box_shadow_position',
-				],
-				'selector' => '{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .houzez-nav-menu-main .dropdown-menu, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .houzez-nav-menu-main .dropdown-menu',
 			]
 		);
 
@@ -1112,8 +946,12 @@ class Houzez_Menu extends Widget_Base {
 				'label' => esc_html__( 'Horizontal Padding', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'default' => [
+					'unit' => 'px',
+					'size' => 15,
+				],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li > a, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li > a' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
 				],
 				'separator' => 'before',
 
@@ -1131,8 +969,12 @@ class Houzez_Menu extends Widget_Base {
 						'max' => 50,
 					],
 				],
+				'default' => [
+					'unit' => 'px',
+					'size' => 15,
+				],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li > a, {{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .mobile-navbar-nav a' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li > a' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -1151,8 +993,16 @@ class Houzez_Menu extends Widget_Base {
 			[
 				'name' => 'dropdown_divider',
 				'selector' => '{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li:not(:last-child), 
-				{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .houzez-nav-menu-layout-dropdown .nav-item:not(:last-child)',
+				{{WRAPPER}} .houzez-elementor-mobile-menu .nav-item a',
 				'exclude' => [ 'width' ],
+				'fields_options' => [
+					'border' => [
+						'default' => 'solid',
+					],
+					'color' => [
+						'default' => '#dce0e0',
+					],
+				],
 			]
 		);
 
@@ -1170,34 +1020,19 @@ class Houzez_Menu extends Widget_Base {
 						'max' => 2,
 					],
 				],
+				'default' => [
+					'unit' => 'px',
+					'size' => 1,
+				],
 				'selectors' => [
 					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .dropdown-menu > li:not(:last-child), 
-					{{WRAPPER}} .houzez-nav-menu-main-mobile-wrap .houzez-nav-menu-layout-dropdown .nav-item:not(:last-child)' => 'border-bottom-width: {{SIZE}}{{UNIT}}',
+					{{WRAPPER}} .houzez-elementor-mobile-menu .nav-item:not(:last-child) a' => 'border-bottom-width: {{SIZE}}{{UNIT}}',
 				],
 				'condition' => [
 					'dropdown_divider_border!' => '',
 				],
 			]
 		);
-
-		/*$this->add_responsive_control(
-			'dropdown_top_distance',
-			[
-				'label' => esc_html__( 'Distance', 'houzez-theme-functionality' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
-				'range' => [
-					'px' => [
-						'min' => -100,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .houzez-nav-menu-main-desktop-wrap .houzez-nav-menu-main > .houzez-elementor-menu > li > .dropdown-menu' => 'margin-top: {{SIZE}}{{UNIT}} !important',
-				],
-				'separator' => 'before',
-			]
-		);*/
 
 		$this->end_controls_section();
 
@@ -1218,7 +1053,7 @@ class Houzez_Menu extends Widget_Base {
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'padding-left: {{SIZE}}{{UNIT}}; padding-right: {{SIZE}}{{UNIT}}',
 				],
 				'separator' => 'before',
 
@@ -1237,7 +1072,7 @@ class Houzez_Menu extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'padding-top: {{SIZE}}{{UNIT}}; padding-bottom: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -1257,8 +1092,8 @@ class Houzez_Menu extends Widget_Base {
 				'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button' => 'color: {{VALUE}}',
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button svg' => 'fill: {{VALUE}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'color: {{VALUE}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button svg' => 'fill: {{VALUE}}',
 				],
 			]
 		);
@@ -1269,7 +1104,7 @@ class Houzez_Menu extends Widget_Base {
 				'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button' => 'background-color: {{VALUE}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'background-color: {{VALUE}}',
 				],
 			]
 		);
@@ -1289,8 +1124,8 @@ class Houzez_Menu extends Widget_Base {
 				'label' => esc_html__( 'Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button:hover' => 'color: {{VALUE}}', // Harder selector to override text color control
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button:hover svg' => 'fill: {{VALUE}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button:hover' => 'color: {{VALUE}}', // Harder selector to override text color control
+					'{{WRAPPER}} .houzez-menu-toggle-button:hover svg' => 'fill: {{VALUE}}',
 				],
 			]
 		);
@@ -1301,7 +1136,7 @@ class Houzez_Menu extends Widget_Base {
 				'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
 				'type' => Controls_Manager::COLOR,
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button:hover' => 'background-color: {{VALUE}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button:hover' => 'background-color: {{VALUE}}',
 				],
 			]
 		);
@@ -1321,9 +1156,42 @@ class Houzez_Menu extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button' => 'font-size: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'font-size: {{SIZE}}{{UNIT}}',
 				],
 				'separator' => 'before',
+			]
+		);
+
+		$this->add_responsive_control(
+			'toggle_svg_width',
+			[
+				'label' => esc_html__( 'Icon Width', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'range' => [
+					'px' => [
+						'min' => 10,
+						'max' => 100,
+					],
+					'em' => [
+						'min' => 0.5,
+						'max' => 5,
+					],
+					'rem' => [
+						'min' => 0.5,
+						'max' => 5,
+					],
+				],
+				'default' => [
+					'unit' => 'px',
+					'size' => 24,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .houzez-menu-toggle-button svg' => 'width: {{SIZE}}{{UNIT}}; height: auto;',
+				],
+				'condition' => [
+					'toggle_icon_normal[library]' => 'svg',
+				],
 			]
 		);
 
@@ -1342,7 +1210,7 @@ class Houzez_Menu extends Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button' => 'border-width: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'border-width: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -1354,10 +1222,55 @@ class Houzez_Menu extends Widget_Base {
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
-					'{{WRAPPER}} .houzez-menu-toggle .houzez-menu-toggle-button' => 'border-radius: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .houzez-menu-toggle-button' => 'border-radius: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
+
+		$this->end_controls_section();
+
+
+		$this->start_controls_section( 'offcanvas_style',
+			[
+				'label' => esc_html__( 'Offcanvas', 'houzez-theme-functionality' ),
+				'tab' => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		
+		$this->add_control(
+			'offcanvas_color',
+			[
+				'label' => esc_html__( 'Header Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .offcanvas-header' => 'color: {{VALUE}}', // Harder selector to override text color control
+				],
+			]
+		);
+
+		$this->add_control(
+			'offcanvas_background_color',
+			[
+				'label' => esc_html__( 'Header Background Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .offcanvas-header' => 'background-color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'offcanvas_body_background_color',
+			[
+				'label' => esc_html__( 'Body Background Color', 'houzez-theme-functionality' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .offcanvas' => 'background-color: {{VALUE}}',
+				],
+			]
+		);
+		
 
 		$this->end_controls_section();
 
@@ -1385,10 +1298,8 @@ class Houzez_Menu extends Widget_Base {
 		$show_desktop = $show_menu_desktop = $show_menu_tablet = $mb_fullwidth = '';
 		$mobile_menu_breakpoint = $settings['mobile-menu-breakpoint'];
 		$layout = $settings['layout'];
+		$offcanvas_position = isset($settings['mobile_offcanvas_position']) ? $settings['mobile_offcanvas_position'] : 'start';
 
-		if( $layout == 'dropdown' ) {
-			$mb_fullwidth = 'houzez-nav-mobile-menu-fullwidth';
-		}
 		$args = [
 			'menu' => $settings['menu_slug'],
 			'menu_class' => 'navbar-nav houzez-elementor-menu',
@@ -1404,7 +1315,7 @@ class Houzez_Menu extends Widget_Base {
 
 		$mobile_args = [
 			'menu' => $settings['menu_slug'],
-			'menu_class' => 'navbar-nav mobile-navbar-nav houzez-elementor-mobile-menu',
+			'menu_class' => 'navbar-nav mobile-navbar-nav',
 			'menu_id' => 'main-mobile-nav-' . $this->get_id(),
 			'fallback_cb' => '__return_empty_string',
 			'container' => '',
@@ -1483,49 +1394,45 @@ class Houzez_Menu extends Widget_Base {
 		<?php } ?>
 
 		<?php if( 'none' !== $mobile_menu_breakpoint || $layout == 'dropdown' ) { ?>
-		<div class="houzez-ele-mobile-menu-<?php echo esc_attr( $this->get_id() ); ?> hz-ele-js-<?php echo esc_attr($token);?> houzez-nav-menu-main-mobile-wrap nav-mobile houzez-nav-menu-align-<?php echo esc_attr($settings['mobile_toggle_align']); ?> houzez-show-menu-<?php echo esc_attr($mobile_menu_breakpoint); ?> <?php echo esc_attr($show_desktop); ?> <?php echo esc_attr($mb_fullwidth);?>">
-			<div id="houzez_toggle" class="houzez-menu-toggle">
-				<div class="houzez-menu-toggle-button">
+		<div class="houzez-ele-mobile-menu-<?php echo esc_attr( $this->get_id() ); ?> nav-mobile houzez-show-menu-<?php echo esc_attr($mobile_menu_breakpoint); ?> <?php echo esc_attr($show_desktop); ?>">
+			
+		
+			<div class="houzez-menu-toggle-button" data-bs-toggle="offcanvas" data-bs-target="#hz-offcanvas-ele-menu-<?php echo esc_attr($token);?>" aria-controls="hz-offcanvas-ele-menu-<?php echo esc_attr($token);?>" aria-expanded="false">
 				<?php
-				if ( ! empty( $settings['toggle_icon_normal']['value'] ) || ! empty( $settings['toggle_icon_active']['value'] ) ) {
+				if ( ! empty( $settings['toggle_icon_normal']['value'] ) ) {
 					
 					if( ! empty( $settings['toggle_icon_normal']['value'] )  ) {
 						echo self::houzez_render_menu_icon($settings['toggle_icon_normal'], ['class' => 'hz-navigation-open'] );
 					}
-					if( ! empty( $settings['toggle_icon_active']['value'] )  ) {
-						echo self::houzez_render_menu_icon($settings['toggle_icon_active'], ['class' => 'hz-navigation-close'] );
-					}
 					
 				} else {
 					?>
-                    <i class="houzez-icon icon-navigation-menu hz-navigation-open"></i>
-					<i class="houzez-icon icon-close hz-navigation-close"></i>
+					<i class="houzez-icon icon-navigation-menu hz-navigation-open"></i>
 					<?php
 				}
 				?>
+			</div> <!-- .houzez-menu-toggle-button -->
+			
+			<div class="main-nav navbar houzez-elementor-mobile-menu">
+				<div class="offcanvas offcanvas-<?php echo esc_attr($offcanvas_position); ?> offcanvas-mobile-menu" tabindex="-1" id="hz-offcanvas-ele-menu-<?php echo esc_attr($token);?>" aria-labelledby="hz-offcanvas-ele-menu-label">
+					<div class="offcanvas-header">
+						<div class="offcanvas-title fs-6" id="hz-offcanvas-ele-menu-label"><?php echo esc_html__( 'Menu', 'houzez' ); ?></div>
+						<button type="button" class="btn-close" data-bs-dismiss="offcanvas">
+							<i class="houzez-icon icon-close"></i>
+						</button>
+					</div>
+					<div class="offcanvas-mobile-menu-body">
+						<?php
+						// PHPCS - escaped by WordPress with "wp_nav_menu"
+						echo $mobile_menu_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						?>
+					</div>
 				</div>
-			</div>
-		    <nav <?php $this->print_render_attribute_string( 'main-mobile-menu' ); ?> role="navigation" aria-hidden="false">
-				<?php
-					// PHPCS - escaped by WordPress with "wp_nav_menu"
-					echo $mobile_menu_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				?>
-			</nav>
-		</div><!-- houzez-nav-menu-main-mobile-wrap -->
+			</div><!-- main-nav -->
+
+		</div>
 		<?php
 		}
-
-		if ( Plugin::$instance->editor->is_edit_mode() ) : 
-            ?>
-            <script>
-			    jQuery(document).ready(function() {
-			    	jQuery('.hz-ele-js-<?php echo esc_attr($token);?> .houzez-menu-toggle').click(function (e) {
-				        jQuery('.hz-ele-js-<?php echo esc_attr($token);?> .navbar-nav, .hz-ele-js-<?php echo esc_attr($token);?> .houzez-menu-toggle').toggleClass('houzez-nav-menu-active');
-				    });
-			    });
-			</script>
-        
-        <?php endif; 
 
     }
 
@@ -1584,32 +1491,6 @@ class Houzez_Menu extends Widget_Base {
 		}
 
 		return implode( ' ', $rendered_attributes );
-	}
-
-	/**
-	 * Retrieve the meta icon based on configuration from the options.
-	 *
-	 * @since 2.8.5
-	 *
-	 * @param string $key     The key to identify the specific icon setting.
-	 * @param string $default The default icon value.
-	 *
-	 * @return string
-	 */
-	private function fetch_configured_meta_icon($key, $default) {
-	    $configurations = $this->get_settings_for_display();
-	    $configuredIcon = $configurations[$key];
-	    $iconRepresentation = $default;
-
-	    if (!empty($configuredIcon['value'])) {
-	        ob_start();
-	        \Elementor\Icons_Manager::render_icon($configuredIcon, ['aria-hidden' => 'true']);
-	        $iconRepresentation = ob_get_clean();
-	    } else {
-	        $iconRepresentation = sprintf('<i class="%s"></i>', esc_attr($default));
-	    }
-
-	    return $iconRepresentation;
 	}
 
 }

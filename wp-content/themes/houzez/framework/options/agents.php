@@ -200,7 +200,6 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
 
                 'Listings Version 5' => array(
-                    'list-view-v5' => 'List View',
                     'grid-view-v5' => 'Grid View',
                 ),
 
@@ -214,6 +213,17 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
             ),
             'default' => 'list-view-v1'
+        ),
+        array(
+            'id'       => 'agent_listings_grid_columns',
+            'type'     => 'select',
+            'title'    => esc_html__( 'Grid Columns', 'houzez' ),
+            'desc' => esc_html__( "Select the number of columns to display for similar properties in grid view", 'houzez' ),
+            'options'  => array(
+                '3' => '3 Columns',
+                '2' => '2 Columns',
+            ),
+            'default' => '2'
         ),
         array(
             'id'       => 'num_of_agent_listings',
@@ -249,7 +259,6 @@ Redux::setSection( $houzez_opt_name, array(
             'subtitle' => '',
             'default'  => '_loadmore',
             'options' => array(
-                '_number' => esc_html__('Number', 'houzez'), 
                 '_loadmore' => esc_html__('Load More', 'houzez'), 
                 '_infinite' => esc_html__('Infinite Scroll', 'houzez'), 
             ), 

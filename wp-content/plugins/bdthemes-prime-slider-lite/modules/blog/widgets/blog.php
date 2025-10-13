@@ -85,9 +85,6 @@ class Blog extends Widget_Base {
     public function has_widget_inner_wrapper(): bool {
         return ! \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
     }
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
 
 	protected function register_controls() {
         $reveal_effects = prime_slider_option('reveal-effects', 'prime_slider_other_settings', 'off');
@@ -166,6 +163,7 @@ class Blog extends Widget_Base {
             [
                 'label'       => esc_html__('Button Text', 'bdthemes-prime-slider'),
                 'type'        => Controls_Manager::TEXT,
+                'dynamic'     => [ 'active' => true ],
                 'placeholder' => esc_html__('Read More', 'bdthemes-prime-slider'),
                 'default'     => esc_html__('Read More', 'bdthemes-prime-slider'),
                 'label_block' => false,
@@ -279,18 +277,6 @@ class Blog extends Widget_Base {
         );
 
         $this->add_control(
-            'show_featured_post',
-            [
-                'label'     => esc_html__('Show Featured Post', 'bdthemes-prime-slider'),
-                'type'      => Controls_Manager::SWITCHER,
-                'default'   => 'yes',
-                'condition' => [
-                    '_skin' => 'zinest',
-                ],
-            ]
-        );
-
-        $this->add_control(
             'show_navigation_arrows',
             [
                 'label'     => esc_html__('Show Arrows', 'bdthemes-prime-slider'),
@@ -382,6 +368,34 @@ class Blog extends Widget_Base {
         );
 
         $this->register_query_builder_controls();
+
+        $this->update_control(
+            'posts_limit',
+            [
+                'type'    => Controls_Manager::NUMBER,
+                'default' => 3,
+            ]
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_featured_post_settings',
+            [
+                'label'     => esc_html__('Featured Post', 'bdthemes-prime-slider'),
+                'condition' => [
+                    '_skin' => 'zinest',
+                ],
+            ]
+        );
+        $this->add_control(
+            'show_featured_post',
+            [
+                'label'     => esc_html__('Show Featured Post', 'bdthemes-prime-slider'),
+                'type'      => Controls_Manager::SWITCHER,
+                'default'   => 'yes',
+            ]
+        );
         $this->add_control(
             'featured_query_heading',
             [
@@ -389,7 +403,7 @@ class Blog extends Widget_Base {
                 'type'      => Controls_Manager::HEADING,
                 'separator' => 'before',
                 'condition' => [
-                    '_skin' => 'zinest'
+                    'show_featured_post' => 'yes'
                 ]
             ]
         );
@@ -401,19 +415,10 @@ class Blog extends Widget_Base {
                 'multiple'    => true,
                 'label_block' => true,
                 'condition' => [
-                    '_skin' => 'zinest'
+                    'show_featured_post' => 'yes'
                 ]
             ]
         );
-
-        $this->update_control(
-            'posts_limit',
-            [
-                'type'    => Controls_Manager::NUMBER,
-                'default' => 3,
-            ]
-        );
-
         $this->end_controls_section();
 
         /**
@@ -1036,7 +1041,7 @@ class Blog extends Widget_Base {
         $this->start_controls_section(
             'section_style_social_icon',
             [
-                'label'     => esc_html__('Social Icon', 'bdthemes-prime-slider'),
+                'label'     => esc_html__('Social Link', 'bdthemes-prime-slider'),
                 'tab'       => Controls_Manager::TAB_STYLE,
                 'condition' => [
                     'show_social_icon' => 'yes',
@@ -1139,7 +1144,7 @@ class Blog extends Widget_Base {
         $this->add_responsive_control(
             'social_icon_spacing',
             [
-                'label'     => esc_html__('Icon Spacing', 'bdthemes-prime-slider'),
+                'label'     => esc_html__('Space Between', 'bdthemes-prime-slider'),
                 'type'      => Controls_Manager::SLIDER,
                 'range'     => [
                     'px' => [
@@ -1147,7 +1152,10 @@ class Blog extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .bdt-prime-slider .bdt-social-icon a' => 'margin-bottom: {{SIZE}}{{UNIT}}; margin-top: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-blog .bdt-social-icon' => 'gap: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-coral .bdt-social-icon' => 'gap: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-zinest .bdt-social-icon' => 'gap: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .bdt-prime-slider-skin-folio .bdt-social-icon .bdt-social-icon-item-wrap' => 'gap: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );

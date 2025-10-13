@@ -256,11 +256,11 @@ else if( $enable_paid_submission == 'membership' ) {
 }
 get_header(); ?>
 
-<section class="frontend-submission-page">
+<section class="frontend-submission-page mt-4" style="min-height: 100vh;">
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <div class="dashboard-content-block">
+                <div class="block-wrap">
                     <?php 
                     if( isset( $_GET['directy_pay'] ) && $_GET['directy_pay'] != '' ) {
                         $orderID = $_GET['directy_pay'];

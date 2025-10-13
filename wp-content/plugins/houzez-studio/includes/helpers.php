@@ -26,6 +26,36 @@ function fts_load_template_part() {
     load_template($path);
 }
 
+function houzez_tb_types()
+{ 
+    $houzez_tb_types = array(
+        'tmp_header' => __('Header', 'houzez-studio'),
+        'tmp_footer' => __('Footer', 'houzez-studio'),
+        'tmp_single' => __('Single', 'houzez-studio'),
+        //'tmp_archive' => __('Archive', 'houzez-studio'),
+        'tmp_megamenu' => __('Mega Menu', 'houzez-studio'),
+        'tmp_custom_block' => __('Block', 'houzez-studio'),
+        //'tmp_popup' => __('Popup', 'houzez-studio'),
+        //'tmp_pagetitle' => __('Page Title', 'houzez-studio'),
+    );
+
+    return $houzez_tb_types;
+}
+
+function houzez_tb_get_template_type($post_id = '') {
+    $post = get_post($post_id);
+    $templates_types = houzez_tb_types();
+    if($post && get_post_type($post) === 'fts_builder') {
+        $meta = get_post_meta( $post_id, 'fts_template_type', true );
+        if( ! empty( $meta ) ) {
+            return $meta;
+        } else{
+            return 'content';
+        }
+    }
+    return false;
+}
+
 
 /**
  * Returns the appropriate file suffix based on script debugging settings.
@@ -85,9 +115,8 @@ function fts_get_header_template() {
 function fts_render_header() {
     if (!fts_header_enabled()) {
         return;
-    }
-    ?>
-    <header itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+    } ?>
+    <header id="header-hz-elementor" data-sticky="0" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
         <?php fts_get_header_template(); ?>
     </header>
     <?php
@@ -158,7 +187,7 @@ function fts_render_footer() {
  * @return string|false The before header ID if set, false otherwise.
  */
 function fts_get_before_header_id() {
-    $before_header_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_before_header');
+    $before_header_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_custom_block', 'before_header');
     return $before_header_id !== '' ? $before_header_id : false;
 }
 
@@ -210,7 +239,7 @@ function fts_render_before_header() {
  * @return string|false The after header ID if set, false otherwise.
  */
 function fts_get_after_header_id() {
-    $after_header_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_after_header');
+    $after_header_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_custom_block', 'after_header');
     return $after_header_id !== '' ? $after_header_id : false;
 }
 
@@ -262,7 +291,7 @@ function fts_render_after_header() {
  * @return string|false The before footer ID if set, false otherwise.
  */
 function fts_get_before_footer_id() {
-    $before_footer_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_before_footer');
+    $before_footer_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_custom_block', 'before_footer');
     return $before_footer_id !== '' ? $before_footer_id : false;
 }
 
@@ -314,7 +343,7 @@ function fts_render_before_footer() {
  * @return string|false The after footer ID if set, false otherwise.
  */
 function fts_get_after_footer_id() {
-    $after_footer_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_after_footer');
+    $after_footer_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('tmp_custom_block', 'after_footer');
     return $after_footer_id !== '' ? $after_footer_id : false;
 }
 
@@ -357,4 +386,240 @@ function fts_render_after_footer() {
         return;
     }
     fts_get_after_footer_template();
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+/* Single Listing
+/*-------------------------------------------------------------------------------------------------*/
+
+/**
+ * Determines the activation status of the Single Listing.
+ *
+ * @since  1.0.0
+ * @return bool Returns true if the single listing is active, false if it is inactive.
+ */
+function fts_single_listing_enabled() {
+    return apply_filters('fts_single_listing_enabled', fts_get_single_listing_id() !== false);
+}
+
+/**
+ * Fetches the single listing ID from the plugin settings.
+ *
+ * @since  1.0.0
+ * @return string|false The single listing ID if set, false otherwise.
+ */
+function fts_get_single_listing_id() {
+    $single_listing_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('single-listing');
+    return $single_listing_id !== '' ? $single_listing_id : false;
+}
+
+/**
+ * Renders the single listing markup.
+ *
+ * @since  1.0.0
+ */
+function fts_render_single_listing() {
+    if (!fts_single_listing_enabled()) {
+        return;
+    }?>
+    <div class="htb-single-listing-wrapper htb-single-listing">
+        <?php fts_get_single_listing_template(); ?>
+    </div>
+    <?php
+}
+
+/**
+ * Returns the single listing template ID.
+ *
+ * @since  1.0.0
+ * @return string|false The single listing template ID if set, false otherwise.
+ */
+function fts_single_listing_template_id() {
+    return apply_filters('fts_single_listing_template_id', fts_get_single_listing_id());
+}
+
+/**
+ * Echoes the single listing Template.
+ *
+ * @since  1.0.0
+ */
+function fts_get_single_listing_template() {
+    echo HouzezStudio\FTS_Elementor::get_elementor_template(fts_single_listing_template_id()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+/* Single Agent
+/*-------------------------------------------------------------------------------------------------*/
+
+/**
+ * Determines the activation status of the Single agent.
+ *
+ * @since  1.0.0
+ * @return bool Returns true if the single agent is active, false if it is inactive.
+ */
+function fts_single_agent_enabled() {
+    return apply_filters('fts_single_agent_enabled', fts_get_single_agent_id() !== false);
+}
+
+/**
+ * Fetches the single agent ID from the plugin settings.
+ *
+ * @since  1.0.0
+ * @return string|false The single agent ID if set, false otherwise.
+ */
+function fts_get_single_agent_id() {
+    $single_agent_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('single-agent');
+    return $single_agent_id !== '' ? $single_agent_id : false;
+}
+
+/**
+ * Renders the single agent markup.
+ *
+ * @since  1.0.0
+ */
+function fts_render_single_agent() {
+    if (!fts_single_agent_enabled()) {
+        return;
+    }?>
+    <div class="htb-single-agent-wrapper htb-single-agent">
+        <?php fts_get_single_agent_template(); ?>
+    </header>
+    <?php
+}
+
+/**
+ * Returns the single agent template ID.
+ *
+ * @since  1.0.0
+ * @return string|false The single agent template ID if set, false otherwise.
+ */
+function fts_single_agent_template_id() {
+    return apply_filters('fts_single_agent_template_id', fts_get_single_agent_id());
+}
+
+/**
+ * Echoes the single agent Template.
+ *
+ * @since  1.0.0
+ */
+function fts_get_single_agent_template() {
+    echo HouzezStudio\FTS_Elementor::get_elementor_template(fts_single_agent_template_id()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+/* Single Agency
+/*-------------------------------------------------------------------------------------------------*/
+
+/**
+ * Determines the activation status of the Single agency.
+ *
+ * @since  1.0.0
+ * @return bool Returns true if the single agency is active, false if it is inactive.
+ */
+function fts_single_agency_enabled() {
+    return apply_filters('fts_single_agency_enabled', fts_get_single_agency_id() !== false);
+}
+
+/**
+ * Fetches the single agency ID from the plugin settings.
+ *
+ * @since  1.0.0
+ * @return string|false The single agency ID if set, false otherwise.
+ */
+function fts_get_single_agency_id() {
+    $single_agency_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('single-agency');
+    return $single_agency_id !== '' ? $single_agency_id : false;
+}
+
+/**
+ * Renders the single agency markup.
+ *
+ * @since  1.0.0
+ */
+function fts_render_single_agency() {
+    if (!fts_single_agency_enabled()) {
+        return;
+    }?>
+    <div class="htb-single-agency-wrapper htb-single-agency">
+        <?php fts_get_single_agency_template(); ?>
+    </header>
+    <?php
+}
+
+/**
+ * Returns the single agency template ID.
+ *
+ * @since  1.0.0
+ * @return string|false The single agency template ID if set, false otherwise.
+ */
+function fts_single_agency_template_id() {
+    return apply_filters('fts_single_agency_template_id', fts_get_single_agency_id());
+}
+
+/**
+ * Echoes the single agency Template.
+ *
+ * @since  1.0.0
+ */
+function fts_get_single_agency_template() {
+    echo HouzezStudio\FTS_Elementor::get_elementor_template(fts_single_agency_template_id()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+
+/*-------------------------------------------------------------------------------------------------*/
+/* Single Post
+/*-------------------------------------------------------------------------------------------------*/
+
+/**
+ * Determines the activation status of the Single post.
+ *
+ * @since  1.0.0
+ * @return bool Returns true if the single post is active, false if it is inactive.
+ */
+function fts_single_post_enabled() {
+    return apply_filters('fts_single_post_enabled', fts_get_single_post_id() !== false);
+}
+
+/**
+ * Fetches the single post ID from the plugin settings.
+ *
+ * @since  1.0.0
+ * @return string|false The single post ID if set, false otherwise.
+ */
+function fts_get_single_post_id() {
+    $single_post_id = HouzezStudio\FTS_Render_Template::instance()->fetch_plugin_settings('single-post');
+    return $single_post_id !== '' ? $single_post_id : false;
+}
+
+/**
+ * Renders the single post markup.
+ *
+ * @since  1.0.0
+ */
+function fts_render_single_post() {
+    if (!fts_single_post_enabled()) {
+        return;
+    }?>
+    <div class="htb-single-post-wrapper htb-single-post">
+        <?php fts_get_single_post_template(); ?>
+    </header>
+    <?php
+}
+
+/**
+ * Returns the single post template ID.
+ *
+ * @since  1.0.0
+ * @return string|false The single post template ID if set, false otherwise.
+ */
+function fts_single_post_template_id() {
+    return apply_filters('fts_single_post_template_id', fts_get_single_post_id());
+}
+
+/**
+ * Echoes the single post Template.
+ *
+ * @since  1.0.0
+ */
+function fts_get_single_post_template() {
+    echo HouzezStudio\FTS_Elementor::get_elementor_template(fts_single_post_template_id()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }

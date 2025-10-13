@@ -3,56 +3,84 @@ Contributors: bdthemes, selimmw, mohammaadfarid, abutalib, maudud, muhammadasik
 Donate link: http://bdthemes.com/
 Tags: wordpress slider, elementor addons, slider, image slider, video slider
 Requires at least: 5.0.0
-Tested up to: 6.7.2
+Tested up to: 6.8.3
 Requires PHP: 7.4.0
-Stable tag: 3.17.5
+Stable tag: 3.18.7
 License: GPL3
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Elementor requires at least: 3.22
-Elementor tested up to: 3.27.6
+Elementor requires at least: 3.28
+Elementor tested up to: 3.32.3
 
 Best Addon for Elementor WordPress Plugin with 55+ Awesome slider designs that you can use for your modern website with Elementor website builder.
 
 == Description ==
 
-Looking for an addon/ plugin dedicated to creating sliders for any website built in WordPress and Elementor? 
+Prime Slider is an award-winning Elementor WordPress plugin that allows you to create sliders on any website. With this plugin, you can highlight key messages, promote products or services and give users control over slide content. 
 
-**[Prime slider](http://PrimeSlider.pro/)** packs the state-of-the-art UI or UX and is a super fast, fully customizable, functional plugin - fit for every site, including blogging, eCommerce and educational sites. 
+Prime Slider comes with **30+ Free widgets, 8 skins, 3 useful features and 75+ ready sliders**. You can create responsive and beautiful sliders with ease, including—
 
-It's a slider builder compatible with any WordPress theme and [Elementor Page Builder](https://wordpress.org/plugins/elementor/) plugin - meaning you’re safe from any unexpected issues.
-
-Tired of the static and non-functional sliders? Fear not!
-
-== Why Prime Slider when dozens of slider plugins are already out there? The fact is, it'll help you make your slider 💡 ==
-
-* Eye-catchy with helpful info
-* Responsive (perfectly viewable on any device including mobile, tablet and desktop)
-* SEO optimized (with title, breadcrumb, link etc.)
-* Highly optimized for web and server performance. 
-
-We always give importance to our customer's experience and expectations like you have. So, we put 100+ effort into making our product more active and functional. 
-
-Moreover, our highly professional team works hard to make room so your business dominates today’s competitive digital world. 
-
-Another thing is that we hear our customers and take attempts accordingly.
-
-== The features from Prime Slider 💫 ==
-
-* WooCommerce ready
-* Responsive
-* RTL and translation ready
-* Regularly updated
-* Support from the experts of BdThemes
-
-Looking for an all-in-one Elementor addon plugin to create a slider for a WordPress website? Look no further than Prime Slider! 
-
-Designed for speed and SEO optimization, Prime Slider is highly customizable and fully compatible with **WooCommerce**.  Prime Slider covers you whether you're creating a portfolio, eCommerce store or blog!
-
-###USEFUL LINKS 👇###
-**[Live Demo](https://primeslider.pro/demo/)** | **[Documentation](https://bdthemes.com/all-knowledge-base-of-prime-slider/)** | **[Video Tutorial](https://www.youtube.com/watch?v=VMBuGusjvtM&list=PLP0S85GEw7DP3-yJrkgwpIeDFoXy0PDlM)** | **[Need Support?](https://bdthemes.com/support/)**
+✅ Logo Slider
+✅ Image Slider
+✅ Carousel Slider
+✅ Post Slider
+✅ Video Slider
+✅ WooCommerce Product Slider
+✅ Testimonial Slider and more
 
 
-== Free Core Widgets for Elementor 🔥 ==
+**[Free Demo](https://primeslider.pro/demo/?utm_source=WordPresss_repo&utm_medium=PrimeSlider&utm_campaign=ORG_Content)** | **[Prime Slider Pro](https://primeslider.pro/pricing/?utm_source=WordPresss_repo&utm_medium=PrimeSlider&utm_campaign=ORG_Content)** | **[Documentation](https://bdthemes.com/all-knowledge-base-of-prime-slider/?utm_source=WordPresss_repo&utm_medium=PrimeSlider&utm_campaign=ORG_Content)**
+
+= Featured on WPTuts: =
+
+https://youtu.be/KwDq6wiS6go
+
+## Prime Slider - An Elementor Slider Plugin for Enhancing Your Slider's Building Experience!
+
+There are some key things our plugin has covered to give you a boost in your website slider creation.
+
+* **Design and Usability:** You can use distinct design elements, including buttons, titles, arrows and more.
+
+* **Customization Options:** You can choose or select various slide layouts, colors and fonts, sivers animations, and the appearance and placement of navigation elements.
+
+* **Effortless Workflow:** You can arrange slides and place content utilizing visual editors.
+
+* **Boosts user engagement:** Encourage users to click, explore, and stay longer.
+
+* **Showcases prioritized content:** Feature important content, including Promotions, Sales, etc.
+
+* **Improved Storytelling:** Engage users by telling a visual story with ease.
+
+* **SEO advantages:** Improve visibility with well-optimized sliders
+
+
+## Features of Prime Slider
+
+* **Interactive elements:** Enable you to engage with slides through clickable elements, including interactive videos.
+
+* **Responsive Design:** Ensures slider works flawlessly on all devices.
+
+* **Autoplay with pause functionality:** Allows you to set automatic slide transitions with the option to pause on hover. 
+
+* **Multimedia Support:** This includes images, videos, text, and more.
+
+* **User Interaction:** Allows easy-to-use navigation controls for users to browse through slides manually.
+
+* **Performance Optimization:** Lightweight, fast-loading, and caching-friendly for efficiency.
+
+* **Integration and Compatibility:** Works seamlessly with Elementor plugins and WordPress themes.
+
+* **Support and Documentation:** Provides guides and tutorials to help you set up and customize the slider.
+
+* **SEO Optimization:** Allows you to add titles,  alt text and titles to images for better SEO.
+
+* **Accessibility:** Make your slider accessible to screen readers.
+
+* **Multilingual Support:** RTL and translation-ready for global audiences.
+
+* **Regular Updates:** Frequent updates for new features, security, bug fixes and more.
+
+
+== Free Core Widgets of Prime Slider for Elementor 🔥 ==
 
 = Post 👇 =
 
@@ -90,20 +118,20 @@ Designed for speed and SEO optimization, Prime Slider is highly customizable and
 * [Multiscroll](https://primeslider.pro/demo/multiscroll/) - Creative, dynamic full-screen slider with cursor scroll-based transitions for an engaging user experience.
 * [Pagepiling](https://primeslider.pro/demo/pagepiling/) - Minimalistic background graphics and sleek slider scrolling effects, offering a fun and fast page transition experience.
 
-== Free 3rd Party Widgets 🔥 ==
+== Widgets for WooCommerce 🔥 ==
 
 * [WooCommerce](https://primeslider.pro/demo/woocommerce/) - Display your products in a slider with detailed information, including price and add-to-cart options.
 * [Woocircle](https://primeslider.pro/demo/woocircle/) - Showcase products in circular layouts for a fresh and unique visual appeal.
 * [Woolamp](https://primeslider.pro/demo/woolamp/) - A minimalistic WooCommerce slider designed to enhance the customer shopping experience with smooth navigation.
 
-== Free Features 🔥 ==
+== Handy Features 🔥 ==
 
 * [Live Copy or Paste](https://www.elementpack.pro/knowledge-base/how-to-use-live-copy-option/) - Copy and paste demo content directly from the Post Kit website to your own site.
 * [Duplicator](https://www.elementpack.pro/knowledge-base/how-to-use-element-pack-duplicator/) - Duplicate posts, pages or Elementor templates with ease for faster design replication.
 
 More free widgets and extensions are coming soon...
 
-== Elementor Pro Widgets 🔥 ==
+== Pro Widgets of Prime Slider for Elementor 🔥 ==
 
 = Post 👇 =
 
@@ -138,24 +166,21 @@ More free widgets and extensions are coming soon...
 * [Remote Pagination](https://primeslider.pro/demo/remote-pagination/) - Display the number of posts left in the query with remote pagination for enhanced user interaction.
 * [Remote Thumbs](https://primeslider.pro/demo/remote-thumbs/) - Link a thumb gallery to any slider to make it more interactive and visually appealing.
 
-== Pro Version 3rd Party Widgets 🔥 ==
+== 3rd Party Widgets 🔥 ==
 
 * [Event Calendar](https://primeslider.pro/demo/event-calendar/) - Display event countdowns and details in a beautifully designed calendar slider.
+
+== Widgets for WooCommerce 🔥 ==
+
 * [Wooexpand](https://primeslider.pro/demo/wooexpand/) - Accordion-style slider fully integrated with WooCommerce for better product showcasing.
 * [WooStand](https://primeslider.pro/demo/woostand/) - An eye-grabbing WooCommerce slider to present featured products with smooth transitions.
 
-== Pro Version Extension 🔥 ==
+== Handy Extension 🔥 ==
 
 * [Adaptive Background](https://primeslider.pro/demo/adaptive-bg/) - Automatically adjusts the background image or color based on the content to create dynamic, engaging visuals.
 
 
 == Featured By - Famous Publications 🎇 ==
-
-= WPTuts: =
-
-https://youtu.be/KwDq6wiS6go
-
-Paul Charlton, a renowned WordPress influencer, has featured Prime Slider in WPTuts. He found Prime Slider for creative, responsive and dynamic slider solution plugins.
 
 = themesCode: =
 
@@ -218,10 +243,111 @@ e.g.
 1. Upload `plugin-name.php` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
-https://youtu.be/XjFiW5rFrac
+https://youtu.be/WhhdCWtPHvA?si=28X_56Pg2sD_vRKe
 
 
 == Changelog ==
+
+= 3.18.7 [6th October 2025] =
+
+* Fixed: Default layout issue fixed in woocommerce widget
+* Fixed: Rendering and js warning issues fixed in woocircle widget
+* Fixed: Content overflow issue fixed in elysium widget
+
+= 3.18.6 [16th September 2025] =
+
+* Fixed: Text domain translation issue fixed ( Thanks to itapress )
+
+= 3.18.5 [8th September 2025] =
+
+* Fixed: Fixed an issue where the license activation notice was displayed twice
+* Fixed: DCI Notice removed for security reason
+
+= 3.18.4 [28th August 2025] =
+
+* Updated: Admin API Notice optimized
+* Fixed: Deprication error fixed
+
+= 3.18.3 [21st August 2025] =
+
+* Updated: Admin API Notice system updated
+
+= 3.18.2 [20th August 2025] =
+
+* Updated: System improved
+
+= 3.18.1 [19th August 2025] =
+
+* Fixed: Admin notice loading issue fixed
+
+= 3.18.0 [19th August 2025] =
+
+* Added: Admin Store API Notice added
+* Added: Excerpt Style control added in General Slider widget ( Thanks to Rebeka Primožič )
+
+= 3.17.17 [21st July 2025] =
+
+* Updated: Made compatible with wordpress version 6.8.2
+* Updated: Security improved
+
+= 3.17.16 [7th July 2025] =
+
+* Fixed: Price spacing issue fixed in WooCircle widget
+
+= 3.17.15 [26th June 2025] =
+
+* Fixed: Blog zinest skin featured post controls updated
+* Updated: Horizontal and Vertical Offset Control Positions Updated in the Flogia Widget
+
+= 3.17.14 [15th June 2025] =
+
+* Fixed: Blog widget social link spacing issue fixed
+* Fixed: Thumbs arrows issue fixed in storker widget
+
+= 3.17.13 [28th May 2025] =
+
+* Added: Fraction color, active fraction color & separator color option added in crelly skin
+* Added: Overview typography option added in crelly skin
+* Added: Vertical spacing option added in crelly skin
+* Fixed: Isolate widget skins kenburn animation issue fixed
+* Fixed: Fixed button icon spacing controls for vertical and horizontal
+* Fixed: JS error fixed in Dashboard Settings
+
+= 3.17.12 [12th May 2025] =
+
+* Fixed: Resolved jQuery Migrate warning ( Thanks to BackuPs )
+
+= 3.17.11 [4th May 2025] =
+
+* Fixed: Thumbs slide issue fixed in rubix widget
+* Fixed: DCI Notice transition issue fixed
+* Updated: Only one plugin RC notice will show at a time 
+
+= 3.17.10 [24th April 2025] =
+
+* Fixed: Dashboard widget usage warning error fixed
+* Fixed: Translation issue fixed (Thanks to itapress)
+
+= 3.17.9 [21th April 2025] =
+
+* Added: WordPress Version 6.8 compatibility added
+* Fixed: Translation issue fixed
+* Updated: Only one plugin DCI notice will show at a time
+* Updated: System improved
+
+= 3.17.8 [6th April 2025] =
+
+* Added: Title text stroke & arrows icon size option added in vertex widget
+* Updated: Height control replaced with image size controls in vertex widget
+* Updated: Navigation arrows icon typography deprecated in vertex widget
+
+= 3.17.7 [16th March 2025] =
+
+* Fixed: Plugin action links condition fixed
+
+= 3.17.6 [26th February 2025] =
+
+* Fixed: Security issue fixed
 
 = 3.17.5 [20th February 2025] =
 
@@ -255,163 +381,6 @@ https://youtu.be/XjFiW5rFrac
 * Fixed: Item showing issue fixed in fiestar widget
 * Fixed: Skin folio meta dynamic issue fixed in blog widget
 * Fixed: Modal image issue fixed in woocircle widget
-
-= 3.16.6 [14th January 2025] =
-
-* Added: Title text stroke control added in multiscroll widget
-* Added: Content margin added in pagepiling widget
-* Fixed: Missing div tag issue fixed in omatic widget
-* Updated: Content max width issue fixed in pagepiling widget
-
-= 3.16.5 [2nd January 2025] =
-
-* Added: Slide fill color option added in isolate widget
-* Fixed: Skin slice sub title color issue fixed in isolate widget
-
-= 3.16.4 [29th December 2024] =
-
-* Added: Slide image controls added in isolate widget
-* Added: Navigation arrows offset option added in isolate widget
-* Added: Dots size, position & spacing added in isolate widget
-* Added: Skin slice scroll down controls added in isolate widget
-* Fixed: Button, arrows & scroll down hover radius issue fixed in isolate widget
-
-= 3.16.3 [24th December 2024] =
-
-* Fixed: Swiper loading issue fixed in Elysium Slider widget
-* Updated: Security improved
-
-= 3.16.2 [23th December 2024] =
-
-* Added: Thumbs size option added in flogia widget
-* Added: Content max width & margin added in blog widget
-* Fixed: Container width issue fixed in flogia widget
-* Fixed: Swiper loading issue fixed in Fiester Slider widget (Thanks to Nathan)
-
-= 3.16.1 [19th December 2024] =
-
-* Fixed: Swiper loading issue fixed
-* Fixed: Navigation RTL issue fixed in tango widget
-
-= 3.16.0 [17th December 2024] =
-
-* Added: Optimized Markup feature compatibility added
-* Added: Upgrade Swiper Library compatibility added
-* Added: Responsive height option added in blog widget
-* Added: Meta item gap & wrapper spacing controls added in skin folio blog widget
-* Fixed: Scroll down & meta style controls issue fixed in blog widget
-* Fixed: Skins div tag missing issue fixed in blog widget
-* Fixed: Css filter issue fixed in dragon widget
-
-= 3.15.23 [30th November 2024] =
-
-* Updated: General widget and skins controls improved
-
-= 3.15.22 [23th November 2024] =
-
-* Fixed: Translation issue fixed
-
-= 3.15.21 [21th November 2024] =
-
-* Fixed: Skin locate subtitle tags issue fixed in isolate widget
-
-= 3.15.20 [14th November 2024] =
-
-* Fixed: Pagination position issue fixed in tango widget
-
-= 3.15.19 [6th November 2024] =
-
-* Fixed: Social links security improved
-
-= 3.15.18 [28th October 2024] =
-
-* Fixed: Security improved
-
-= 3.15.16 [23th October 2024] =
-
-* Fixed: Security improved
-* Removed: Deprecated code removed for security issue
-
-= 3.15.15 [19th October 2024] =
-
-* Added: Pandora widget added (Pro)
-
-= 3.15.14 [14th October 2024] =
-
-* Added: Thumbs item gap option added in flogia widget
-* Fixed: JS dependency Error fixed (Thanks to Hasan)
-
-= 3.15.13 [9th October 2024] =
-
-* Added: Title link target added
-* Fixed: Video default link issue fixed in general & isolate widget
-
-= 3.15.12 [1st October 2024] =
-
-* Fixed: Add link attributes condition fixed
-
-= 3.15.11 [1st October 2024] =
-
-* Fixed: Security improved
-* Updated: Social link controls improved
-
-= 3.15.10 [26th September 2024] =
-
-* Fixed: JS script issue fixed
-
-= 3.15.9 [23th September 2024] =
-
-* Fixed: Security improved in general, isolate & multi scroll widgets
-
-= 3.15.8 [19th September 2024] =
-
-* Fixed: Site js loading position fixed ( Thanks to Anupam Srivastav )
-* Removed: Unnecessary Background Image Settings removed from Storker widget
-
-= 3.15.7 [12th September 2024] =
-
-* Fixed: Security improved
-
-= 3.15.6 [10th September 2024] =
-
-* Removed: Waypoint removed completely
-
-= 3.15.5 [9th September 2024] =
-
-* Added: Custom Post Type Project support added (Thanks to Owen Kane)
-* Fixed: Social link security improvement
-
-= 3.15.4 [5th September 2024] =
-
-* Added: Navigation position added in flogia widget
-* Fixed: Security issue fixed (Thanks to Tiffany Tyson)
-
-= 3.15.3 [2nd September 2024] =
-
-* Updated: Swiper library old support completely removed
-
-= 3.15.2 [17th August 2024] =
-
-* Added: Category Taxonomy support added for some of the post types ( Thanks to Matthieu Verneau )
-* Fixed: Animation conflict issue fixed
-
-= 3.15.1 [10th August 2024] =
-
-* Fixed: Image radius issue fixed in tango widget
-
-= 3.15.1 [10th August 2024] =
-
-* Updated: System improved
-
-= 3.15.0 [28th July 2024] =
-
-* Added: Button vertical ofset added in Multiscroll widget (Thanks to Fouzi)
-
-= 3.15.0 [28th July 2024] =
-
-* Added: Element caching feature added
-* Added: Skin slide secondary shape color option added in the general widget
-* Updated: System improved
 
 Details [changelog here](https://feedback.bdthemes.com/announcements?category=category_7wo5zoxl)
 
@@ -455,24 +424,34 @@ Details [changelog here](https://feedback.bdthemes.com/announcements?category=ca
 
 - Yes, Prime Slider supports both http:// and https:// protocols.
 
+### How can I report security bugs? 
+
+- You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/9e5fb813-d8f7-41ad-ad27-748af1395dfb)
+
 
 == Screenshots ==
 
 01. Prime Slider Intro
 02. Best features in prime slider
 03. Widget demo of prime slider
-04. General Slider demo
-05. Slider Example 5.
-06. Slider Example 6.
-07. Slider Example 7.
-08. Slider Example 8.
-09. Slider Example 9.
-10. Slider Example 10.
-11. Slider Example 11.
-12. Slider Example 12.
-13. Slider Example 13.
-14. Slider Example 14.
-15. Prime Slider features
-16. Prime Slider features
-17. Prime Slider features
-18. Check our others popular plugins
+04. General Slider demo #1
+05. WooLamp Slider demo
+06. General Skin Meteor demo
+07. Custom Slider demo #1
+08. Custom Slider demo #2
+09. Isolate Slider demo
+10. Paranoia Slider demo
+11. Multiscroll Slider demo
+12. Prism Slider demo
+13. General Slider demo #2
+14. Crossroad Slider demo
+15. Escape Slider demo
+16. Elysium Slider demo
+17. Custom Slider demo #3
+18. Coddle Slider demo
+19. Sequester Slider demo
+20. Pagepiling Slider demo
+21. Woocommerce Slider demo
+22. Flexure Slider demo
+23. Astoria Slider demo
+24. Check our others popular plugins

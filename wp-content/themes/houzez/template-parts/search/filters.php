@@ -13,6 +13,8 @@ if( (isset($_GET['search_style']) && $_GET['search_style'] == 'style_3') || ( is
 }
 unset($layout['placebo']);
 
+$advanced_fields = array_slice($layout, houzez_search_builder_first_row());
+
 if(!taxonomy_exists('property_country')) {
     unset($layout['country']);
 }
@@ -40,13 +42,12 @@ if( houzez_is_price_range_search() && !houzez_search_style() ) {
 
 if( houzez_search_style() && array_key_exists('price', $layout) ) {
 	unset($layout['min-price'], $layout['max-price']);
-}
-$advanced_fields = array_slice($layout, houzez_search_builder_first_row()); 
+} 
 unset($advanced_fields['price']);
 ?>
 
 <div class="advanced-search-filters search-v1-v2">
-	<div class="d-flex">
+	<div class="row row-cols-2 row-cols-lg-5 g-2">
 		<?php
 		if ($advanced_fields) {
 			foreach ($advanced_fields as $key=>$value) {
@@ -56,14 +57,14 @@ unset($advanced_fields['price']);
 						get_template_part('template-parts/search/fields/currency');
 						
 					}
-					echo '<div class="flex-search">';
+					echo '<div class="col">';
 						get_template_part('template-parts/search/fields/'.$key);
 					echo '</div>';
 					
 				} else {
 
-					echo '<div class="flex-search">';
-						houzez_get_custom_search_field($key);
+					echo '<div class="col">';
+						Houzez_Property_Search::get_custom_search_field($key);
 					echo '</div>';
 					
 				}
@@ -78,9 +79,9 @@ unset($advanced_fields['price']);
 	</div>
 
 	<?php if( houzez_is_price_range_search() && !houzez_search_style() ) { ?>
-	<div class="d-flex">
-		<div class="flex-search-half <?php if(houzez_is_half_map()) { echo 'flex-search-full'; } ?>">
-			<?php get_template_part('template-parts/search/fields/price-range'); ?>
+	<div class="row my-4">
+		<div class="col-12 col-lg-6 <?php if(houzez_is_half_map()) { echo 'flex-search-full'; } ?>">
+			<?php get_template_part('template-parts/search/fields/price', 'range', array('unique_id' => 'price_range_desktop')); ?>
 		</div>
 	</div>
 	<?php } ?>

@@ -1,162 +1,163 @@
 <?php
-$agent_facebook = get_post_meta( get_the_ID(), 'fave_agent_facebook', true );
-$agent_twitter = get_post_meta( get_the_ID(), 'fave_agent_twitter', true );
-$agent_linkedin = get_post_meta( get_the_ID(), 'fave_agent_linkedin', true );
-$agent_googleplus = get_post_meta( get_the_ID(), 'fave_agent_googleplus', true );
-$agent_youtube = get_post_meta( get_the_ID(), 'fave_agent_youtube', true );
-$agent_pinterest = get_post_meta( get_the_ID(), 'fave_agent_pinterest', true );
-$agent_instagram = get_post_meta( get_the_ID(), 'fave_agent_instagram', true );
-$agent_vimeo = get_post_meta( get_the_ID(), 'fave_agent_vimeo', true );
-$agent_skype = get_post_meta( get_the_ID(), 'fave_agent_skype', true );
-$agent_mobile = get_post_meta( get_the_ID(), 'fave_agent_mobile', true );
-$agent_whatsapp = get_post_meta( get_the_ID(), 'fave_agent_whatsapp', true );
-$agent_line_id = get_post_meta( get_the_ID(), 'fave_agent_line_id', true );
-$agent_tiktok = get_post_meta( get_the_ID(), 'fave_agent_tiktok', true );
-$agent_telegram = get_post_meta( get_the_ID(), 'fave_agent_telegram', true );
-$agent_zillow = get_post_meta( get_the_ID(), 'fave_agent_zillow', true );
-$agent_realtor_com = get_post_meta( get_the_ID(), 'fave_agent_realtor_com', true );
+/**
+ * Agent/Author Social Media Links
+ *
+ * @package Houzez
+ * @since Houzez 1.0
+ */
 
+// Get agent social media data
+$social_data = array(
+	'facebook'    => array(
+		'meta_key'  => 'fave_agent_facebook',
+		'author_key' => 'fave_author_facebook',
+		'icon'      => 'icon-social-media-facebook',
+		'label'     => 'Facebook'
+	),
+	'twitter'     => array(
+		'meta_key'  => 'fave_agent_twitter',
+		'author_key' => 'fave_author_twitter',
+		'icon'      => 'icon-x-logo-twitter-logo-2',
+		'label'     => 'Twitter'
+	),
+	'linkedin'    => array(
+		'meta_key'  => 'fave_agent_linkedin',
+		'author_key' => 'fave_author_linkedin',
+		'icon'      => 'icon-professional-network-linkedin',
+		'label'     => 'LinkedIn'
+	),
+	'googleplus'  => array(
+		'meta_key'  => 'fave_agent_googleplus',
+		'author_key' => 'fave_author_googleplus',
+		'icon'      => 'icon-social-media-google-plus-1',
+		'label'     => 'Google Plus'
+	),
+	'youtube'     => array(
+		'meta_key'  => 'fave_agent_youtube',
+		'author_key' => 'fave_author_youtube',
+		'icon'      => 'icon-social-video-youtube-clip',
+		'label'     => 'YouTube'
+	),
+	'pinterest'   => array(
+		'meta_key'  => 'fave_agent_pinterest',
+		'author_key' => 'fave_author_pinterest',
+		'icon'      => 'icon-social-pinterest',
+		'label'     => 'Pinterest'
+	),
+	'instagram'   => array(
+		'meta_key'  => 'fave_agent_instagram',
+		'author_key' => 'fave_author_instagram',
+		'icon'      => 'icon-social-instagram',
+		'label'     => 'Instagram'
+	),
+	'vimeo'       => array(
+		'meta_key'  => 'fave_agent_vimeo',
+		'author_key' => 'fave_author_vimeo',
+		'icon'      => 'icon-social-video-vimeo',
+		'label'     => 'Vimeo'
+	),
+	'skype'       => array(
+		'meta_key'  => 'fave_agent_skype',
+		'author_key' => 'fave_author_skype',
+		'icon'      => 'icon-video-meeting-skype',
+		'label'     => 'Skype',
+		'custom_url' => true
+	),
+	'tiktok'      => array(
+		'meta_key'  => 'fave_agent_tiktok',
+		'author_key' => 'fave_agent_tiktok',
+		'icon'      => 'icon-tiktok-1-logos-24',
+		'label'     => 'TikTok'
+	),
+	'telegram'    => array(
+		'meta_key'  => 'fave_agent_telegram',
+		'author_key' => 'fave_author_telegram',
+		'icon'      => 'icon-telegram-logos-24',
+		'label'     => 'Telegram',
+		'custom_url' => true
+	),
+	'line_id'     => array(
+		'meta_key'  => 'fave_agent_line_id',
+		'author_key' => 'fave_author_line_id',
+		'icon'      => 'icon-lineapp-5',
+		'label'     => 'Line App',
+		'custom_url' => true
+	),
+	'zillow'      => array(
+		'meta_key'  => 'fave_agent_zillow',
+		'author_key' => 'fave_author_zillow',
+		'icon'      => 'icon-zillow',
+		'label'     => 'Zillow'
+	),
+	'realtor_com' => array(
+		'meta_key'  => 'fave_agent_realtor_com',
+		'author_key' => 'fave_author_realtor_com',
+		'icon'      => 'icon-realtor-com',
+		'label'     => 'Realtor.com'
+	),
+	'whatsapp'    => array(
+		'meta_key'  => 'fave_agent_whatsapp',
+		'author_key' => 'fave_author_whatsapp',
+		'icon'      => 'icon-messaging-whatsapp',
+		'label'     => 'WhatsApp',
+		'custom_url' => true,
+		'custom_class' => 'agent-whatsapp'
+	)
+);
 
-if(is_author()) {
+// Get agent social media values
+$social_values = array();
+
+if (is_author()) {
 	global $current_author_meta;
-
-	$agent_facebook = $current_author_meta['fave_author_facebook'][0] ?? "";
-	$agent_twitter = $current_author_meta['fave_author_twitter'][0] ?? '';
-	$agent_linkedin = $current_author_meta['fave_author_linkedin'][0] ?? '';
-	$agent_googleplus = $current_author_meta['fave_author_googleplus'][0] ?? '';
-	$agent_youtube = $current_author_meta['fave_author_youtube'][0] ?? '';
-	$agent_pinterest = $current_author_meta['fave_author_pinterest'][0] ?? '';
-	$agent_instagram = $current_author_meta['fave_author_instagram'][0] ?? '';
-	$agent_vimeo = $current_author_meta['fave_author_vimeo'][0] ?? '';
-	$agent_skype = $current_author_meta['fave_author_skype'][0] ?? '';
-	$agent_mobile = $current_author_meta['fave_author_mobile'][0] ?? '';
-	$agent_whatsapp = $current_author_meta['fave_author_whatsapp'][0] ?? '';
-	$agent_line_id = $current_author_meta['fave_author_line_id'][0] ?? '';
-	$agent_tiktok = $current_author_meta['fave_agent_tiktok'][0] ?? '';
-	$agent_telegram = $current_author_meta['fave_author_telegram'][0] ?? '';
-	$agent_zillow = $current_author_meta['fave_author_zillow'][0] ?? '';
-	$agent_realtor_com = $current_author_meta['fave_author_realtor_com'][0] ?? '';
+	
+	foreach ($social_data as $key => $data) {
+		$author_key = $data['author_key'];
+		$social_values[$key] = $current_author_meta[$author_key][0] ?? '';
+	}
+} else {
+	foreach ($social_data as $key => $data) {
+		$meta_key = $data['meta_key'];
+		$social_values[$key] = get_post_meta(get_the_ID(), $meta_key, true);
+	}
 }
-$agent_mobile_call = str_replace(array('(',')',' ','-'),'', $agent_mobile);
-$agent_whatsapp_call = str_replace(array('(',')',' ','-'),'', $agent_whatsapp);
+
+// Format phone numbers for WhatsApp and mobile
+$social_values['mobile_call'] = str_replace(array('(',')',' ','-'), '', $social_values['mobile'] ?? '');
+$social_values['whatsapp_call'] = str_replace(array('(',')',' ','-'), '', $social_values['whatsapp'] ?? '');
+
+// Display social media links
+foreach ($social_data as $key => $data) {
+	$value = $social_values[$key];
+	
+	// Skip if empty
+	if (empty($value)) {
+		continue;
+	}
+	
+	$url = $value;
+	$custom_class = isset($data['custom_class']) ? ' class="' . esc_attr($data['custom_class']) . '"' : '';
+	
+	// Handle special URL formats
+	if (isset($data['custom_url']) && $data['custom_url']) {
+		if ($key === 'skype') {
+			$url = "skype:" . esc_attr($value) . "?chat";
+		} elseif ($key === 'telegram') {
+			$url = houzezStandardizeTelegramURL($value);
+		} elseif ($key === 'line_id') {
+			$url = "https://line.me/ti/p/~" . esc_attr($value);
+		} elseif ($key === 'whatsapp') {
+			$url = "https://wa.me/" . esc_attr($social_values['whatsapp_call']);
+		}
+	}
+	
+	// Output the social media link
+	?>
+	<span<?php echo $custom_class; ?>>
+		<a class="btn-<?php echo esc_attr($key); ?>" target="_blank" href="<?php echo $key === 'skype' ? $url : esc_url($url); ?>" aria-label="<?php echo esc_attr($data['label']); ?>" itemprop="sameAs">
+			<i class="houzez-icon <?php echo esc_attr($data['icon']); ?> me-2"></i>
+		</a>
+	</span>
+	<?php
+}
 ?>
-
-<?php if( !empty( $agent_skype ) ) { ?>
-<span>
-	<a class="btn-skype" target="_blank" href="skype:<?php echo esc_attr( $agent_skype ); ?>?chat">
-		<i class="houzez-icon icon-video-meeting-skype mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_facebook ) ) { ?>
-<span>
-	<a class="btn-facebook" target="_blank" href="<?php echo esc_url( $agent_facebook ); ?>">
-		<i class="houzez-icon icon-social-media-facebook mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
- <?php if( !empty( $agent_instagram ) ) { ?>
-<span>
-	<a class="btn-instagram" target="_blank" href="<?php echo esc_url( $agent_instagram ); ?>">
-		<i class="houzez-icon icon-social-instagram mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_twitter ) ) { ?>
-<span>
-	<a class="btn-twitter" target="_blank" href="<?php echo esc_url( $agent_twitter ); ?>">
-		<i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_linkedin ) ) { ?>
-<span>
-	<a class="btn-linkedin" target="_blank" href="<?php echo esc_url( $agent_linkedin ); ?>">
-		<i class="houzez-icon icon-professional-network-linkedin mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_googleplus ) ) { ?>
-<span>
-	<a class="btn-googleplus" target="_blank" href="<?php echo esc_url( $agent_googleplus ); ?>">
-		<i class="houzez-icon icon-social-media-google-plus-1 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_youtube ) ) { ?>
-<span>
-	<a class="btn-youtube" target="_blank" href="<?php echo esc_url( $agent_youtube ); ?>">
-		<i class="houzez-icon icon-social-video-youtube-clip mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_tiktok ) ) { ?>
-<span>
-	<a class="btn-tiktok" target="_blank" href="<?php echo esc_url( $agent_tiktok ); ?>">
-		<i class="houzez-icon icon-tiktok-1-logos-24 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_pinterest ) ) { ?>
-<span>
-	<a class="btn-pinterest" target="_blank" href="<?php echo esc_url( $agent_pinterest ); ?>">
-		<i class="houzez-icon icon-social-pinterest mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_vimeo ) ) { ?>
-<span>
-	<a class="btn-vimeo" target="_blank" href="<?php echo esc_url( $agent_vimeo ); ?>">
-		<i class="houzez-icon icon-social-video-vimeo mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_telegram ) ) { ?>
-<span>
-	<a class="btn-telegram" target="_blank" href="<?php echo houzezStandardizeTelegramURL($agent_telegram); ?>">
-		<i class="houzez-icon icon-telegram-logos-24 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_line_id ) ) { ?>
-<span>
-	<a class="btn-lineapp" target="_blank" href="https://line.me/ti/p/~<?php echo esc_attr( $agent_line_id ); ?>">
-		<i class="houzez-icon icon-lineapp-5 mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_realtor_com ) ) { ?>
-<span>
-	<a class="btn-realtor-com" target="_blank" href="<?php echo esc_url( $agent_realtor_com ); ?>">
-		<i class="houzez-icon icon-realtor-com mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_zillow ) ) { ?>
-<span>
-	<a class="btn-zillow" target="_blank" href="<?php echo esc_url( $agent_zillow ); ?>">
-		<i class="houzez-icon icon-zillow mr-2"></i>
-	</a>
-</span>
-<?php } ?>
-
-<?php if( !empty( $agent_whatsapp ) ) { ?>
-<span class="agent-whatsapp">
-	<a class="btn-whatsapp" target="_blank" href="https://wa.me/<?php echo esc_attr($agent_whatsapp_call); ?>">
-		<i class="houzez-icon icon-messaging-whatsapp mr-2"></i>
-	</a>
-</span>
-<?php } ?>

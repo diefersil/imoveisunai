@@ -1,5 +1,5 @@
 <?php
-namespace Houzez\Elementor\Widgets\HeaderFooter;
+namespace Elementor;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
@@ -70,7 +70,20 @@ class Houzez_Area_Switcher extends Widget_Base {
      * @return array Widget categories.
      */
     public function get_categories() {
-        return [ 'houzez-elements', 'houzez-header-footer' ];
+        // Check if the current post type is 'fts_builder'
+        if (get_post_type() === 'fts_builder') {
+            // Get the template type of the current post
+            $template_type = htb_get_template_type(get_the_ID());
+
+            // Check if the template type is 'tmp_header' or 'tmp_footer'
+            if ($template_type === 'tmp_header' || $template_type === 'tmp_footer') {
+                // Return the specific category for header and footer builders
+                return ['houzez-header-footer-builder'];
+            }
+        }
+        
+        // Return the default categories
+        return ['houzez-elements', 'houzez-header-footer'];
     }
 
     /**
@@ -305,9 +318,9 @@ class Houzez_Area_Switcher extends Widget_Base {
         } else {
             ?>
             <div class="switcher-wrap area-switcher-wrap">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><span><?php esc_html_e('Area Switcher', 'houzez-theme-functionality'); ?></span>
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-bs-haspopup="true" aria-bs-expanded="true"><span><?php esc_html_e('Area Switcher', 'houzez-theme-functionality'); ?></span>
                 </button>
-                <ul id="hz-currency-switcher-list" class="dropdown-menu" aria-labelledby="dropdown">
+                <ul id="hz-currency-switcher-list" class="dropdown-menu" aria-bs-labelledby="dropdown">
                     <li><?php esc_html_e('You need enable it under Theme Options -> Top Bar -> Area Switcher', 'houzez-theme-functionality'); ?></li>
                 </ul>
             </div><!-- currency-switcher-wrap -->

@@ -2,22 +2,22 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title"><?php esc_html_e( 'Reset Password', 'houzez' ); ?></div>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <div class="modal-title fw-normal"><?php esc_html_e( 'Forgot Password', 'houzez' ); ?></div>
+                <button type="button" class="btn close ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
                 </button>
             </div><!-- modal-header -->
             <div class="modal-body">
                 <div id="reset_pass_msg"></div>
                 <p><?php esc_html_e( 'Please enter your username or email address. You will receive a link to create a new password via email.', 'houzez' ); ?></p>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control forgot-password" name="user_login_forgot" id="user_login_forgot" placeholder="<?php esc_html_e( 'Enter your username or email', 'houzez' ); ?>" class="form-control">
+                <form id="houzez_forgot_password_form" onsubmit="return false;">
+                    <div class="form-group mb-3">
+                        <input type="text" class="form-control forgot-password" name="user_login" id="user_login" placeholder="<?php esc_html_e( 'Enter your username or email address', 'houzez' ); ?>">
                     </div>
                     <?php wp_nonce_field( 'fave_resetpassword_nonce', 'fave_resetpassword_security' ); ?>
-                    <button type="button" id="houzez_forgetpass" class="btn btn-primary btn-block">
+                    <button type="submit" id="houzez_forgetpass" class="btn-reset-password btn btn-primary w-100">
                         <?php get_template_part('template-parts/loader'); ?>
-                        <?php esc_html_e( 'Get new password', 'houzez' ); ?>
+                        <?php esc_html_e( 'Submit', 'houzez' ); ?>
                     </button>
                 </form>
             </div><!-- modal-body -->

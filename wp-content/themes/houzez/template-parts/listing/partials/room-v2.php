@@ -4,21 +4,21 @@ $prop_room_label = ($prop_room > 1 ) ? houzez_option('glc_rooms', 'Rooms') : hou
 
 $output = '';
 if( $prop_room != '' ) { 
-	$output .= '<li class="h-rooms">';
-		$output .= '<span class="hz-figure">'.esc_attr($prop_room).' ';
+	$output .= '<li class="h-rooms pe-2" role="listitem">';
+		$output .= '<span class="d-flex align-items-center gap-2">'.esc_attr($prop_room).' ';
 		
 		if(houzez_option('icons_type') == 'font-awesome') {
-			$output .= '<i class="'.houzez_option('fa_room').' ml-1"></i>';
+			$output .= '<i class="'.houzez_option('fa_room').'"></i>';
 
 		} elseif (houzez_option('icons_type') == 'custom') {
 			$cus_icon = houzez_option('room');
 			if(!empty($cus_icon['url'])) {
 
 				$alt = isset($cus_icon['title']) ? $cus_icon['title'] : '';
-				$output .= '<img class="img-fluid ml-1" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
+				$output .= '<img class="img-fluid me-1" src="'.esc_url($cus_icon['url']).'" width="16" height="16" alt="'.esc_attr($alt).'">';
 			}
 		} else {
-			$output .= '<i class="houzez-icon icon-real-estate-dimensions-plan-1 mr-1"></i>';
+			$output .= '<i class="houzez-icon icon-architecture-door"></i>';
 		}
 
 		$output .= '</span>';

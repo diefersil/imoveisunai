@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Api routes
  */
@@ -21,16 +22,23 @@ use Extendify\Draft\Controllers\ImageController;
 use Extendify\Draft\Controllers\UserSettingsController;
 use Extendify\Draft\Controllers\RouterController as DraftRouterController;
 
-use Extendify\Launch\Controllers\DataController;
 use Extendify\Launch\Controllers\WPController;
 use Extendify\Launch\Controllers\WooCommerceController;
 
 use Extendify\Library\Controllers\SiteController;
+
+use Extendify\PageCreator\Controllers\SiteController as PageCreatorSiteController;
+
+use Extendify\Agent\Controllers\WPController as AgentWPController;
+use Extendify\Agent\Controllers\ChatHistoryController as AgentChatController;
+use Extendify\Agent\Controllers\WorkflowHistoryController as AgentWorkflowController;
+
 use Extendify\Shared\Controllers\PatternPlaceholderController;
 use Extendify\Shared\Controllers\UserSelectionController;
 use Extendify\Shared\Controllers\UserSettingsController as SharedUserSettingsController;
 use Extendify\Shared\Controllers\ActivityController;
-
+use Extendify\Shared\Controllers\SiteProfileController;
+use Extendify\Shared\Controllers\DataController as SharedDataController;
 
 \add_action(
     'rest_api_init',
@@ -39,19 +47,20 @@ use Extendify\Shared\Controllers\ActivityController;
         ApiRouter::get('/library/settings', [SiteController::class, 'get']);
         ApiRouter::post('/library/settings', [SiteController::class, 'store']);
         ApiRouter::post('/library/settings/single', [SiteController::class, 'single']);
-        // TODO: Remove this after a few months.
-        ApiRouter::post('/library/settings/add-utils-to-global-styles', [SiteController::class, 'addUtilsToGlobalStyles']);
+
+        // Page Creator.
+        ApiRouter::get('/page-creator/settings/get-option', [PageCreatorSiteController::class, 'get']);
+        ApiRouter::post('/page-creator/settings/single', [PageCreatorSiteController::class, 'single']);
 
         // Launch.
         ApiRouter::post('/launch/options', [WPController::class, 'updateOption']);
         ApiRouter::get('/launch/options', [WPController::class, 'getOption']);
+        ApiRouter::post('/launch/save-pattern', [WPController::class, 'savePattern']);
         ApiRouter::get('/launch/active-plugins', [WPController::class, 'getActivePlugins']);
-        ApiRouter::get('/launch/goals', [DataController::class, 'getGoals']);
-        ApiRouter::get('/launch/ping', [DataController::class, 'ping']);
         ApiRouter::get('/launch/prefetch-assist-data', [WPController::class, 'prefetchAssistData']);
         ApiRouter::post('/launch/create-navigation', [WPController::class, 'createNavigationWithMeta']);
         ApiRouter::post('/launch/post-launch-functions', [WPController::class, 'postLaunch']);
-        APIRouter::get('/launch/import-woocommerce', [WooCommerceController::class, 'importTemporaryProducts']);
+        ApiRouter::get('/launch/import-woocommerce', [WooCommerceController::class, 'importTemporaryProducts']);
 
         // Assist.
         ApiRouter::get('/assist/task-data', [TasksController::class, 'get']);
@@ -60,6 +69,7 @@ use Extendify\Shared\Controllers\ActivityController;
         ApiRouter::get('/assist/global-data', [GlobalsController::class, 'get']);
         ApiRouter::post('/assist/global-data', [GlobalsController::class, 'store']);
         ApiRouter::post('/assist/delete-domains-recommendations', [DomainsSuggestionController::class, 'deleteCache']);
+        ApiRouter::post('assists/domains-recommendations-activities', [DomainsSuggestionController::class, 'tracking']);
 
         // Help Center.
         ApiRouter::get('/help-center/tour-data', [TourController::class, 'get']);
@@ -77,6 +87,15 @@ use Extendify\Shared\Controllers\ActivityController;
         ApiRouter::post('/draft/router-data', [DraftRouterController::class, 'store']);
         ApiRouter::get('/draft/router-data', [DraftRouterController::class, 'get']);
 
+        // Agent.
+        ApiRouter::get('/agent/theme-variations', [AgentWPController::class, 'getVariations']);
+        ApiRouter::get('/agent/theme-fonts-variations', [AgentWPController::class, 'getFontsVariations']);
+        ApiRouter::get('/agent/get-block-code', [AgentWPController::class, 'getBlockCode']);
+        ApiRouter::post('/agent/get-block-html', [AgentWPController::class, 'getBlockHtml']);
+        ApiRouter::get('/agent/chat-events', [AgentChatController::class, 'get']);
+        ApiRouter::post('/agent/chat-events', [AgentChatController::class, 'store']);
+        ApiRouter::post('/agent/workflows', [AgentWorkflowController::class, 'add']);
+
         // Shared.
         ApiRouter::get('/shared/user-selections-data', [UserSelectionController::class, 'get']);
         ApiRouter::post('/shared/user-selections-data', [UserSelectionController::class, 'store']);
@@ -84,5 +103,9 @@ use Extendify\Shared\Controllers\ActivityController;
         ApiRouter::post('/shared/process-placeholders', [PatternPlaceholderController::class, 'processPlaceholders']);
         ApiRouter::get('/shared/activity', [ActivityController::class, 'get']);
         ApiRouter::post('/shared/activity', [ActivityController::class, 'store']);
+        ApiRouter::post('/shared/site-profile', [SiteProfileController::class, 'store']);
+        ApiRouter::get('/shared/site-profile', [SiteProfileController::class, 'get']);
+        ApiRouter::get('/shared/ping', [SharedDataController::class, 'ping']);
+        ApiRouter::get('/shared/partner-plugins', [SharedDataController::class, 'getPartnerPlugins']);
     }
 );

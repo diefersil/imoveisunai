@@ -22,22 +22,23 @@ class Houzez_Fields_Builder {
 
 
     public static function render() {
-        ?>
-        <div class="houzez-admin-wrapper">
-        <?php
+       ?>
+        <div class="wrap houzez-template-library">
+            <div class="houzez-header">
+                <div class="houzez-header-content">
+                    <div class="houzez-logo">
+                        <h1><?php esc_html_e('Fields Builder', 'houzez-theme-functionality'); ?></h1>
+                    </div>
+                    <div class="houzez-header-actions">
+                        <a href="<?php echo esc_url(self::field_add_link()); ?>" class="houzez-btn houzez-btn-primary">
+                            <i class="dashicons dashicons-plus"></i>
+                            <?php esc_html_e('Add New Field', 'houzez-theme-functionality'); ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-            $header = get_template_directory().'/framework/admin/header.php';
-            $tabs = get_template_directory().'/framework/admin/tabs.php';
-
-            if ( file_exists( $header ) ) {
-                load_template( $header );
-            }
-
-            if ( file_exists( $tabs ) ) {
-                load_template( $tabs );
-            } ?>
-
-            <div class="admin-houzez-content"> 
+            <div class="houzez-dashboard">
             <?php
             $template = apply_filters( 'houzez_fbuilder_index_template_path', HOUZEZ_TEMPLATES . '/fields-builder/page.php' );
 
@@ -105,6 +106,19 @@ class Houzez_Fields_Builder {
 
 
     public static function load_select_options() {
+        // Initialize $instance as an empty array for new fields
+        $instance = array();
+        
+        // If we're editing an existing field, get the field data
+        if (!empty($_POST['field_id'])) {
+            $field_id = intval($_POST['field_id']);
+            $instance = self::get_field($field_id);
+        }
+        
+        // Ensure $instance is always an array
+        if (!$instance) {
+            $instance = array();
+        }
 
         $file = HOUZEZ_TEMPLATES . '/fields-builder/multiple.php';
         if ( file_exists( $file ) ) {
@@ -128,10 +142,12 @@ class Houzez_Fields_Builder {
     }
 
     public static function get_field_option($instance) {
-
         if( isset($instance['type']) && ( $instance['type'] == 'checkbox_list' || $instance['type'] == 'radio' ) ) {
             return isset($instance['fvalues']) && ! empty( $instance['fvalues'] ) ? $instance['fvalues'] : '';
         }
+        
+        // Always return an empty string if no conditions are met
+        return '';
     }
 
     public static function field_edit_link( $id ) {
@@ -396,8 +412,15 @@ class Houzez_Fields_Builder {
             ['id' => $id]
         );
 
-        if ($updated) {
-            add_action('admin_notices', [__CLASS__, 'update_field_notice']);
+        // Check if update was successful OR if no rows were affected (no changes made)
+        // $wpdb->update() returns the number of rows updated, or false on error
+        // 0 means no rows were updated (no changes), which is not an error
+        if ($updated !== false) {
+            wp_redirect(add_query_arg(['action' => 'houzez-edit-field', 'id' => $id, 'field_updated' => '1'], admin_url('admin.php?page=houzez_fbuilder')));
+            exit;
+        } else {
+            wp_redirect(add_query_arg(['action' => 'houzez-edit-field', 'id' => $id, 'field_error' => '1'], admin_url('admin.php?page=houzez_fbuilder')));
+            exit;
         }
     }
 
@@ -405,8 +428,8 @@ class Houzez_Fields_Builder {
         $field_id = self::generate_field_id($instance['label']);
         
         if (self::field_id_exists($wpdb, $field_id) || in_array($field_id, self::builtInFields())) {
-            add_action('admin_notices', [__CLASS__, 'field_exists_notice']);
-            return;
+            wp_redirect(add_query_arg(['action' => 'add-new', 'field_exists' => '1'], admin_url('admin.php?page=houzez_fbuilder')));
+            exit;
         }
 
         $inserted = $wpdb->insert(
@@ -415,9 +438,11 @@ class Houzez_Fields_Builder {
         );
 
         if ($inserted) {
-            add_action('admin_notices', [__CLASS__, 'add_field_notice']);
+            wp_redirect(add_query_arg(['action' => 'add-new', 'field_added' => '1'], admin_url('admin.php?page=houzez_fbuilder')));
+            exit;
         } else {
-            add_action('admin_notices', [__CLASS__, 'error_field_notice']);
+            wp_redirect(add_query_arg(['action' => 'add-new', 'field_error' => '1'], admin_url('admin.php?page=houzez_fbuilder')));
+            exit;
         }
     }
 
@@ -458,6 +483,7 @@ class Houzez_Fields_Builder {
             'property_price_prefix',
             'location',
             'type',
+            'status',
             'country',
             'states',
             'areas',

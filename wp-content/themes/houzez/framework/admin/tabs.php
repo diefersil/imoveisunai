@@ -9,6 +9,9 @@ $tabs = array(
 	'houzez_permalinks' => esc_html__('Permalinks', 'houzez'),
 	'fcc_api_settings' => esc_html__('Currency Switcher', 'houzez'),
 	'houzez_currencies' => esc_html__('Currencies', 'houzez'),
+	'houzez_image_sizes' => esc_html__('Media Manager', 'houzez'),
+	'houzez-template-library' => esc_html__('Template Library', 'houzez'),
+	'houzez-verification-requests' => esc_html__('User Verification', 'houzez'),
 	'houzez_help' => esc_html__('Documentation', 'houzez'),
 	'houzez_feedback' => esc_html__('Feedback', 'houzez'),
 	'houzez_purchase' => esc_html__('Purchase Code', 'houzez'),
@@ -22,6 +25,9 @@ if( ! class_exists('Houzez') ) {
 	unset($tabs['houzez_permalinks']);
 	unset($tabs['fcc_api_settings']);
 	unset($tabs['houzez_currencies']);
+	unset($tabs['houzez_image_sizes']);
+	unset($tabs['houzez-template-library']);
+	unset($tabs['houzez-verification-requests']);
 	unset($tabs['houzez_purchase']);
 }
 ?>

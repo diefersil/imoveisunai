@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Twenty Twenty-Five package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-01-29 01:27:12+0000\n"
+"PO-Revision-Date: 2025-09-22 20:18:15+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,6 +23,31 @@ msgstr "O Twenty Twenty-Five enfatiza simplicidade e adaptabilidade. Oferece op�
 #, gp-priority: high
 msgid "Twenty Twenty-Five"
 msgstr "Twenty Twenty-Five"
+
+#: patterns/template-home-vertical-header-blog.php
+msgctxt "Pattern title"
+msgid "Right-aligned home"
+msgstr "Página inicial alinhada à direita"
+
+#: patterns/template-archive-vertical-header-blog.php
+msgctxt "Pattern title"
+msgid "Right-aligned archive"
+msgstr "Arquivo alinhado à direita"
+
+#: patterns/template-search-text-blog.php
+msgctxt "Pattern title"
+msgid "Text blog search results"
+msgstr "Resultados de busca para blog de textos"
+
+#: patterns/template-query-loop-vertical-header-blog.php
+msgctxt "Pattern title"
+msgid "Right-aligned query loop"
+msgstr "Loop de consulta alinhado à direita"
+
+#: patterns/template-query-loop-text-blog.php
+msgctxt "Pattern title"
+msgid "Text blog query loop"
+msgstr "Loop de consulta para blog de textos"
 
 #: patterns/text-faqs.php:35 patterns/text-faqs.php:51
 #: patterns/text-faqs.php:71 patterns/text-faqs.php:87
@@ -62,7 +87,7 @@ msgstr "Cabeçalho com título grande."
 
 #: theme.json
 msgctxt "Template part name"
-msgid "Vertical Header"
+msgid "Vertical site header"
 msgstr "Cabeçalho vertical"
 
 #: theme.json
@@ -429,12 +454,12 @@ msgstr "Noite"
 
 #: patterns/vertical-header.php
 msgctxt "Pattern description"
-msgid "Vertical Header with site title and navigation"
+msgid "Vertical site header with site title and navigation."
 msgstr "Cabeçalho vertical com título do site e navegação"
 
 #: patterns/vertical-header.php
 msgctxt "Pattern title"
-msgid "Vertical header"
+msgid "Vertical site header"
 msgstr "Cabeçalho vertical"
 
 #: patterns/text-faqs.php:83
@@ -555,8 +580,8 @@ msgstr "Post individual alinhado à direita"
 
 #: patterns/template-single-text-blog.php
 msgctxt "Pattern title"
-msgid "Text-only blog, single post"
-msgstr "Blog apenas de texto, post individual"
+msgid "Text blog single post"
+msgstr "Post individual para blog de textos"
 
 #: patterns/template-single-photo-blog.php:79
 msgid "Next Photo"
@@ -624,11 +649,6 @@ msgctxt "Pattern title"
 msgid "Right-aligned blog, search"
 msgstr "Blog alinhado à direita, pesquisa"
 
-#: patterns/template-search-text-blog.php
-msgctxt "Pattern title"
-msgid "Text-only blog, search"
-msgstr "Blog apenas de texto, pesquisa"
-
 #: patterns/template-search-photo-blog.php
 msgctxt "Pattern title"
 msgid "Photo blog search results"
@@ -649,15 +669,10 @@ msgctxt "Pattern title"
 msgid "List of posts, 1 column"
 msgstr "Lista de posts, 1 coluna"
 
-#: patterns/template-query-loop-vertical-header-blog.php
+#: patterns/template-page-vertical-header-blog.php
 msgctxt "Pattern title"
-msgid "Right-aligned posts"
-msgstr "Posts alinhados à direita"
-
-#: patterns/template-query-loop-text-blog.php
-msgctxt "Pattern title"
-msgid "Text-only blog, posts"
-msgstr "Blog apenas de texto, posts"
+msgid "Right-aligned page"
+msgstr "Página alinhada à direita"
 
 #: patterns/template-query-loop-photo-blog.php
 msgctxt "Pattern description"
@@ -687,11 +702,6 @@ msgctxt "Pattern title"
 msgid "News blog query loop"
 msgstr "Loop de consulta do blog de notícias"
 
-#: patterns/template-page-vertical-header-blog.php
-msgctxt "Pattern title"
-msgid "Page template for the right-aligned blog"
-msgstr "Modelo de página para o blog alinhado à direita"
-
 #: patterns/template-page-photo-blog.php
 msgctxt "Pattern title"
 msgid "Photo blog page"
@@ -706,15 +716,10 @@ msgctxt "Pattern title"
 msgid "News blog with sidebar"
 msgstr "Blog de notícias com barra lateral"
 
-#: patterns/template-home-vertical-header-blog.php
-msgctxt "Pattern title"
-msgid "Homepage for right-aligned blog"
-msgstr "Página inicial do blog alinhada à direita"
-
 #: patterns/template-home-text-blog.php
 msgctxt "Pattern title"
-msgid "Text-only blog, home"
-msgstr "Blog apenas de texto, página inicial"
+msgid "Text blog home"
+msgstr "Página inicial para blog de textos"
 
 #: patterns/template-home-posts-grid-news-blog.php:114
 msgid "Architecture"
@@ -735,15 +740,10 @@ msgctxt "Pattern title"
 msgid "News blog home"
 msgstr "Página inicial do blog de notícias"
 
-#: patterns/template-archive-vertical-header-blog.php
-msgctxt "Pattern title"
-msgid "Archive for the right-aligned blog"
-msgstr "Arquivo para o blog alinhado à direita"
-
 #: patterns/template-archive-text-blog.php
 msgctxt "Pattern title"
-msgid "Text-only blog, archive"
-msgstr "Blog apenas de texto, arquivo"
+msgid "Text blog archive"
+msgstr "Arquivo de blog de textos"
 
 #: patterns/template-archive-photo-blog.php
 msgctxt "Pattern title"
@@ -757,8 +757,8 @@ msgstr "Arquivo do blog de notícias"
 
 #: patterns/template-404-vertical-header-blog.php
 msgctxt "Pattern title"
-msgid "Right-aligned blog, 404"
-msgstr "Blog alinhado à direita, 404"
+msgid "Right-aligned 404"
+msgstr "Página 404 alinhada à direita"
 
 #: patterns/services-team-photos.php:50
 msgid "Man in hat, standing in front of a building."
@@ -1393,11 +1393,6 @@ msgctxt "Pattern title"
 msgid "Hero, overlapped book cover with links"
 msgstr "Destaque, sobreposição de capa de livro com links"
 
-#: patterns/hero-full-width-image.php:33
-msgctxt "Sample hero button"
-msgid "Learn More"
-msgstr "Saiba mais"
-
 #: patterns/hero-full-width-image.php:27
 msgctxt "Sample hero paragraph"
 msgid "Like flowers that bloom in unexpected places, every story unfolds with beauty and resilience, revealing hidden wonders."
@@ -1478,7 +1473,7 @@ msgstr "Título e parágrafo com imagem à direita"
 
 #: patterns/header.php
 msgctxt "Pattern description"
-msgid "Header with site title and navigation."
+msgid "Site header with site title and navigation."
 msgstr "Cabeçalho com título do site e navegação."
 
 #: patterns/header.php
@@ -1488,8 +1483,8 @@ msgstr "Cabeçalho"
 
 #: patterns/header-large-title.php
 msgctxt "Pattern description"
-msgid "Header with large site title and right-aligned navigation."
-msgstr "Cabeçalho com o título do site com tamanho grande e navegação alinhada à direita."
+msgid "Site header with large site title and right-aligned navigation."
+msgstr "Cabeçalho com o título do site em tamanho grande e navegação alinhada à direita."
 
 #: patterns/header-large-title.php
 msgctxt "Pattern title"
@@ -1498,7 +1493,7 @@ msgstr "Cabeçalho com título grande"
 
 #: patterns/header-columns.php
 msgctxt "Pattern description"
-msgid "Header with site title and navigation in columns."
+msgid "Site header with site title and navigation in columns."
 msgstr "Cabeçalho com título do site e navegação em colunas."
 
 #: patterns/header-columns.php
@@ -1508,12 +1503,12 @@ msgstr "Cabeçalho com colunas"
 
 #: patterns/header-centered.php
 msgctxt "Pattern description"
-msgid "Header with centered site title and navigation."
+msgid "Site header with centered site title and navigation."
 msgstr "Cabeçalho com o título do site e navegação centralizados."
 
 #: patterns/header-centered.php
 msgctxt "Pattern title"
-msgid "Centered header"
+msgid "Centered site header"
 msgstr "Cabeçalho centralizado"
 
 #: patterns/grid-with-categories.php:64
@@ -1956,7 +1951,8 @@ msgctxt "Pattern title"
 msgid "Events list"
 msgstr "Lista de eventos"
 
-#: patterns/cta-centered-heading.php:28
+#: patterns/banner-intro-image.php:42 patterns/cta-centered-heading.php:28
+#: patterns/hero-full-width-image.php:33
 msgid "Learn more"
 msgstr "Saiba mais"
 
@@ -2329,11 +2325,6 @@ msgstr "Um título grande alinhado à esquerda com um nome da marca realçado em
 msgctxt "Pattern title"
 msgid "Intro with left-aligned description"
 msgstr "Introdução com descrição alinhada à esquerda"
-
-#: patterns/banner-intro-image.php:42
-msgctxt "Button text of intro section."
-msgid "Learn More"
-msgstr "Saiba mais"
 
 #: patterns/banner-intro-image.php:35
 msgctxt "Sample description for banner with flower."

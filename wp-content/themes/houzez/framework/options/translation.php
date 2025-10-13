@@ -26,6 +26,7 @@ Redux::setSection( $houzez_opt_name, array(
             'subtitle' => esc_html__('Manage common strings accross site', 'houzez'),
             'indent'   => true,
         ),
+        
         array(
             'id'       => 'cl_featured_label',
             'type'     => 'text',
@@ -352,18 +353,7 @@ Redux::setSection( $houzez_opt_name, array(
             'title'    => esc_html__('Price Range', 'houzez'),
             'default' => esc_html__('Price Range', 'houzez')
         ),
-        array(
-            'id'       => 'srh_from',
-            'type'     => 'text',
-            'title'    => esc_html__('From', 'houzez'),
-            'default' => esc_html__('From', 'houzez')
-        ),
-        array(
-            'id'       => 'srh_to',
-            'type'     => 'text',
-            'title'    => esc_html__('To', 'houzez'),
-            'default' => esc_html__('To', 'houzez')
-        ),
+        
         array(
             'id'       => 'srh_prop_id',
             'type'     => 'text',
@@ -813,7 +803,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'spl_prop_type',
             'type'     => 'text',
             'title'    => esc_html__("Property Type", 'houzez'),
-            'default' => esc_html__("Property Type", 'houzez')
+            'default' => esc_html__("Type", 'houzez')
         ),
         array(
             'id'       => 'spl_prop_status',
@@ -832,6 +822,12 @@ Redux::setSection( $houzez_opt_name, array(
             'type'     => 'text',
             'title'    => esc_html__("Land Area", 'houzez'),
             'default' => esc_html__("Land Area", 'houzez')
+        ),
+        array(
+            'id'       => 'spl_area_size',
+            'type'     => 'text',
+            'title'    => esc_html__("Area Size", 'houzez'),
+            'default' => esc_html__("Area Size", 'houzez')
         ),
         array(
             'id'       => 'spl_room',
@@ -2808,6 +2804,27 @@ Redux::setSection( $houzez_opt_name, array(
         ),
 
         array(
+            'id'       => 'dsh_overview',
+            'type'     => 'text',
+            'title'    => esc_html__("Overview", 'houzez'),
+            'default' => esc_html__("Overview", 'houzez')
+        ),
+
+        array(
+            'id'       => 'dsh_crm',
+            'type'     => 'text',
+            'title'    => esc_html__("CRM", 'houzez'),
+            'default' => esc_html__("CRM", 'houzez')
+        ),
+
+        array(
+            'id'       => 'dsh_dashboard',
+            'type'     => 'text',
+            'title'    => esc_html__("Dashboard", 'houzez'),
+            'default' => esc_html__("Dashboard", 'houzez')
+        ),
+
+        array(
             'id'       => 'dsh_home',
             'type'     => 'text',
             'title'    => esc_html__("Home", 'houzez'),
@@ -2846,8 +2863,8 @@ Redux::setSection( $houzez_opt_name, array(
         array(
             'id'       => 'dsh_insight',
             'type'     => 'text',
-            'title'    => esc_html__("Insight", 'houzez'),
-            'default' => esc_html__("Insight", 'houzez')
+            'title'    => esc_html__("Insights", 'houzez'),
+            'default' => esc_html__("Insights", 'houzez')
         ),
         array(
             'id'       => 'dsh_props',
@@ -2904,6 +2921,12 @@ Redux::setSection( $houzez_opt_name, array(
             'default' => esc_html__("Disapproved", 'houzez')
         ),
         array(
+            'id'       => 'dsh_sold',
+            'type'     => 'text',
+            'title'    => esc_html__("Sold", 'houzez'),
+            'default' => esc_html__("Sold", 'houzez')
+        ),
+        array(
             'id'       => 'dsh_create_listing',
             'type'     => 'text',
             'title'    => esc_html__("Create a Listing", 'houzez'),
@@ -2920,6 +2943,12 @@ Redux::setSection( $houzez_opt_name, array(
             'type'     => 'text',
             'title'    => esc_html__("Messages", 'houzez'),
             'default' => esc_html__("Messages", 'houzez')
+        ),
+        array(
+            'id'       => 'dsh_other',
+            'type'     => 'text',
+            'title'    => esc_html__("Other", 'houzez'),
+            'default' => esc_html__("Other", 'houzez')
         ),
         array(
             'id'       => 'dsh_saved_searches',
@@ -2952,6 +2981,12 @@ Redux::setSection( $houzez_opt_name, array(
             'default' => esc_html__("GDPR Request", 'houzez')
         ),
         array(
+            'id'       => 'dsh_team',
+            'type'     => 'text',
+            'title'    => esc_html__("Team", 'houzez'),
+            'default' => esc_html__("Team", 'houzez')
+        ),
+        array(
             'id'       => 'dsh_agents',
             'type'     => 'text',
             'title'    => esc_html__("Agents", 'houzez'),
@@ -2962,6 +2997,18 @@ Redux::setSection( $houzez_opt_name, array(
             'type'     => 'text',
             'title'    => esc_html__("Add New", 'houzez'),
             'default' => esc_html__("Add New", 'houzez')
+        ),
+        array(
+            'id'       => 'dsh_account',
+            'type'     => 'text',
+            'title'    => esc_html__("Account", 'houzez'),
+            'default' => esc_html__("Account", 'houzez')
+        ),
+        array(
+            'id'       => 'dsh_verification',
+            'type'     => 'text',
+            'title'    => esc_html__("Verification", 'houzez'),
+            'default' => esc_html__("Verification", 'houzez')
         ),
         array(
             'id'       => 'dsh_logout',

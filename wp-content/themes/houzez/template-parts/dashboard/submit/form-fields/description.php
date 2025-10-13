@@ -1,7 +1,7 @@
-<div class="form-group">
-	<label><?php echo houzez_option('cl_content', 'Content'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="property_description"><?php echo houzez_option('cl_content', 'Content'); ?></label>
 	<?php
-	$editor_id = 'prop_des';
+	$editor_id = 'property_description';
 	$settings = array(
 	    'media_buttons' => false,
 	    'textarea_rows' => 10,

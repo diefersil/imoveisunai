@@ -20,6 +20,8 @@ class Deactivator {
 	public $plugin;
 	
 	public $slug;
+
+	public $hash_deactivator;
 	
 	public $name;
 	
@@ -31,20 +33,16 @@ class Deactivator {
 	
 	public function __construct( $plugin, $args = [] ) {
 
-		if( ! function_exists( 'get_plugin_data' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-		}
-		
-		$this->plugin 	= get_plugin_data( $plugin );
-
-		$this->args = wp_parse_args( $args, [
-			'server'	=> 'https://my.pluggable.io'
+		$this->plugin	= wp_parse_args( $plugin, [
+			'server'		=> 'https://my.pluggable.io',
+			'hash_deactivator'	=> 'a7719b8f-a43b-4c1d-aeb3-2823ef174f54'
 		] );
 
-		$this->server 	= $this->args['server'];
-		$this->slug 	= $this->plugin['TextDomain'];
-		$this->name 	= $this->plugin['Name'];
-		$this->basename	= plugin_basename( $plugin );
+		$this->server 			= $this->plugin['server'];
+		$this->hash_deactivator = $this->plugin['hash_deactivator'];
+		$this->slug 			= $this->plugin['TextDomain'];
+		$this->name 			= $this->plugin['Name'];
+		$this->basename			= plugin_basename( $plugin['basename'] );
 		
 		$this->hooks();
 	}
@@ -178,20 +176,23 @@ class Deactivator {
 
 		$user = wp_get_current_user();
 
-		// send data
-		$url = add_query_arg( [ 
-		    'rest_route'    => '/plugins/deactivation',
-		    'first_name'    => $user->first_name,
-		    'last_name'     => $user->last_name,
-		    'email'     	=> $user->user_email,
-		    'plugin'     	=> sanitize_text_field( $_POST['plugin'] ),
-		    'site_url'     	=> site_url( '/' ),
-		    'delay'     	=> date_i18n( 'U' ) - (int) get_option( 'codesigner_install_time' ),
-		    'reason'     	=> serialize( $_POST['reason'] ),
-		    'explanation'	=> sanitize_textarea_field( $_POST['explanation'] ),
-		], wp_unslash( $this->server ) );
-
-		wp_remote_get( $url );
+		if( '' !== $this->hash_deactivator ) {
+			wp_remote_post(
+				"{$this->server}/?fluentcrm=1&route=contact&hash={$this->hash_deactivator}",
+				array(
+					'body' => array(
+						'first_name'    => $user->first_name,
+						'last_name'     => $user->last_name,
+						'email'     	=> $user->user_email,
+						'plugin'     	=> sanitize_text_field( $_POST['plugin'] ),
+						'site_url'     	=> site_url( '/' ),
+						'delay'     	=> date_i18n( 'U' ) - (int) get_option( "{$this->slug}_install_time" ),
+						'deactivation'  => serialize( $_POST['reason'] ),
+						'feedback'		=> sanitize_textarea_field( $_POST['explanation'] ),
+					),
+				)
+			);
+		}
 
 		wp_send_json( [ 'status' => 1, 'message' => __( 'Plugin deactivated' ) ] );
 	}

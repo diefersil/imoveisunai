@@ -6,16 +6,21 @@ if(empty($slider_img)) {
 	$img_url = wp_get_attachment_url( get_post_thumbnail_id() );
 }
 ?>
-<section class="top-banner-wrap property-slider-wrap">
-	<div class="property-slider">
-		<div class="property-slider-item-wrap" style="background-image: url(<?php echo esc_url($img_url); ?>);"	>
-			<div class="property-slider-item">
-			<?php get_template_part('template-parts/listing/partials/item-title'); ?>
-			<?php get_template_part('template-parts/listing/partials/item-address'); ?>
-			<?php get_template_part('template-parts/listing/partials/item-price'); ?>
-			<?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>
-			<?php get_template_part('template-parts/listing/partials/item-btn'); ?>
-			</div><!-- property-slider-item -->
-		</div><!-- property-slider-item-wrap -->
-	</div><!-- property-slider -->
-</section><!-- property-slider-wrap -->
+<div class="property-slider-item-wrap d-flex justify-content-start align-items-center" style="background-image: url('<?php echo esc_url($img_url); ?>');"	>
+	<div class="property-slider-item">
+		<?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>
+		<?php get_template_part('template-parts/listing/partials/item-title'); ?>
+		<?php get_template_part('template-parts/listing/partials/item-address'); ?>
+		<ul class="item-price-wrap d-flex flex-column gap-2 mb-3" role="list">
+			<?php echo houzez_listing_price_v1(); ?>
+		</ul>
+		<?php get_template_part('template-parts/listing/partials/item-features-v1'); ?>
+		<?php get_template_part('template-parts/listing/partials/item-btn'); ?>
+		<?php if(houzez_option('disable_date', 1) || houzez_option('disable_agent', 1)) { ?>
+		<div class="d-flex mt-3">
+				<?php get_template_part('template-parts/listing/partials/item-author'); ?>
+				<?php get_template_part('template-parts/listing/partials/item-date'); ?>
+			</div>
+		<?php } ?>
+	</div>
+</div>

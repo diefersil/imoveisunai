@@ -11,16 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.0
  */
 class Houzez_Elementor_Inquiry_Form extends Widget_Base {
-
-    public function __construct( array $data = [], array $args = null ) {
-        parent::__construct( $data, $args );
-
-        $js_path = 'assets/frontend/js/';
-
-        wp_register_script( 'validate', HOUZEZ_PLUGIN_URL . $js_path . 'jquery.validate.min.js', array( 'jquery' ), '1.19.2' );
-        wp_register_script( 'houzez-validate-js', HOUZEZ_PLUGIN_URL . $js_path . 'houzez-validate.js', array( 'jquery' ), '1.0.0' );
-
-    }
+    use \HouzezThemeFunctionality\Elementor\Traits\Houzez_Form_Traits;
 
     public function get_script_depends() {
         return [ 'validate', 'houzez-validate-js', 'jquery-form' ];
@@ -356,16 +347,19 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
         );
 
         $this->add_control(
-            'gdpr_label',
+            'hide_gdpr_checkbox',
             [
-                'label' => esc_html__( 'Label', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::TEXT,
+                'label' => esc_html__( 'Hide checkbox', 'houzez-theme-functionality' ),
+                'description' => esc_html__( 'If you want to hide the checkbox, you can enable this option.', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SWITCHER,
+                'return_value' => 'true',
                 'default' => '',
                 'condition' => [
                     'gdpr_agreement' => 'yes',
                 ],
             ]
         );
+
         $this->add_control(
             'gdpr_required',
             [
@@ -470,19 +464,19 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
                 'options' => [
                     'start' => [
                         'title' => esc_html__( 'Left', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-left',
+                        'icon' => 'eicon-text-align-left',
                     ],
                     'center' => [
                         'title' => esc_html__( 'Center', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-center',
+                        'icon' => 'eicon-text-align-center',
                     ],
                     'end' => [
                         'title' => esc_html__( 'Right', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-right',
+                        'icon' => 'eicon-text-align-right',
                     ],
                     'stretch' => [
                         'title' => esc_html__( 'Justified', 'houzez-theme-functionality' ),
-                        'icon' => 'fa fa-align-justify',
+                        'icon' => 'eicon-text-align-justify',
                     ],
                 ],
                 'default' => 'stretch',
@@ -626,386 +620,7 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
 
         $this->end_controls_section();
 
-
-        $this->start_controls_section(
-            'section_form_style',
-            [
-                'label' => esc_html__( 'Form', 'houzez-theme-functionality' ),
-                'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
-
-        $this->add_responsive_control(
-            'column_gap',
-            [
-                'label' => esc_html__( 'Columns Gap', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 10,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 60,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group' => 'padding-right: calc( {{SIZE}}{{UNIT}}/2 ); padding-left: calc( {{SIZE}}{{UNIT}}/2 );',
-                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'margin-left: calc( -{{SIZE}}{{UNIT}}/2 ); margin-right: calc( -{{SIZE}}{{UNIT}}/2 );',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'row_gap',
-            [
-                'label' => esc_html__( 'Rows Gap', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 10,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 60,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group' => 'margin-bottom: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .elementor-form-fields-wrapper' => 'margin-bottom: -{{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'heading_label',
-            [
-                'label' => esc_html__( 'Label', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::HEADING,
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_responsive_control(
-            'label_spacing',
-            [
-                'label' => esc_html__( 'Spacing', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 0,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 60,
-                    ],
-                ],
-                'selectors' => [
-                    'body.rtl {{WRAPPER}} .elementor-labels-inline .elementor-field-group > label' => 'padding-left: {{SIZE}}{{UNIT}};',
-                    'body:not(.rtl) {{WRAPPER}} .elementor-labels-inline .elementor-field-group > label' => 'padding-right: {{SIZE}}{{UNIT}};',
-                    'body {{WRAPPER}} .elementor-labels-above .elementor-field-group > label' => 'padding-bottom: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'label_color',
-            [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group > label, {{WRAPPER}} .elementor-field-subgroup label' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'mark_required_color',
-            [
-                'label' => esc_html__( 'Mark Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-mark-required .elementor-field-label:after' => 'color: {{COLOR}};',
-                ],
-                'condition' => [
-                    'mark_required' => 'yes',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'label_typography',
-                'selector' => '{{WRAPPER}} .elementor-field-group > label',
-            ]
-        );
-
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_field_style',
-            [
-                'label' => esc_html__( 'Field', 'houzez-theme-functionality' ),
-                'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
-
-        $this->add_control(
-            'field_text_color',
-            [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group .elementor-field' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'field_typography',
-                'selector' => '{{WRAPPER}} .elementor-field-group .elementor-field, {{WRAPPER}} .elementor-field-subgroup label',
-            ]
-        );
-
-        $this->add_control(
-            'field_background_color',
-            [
-                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#ffffff',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'background-color: {{VALUE}};',
-                    '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'background-color: {{VALUE}};',
-                ],
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_control(
-            'field_border_color',
-            [
-                'label' => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#dce0e0',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-color: {{VALUE}};',
-                    '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-color: {{VALUE}};',
-                    '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper::before' => 'color: {{VALUE}};',
-                ],
-                'separator' => 'before',
-            ]
-        );
-
-        $this->add_responsive_control(
-            'field_border_width',
-            [
-                'label' => esc_html__( 'Border Width', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'placeholder' => '1',
-                'size_units' => [ 'px' ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                    '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-width: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'field_border_radius',
-            [
-                'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-field-group:not(.elementor-field-type-upload) .elementor-field:not(.elementor-select-wrapper)' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                    '{{WRAPPER}} .elementor-field-group .elementor-select-wrapper select' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_gdpr_style',
-            [
-                'label' => esc_html__( 'GDPR', 'houzez-theme-functionality' ),
-                'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
-
-        $this->add_control(
-            'field_gdpr_color',
-            [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .gdpr-text' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'gdpr_typography',
-                'selector' => '{{WRAPPER}} .gdpr-text',
-                'fields_options' => [
-                    // Inner control name
-                    'font_weight' => [
-                        // Inner control settings
-                        'default' => '300',
-                    ],
-                ],
-            ]
-        );
-
-        
-        $this->end_controls_section();
-
-        $this->start_controls_section(
-            'section_button_style',
-            [
-                'label' => esc_html__( 'Button', 'houzez-theme-functionality' ),
-                'tab' => Controls_Manager::TAB_STYLE,
-            ]
-        );
-
-        $this->start_controls_tabs( 'tabs_button_style' );
-
-        $this->start_controls_tab(
-            'tab_button_normal',
-            [
-                'label' => esc_html__( 'Normal', 'houzez-theme-functionality' ),
-            ]
-        );
-
-        $this->add_control(
-            'button_background_color',
-            [
-                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#00aeff',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button' => 'background-color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'button_text_color',
-            [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Typography::get_type(),
-            [
-                'name' => 'button_typography',
-                'selector' => '{{WRAPPER}} .elementor-button',
-            ]
-        );
-
-        $this->add_group_control(
-            Group_Control_Border::get_type(), [
-                'name' => 'button_border',
-                'selector' => '{{WRAPPER}} .elementor-button',
-            ]
-        );
-
-        $this->add_responsive_control(
-            'button_border_radius',
-            [
-                'label' => esc_html__( 'Border Radius', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'button_text_padding',
-            [
-                'label' => esc_html__( 'Text Padding', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', 'em', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->end_controls_tab();
-
-        $this->start_controls_tab(
-            'tab_button_hover',
-            [
-                'label' => esc_html__( 'Hover', 'houzez-theme-functionality' ),
-            ]
-        );
-
-        $this->add_control(
-            'button_background_hover_color',
-            [
-                'label' => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'default' => '#33beff',
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button:hover' => 'background-color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'button_hover_color',
-            [
-                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button:hover' => 'color: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'button_hover_border_color',
-            [
-                'label' => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::COLOR,
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-button:hover' => 'border-color: {{VALUE}};',
-                ],
-                'condition' => [
-                    'button_border_border!' => '',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'button_hover_animation',
-            [
-                'label' => esc_html__( 'Animation', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::HOVER_ANIMATION,
-            ]
-        );
-
-        $this->end_controls_tab();
-
-        $this->end_controls_tabs();
-
-        $this->end_controls_section();
-        
+        $this->register_houzez_forms_style_traits();
     }
 
     /**
@@ -1019,6 +634,7 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
     protected function render() {
         global $post;
         $settings = $this->get_settings_for_display();
+        $gdpr_checkbox = isset($settings['hide_gdpr_checkbox']) ? $settings['hide_gdpr_checkbox'] : '';
 
         $allowed_html = array(
             'a' => array(
@@ -1108,6 +724,17 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
 
         $webhook_url = isset($settings['webhook_url']) ? esc_url($settings['webhook_url']) : '';
         $redirect_to = isset($settings['redirect_to']) ? esc_url($settings['redirect_to']) : '';
+
+        $form_id = $this->get_id();
+
+        $form_settings = array(
+            'email_to' => $email_to,
+            'email_subject' => $email_subject, 
+            'email_to_cc' => $email_to_cc,
+            'email_to_bcc' => $email_to_bcc
+        );
+
+        update_option('houzez_form_' . $form_id, $form_settings);
         ?>
 
         <script type="application/javascript">
@@ -1117,19 +744,15 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
         </script>
 
 
-        <form class="elementor-form" id="houzez-form-<?php echo $this->get_id(); ?>" method="post" <?php echo $this->get_render_attribute_string( 'form' ); ?> action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
-            <input type="hidden" name="form_id" value="<?php echo $this->get_id(); ?>"/>
+        <form class="elementor-form houzez-ele-form-js" id="houzez-form-<?php echo $this->get_id(); ?>" method="post" <?php echo $this->get_render_attribute_string( 'form' ); ?> action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
+            <input type="hidden" name="form_id" value="<?php echo esc_attr($this->get_id()); ?>"/>
             <input type="hidden" name="action" value="houzez_ele_inquiry_form" />
-            <input type="hidden" name="source_link" value="<?php echo esc_url(get_permalink($post->ID));?>" />
-            <input type="hidden" name="lead_page_id" value="<?php echo intval($post->ID);?>" />
+            <input type="hidden" name="source_link" value="<?php echo esc_url(get_permalink($post ? $post->ID : 0));?>" />
+            <input type="hidden" name="lead_page_id" value="<?php echo intval($post ? $post->ID : 0);?>" />
             <input type="hidden" name="is_estimation" value="yes" />
-            <input type="hidden" name="email_to" value="<?php echo esc_attr($email_to); ?>" />
-            <input type="hidden" name="email_subject" value="<?php echo esc_attr($email_subject); ?>" />
-            <input type="hidden" name="email_to_cc" value="<?php echo esc_attr($email_to_cc); ?>" />
-            <input type="hidden" name="email_to_bcc" value="<?php echo esc_attr($email_to_bcc); ?>" />
             <input type="hidden" name="webhook" value="<?php echo esc_attr($settings['webhook']); ?>" />
-            <input type="hidden" name="webhook_url" value="<?php echo $webhook_url; ?>" />
-            <input type="hidden" name="redirect_to" value="<?php echo $redirect_to; ?>" />
+            <input type="hidden" name="webhook_url" value="<?php echo esc_attr($webhook_url); ?>" />
+            <input type="hidden" name="redirect_to" value="<?php echo esc_attr($redirect_to); ?>" />
             <input type="hidden" name="google_recaptcha" value="<?php echo esc_attr($settings['con_google_recaptcha']); ?>" />
 
             <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
@@ -1213,21 +836,27 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
 
                     <?php endforeach; ?>
 
+                    <?php do_action( 'houzez_inquiry_form_fields' );?>
+
                     <?php 
                     if( isset($settings['gdpr_agreement']) && $settings['gdpr_agreement'] == 'yes') { 
                         $gdpr_validate = isset($settings['gdpr_validate']) && ! empty($settings['gdpr_validate']) ? $settings['gdpr_validate'] : '* '.esc_attr($settings['gdpr_label']);
                         ?>
-                    <div class="houzez-gdpr-agreement elementor-field-group elementor-col-100">
-                        <label for="gdpr_agreement" class="elementor-field-label"><?php echo esc_attr($settings['gdpr_label']); ?></label>
-                        <div class="gdpr-agreement-subgroup">
-                            <span class="gdpr-field-option">
-                                <label class="gdpr-text" for="gdpr_agreement">
-                                    <input <?php if($settings['gdpr_required']){ echo 'required'; } ?> type="checkbox" title="<?php echo esc_attr($gdpr_validate); ?>" name="gdpr_agreement" id="gdpr_agreement">  <?php echo wp_kses($settings['gdpr_text'], $allowed_html); ?>
-                                </label>
-                            </span>
-                        </div>             
-                    </div>
+                    <div class="form-group elementor-field-group elementor-col-100">
+                        <label class="control control--checkbox m-0 <?php if( $gdpr_checkbox ){ echo 'p-0 hz-no-gdpr-checkbox';}?>">
+                            <?php if( ! $gdpr_checkbox ) { ?>
+                            <input <?php if($settings['gdpr_required']){ echo 'required'; } ?> type="checkbox" name="gdpr_agreement" id="gdpr_agreement" aria-required="true">
+                            <span class="control__indicator"></span>
+                            <?php } ?>
+                            <div class="gdpr-text-wrap">
+                            <?php echo wp_kses($settings['gdpr_text'], $allowed_html); ?>
+                            </div>
+                            
+                        </label>
+                    </div><!-- form-group -->
                     <?php } ?>
+
+                    <?php do_action('houzez_after_elementor_inquiry_form_fields'); ?>
 
                     <?php if( $settings['con_google_recaptcha'] == 'yes') { ?>
                     <div class="<?php if( houzez_option( 'recaptha_type', 'v2' ) == 'v2') { ?>elementor-field-group <?php } ?>">
@@ -1237,7 +866,7 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
 
                     <div <?php echo $this->get_render_attribute_string( 'submit-group' ); ?>>
                     <button type="submit" <?php echo $this->get_render_attribute_string( 'button' ); ?>>
-                        <i class="btn-loader houzez-loader-js"></i>
+                        <i class="houzez-loader-js houzez-hidden spinner-border spinner-border-sm"></i>
                         <?php if ( ! empty( $settings['button_text'] ) ) : ?>
                             <?php echo $settings['button_text']; ?>
                         <?php endif; ?>
@@ -1288,7 +917,7 @@ class Houzez_Elementor_Inquiry_Form extends Widget_Base {
                 ],
                 'label' . $i => [
                     'for' => $this->houzez_get_attribute_id( $item ),
-                    'class' => 'elementor-field-label',
+                    'class' => 'form-label elementor-field-label',
                 ],
             ]
         );

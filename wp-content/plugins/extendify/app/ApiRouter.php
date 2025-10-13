@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API router
  */
@@ -10,37 +11,15 @@ defined('ABSPATH') || die('No direct access.');
 /**
  * Simple router for the REST Endpoints
  */
+
 class ApiRouter extends \WP_REST_Controller
 {
-
     /**
      * The class instance.
      *
-     * @var $instance
+     * @var self|null
      */
     protected static $instance = null;
-
-
-    /**
-     * The constructor
-     */
-    public function __construct()
-    {
-        \add_filter(
-            'rest_request_before_callbacks',
-            // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
-            function ($response, $handler, $request) {
-                // Add the request to our helper class.
-                if ($request->get_header('x_extendify')) {
-                    Http::init($request);
-                }
-
-                return $response;
-            },
-            10,
-            3
-        );
-    }
 
     /**
      * Check the authorization of the request
@@ -50,7 +29,10 @@ class ApiRouter extends \WP_REST_Controller
     public function checkPermission()
     {
         // Check for the nonce on the server (used by WP REST).
-        if (isset($_SERVER['HTTP_X_WP_NONCE']) && \wp_verify_nonce(sanitize_text_field(wp_unslash($_SERVER['HTTP_X_WP_NONCE'])), 'wp_rest')) {
+        if (
+            isset($_SERVER['HTTP_X_WP_NONCE'])
+            && \wp_verify_nonce(sanitize_text_field(wp_unslash($_SERVER['HTTP_X_WP_NONCE'])), 'wp_rest')
+        ) {
             return \current_user_can(Config::$requiredCapability);
         }
 

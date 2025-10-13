@@ -2781,85 +2781,6 @@ if (class_exists('Vc_Manager')) {
 		) // end params
 	) );
 
-	/*---------------------------------------------------------------------------------
-	 Property By ID
-	-----------------------------------------------------------------------------------*/
-	vc_map(array(
-		"name" => esc_html__("Property by ID", "houzez"),
-		"description" => esc_html__('Show single property by id', "houzez"),
-		"base" => "houzez-prop-by-id",
-		'category' => "By Favethemes",
-		"class" => "",
-		'admin_enqueue_js' => "",
-		'admin_enqueue_css' => "",
-		"icon" => "icon-prop-by-id",
-		"params" => array(
-			array(
-				"param_name" => "prop_grid_style",
-				"type" => "dropdown",
-				"value" => array(
-					'Property Card v1' => 'v_1', 
-					'Property Card v2' => 'v_2',
-					'Property Card v3' => 'v_3',
-					'Property Card v4' => 'v_4',
-					'Property Card v5' => 'v_5',
-					'Property Card v6' => 'v_6',
-				),
-				"heading" => esc_html__("Grid/List Style:", "houzez"),
-				"description" => esc_html__("Choose grid/list style, default will be v1", "houzez"),
-				"save_always" => true
-			),
-			array(
-				"param_name" => "property_id",
-				"type" => "textfield",
-				"value" => "",
-				"heading" => esc_html__("Property ID:", "houzez"),
-				"description" => esc_html__("Enter property ID. Ex 305", "houzez"),
-				"save_always" => true
-			)
-
-		) // End params
-	));
-
-	/*---------------------------------------------------------------------------------
-	 Property By ID
-	-----------------------------------------------------------------------------------*/
-	vc_map(array(
-		"name" => esc_html__("Properties by IDs", "houzez"),
-		"description" => esc_html__("Show properties by IDs", "houzez"),
-		"base" => "houzez-prop-by-ids",
-		'category' => "By Favethemes",
-		"class" => "",
-		'admin_enqueue_js' => "",
-		'admin_enqueue_css' => "",
-		"icon" => "icon-prop-by-ids",
-		"params" => array(
-			array(
-				"param_name" => "prop_grid_style",
-				"type" => "dropdown",
-				"value" => array(
-					'Property Card v1' => 'v_1', 
-					'Property Card v2' => 'v_2',
-					'Property Card v3' => 'v_3',
-					'Property Card v4' => 'v_4',
-					'Property Card v5' => 'v_5',
-					'Property Card v6' => 'v_6',
-				),
-				"heading" => esc_html__("Grid/List Style:", "houzez"),
-				"description" => esc_html__("Choose grid/list style, default will be  v1", "houzez"),
-				"save_always" => true
-			),
-			array(
-				"param_name" => "property_ids",
-				"type" => "textfield",
-				"value" => "",
-				"heading" => esc_html__("Properties IDs:", "houzez"),
-				"description" => esc_html__("Enter properties ids comma separated. Ex 12,305,34", "houzez"),
-				"save_always" => true
-			)
-
-		) // End params
-	));
 
 	/*---------------------------------------------------------------------------------
 	 Property grids
@@ -3094,9 +3015,9 @@ if (class_exists('Vc_Manager')) {
 				"param_name" => "content",
 				"type" => "textarea_html",
 				"value" => '<ul class="list-unstyled">
- 	<li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Time Period: <strong>10 days</strong></li>
- 	<li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Properties: <strong>2</strong></li>
- 	<li><i class="houzez-icon icon-check-circle-1 primary-text mr-1"></i> Featured Listings: <strong>2</strong></li>
+ 	<li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Time Period: <strong>10 days</strong></li>
+ 	<li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Properties: <strong>2</strong></li>
+ 	<li><i class="houzez-icon icon-check-circle-1 primary-text me-1"></i> Featured Listings: <strong>2</strong></li>
 </ul>',
 				"heading" => esc_html__("Content:", "houzez"),
 				"description" => '',

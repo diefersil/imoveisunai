@@ -16,6 +16,14 @@ if( $keyword_field == 'prop_title' ) {
 $keyword = isset ( $_GET['keyword'] ) ? $_GET['keyword'] : ''; ?>
 <div class="form-group">
 	<div class="search-icon">
-		<input name="keyword" type="text" data-type="banner" class="houzez-keyword-autocomplete form-control" value="<?php echo esc_attr($keyword); ?>" placeholder="<?php echo esc_attr($keyword_placeholder); ?>">
-	</div><!-- search-icon -->
+		<input name="keyword" type="text" data-type="banner" class="houzez-keyword-autocomplete is-banner form-control" value="<?php echo esc_attr($keyword); ?>" placeholder="<?php echo esc_attr($keyword_placeholder); ?>">        
+    </div><!-- search-icon -->
 </div><!-- form-group -->
+
+<?php 
+add_action('houzez_after_banner', function() {
+    ?>
+    <div id="auto_complete_ajax" class="auto-complete auto-complete-banner auto-complete-keyword"></div>
+    <?php
+});
+?>

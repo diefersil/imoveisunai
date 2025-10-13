@@ -41,8 +41,8 @@ export const Topbar = () => {
 					'cursor-pointer': isMinimized,
 				})}>
 				<div
-					className={classNames('flex w-full gap-1', {
-						'gap-4': history.length === 1,
+					className={classNames('flex w-full gap-3', {
+						'gap-3': history.length === 1,
 					})}>
 					<LogoOrBackButton />
 					{current?.title && (
@@ -54,7 +54,7 @@ export const Topbar = () => {
 			</div>
 			<div className="flex items-center justify-end gap-2.5">
 				<button
-					className="m-0 cursor-pointer border-0 bg-transparent fill-banner-text p-0 text-banner-text"
+					className="m-0 border-0 bg-transparent fill-banner-text p-0 text-banner-text"
 					type="button"
 					data-test="help-center-toggle-minimize-button"
 					onClick={toggleMinimized}>
@@ -79,7 +79,7 @@ export const Topbar = () => {
 					)}
 				</button>
 				<button
-					className="m-0 cursor-pointer border-0 bg-transparent fill-banner-text p-0 text-banner-text"
+					className="m-0 border-0 bg-transparent fill-banner-text p-0 text-banner-text"
 					type="button"
 					data-test="help-center-close-button"
 					onClick={handleClose}>
@@ -98,7 +98,7 @@ const LogoOrBackButton = () => {
 	if (history.length > 1 && visibility === 'open') {
 		return (
 			<button
-				className="m-0 cursor-pointer border-0 bg-transparent fill-banner-text p-0 text-banner-text"
+				className="m-0 border-0 bg-transparent fill-banner-text p-0 text-banner-text"
 				type="button"
 				onClick={goBack}>
 				<Icon icon={isRTL() ? chevronRight : chevronLeft} />
@@ -108,7 +108,7 @@ const LogoOrBackButton = () => {
 	}
 
 	return partnerLogo ? (
-		<div className="flex h-6 justify-center bg-banner-main after:relative after:-right-2 after:top-0.5 after:mr-2 after:text-banner-text after:opacity-40 after:content-['|'] rtl:after:-right-0">
+		<div className="flex h-6 justify-center bg-banner-main after:relative after:-right-2.5 after:top-1 after:mr-2 after:text-banner-text after:opacity-40 after:content-['|'] rtl:after:-right-0">
 			<div className="flex h-6 max-w-[9rem] overflow-hidden">
 				<img
 					className="max-h-full max-w-full object-contain"

@@ -1,9 +1,9 @@
-<div class="form-group">
-	<label for="prop_labels">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_labels">
 		<?php echo houzez_option('cl_prop_label', 'Property Label').houzez_required_field('prop_labels'); ?>		
 	</label>
 
-	<select name="prop_labels[]" id="prop_labels" <?php houzez_required_field_2('prop_labels'); ?> class="selectpicker labels-select-picker form-control bs-select-hidden" data-selected-text-format="count > 2" title="<?php echo houzez_option('cl_select', 'Select'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}" data-live-search="false" data-actions-box="true" <?php houzez_multiselect(houzez_option('ams_label', 0)); ?> data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-count-selected-text="{0} <?php echo houzez_option('cl_prop_labels', 'Labels'); ?>">
+	<select name="property_labels[]" id="property_labels" <?php houzez_required_field_2('prop_labels'); ?> class="selectpicker labels-select-picker form-control bs-select-hidden" data-selected-text-format="count > 2" title="<?php echo houzez_option('cl_select', 'Select'); ?>" data-none-results-text="<?php echo houzez_option('cl_no_results_matched', 'No results matched');?> {0}" data-live-search="false" data-actions-box="true" <?php houzez_multiselect(houzez_option('ams_label', 0)); ?> data-select-all-text="<?php echo houzez_option('cl_select_all', 'Select All'); ?>" data-deselect-all-text="<?php echo houzez_option('cl_deselect_all', 'Deselect All'); ?>" data-count-selected-text="{0} <?php echo houzez_option('cl_prop_labels', 'Labels'); ?>">
 		<?php
         if( !houzez_is_multiselect(houzez_option('ams_label', 0)) ) {
             echo '<option value="">'.houzez_option('cl_select', 'Select').'</option>';

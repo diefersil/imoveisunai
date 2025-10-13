@@ -4,7 +4,7 @@ $is_sticky = '';
 $sticky_sidebar = houzez_option('sticky_sidebar');
 if( isset($sticky_sidebar['default_sidebar']) && $sticky_sidebar['default_sidebar'] != 0 ) { 
     $is_sticky = 'houzez_sticky'; 
-}
+} 
 
 if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'archive' ) ) { ?>
 <section class="blog-wrap">

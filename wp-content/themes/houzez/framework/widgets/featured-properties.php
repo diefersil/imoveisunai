@@ -30,7 +30,7 @@ class HOUZEZ_featured_properties extends WP_Widget {
 		global $before_widget, $after_widget, $before_title, $after_title, $post, $image_size;
 		extract( $args );
 
-		$image_size = 'houzez-item-image-1';
+		$image_size = 'houzez-item-image-6';
 
 		$allowed_html_array = array(
 			'div' => array(
@@ -46,7 +46,18 @@ class HOUZEZ_featured_properties extends WP_Widget {
 		$items_num = $instance['items_num'];
 		$widget_type = $instance['widget_type'];
 
-		$slider_class = '';
+		// Modify the widget class based on widget type
+		$widget_class = ($widget_type == 'slider') ? 'widget-featured-property-with-slider' : 'widget-featured-property';
+		$before_widget = str_replace('widget-featured-property', $widget_class, $before_widget);
+		
+		// Remove p-4 class only when widget type is slider
+		if($widget_type == 'slider') {
+			$before_widget = str_replace(' p-4', '', $before_widget);
+			$before_title = str_replace('widget-title mb-4', 'widget-title p-4', $before_title);
+			$after_title = str_replace('widget-title mb-4', 'widget-title p-4', $after_title);
+		}
+		
+		$slider_class = 'widget-featured-property-wrap';
 		if($widget_type == 'slider') {
 			$slider_class = 'widget-featured-property-slider-wrap';
 		}
@@ -74,38 +85,28 @@ class HOUZEZ_featured_properties extends WP_Widget {
 			<div class="widget-body <?php echo esc_attr($slider_class); ?>">
 
 				<?php if( $widget_type == "slider" ) { ?>
-				<div class="widget-featured-property-slider">
+				<div class="widget-featured-property-slider houzez-all-slider-wrap">
 				<?php } ?>
 
 				
 
 				<?php if( $wp_qry->have_posts() ): while( $wp_qry->have_posts() ): $wp_qry->the_post(); ?>
-					
-					<?php if( $widget_type == "slider" ) { ?>
-							<div class="featured-property-item-widget">
-								<div class="item-wrap item-wrap-v3">
-								<?php get_template_part('template-parts/listing/partials/item-image'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-labels-widget'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-price'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-address'); ?>
-								</div><!-- item-wrap -->
-							</div>
-								
-					<?php } else { ?>
 
-							<div class="featured-property-item-widget">
-								<div class="item-wrap item-wrap-v3">
-								<?php get_template_part('template-parts/listing/partials/item-image'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-labels-widget'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-featured-label'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-price'); ?>
-								<?php get_template_part('template-parts/listing/partials/item-address'); ?>
-								</div><!-- item-wrap -->
+					<div class="item-listing-wrap item-wrap-v1" role="article">
+						<div class="item-wrap item-wrap-no-frame">
+							<div class="d-flex flex-column align-items-center">
+								<div class="item-header">
+									<?php get_template_part('template-parts/listing/partials/item-price'); ?>
+									<?php get_template_part('template-parts/listing/partials/item-image'); ?>
+								</div>
+								<div class="item-body flex-grow-1" role="contentinfo">
+									<?php get_template_part('template-parts/listing/partials/item-title');?>
+									<?php get_template_part('template-parts/listing/partials/item-address');?>				
+									<?php get_template_part('template-parts/listing/partials/item-features-v1');?>
+								</div>
 							</div>
-	
-					<?php } ?>
-
+						</div>
+					</div>
 
 				<?php endwhile; endif; ?>
 				

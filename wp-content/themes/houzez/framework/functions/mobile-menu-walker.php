@@ -41,7 +41,7 @@ class houzez_mobile_nav_walker extends Walker_Nav_Menu {
         $dropdown_span = '';
         if($args->has_children) {
         	$dropdown_li_class = "dropdown";
-            $dropdown_span = '<span class="nav-mobile-trigger dropdown-toggle" data-toggle="dropdown">
+            $dropdown_span = '<span class="nav-mobile-trigger dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                 <i class="houzez-icon arrow-down-1"></i>
             </span>';
         }

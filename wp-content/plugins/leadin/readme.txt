@@ -6,7 +6,7 @@ Tags: CRM, Marketing, Live Chat, Forms, Analytics, popups, newsletter, contact m
 Requires at least: 5.8
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 11.1.82
+Stable tag: 11.3.21
 
 The CRM, Sales, and Marketing WordPress plugin to grow your business better.
 
@@ -113,7 +113,6 @@ First, get familiar with our different form types:
 
 ✅ Embedded
 ✅ Standalone page
-✅ Pop-up box
 ✅ Dropdown banner
 ✅ Slide in left/right box
 
@@ -121,9 +120,10 @@ Then, when you're ready to go, pick a custom template:
 
 ✅ Contact us
 ✅ Newsletter sign up form template
-✅ Support template
-✅ eBook download template
 ✅ Event registration template
+✅ Talk to an expert template
+✅ Book a meeting template
+✅ Gated content template
 ✅ More coming soon
 
 Choose from a variety of settings, color schemes, and fonts — or start from scratch. HubSpot comes with an intuitive form and popup builder that simplifies the process, no matter what type of form you have in mind.
@@ -418,12 +418,12 @@ Please visit the <a href="https://community.hubspot.com/?utm_source=wordpress-pl
 == Changelog ==
 
 <a href="http://plugins.svn.wordpress.org/leadin/trunk/changelog.txt" target="_blank">Full changelog here</a>
-- Current version: 11.1.82
-- Version release date: 2025-01-23
+- Current version: 11.3.21
+- Version release date: 2025-08-26
 
-= 11.1.82 (2025-01-23) =
-* Change Raven URL for error capture
+= 11.3.20 (2025-08-26) =
+* Update error handling to avoid serialization problems
 
-= 11.1.75 (2024-11-29) =
-* Add Salt/key config global to avoid disconnection in case secret changes
+= 11.3.16 (2025-07-15) =
+* Fix bug causing duplicate scheduled cron events
 

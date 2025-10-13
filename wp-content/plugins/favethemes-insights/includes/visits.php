@@ -319,6 +319,21 @@ if(!class_exists('Fave_Visits')) {
             $table_name = $wpdb->prefix . 'favethemes_insights';
 
             if (!empty($args['user_id'])) {
+                
+                // WPML Compatibility: Handle agent post translations
+                if (defined('ICL_SITEPRESS_VERSION') && is_singular('houzez_agent')) {
+                    $current_agent_id = get_the_ID();
+                    $default_lang = apply_filters('wpml_default_language', NULL);
+                    $original_agent_id = apply_filters('wpml_object_id', $current_agent_id, 'houzez_agent', TRUE, $default_lang);
+                    
+                    // If we're on a translated agent page, use the original agent's author ID
+                    if ($original_agent_id && $original_agent_id !== $current_agent_id) {
+                        $original_author_id = get_post_field('post_author', $original_agent_id);
+                        if ($original_author_id) {
+                            $args['user_id'] = intval($original_author_id);
+                        }
+                    }
+                }
 
                 if ( is_array( $args['user_id'] ) ) {
                     // If user_id is an array, use IN clause

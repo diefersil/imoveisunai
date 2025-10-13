@@ -1,5 +1,5 @@
 <div class="agent-contacts-wrap">
-	<h3 class="widget-title"><?php echo houzez_option( 'agency_lb_contact', esc_html__('Contact', 'houzez') ); ?></h3>
+	<h3 class="widget-title mb-4"><?php echo houzez_option( 'agency_lb_contact', esc_html__('Contact', 'houzez') ); ?></h3>
 	<div class="agent-map">
 		<?php 
 		if( houzez_option('agency_sidebar_map', 1) ) {
@@ -10,23 +10,23 @@
 			get_template_part('template-parts/realtors/agency/address'); 
 		}?>
 	</div>
-	<ul class="list-unstyled">
+	<ul class="list-unstyled d-flex flex-column">
 
 		<?php 
 		if( houzez_option('agency_phone', 1) ) {
-			get_template_part('template-parts/realtors/agency/office-phone');
+			get_template_part('template-parts/realtors/agency/office-phone', null, array('version' => 'v2'));
 		} 
 
 		if( houzez_option('agency_mobile', 1) ) {
-			get_template_part('template-parts/realtors/agency/mobile'); 
+			get_template_part('template-parts/realtors/agency/mobile', null, array('version' => 'v2'));
 		}
 
 		if( houzez_option('agency_fax', 1) ) {
-			get_template_part('template-parts/realtors/agency/fax');
+			get_template_part('template-parts/realtors/agency/fax', null, array('version' => 'v2'));
 		} 
 
 		if( houzez_option('agency_email', 1) ) {
-			get_template_part('template-parts/realtors/agency/email'); 
+			get_template_part('template-parts/realtors/agency/email', null, array('version' => 'v2'));
 		}
 		if( houzez_option('agent_website', 1) ) {
 			get_template_part('template-parts/realtors/agency/website'); 

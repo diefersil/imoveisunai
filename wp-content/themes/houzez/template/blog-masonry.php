@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Blog Masonry Template
+ * Template Name: Blog Grid Template
  * Created by PhpStorm.
  * User: waqasriaz
  * Date: 25/01/16
@@ -35,28 +35,20 @@ $the_query = New WP_Query($wp_query_args);
             </div><!-- d-flex -->  
         </div><!-- page-title-wrap -->
         <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <div class="masonry">
+            <?php 
+            if( $the_query->have_posts() ): 
+                while( $the_query->have_posts() ): $the_query->the_post(); ?>
 
-                    <?php 
-                    if( $the_query->have_posts() ): 
-                        while( $the_query->have_posts() ): $the_query->the_post(); ?>
+                    <div class="col-sm-6 col-lg-4 mb-4">
+                        <?php get_template_part('template-parts/blog/masonry-post'); ?>     
+                    </div>
 
-                            <div class="masonry-brick">
-                                <div class="masonry-content">
-                                    <?php get_template_part('template-parts/blog/masonry-post'); ?>     
-                                </div>
-                            </div>
-
-                    <?php endwhile; endif; ?>
-                    <?php wp_reset_postdata(); ?>
-                    
-                </div><!-- masonry -->
-
-                <?php houzez_pagination( $the_query->max_num_pages ); ?>
-
-            </div><!-- bt-content-wrap -->
-        </div><!-- row -->
+            <?php endwhile; endif; ?>
+            <?php wp_reset_postdata(); ?>
+        </div>
+        <?php houzez_pagination( $the_query->max_num_pages ); ?>
+        
     </div><!-- container -->
 </section><!-- listing-wrap -->
+<?php wp_enqueue_script('masonry'); ?>
 <?php get_footer(); ?>

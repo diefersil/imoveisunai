@@ -33,46 +33,42 @@ if ( !empty( $rp_key ) && !empty( $rp_login ) ) :
 endif;
 
 ?>
-<section class="frontend-submission-page">
+<section class="frontend-submission-page my-5">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
             	<div id="reset_pass_msg_2"></div>
 
-                <div class="dashboard-content-block hz-password-reset-page">
+                <div class="dashboard-content-block hz-password-reset-page shadow-sm p-4 rounded">
                     <?php if ( $rp_login == 'invalidkey' ) : $resetpass = false; ?>
 						<div class="alert alert-danger" role="alert"> <?php esc_html_e('Oops something went wrong.', 'houzez'); ?>  </div>
-						<div class="login-register-title text-center">
-			                <p class="text-danger"> <?php esc_html_e('Oops something went wrong.', 'houzez'); ?> </p>
-			            </div>
 					<?php endif; ?>
 					<?php if ( $rp_login == 'expiredkey' ) : $resetpass = false; ?>
-			        	<div class="login-register-title text-center">
-			                <p class="text-danger"> <?php esc_html_e('Session key expired.', 'houzez'); ?> </p>
-			            </div>
+			        	<div class="alert alert-danger"><?php esc_html_e('Session key expired.', 'houzez'); ?></div>
 					<?php endif; ?>
 					<?php if ( isset( $_REQUEST['password'] ) && $_REQUEST['password'] == 'changed' ) : $resetpass = false; ?>
-			        	<div class="login-register-title text-center">
-			                <p> <?php esc_html_e('Password has been changed, you can login now.', 'houzez'); ?> </p>
-			                <a href="#" data-toggle="modal" data-target="#pop-login" class="back text-center"> <?php esc_html_e('Log in | Register', 'houzez'); ?> </a>
+			        	<div class="alert alert-success"><?php esc_html_e('Password has been changed, you can login now.', 'houzez'); ?></div>
+			                <a href="#" data-bs-toggle="modal" data-bs-target="#login-register-form" class="back text-center"> <?php esc_html_e('Log in | Register', 'houzez'); ?> </a>
 			            </div>
 					<?php endif; ?>
-		            <?php if ( $resetpass ) : ?>
-			            <form action="#" method="post" autocomplete="off">
-				            <input type="hidden" name="rp_login" value="<?php echo $rp_login; ?>" autocomplete="off" />
-							<input type="hidden" name="rp_key" value="<?php echo $rp_key; ?>" />
-							<?php wp_nonce_field( 'fave_resetpassword_nonce', 'fave_resetpassword_security' ); ?>
-			                <div class="form-group">
+					<?php if ( $resetpass ) : ?>
+                        <div class="text-center mb-4">
+                            <h3><?php esc_html_e('Reset Your Password', 'houzez'); ?></h3>
+                        </div>
+			            <form id="houzez_reset_password_form" onsubmit="return false;" autocomplete="off">
+				            <input type="hidden" name="rp_login" value="<?php echo esc_attr($rp_login); ?>" autocomplete="off" />
+							<input type="hidden" name="rp_key" value="<?php echo esc_attr($rp_key); ?>" />
+							<?php wp_nonce_field( 'resetpassword_nonce', 'resetpassword_security' ); ?>
+			                <div class="form-group mb-3">
 			                    <input type="password" name="pass1" class="form-control" placeholder="<?php esc_html_e('New Password', 'houzez'); ?>">
 			                </div>
-			                <div class="form-group">
+			                <div class="form-group mb-4">
 			                    <input type="password" name="pass2" class="form-control" placeholder="<?php esc_html_e('Confirm Password', 'houzez'); ?>">
 			                </div>
-			                <button type="submit" id="houzez_reset_password" class="btn btn-primary btn-block">
+			                <button type="submit" id="houzez_reset_password" class="btn btn-primary btn-block w-100">
 			                	<?php get_template_part('template-parts/loader'); ?>
 			                	<?php esc_html_e('Reset Password', 'houzez'); ?>		
 			                </button>
-			                
 			            </form>
 			        <?php endif; ?>
                 </div><!-- dashboard-content-block -->

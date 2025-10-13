@@ -91,7 +91,7 @@ class Houzez_Post_Type_Invoice {
             "invoice_buyer_email" => __('Buyer Email','houzez-theme-functionality'),
             "invoice_type" => __('Invoice Type','houzez-theme-functionality'),
             "billing_for" => __('Billion For','houzez-theme-functionality'),
-            "invoice_status" => __( 'Status','houzez-theme-functionality' ),
+            "invoice_actions" => __( 'Actions','houzez-theme-functionality' ),
             "date" => __( 'Date','houzez-theme-functionality' )
         );
 
@@ -151,20 +151,38 @@ class Houzez_Post_Type_Invoice {
 
                 case 'invoice_buyer':
                     $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
-                    echo isset($user_info->display_name) ? esc_attr( $user_info->display_name ) : '';
+                    echo $user_info ? esc_attr($user_info->display_name) : 'N/A';
                     break;
 
                 case 'invoice_buyer_email':
                     $user_info = get_userdata($invoice_meta['invoice_buyer_id']);
-                    echo  isset($user_info->user_email) ? esc_attr( $user_info->user_email ) : '';
+                    echo $user_info ? esc_attr($user_info->user_email) : 'N/A';
                     break;
 
-                case 'invoice_status':
-                    $invoice_status = get_post_meta(  $post->ID, 'invoice_payment_status', true );
+                case 'invoice_actions':
+                    $invoice_status = get_post_meta( $post->ID, 'invoice_payment_status', true );
                     if( $invoice_status == 0 ) {
-                        echo '<span class="fave_admin_label float-none label-red">'.__('Not Paid','houzez-theme-functionality').'</span>';
+                        $invoice_billion_for = esc_html($invoice_meta['invoice_billion_for']);
+                        
+                        // Determine purchase type
+                        $purchase_type = 0;
+                        if( $invoice_billion_for == 'Listing' ) {
+                            $purchase_type = 1;
+                        } else if( $invoice_billion_for == 'Upgrade to Featured' ) {
+                            $purchase_type = 2;
+                        } else if( $invoice_billion_for == 'Publish Listing with Featured' ) {
+                            $purchase_type = 3;
+                        }
+                        
+                        if( $invoice_billion_for == 'package' || $invoice_billion_for == 'Package' ) {
+                            echo '<div class="houzez_activate_listing button button-primary button-small" data-invoice="'.$post->ID.'" data-item="'.esc_attr($invoice_meta['invoice_item_id']).'" data-action="activate_package"><span class="btn-loader houzez-loader-js"></span>'.esc_html__('Activate Purchase', 'houzez-theme-functionality').'</div>';
+                            echo '<br><span class="fave_admin_label float-none label-red" style="font-size: 10px; padding: 2px 8px; margin-top: 5px; display: inline-block; text-transform: uppercase; font-weight: 600; border-radius: 3px; background-color: #c31b1b; color: #fff;">'.__('Not Paid', 'houzez-theme-functionality').'</span>';
+                        } else {
+                            echo '<div class="houzez_activate_listing button button-primary button-small" data-invoice="'.$post->ID.'" data-item="'.esc_attr($invoice_meta['invoice_item_id']).'" data-purchaseType="'.$purchase_type.'" data-action="activate_purchase"><span class="btn-loader houzez-loader-js"></span>'.esc_html__('Activate Purchase', 'houzez-theme-functionality').'</div>';
+                            echo '<br><span class="fave_admin_label float-none label-red" style="font-size: 10px; padding: 2px 8px; margin-top: 5px; display: inline-block; text-transform: uppercase; font-weight: 600; border-radius: 3px; background-color: #c31b1b; color: #fff;">'.__('Not Paid', 'houzez-theme-functionality').'</span>';
+                        }
                     } else {
-                        echo '<span class="fave_admin_label float-none label-green">'.__('Paid','houzez-theme-functionality').'</span>';
+                        echo '<span class="fave_admin_label float-none label-green" style="font-size: 10px; padding: 2px 8px; display: inline-block; text-transform: uppercase; font-weight: 600; border-radius: 3px; background-color: #00a32a; color: #fff;">'.__('Paid', 'houzez-theme-functionality').'</span>';
                     }
                     break;
             }
@@ -179,7 +197,7 @@ class Houzez_Post_Type_Invoice {
         $columns['billing_for']    = 'billing_for';
         $columns['invoice_buyer']  = 'invoice_buyer';
         $columns['invoice_buyer_email']  = 'invoice_buyer_email';
-        $columns['invoice_status'] = 'invoice_status';
+        $columns['invoice_actions'] = 'invoice_actions';
         return $columns;
     }
 

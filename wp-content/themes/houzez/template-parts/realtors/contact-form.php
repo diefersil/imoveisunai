@@ -45,22 +45,26 @@ if ( is_singular( 'houzez_agent' ) ) {
 <div class="modal fade mobile-property-form" id="realtor-form">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="phoneNumberModalLabel"><?php echo esc_html__('Contact us', 'houzez'); ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div><!-- modal-header -->
             <div class="modal-body">
                 <div class="property-form-wrap">
-                    <div class="agent-details">
-                        <div class="d-flex align-items-center">
+                    <div class="agent-details mb-3">
+                        <div class="d-flex align-items-center gap-2">
                             <?php if(!empty($image_url)) { ?>
                             <div class="agent-image">
                                 <img class="rounded" src="<?php echo esc_url($image_url); ?>" width="50" height="50" alt="">
                             </div>
                             <?php } ?>
                             
-                            <ul class="agent-information list-unstyled">
-                                <li class="agent-name">
-                                    <i class="houzez-icon icon-single-neutral mr-1"></i> <?php echo esc_attr($name); ?>
+                            <ul class="agent-information list-unstyled mb-0" role="list">
+                                <li class="agent-name" role="listitem">
+                                    <i class="houzez-icon icon-single-neutral me-1"></i> <?php echo esc_attr($name); ?>
+                                </li>
+                                <li class="agent-link" role="listitem">
+                                    <a href="<?php echo esc_url($source_link); ?>"><?php echo esc_html__('View listings', 'houzez'); ?></a>
                                 </li>
                             </ul>
 
@@ -71,7 +75,7 @@ if ( is_singular( 'houzez_agent' ) ) {
                     if(houzez_form_type()) {
 
                         if(!empty($form_shortcode)) {
-                            echo '<div class="property-form clearfix">';
+                            echo '<div class="property-form">';
                                 echo do_shortcode($form_shortcode);
                             echo '</div>';
                         }
@@ -79,9 +83,8 @@ if ( is_singular( 'houzez_agent' ) ) {
                     } else {
                     ?>
 
-                    <div class="property-form clearfix">
-                        <div class="form_messages"></div>
-
+                    <div class="property-form">
+                    
                         <form method="post">
                             
                             <input type="hidden" name="contact_realtor_ajax" id="contact_realtor_ajax" value="<?php echo wp_create_nonce('contact_realtor_nonce'); ?>"/>
@@ -92,23 +95,23 @@ if ( is_singular( 'houzez_agent' ) ) {
                             <input type="hidden" name="realtor_page" value="yes">
 
                             <?php if( $hide_form_fields['name'] != 1 ) { ?>
-                            <div class="form-group">
+                            <div class="form-group mb-2">
                                 <input class="form-control" name="name" value="" type="text" placeholder="<?php esc_html_e('Your Name', 'houzez'); ?>">
                             </div><!-- form-group --> 
                             <?php } ?>
 
                             <?php if( $hide_form_fields['phone'] != 1 ) { ?>  
-                            <div class="form-group">
+                            <div class="form-group mb-2">
                                 <input class="form-control" name="mobile" value="" type="text" placeholder="<?php esc_html_e('Phone', 'houzez'); ?>">
                             </div><!-- form-group -->   
                             <?php } ?>
 
-                            <div class="form-group">
+                            <div class="form-group mb-2">
                                 <input class="form-control" name="email" value="" type="email" placeholder="<?php esc_html_e('Email', 'houzez'); ?>">
                             </div><!-- form-group --> 
 
                             <?php if( $hide_form_fields['message'] != 1 ) { ?>  
-                            <div class="form-group form-group-textarea">
+                            <div class="form-group form-group-textarea mb-2">
                                 <textarea class="form-control" name="message" rows="4" placeholder="<?php esc_html_e('Message', 'houzez'); ?>"><?php echo sprintf(esc_html__('Hi %s, I saw your profile on %s and wanted to see if i can get some help', 'houzez'), $name, get_option('blogname')); ?></textarea>
                             </div><!-- form-group -->
                             <?php } ?>
@@ -116,7 +119,7 @@ if ( is_singular( 'houzez_agent' ) ) {
                             <?php do_action('houzez_realtor_contact_form_fields'); ?>
 
                             <?php if( $hide_form_fields['usertype'] != 1 ) { ?>    
-                            <div class="form-group">
+                            <div class="form-group mb-2">
                                 <select name="user_type" class="selectpicker form-control bs-select-hidden" title="<?php echo houzez_option('spl_con_select', 'Select'); ?>">
                                     <?php if( houzez_option('spl_con_buyer') != "" ) { ?>
                                     <option value="buyer"><?php echo houzez_option('spl_con_buyer', "I'm a buyer"); ?></option>
@@ -137,8 +140,8 @@ if ( is_singular( 'houzez_agent' ) ) {
                             </div><!-- form-group -->   
                             <?php } ?>
 
-                            <div class="form-group">
-                                <label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+                            <div class="form-group mb-2">
+                                <label class="control control--checkbox m-0 flex-row align-items-center <?php if( $gdpr_checkbox ){ echo 'p-0 hz-no-gdpr-checkbox';}?>">
                                     <?php if( ! $gdpr_checkbox ) { ?>
                                     <input type="checkbox" name="privacy_policy">
                                     <span class="control__indicator"></span>
@@ -149,12 +152,15 @@ if ( is_singular( 'houzez_agent' ) ) {
                                 </label>
                             </div><!-- form-group -->
 
+                            <?php do_action('houzez_after_realtors_contact_form_fields'); ?>
+
                             <?php get_template_part('template-parts/google', 'reCaptcha'); ?>        
 
-                            <button id="contact_realtor_btn" type="button" class="btn btn-secondary btn-full-width">
-                                <?php esc_html_e('Submit', 'houzez'); ?>
+                            <button id="contact_realtor_btn_modal" type="button" class="btn btn-secondary w-100 contact-realtor-btn">
                                 <?php get_template_part('template-parts/loader'); ?>
+                                <?php esc_html_e('Submit', 'houzez'); ?>
                             </button>
+                            <div class="form_messages mt-2"></div>
                         </form>
                     </div><!-- property-form -->
                     

@@ -45,7 +45,7 @@ Redux::setSection( $houzez_opt_name, array(
             'id'       => 'taxonomy_posts_layout',
             'type'     => 'select',
             'title'    => __('Listings Layout', 'houzez'),
-            'desc' => __('Select the listings layout for the taxonomy page.', 'houzez'),
+            'desc' => __('Select the listings layout for the taxonomy page. View switcher will be automatically enabled for v1, v2, and v5 layouts.', 'houzez'),
             'options'  => array(
                 'Listings Version 1' => array(
                     'list-view-v1' => 'List View',
@@ -66,7 +66,6 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
 
                 'Listings Version 5' => array(
-                    'list-view-v5' => 'List View',
                     'grid-view-v5' => 'Grid View',
                 ),
 
@@ -80,6 +79,20 @@ Redux::setSection( $houzez_opt_name, array(
                 ),
             ),
             'default' => 'list-view-v1'
+        ),
+
+        array(
+            'id'       => 'taxonomy_grid_columns',
+            'type'     => 'select',
+            'title'    => esc_html__('Grid Columns', 'houzez'),
+            'desc'     => esc_html__('Select the number of columns to display in grid view when no sidebar is present. Note: 4-column grid is only applicable for Version 1 and Version 2 templates.', 'houzez'),
+            'options'  => array(
+                '2' => esc_html__('2 Columns', 'houzez'),
+                '3' => esc_html__('3 Columns', 'houzez'),
+                '4' => esc_html__('4 Columns (Only for Version 1 & 2)', 'houzez'),
+            ),
+            'default'  => '3',
+            'required' => array('taxonomy_layout', '=', 'no-sidebar'),
         ),
 
         array(

@@ -9,6 +9,7 @@ use Elementor\Controls_Manager;
 use Elementor\Modules\NestedElements\Base\Widget_Nested_Base;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget_Trait;
+use ElementorPro\Plugin;
 
 class Off_Canvas extends Widget_Nested_Base {
 
@@ -34,6 +35,14 @@ class Off_Canvas extends Widget_Nested_Base {
 
 	public function get_categories() {
 		return [ 'pro-elements' ];
+	}
+
+	public function show_in_panel() {
+		return Plugin::elementor()->experiments->is_feature_active( 'nested-elements', true );
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	/**
@@ -572,7 +581,7 @@ class Off_Canvas extends Widget_Nested_Base {
 
 	protected function add_wrapper_attributes() {
 		$this->add_render_attribute( 'off-canvas__wrapper', [
-			'id' => 'off-canvas-' . $this->get_id(),
+			'id' => 'off-canvas-' . apply_filters( 'elementor-pro/off-canvas/id', $this->get_id() ),
 			'class' => 'e-off-canvas',
 			'role' => 'dialog',
 			'aria-hidden' => 'true',
@@ -585,5 +594,15 @@ class Off_Canvas extends Widget_Nested_Base {
 		$this->add_render_attribute( 'off-canvas__overlay', [
 			'class' => 'e-off-canvas__overlay',
 		] );
+	}
+
+	protected function is_dynamic_content(): bool {
+		global $wp_query;
+
+		if ( ! isset( $wp_query->is_loop_widget ) ) {
+			return false;
+		}
+
+		return true;
 	}
 }

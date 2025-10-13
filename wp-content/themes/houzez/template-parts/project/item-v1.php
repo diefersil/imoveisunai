@@ -1,10 +1,6 @@
 <?php
 global $post, $ele_thumbnail_size, $image_size; 
-if( houzez_is_fullwidth_2cols_custom_width() ) {
-	$image_size = 'houzez-item-image-4';
-} else {
-	$image_size = 'houzez-item-image-6';
-}
+$image_size = 'houzez-item-image-6';
 ?>
 <div class="item-listing-wrap item-listing-wrap-v6 project-item-listing-wrap project-item-listing-wrap-v6 card">
 	<div class="item-wrap item-wrap-v6 project-item-wrap-v6 h-100">

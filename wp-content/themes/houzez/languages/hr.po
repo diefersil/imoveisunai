@@ -5,16 +5,15 @@ msgstr ""
 "Project-Id-Version: 4.6.x\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/tags/_s\n"
 "POT-Creation-Date: 2023-06-15 15:52+0500\n"
-"PO-Revision-Date: 2023-06-15 15:54+0500\n"
+"PO-Revision-Date: 2025-05-23 11:31+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.3.1\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: esc_html__;esc_html_e;esc_attr__;esc_attr_e;__;_e;_n\n"
 "X-Poedit-Basepath: .\n"
@@ -114,14 +113,11 @@ msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>"
 msgstr ""
 
 #: ../content-none.php:26
-msgid ""
-"Sorry, but nothing matched your search terms. Please try again with some "
-"different keywords."
+msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
 msgstr ""
 
 #: ../content-none.php:33
-msgid ""
-"It seems we cannot find what you are looking for. Perhaps searching can help."
+msgid "It seems we cannot find what you are looking for. Perhaps searching can help."
 msgstr ""
 
 #: ../content-page.php:7 ../single.php:63
@@ -276,10 +272,7 @@ msgid "Send your feedback"
 msgstr ""
 
 #: ../framework/admin/feedback.php:25
-msgid ""
-"Your feedback and comments have played a major role in determining the "
-"features incorporated into Houzez. We’d like to hear your thoughts and ideas "
-"on what we should be considering for the next or future updates."
+msgid "Your feedback and comments have played a major role in determining the features incorporated into Houzez. We’d like to hear your thoughts and ideas on what we should be considering for the next or future updates."
 msgstr ""
 
 #: ../framework/admin/feedback.php:32
@@ -399,10 +392,7 @@ msgid "Enter your message"
 msgstr ""
 
 #: ../framework/admin/feedback.php:54
-msgid ""
-"Any data submitted through this form is not stored on our servers but just "
-"sent to our support email address, so that we are able to process your "
-"request."
+msgid "Any data submitted through this form is not stored on our servers but just sent to our support email address, so that we are able to process your request."
 msgstr ""
 
 #: ../framework/admin/feedback.php:58
@@ -525,9 +515,7 @@ msgid "Houzez Purchase Verification"
 msgstr ""
 
 #: ../framework/admin/purchase.php:24
-msgid ""
-"Enter purchase code to verify your purchase. This will allow you to install "
-"plugins, import demo and unlock all features"
+msgid "Enter purchase code to verify your purchase. This will allow you to install plugins, import demo and unlock all features"
 msgstr ""
 
 #: ../framework/admin/purchase.php:57
@@ -576,9 +564,7 @@ msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:355
 #, php-format
-msgid ""
-"The following plugin needs to be updated to its latest version to ensure "
-"maximum compatibility with this theme: %1$s."
+msgid "The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:361
@@ -636,9 +622,7 @@ msgstr "Nije izvršena niti jedna akcija. Dodatak %1$s je već aktiviran."
 
 #: ../framework/class-tgm-plugin-activation.php:399
 #, php-format
-msgid ""
-"Plugin not activated. A higher version of %s is needed for this theme. "
-"Please update the plugin."
+msgid "Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:401
@@ -651,9 +635,7 @@ msgid "Dismiss this notice"
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:403
-msgid ""
-"There are one or more required or recommended plugins to install, update or "
-"activate."
+msgid "There are one or more required or recommended plugins to install, update or activate."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:404
@@ -669,22 +651,16 @@ msgid "Update Required"
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:1019
-msgid ""
-"The remote plugin package does not contain a folder with the desired slug "
-"and renaming did not work."
+msgid "The remote plugin package does not contain a folder with the desired slug and renaming did not work."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:1019
 #: ../framework/class-tgm-plugin-activation.php:1022
-msgid ""
-"Please contact the plugin provider and ask them to package their plugin "
-"according to the WordPress guidelines."
+msgid "Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:1022
-msgid ""
-"The remote plugin package consists of more than one file, but the files are "
-"not packaged in a folder."
+msgid "The remote plugin package consists of more than one file, but the files are not packaged in a folder."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:1206
@@ -907,9 +883,7 @@ msgid "The installation of %1$s failed."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:3592
-msgid ""
-"The installation and activation process is starting. This process may take a "
-"while on some hosts, so please be patient."
+msgid "The installation and activation process is starting. This process may take a while on some hosts, so please be patient."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:3594
@@ -927,9 +901,7 @@ msgid "Installing and Activating Plugin %1$s (%2$d/%3$d)"
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:3600
-msgid ""
-"The installation process is starting. This process may take a while on some "
-"hosts, so please be patient."
+msgid "The installation process is starting. This process may take a while on some hosts, so please be patient."
 msgstr ""
 
 #: ../framework/class-tgm-plugin-activation.php:3602
@@ -969,9 +941,7 @@ msgid "Reply"
 msgstr "Odgovori"
 
 #: ../framework/functions/cron-functions.php:443
-msgid ""
-"If you do not wish to be notified anymore please enter your account and "
-"delete the saved search.Thank you!"
+msgid "If you do not wish to be notified anymore please enter your account and delete the saved search.Thank you!"
 msgstr ""
 
 #: ../framework/functions/emails-functions.php:138
@@ -3255,11 +3225,7 @@ msgstr ""
 
 #: ../framework/functions/membership-functions.php:2135
 #, php-format
-msgid ""
-"Hello, You downgraded your subscription on  %s. Because your listings number "
-"was greater than what the actual package offers, we set the status of all "
-"your listings to \"expired\". You will need to choose which listings you "
-"want live and send them again for approval. Thank you!"
+msgid "Hello, You downgraded your subscription on  %s. Because your listings number was greater than what the actual package offers, we set the status of all your listings to \"expired\". You will need to choose which listings you want live and send them again for approval. Thank you!"
 msgstr ""
 
 #: ../framework/functions/membership-functions.php:2138
@@ -3718,7 +3684,7 @@ msgstr ""
 #: ../template-parts/dashboard/board/leads/new-lead-panel.php:90
 #: ../template-parts/dashboard/profile/information.php:169
 msgid "Address"
-msgstr "Adresa"
+msgstr ""
 
 #: ../framework/functions/profile_functions.php:1209
 #: ../framework/metaboxes/agent-metaboxes.php:196
@@ -3775,8 +3741,7 @@ msgid "Fields are required"
 msgstr ""
 
 #: ../framework/functions/profile_functions.php:1415
-msgid ""
-"Unable to initiate confirmation request. Please contact the administrator."
+msgid "Unable to initiate confirmation request. Please contact the administrator."
 msgstr ""
 
 #: ../framework/functions/profile_functions.php:1418
@@ -3864,9 +3829,7 @@ msgid "Sold (%s)"
 msgstr ""
 
 #: ../framework/functions/property_functions.php:1360
-msgid ""
-"Search is saved. You will receive an email notification when new properties "
-"matching your search will be published"
+msgid "Search is saved. You will receive an email notification when new properties matching your search will be published"
 msgstr ""
 
 #: ../framework/functions/property_functions.php:1381
@@ -4334,9 +4297,7 @@ msgid "Enter a short description"
 msgstr ""
 
 #: ../framework/metaboxes/agent-metaboxes.php:93
-msgid ""
-"All messages related to the agent from the contact form on property details "
-"page, will be sent on this email address. "
+msgid "All messages related to the agent from the contact form on property details page, will be sent on this email address. "
 msgstr ""
 
 #: ../framework/metaboxes/agent-metaboxes.php:101
@@ -4735,9 +4696,7 @@ msgstr ""
 
 #: ../framework/metaboxes/listings-templates-metaboxes-classic-editor.php:295
 #: ../framework/metaboxes/listings-templates-metaboxes.php:295
-msgid ""
-"Enable/disable the tabs on the listing page(not work for half map and "
-"parallax listing template)"
+msgid "Enable/disable the tabs on the listing page(not work for half map and parallax listing template)"
 msgstr ""
 
 #: ../framework/metaboxes/listings-templates-metaboxes-classic-editor.php:298
@@ -5492,10 +5451,7 @@ msgstr "Odaberite Slider"
 
 #: ../framework/metaboxes/page-header-metaboxes-classic-editor.php:203
 #: ../framework/metaboxes/page-header-metaboxes.php:204
-msgid ""
-"Select a city where to start the property map on header page. You can select "
-"multiple cities or keep all un-select to display properties from all the "
-"cities"
+msgid "Select a city where to start the property map on header page. You can select multiple cities or keep all un-select to display properties from all the cities"
 msgstr ""
 
 #: ../framework/metaboxes/page-template-metaboxes.php:9
@@ -5833,9 +5789,7 @@ msgid "Recommended image size 88 x 112 px"
 msgstr ""
 
 #: ../framework/metaboxes/taxonomies-metaboxes.php:62
-msgid ""
-"Enter a custom link for this taxonomy if you want to link it with an "
-"external site"
+msgid "Enter a custom link for this taxonomy if you want to link it with an external site"
 msgstr ""
 
 #: ../framework/metaboxes/taxonomies-metaboxes.php:75
@@ -5912,9 +5866,7 @@ msgid "Main Menu Transparent?"
 msgstr ""
 
 #: ../framework/metaboxes/transparent-menu-metaboxes.php:43
-msgid ""
-"This option only works if you are using the header 4. You can choose the "
-"header 4 from theme options"
+msgid "This option only works if you are using the header 4. You can choose the header 4 from theme options"
 msgstr ""
 
 #: ../framework/options/404.php:5
@@ -5984,15 +5936,11 @@ msgid "Range Values for Bedrooms, Bathrooms and Rooms"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:60
-msgid ""
-"Note: Set search query Like for bedrooms, bathrooms and Rooms under "
-"<strong>Searches -> Settings</strong> to make it searchable."
+msgid "Note: Set search query Like for bedrooms, bathrooms and Rooms under <strong>Searches -> Settings</strong> to make it searchable."
 msgstr ""
 
 #: ../framework/options/add-new-property.php:61
-msgid ""
-"Enable range inputs for bedrooms, rooms and bathrooms fields. Example( 3 - "
-"5, 2 - 4)"
+msgid "Enable range inputs for bedrooms, rooms and bathrooms fields. Example( 3 - 5, 2 - 4)"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:69
@@ -6038,9 +5986,7 @@ msgid "Display Drop-down Menus"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:118
-msgid ""
-"Select Yes to replace the Property Location text fields with drop-down menus "
-"in order to select the property City, Area, County/State and Country"
+msgid "Select Yes to replace the Property Location text fields with drop-down menus in order to select the property City, Area, County/State and Country"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:128
@@ -6076,9 +6022,7 @@ msgid "Property ID Prefix"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:168
-msgid ""
-"Enter prefix for property id, leave empty if you don't want to show prefix. "
-"Example HZ-"
+msgid "Enter prefix for property id, leave empty if you don't want to show prefix. Example HZ-"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:174
@@ -6106,8 +6050,7 @@ msgid "Maximum File Size for attachments"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:200
-msgid ""
-"Maximum upload attachment size. For example 10kb, 500kb, 1mb, 10m, 100mb"
+msgid "Maximum upload attachment size. For example 10kb, 500kb, 1mb, 10m, 100mb"
 msgstr ""
 
 #: ../framework/options/add-new-property.php:207
@@ -6477,8 +6420,7 @@ msgid "Specify Pages"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:135
-msgid ""
-"Specify which pages have to display the search. You can select multiple pages"
+msgid "Specify which pages have to display the search. You can select multiple pages"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:142
@@ -6606,9 +6548,7 @@ msgstr ""
 
 #: ../framework/options/advanced-search.php:254
 #: ../framework/options/advanced-search.php:533
-msgid ""
-"Note: If \"Yes\" it will remove advanced button in search and show all "
-"filters"
+msgid "Note: If \"Yes\" it will remove advanced button in search and show all filters"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:263
@@ -6641,9 +6581,7 @@ msgid "Advanced Search Panel"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:301
-msgid ""
-"Enable or disable the advanced search panel over the header type like Header "
-"Map, Revolution Slider, Image, Property Slider and Video."
+msgid "Enable or disable the advanced search panel over the header type like Header Map, Revolution Slider, Image, Property Slider and Video."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:311
@@ -6667,9 +6605,7 @@ msgid "Keep Advanced Search visible?"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:357
-msgid ""
-"If no, the advanced search panel over the header will be displayed in the "
-"closed position by default."
+msgid "If no, the advanced search panel over the header will be displayed in the closed position by default."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:427
@@ -6705,8 +6641,7 @@ msgid "Price Range Slider for Half Map"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:511
-msgid ""
-"If enabled, the minimum and maximum price dropdown fields will not displayed"
+msgid "If enabled, the minimum and maximum price dropdown fields will not displayed"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:520
@@ -6802,9 +6737,7 @@ msgid "State, City, Area dropdowns."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:643
-msgid ""
-"Do you want to display the States, Cities, Areas fields if they have at "
-"least 1 property?"
+msgid "Do you want to display the States, Cities, Areas fields if they have at least 1 property?"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:646
@@ -6872,9 +6805,7 @@ msgid "Features Limit"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:773
-msgid ""
-"Enter the number of features to show in the advanced search. Note: enter -1 "
-"to display them all."
+msgid "Enter the number of features to show in the advanced search. Note: enter -1 to display them all."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:780
@@ -6906,9 +6837,7 @@ msgstr ""
 #: ../framework/options/advanced-search.php:815
 #: ../framework/options/advanced-search.php:845
 #: ../framework/options/advanced-search.php:854
-msgid ""
-"Only provide comma separated numbers. Do not add decimal points, dashes, "
-"spaces and currency signs."
+msgid "Only provide comma separated numbers. Do not add decimal points, dashes, spaces and currency signs."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:812
@@ -6920,9 +6849,7 @@ msgid "<span class=\"font24\">Rent Prices.</span>"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:824
-msgid ""
-"Visitors expect smaller values for rent prices, So please provide the list "
-"of minimum and maximum rent prices below"
+msgid "Visitors expect smaller values for rent prices, So please provide the list of minimum and maximum rent prices below"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:829
@@ -6944,8 +6871,7 @@ msgid "Maximum Prices List for Rent Only"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:862
-msgid ""
-"<span class=\"font24\">Advanced Search Price range for price slider.</span>"
+msgid "<span class=\"font24\">Advanced Search Price range for price slider.</span>"
 msgstr ""
 
 #: ../framework/options/advanced-search.php:868
@@ -6985,9 +6911,7 @@ msgstr "Spavaće sobe popis"
 #: ../framework/options/advanced-search.php:932
 #: ../framework/options/advanced-search.php:941
 #: ../framework/options/advanced-search.php:950
-msgid ""
-"Only provide comma separated numbers. Do not add dashes, spaces and currency "
-"signs."
+msgid "Only provide comma separated numbers. Do not add dashes, spaces and currency signs."
 msgstr ""
 
 #: ../framework/options/advanced-search.php:938
@@ -7369,9 +7293,7 @@ msgid "Select which forms you want to use."
 msgstr ""
 
 #: ../framework/options/contact-forms.php:28
-msgid ""
-"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/"
-"articles/360061352091-HubSpot\">HubSpot Documentation</a>"
+msgid "Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/articles/360061352091-HubSpot\">HubSpot Documentation</a>"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:29
@@ -7395,9 +7317,7 @@ msgid "Agent Contact Form"
 msgstr "Kontakt agenta"
 
 #: ../framework/options/contact-forms.php:48
-msgid ""
-"Enter the contact form shortcode for the agent form above image, sidebar and "
-"property gallery lightbox."
+msgid "Enter the contact form shortcode for the agent form above image, sidebar and property gallery lightbox."
 msgstr ""
 
 #: ../framework/options/contact-forms.php:57
@@ -7405,9 +7325,7 @@ msgid "Agent Contact Form Bottom"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:59
-msgid ""
-"Enter the contact form shortcode for the agent form at the bottom of the "
-"property detail page."
+msgid "Enter the contact form shortcode for the agent form at the bottom of the property detail page."
 msgstr ""
 
 #: ../framework/options/contact-forms.php:67
@@ -7415,9 +7333,7 @@ msgid "Schedule Tour Form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:69
-msgid ""
-"Enter the contact form shortcode for the schedule tour form on property "
-"detail page."
+msgid "Enter the contact form shortcode for the schedule tour form on property detail page."
 msgstr ""
 
 #: ../framework/options/contact-forms.php:77
@@ -7443,9 +7359,7 @@ msgid "Property Page"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:97
-msgid ""
-"Enable or disable the agent contact form on property featured image for "
-"property detail v.1"
+msgid "Enable or disable the agent contact form on property featured image for property detail v.1"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:106
@@ -7453,8 +7367,7 @@ msgid "Property Page Sidebar Form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:107
-msgid ""
-"Enable or disable the agent contact form on the property detail page sidebar"
+msgid "Enable or disable the agent contact form on the property detail page sidebar"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:116
@@ -7470,8 +7383,7 @@ msgid "Property Page Popup Gallery Form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:128
-msgid ""
-"Enable or disable the agent contact form on the property detail popup gallery"
+msgid "Enable or disable the agent contact form on the property detail popup gallery"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:137
@@ -7516,9 +7428,7 @@ msgid "Do you want to display direct message button for agent contact forms?"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:196
-msgid ""
-"Please make sure you have create message page using User Dashboard Messages "
-"template."
+msgid "Please make sure you have create message page using User Dashboard Messages template."
 msgstr ""
 
 #: ../framework/options/contact-forms.php:206
@@ -7544,9 +7454,7 @@ msgid "Contact form Fields"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:241
-msgid ""
-"Select which fields you want to disable from the property detail page agent "
-"contact form"
+msgid "Select which fields you want to disable from the property detail page agent contact form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:246
@@ -7559,9 +7467,7 @@ msgid "Agency & Agent Page Contact Form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:273
-msgid ""
-"Select which fields you want to disable from the agency & agent page contact "
-"form"
+msgid "Select which fields you want to disable from the agency & agent page contact form"
 msgstr ""
 
 #: ../framework/options/contact-forms.php:296
@@ -7614,9 +7520,7 @@ msgid "Email Management"
 msgstr ""
 
 #: ../framework/options/emails.php:6
-msgid ""
-"Global variables: %website_url as website url,%website_name as website name, "
-"%user_email as user_email, %username as username"
+msgid "Global variables: %website_url as website url,%website_name as website name, %user_email as user_email, %username as username"
 msgstr ""
 
 #: ../framework/options/emails.php:12
@@ -7624,9 +7528,7 @@ msgid "HTML Emails?"
 msgstr ""
 
 #: ../framework/options/emails.php:14
-msgid ""
-"Enable/Disable HTML emails, if enable then system will allow you to add html "
-"in email templates"
+msgid "Enable/Disable HTML emails, if enable then system will allow you to add html in email templates"
 msgstr ""
 
 #: ../framework/options/emails.php:25
@@ -7716,10 +7618,7 @@ msgid "<span class=\"font24\">Property Agent Contact Form</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:244
-msgid ""
-"Use %sender_name , %sender_email , %sender_phone , %website_name , "
-"%property_title , %property_link , %property_id , %user_type ,  "
-"%sender_message"
+msgid "Use %sender_name , %sender_email , %sender_phone , %website_name , %property_title , %property_link , %property_id , %user_type ,  %sender_message"
 msgstr ""
 
 #: ../framework/options/emails.php:251
@@ -7748,10 +7647,7 @@ msgid "<span class=\"font24\">Property Schedule Tour</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:296
-msgid ""
-"Use %sender_name , %sender_email , %sender_phone , %website_name , "
-"%property_title , %property_link, %property_id, %schedule_date , "
-"%schedule_time ,  %sender_message, %schedule_tour_type"
+msgid "Use %sender_name , %sender_email , %sender_phone , %website_name , %property_title , %property_link, %property_id, %schedule_date , %schedule_time ,  %sender_message, %schedule_tour_type"
 msgstr ""
 
 #: ../framework/options/emails.php:303
@@ -7772,10 +7668,7 @@ msgstr ""
 
 #: ../framework/options/emails.php:347
 #, php-format
-msgid ""
-"%user_login_register as username, %user_pass_register as user password, "
-"%user_email_register as new user email, %user_phone_register as phone "
-"number, %email_verification_link as email verification"
+msgid "%user_login_register as username, %user_pass_register as user password, %user_email_register as new user email, %user_phone_register as phone number, %email_verification_link as email verification"
 msgstr ""
 
 #: ../framework/options/emails.php:353
@@ -7799,8 +7692,7 @@ msgid "Email content for new user notification"
 msgstr ""
 
 #: ../framework/options/emails.php:364
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "Welcome to %website_url! You can login now using the below credentials:\n"
 "Username:%user_login_register\n"
 "Password: %user_pass_register\n"
@@ -7829,8 +7721,7 @@ msgid "Email content for new user admin notification"
 msgstr ""
 
 #: ../framework/options/emails.php:390
-msgid ""
-"New user registration on %website_url.\n"
+msgid "New user registration on %website_url.\n"
 "Username: %user_login_register,\n"
 "E-mail: %user_email_register"
 msgstr ""
@@ -7868,14 +7759,10 @@ msgid "Email content for Purchase Activated"
 msgstr ""
 
 #: ../framework/options/emails.php:457
-msgid ""
-"Hi there,<br>\n"
-"Welcome to %website_url and thank you for purchasing a plan with us. We are "
-"excited you have chosen %website_name . %website_name is a great place to "
-"advertise and search properties.<br>\n"
+msgid "Hi there,<br>\n"
+"Welcome to %website_url and thank you for purchasing a plan with us. We are excited you have chosen %website_name . %website_name is a great place to advertise and search properties.<br>\n"
 "\n"
-"You plan on  %website_url activated! You can now list your properties "
-"according to you plan."
+"You plan on  %website_url activated! You can now list your properties according to you plan."
 msgstr ""
 
 #: ../framework/options/emails.php:473
@@ -7891,8 +7778,7 @@ msgid "Per listing wire transfer purchase activate"
 msgstr ""
 
 #: ../framework/options/emails.php:503
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "Your purchase on %website_url is activated! You should go and check it out."
 msgstr ""
 
@@ -7906,8 +7792,7 @@ msgstr ""
 
 #: ../framework/options/emails.php:529 ../framework/options/emails.php:564
 #: ../framework/options/emails.php:599
-msgid ""
-"You can use %listing_title as listing title, %listing_url as listing link"
+msgid "You can use %listing_title as listing title, %listing_url as listing link"
 msgstr ""
 
 #: ../framework/options/emails.php:536
@@ -7931,8 +7816,7 @@ msgid "Email content for listing approved"
 msgstr ""
 
 #: ../framework/options/emails.php:547
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "Your listing on %website_url has been approved.\n"
 "\n"
 "Listins Title:%listing_title\n"
@@ -7964,8 +7848,7 @@ msgid "Email content for listing expired"
 msgstr ""
 
 #: ../framework/options/emails.php:582
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "Your listing on %website_url has been expired.\n"
 "\n"
 "Listins Title:%listing_title\n"
@@ -7997,8 +7880,7 @@ msgid "Email content for listing disapproved"
 msgstr ""
 
 #: ../framework/options/emails.php:617
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "Your listing on %website_url has been disapproved.\n"
 "\n"
 "Listins Title:%listing_title\n"
@@ -8014,9 +7896,7 @@ msgid "<span class=\"font24\">New Wire Transfer.</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:646
-msgid ""
-"you can use %invoice_no as invoice number, %total_price as total price and "
-"%payment_details as payment details"
+msgid "you can use %invoice_no as invoice number, %total_price as total price and %payment_details as payment details"
 msgstr ""
 
 #: ../framework/options/emails.php:651
@@ -8040,10 +7920,8 @@ msgid "Email content for New wire Transfer"
 msgstr ""
 
 #: ../framework/options/emails.php:662 ../framework/options/emails.php:686
-msgid ""
-"We received your Wire Transfer payment request on  %website_url !\n"
-"Please follow the instructions below in order to start submitting properties "
-"as soon as possible.\n"
+msgid "We received your Wire Transfer payment request on  %website_url !\n"
+"Please follow the instructions below in order to start submitting properties as soon as possible.\n"
 "The invoice number is: %invoice_no, Amount: %total_price.\n"
 "Instructions:  %payment_details."
 msgstr ""
@@ -8069,9 +7947,7 @@ msgid "<span class=\"font24\">Paid Submission Per Listing.</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:714
-msgid ""
-"you can use %invoice_no as invoice number, %listing_title as listing title, "
-"%listing_url as listing link and %listing_id as listing id"
+msgid "you can use %invoice_no as invoice number, %listing_title as listing title, %listing_url as listing link and %listing_id as listing id"
 msgstr ""
 
 #: ../framework/options/emails.php:720
@@ -8095,8 +7971,7 @@ msgid "Email content for paid submission per listing"
 msgstr ""
 
 #: ../framework/options/emails.php:731
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have submitted new listing on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8117,8 +7992,7 @@ msgid "Content for Admin - Paid Submission"
 msgstr ""
 
 #: ../framework/options/emails.php:757
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have a new paid submission on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8131,9 +8005,7 @@ msgid "<span class=\"font24\">Featured Submission Per Listing.</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:775
-msgid ""
-"you can use %invoice_no as invoice number, %listing_title as listing title , "
-"%listing_url as listing link and %listing_id as listing id"
+msgid "you can use %invoice_no as invoice number, %listing_title as listing title , %listing_url as listing link and %listing_id as listing id"
 msgstr ""
 
 #: ../framework/options/emails.php:781
@@ -8157,8 +8029,7 @@ msgid "Email content for featured submission per listing"
 msgstr ""
 
 #: ../framework/options/emails.php:792 ../framework/options/emails.php:818
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have a new featured submission on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8187,9 +8058,7 @@ msgid "<span class=\"font24\">Package and Free Submission Listings.</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:848 ../framework/options/emails.php:907
-msgid ""
-"you can use %listing_title as listing title, %listing_url as listing link "
-"and %listing_id as listing id"
+msgid "you can use %listing_title as listing title, %listing_url as listing link and %listing_id as listing id"
 msgstr ""
 
 #: ../framework/options/emails.php:854
@@ -8209,8 +8078,7 @@ msgid "Email content for package and free listing submission"
 msgstr ""
 
 #: ../framework/options/emails.php:865
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have submitted new listing on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8230,8 +8098,7 @@ msgid "Content for Admin - Submission"
 msgstr ""
 
 #: ../framework/options/emails.php:890
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have a new submission on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8263,8 +8130,7 @@ msgid "Email content for update listing submission"
 msgstr ""
 
 #: ../framework/options/emails.php:925
-msgid ""
-"Hi there,\n"
+msgid "Hi there,\n"
 "You have a new updated listing on  %website_url!\n"
 "Listing Title: %listing_title\n"
 "Listing url: %listing_url\n"
@@ -8281,9 +8147,7 @@ msgstr ""
 
 #: ../framework/options/emails.php:954 ../framework/options/emails.php:985
 #, php-format
-msgid ""
-"Can use %expired_listing_url as expired listing url and "
-"%expired_listing_name as expired listing name"
+msgid "Can use %expired_listing_url as expired listing url and %expired_listing_name as expired listing name"
 msgstr ""
 
 #: ../framework/options/emails.php:959
@@ -8307,10 +8171,8 @@ msgid "Email content for free listing expired"
 msgstr ""
 
 #: ../framework/options/emails.php:970 ../framework/options/emails.php:1001
-msgid ""
-"Hi there,\n"
-"One of your free listings on  %website_url has \"expired\". The listing is "
-"%expired_listing_url.\n"
+msgid "Hi there,\n"
+"One of your free listings on  %website_url has \"expired\". The listing is %expired_listing_url.\n"
 "Thank you!"
 msgstr ""
 
@@ -8344,9 +8206,7 @@ msgstr ""
 
 #: ../framework/options/emails.php:1016
 #, php-format
-msgid ""
-"%submission_title as property title, %submission_url as property submission "
-"url"
+msgid "%submission_title as property title, %submission_url as property submission url"
 msgstr ""
 
 #: ../framework/options/emails.php:1021
@@ -8370,10 +8230,8 @@ msgid "Email content for admin expired listing"
 msgstr ""
 
 #: ../framework/options/emails.php:1032
-msgid ""
-"Hi there,\n"
-"A user has re-submited a new property on %website_url! You should go and "
-"check it out.\n"
+msgid "Hi there,\n"
+"A user has re-submited a new property on %website_url! You should go and check it out.\n"
 "This is the property title: %submission_title."
 msgstr ""
 
@@ -8386,9 +8244,7 @@ msgid "<span class=\"font24\">Matching Submission.</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:1059
-msgid ""
-"Use %matching_submissions as matching submissions list, %listing_count for "
-"number of listing count"
+msgid "Use %matching_submissions as matching submissions list, %listing_count for number of listing count"
 msgstr ""
 
 #: ../framework/options/emails.php:1064
@@ -8420,9 +8276,7 @@ msgid "<span class=\"font24\">Recurring Payment</span>"
 msgstr ""
 
 #: ../framework/options/emails.php:1105
-msgid ""
-"Can use %recurring_package_name as recurring packacge name and %merchant as "
-"merchant name"
+msgid "Can use %recurring_package_name as recurring packacge name and %merchant as merchant name"
 msgstr ""
 
 #: ../framework/options/emails.php:1110
@@ -8446,10 +8300,8 @@ msgid "Email content for recurring payment"
 msgstr ""
 
 #: ../framework/options/emails.php:1121
-msgid ""
-"Hi there,\n"
-"We charged your account on %merchant for a subscription on %website_url ! "
-"You should go and check it out."
+msgid "Hi there,\n"
+"We charged your account on %merchant for a subscription on %website_url ! You should go and check it out."
 msgstr ""
 
 #: ../framework/options/emails.php:1134
@@ -8477,11 +8329,8 @@ msgid "Email content for membership cancelled"
 msgstr ""
 
 #: ../framework/options/emails.php:1151
-msgid ""
-"Hi there,\n"
-"Your subscription on %website_url was cancelled because it expired or the "
-"recurring payment from the merchant was not processed. All your listings are "
-"no longer visible for our visitors but remain in your account.\n"
+msgid "Hi there,\n"
+"Your subscription on %website_url was cancelled because it expired or the recurring payment from the merchant was not processed. All your listings are no longer visible for our visitors but remain in your account.\n"
 "Thank you."
 msgstr ""
 
@@ -8703,9 +8552,7 @@ msgid "Templates"
 msgstr ""
 
 #: ../framework/options/general.php:202
-msgid ""
-"Select templates which you want to remove from template list when add new "
-"page"
+msgid "Select templates which you want to remove from template list when add new page"
 msgstr ""
 
 #: ../framework/options/general.php:264
@@ -8713,9 +8560,7 @@ msgid "Page Filters"
 msgstr ""
 
 #: ../framework/options/general.php:265
-msgid ""
-"Select which taxonomy filters you want to remove when add new page in admin "
-"panel."
+msgid "Select which taxonomy filters you want to remove when add new page in admin panel."
 msgstr ""
 
 #: ../framework/options/general.php:268
@@ -8729,9 +8574,7 @@ msgid "Measurement Unit Globally"
 msgstr ""
 
 #: ../framework/options/general.php:281
-msgid ""
-"Enable/Disable property measurement unit globally, it will overwrite "
-"measurement unit added for single properties"
+msgid "Enable/Disable property measurement unit globally, it will overwrite measurement unit added for single properties"
 msgstr ""
 
 #: ../framework/options/general.php:289
@@ -9216,9 +9059,7 @@ msgid "It shows only for the listing page v1, v4 and v5"
 msgstr ""
 
 #: ../framework/options/listing-options.php:90
-msgid ""
-"Enable or disable the property type on the listing page (It shows only for "
-"the listing page v1, v4 and v5)"
+msgid "Enable or disable the property type on the listing page (It shows only for the listing page v1, v4 and v5)"
 msgstr ""
 
 #: ../framework/options/listing-options.php:99
@@ -9238,8 +9079,7 @@ msgid "Maximum 4 options allowed"
 msgstr ""
 
 #: ../framework/options/listing-options.php:149
-msgid ""
-"Drag and drop layout manager, to quickly organize your grid and list meta.\n"
+msgid "Drag and drop layout manager, to quickly organize your grid and list meta.\n"
 msgstr ""
 
 #: ../framework/options/listing-options.php:161
@@ -9333,8 +9173,7 @@ msgid "Meta v1, v4 and v7"
 msgstr ""
 
 #: ../framework/options/listing-options.php:272
-msgid ""
-"Manage list or grid (grid v.1, v.4 and v.7) meta type on the listing pages"
+msgid "Manage list or grid (grid v.1, v.4 and v.7) meta type on the listing pages"
 msgstr ""
 
 #: ../framework/options/listing-options.php:278
@@ -9537,10 +9376,7 @@ msgid "Frontend register user as agent or agency"
 msgstr ""
 
 #: ../framework/options/login-register.php:105
-msgid ""
-"If set to \"Yes\" then every user register from front-end role Agent will be "
-"auto create in agent custom post type and role Agency will be auto create in "
-"agency custom post type"
+msgid "If set to \"Yes\" then every user register from front-end role Agent will be auto create in agent custom post type and role Agency will be auto create in agency custom post type"
 msgstr ""
 
 #: ../framework/options/login-register.php:112
@@ -9548,8 +9384,7 @@ msgid "Agent/Agency Visibility"
 msgstr ""
 
 #: ../framework/options/login-register.php:113
-msgid ""
-"Front-end registered agent/agency should not show automatically on front-end"
+msgid "Front-end registered agent/agency should not show automatically on front-end"
 msgstr ""
 
 #: ../framework/options/login-register.php:114
@@ -9630,9 +9465,7 @@ msgid "Registration Form"
 msgstr "Registracijski obrazac"
 
 #: ../framework/options/login-register.php:224
-msgid ""
-"If enabled, the registration form displays a drop-down menu with the list of "
-"user roles"
+msgid "If enabled, the registration form displays a drop-down menu with the list of user roles"
 msgstr ""
 
 #: ../framework/options/login-register.php:228
@@ -9938,11 +9771,7 @@ msgid "Google Maps API KEY"
 msgstr ""
 
 #: ../framework/options/map.php:26
-msgid ""
-"We strongly encourage you to get an APIs Console key and post the code in "
-"Theme Options. You can get it from <a target=\"_blank\" href=\"https://"
-"developers.google.com/maps/documentation/javascript/tutorial#api_key\">here</"
-"a>."
+msgid "We strongly encourage you to get an APIs Console key and post the code in Theme Options. You can get it from <a target=\"_blank\" href=\"https://developers.google.com/maps/documentation/javascript/tutorial#api_key\">here</a>."
 msgstr ""
 
 #: ../framework/options/map.php:27
@@ -9954,9 +9783,7 @@ msgid "Mapbox API KEY"
 msgstr ""
 
 #: ../framework/options/map.php:34
-msgid ""
-"Please enter the Mapbox API key, you can get from <a target=\"_blank\" "
-"href=\"https://account.mapbox.com/\">here</a>."
+msgid "Please enter the Mapbox API key, you can get from <a target=\"_blank\" href=\"https://account.mapbox.com/\">here</a>."
 msgstr ""
 
 #: ../framework/options/map.php:40
@@ -9988,9 +9815,7 @@ msgid "Short Price"
 msgstr ""
 
 #: ../framework/options/map.php:70
-msgid ""
-"Please note that the currency switcher will not work if the short price "
-"functionality is enabled."
+msgid "Please note that the currency switcher will not work if the short price functionality is enabled."
 msgstr ""
 
 #: ../framework/options/map.php:71 ../framework/options/price-currency.php:41
@@ -10062,9 +9887,7 @@ msgid "Cluster Zoom Level"
 msgstr ""
 
 #: ../framework/options/map.php:212
-msgid ""
-"Enter the maximum zoom level for the cluster to appear. From 1 to 20 the "
-"fefault is 12"
+msgid "Enter the maximum zoom level for the cluster to appear. From 1 to 20 the fefault is 12"
 msgstr ""
 
 #: ../framework/options/map.php:221
@@ -10211,8 +10034,7 @@ msgid "Sandbox = test API. LIVE = real payments API"
 msgstr ""
 
 #: ../framework/options/membership.php:161
-msgid ""
-"Update PayPal, Stripe and 2Checkout settings according to API type selection"
+msgid "Update PayPal, Stripe and 2Checkout settings according to API type selection"
 msgstr ""
 
 #: ../framework/options/membership.php:181
@@ -10237,9 +10059,7 @@ msgid "Choose Payment gateway type"
 msgstr ""
 
 #: ../framework/options/membership.php:235
-msgid ""
-"Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/"
-"articles/360045293072\">WooCommerce Documentation</a>"
+msgid "Follow <a target=\"_blank\" href=\"https://favethemes.zendesk.com/hc/en-us/articles/360045293072\">WooCommerce Documentation</a>"
 msgstr ""
 
 #: ../framework/options/membership.php:236
@@ -10387,11 +10207,7 @@ msgid "Minify CSS"
 msgstr ""
 
 #: ../framework/options/optimization.php:45
-msgid ""
-"By default the theme loads a style.css that is not minified. If you wish you "
-"can enable this setting to instead load a single style-min.css file with the "
-"code minified. If you are using a child theme you will have to change the "
-"@import from pointing to style.css to point to style-min.css"
+msgid "By default the theme loads a style.css that is not minified. If you wish you can enable this setting to instead load a single style-min.css file with the code minified. If you are using a child theme you will have to change the @import from pointing to style.css to point to style-min.css"
 msgstr ""
 
 #: ../framework/options/optimization.php:54
@@ -10399,11 +10215,7 @@ msgid "Remove Version Parameter From JS & CSS Files"
 msgstr ""
 
 #: ../framework/options/optimization.php:55
-msgid ""
-"Most scripts and style-sheets called by WordPress include a query string "
-"identifying the version. This can cause issues with caching and such, which "
-"will result in less than optimal load times. You can toggle this setting on "
-"to remove the query string from such strings."
+msgid "Most scripts and style-sheets called by WordPress include a query string identifying the version. This can cause issues with caching and such, which will result in less than optimal load times. You can toggle this setting on to remove the query string from such strings."
 msgstr ""
 
 #: ../framework/options/optimization.php:64
@@ -10411,15 +10223,11 @@ msgid "Preload Pages"
 msgstr ""
 
 #: ../framework/options/optimization.php:65
-msgid ""
-"Preload pages right before a user clicks on it for blazing fast browsing "
-"between pages."
+msgid "Preload pages right before a user clicks on it for blazing fast browsing between pages."
 msgstr ""
 
 #: ../framework/options/optimization.php:66
-msgid ""
-"NOTE: if you are using login/register for front-end site then better to not "
-"enable this option."
+msgid "NOTE: if you are using login/register for front-end site then better to not enable this option."
 msgstr ""
 
 #: ../framework/options/optimization.php:74
@@ -10443,9 +10251,7 @@ msgid "JPEG 100% Quality"
 msgstr ""
 
 #: ../framework/options/optimization.php:113
-msgid ""
-"By default images cropped with WordPress are resized/cropped at 90% quality. "
-"Enable this setting to set all JPEGs to 100% quality."
+msgid "By default images cropped with WordPress are resized/cropped at 90% quality. Enable this setting to set all JPEGs to 100% quality."
 msgstr ""
 
 #: ../framework/options/price-currency.php:4
@@ -10457,8 +10263,7 @@ msgid "Multi-currency"
 msgstr ""
 
 #: ../framework/options/price-currency.php:14
-msgid ""
-"Please note: the currency switcher will not work if this option is enabled"
+msgid "Please note: the currency switcher will not work if this option is enabled"
 msgstr ""
 
 #: ../framework/options/price-currency.php:15
@@ -10479,15 +10284,11 @@ msgid "Info"
 msgstr ""
 
 #: ../framework/options/price-currency.php:33
-msgid ""
-"<a target=\"_blank\" href=\"admin.php?page=houzez_currencies\">Add "
-"Currencies</a>"
+msgid "<a target=\"_blank\" href=\"admin.php?page=houzez_currencies\">Add Currencies</a>"
 msgstr ""
 
 #: ../framework/options/price-currency.php:40
-msgid ""
-"Please note: the currency switcher will not work if the short price option "
-"is enabled"
+msgid "Please note: the currency switcher will not work if the short price option is enabled"
 msgstr ""
 
 #: ../framework/options/price-currency.php:49
@@ -10495,9 +10296,7 @@ msgid "Short Price Indian - Format"
 msgstr ""
 
 #: ../framework/options/price-currency.php:51
-msgid ""
-"Enable or disable the short price numbers like 1 Hundred, 10 thousand, 10 "
-"crore."
+msgid "Enable or disable the short price numbers like 1 Hundred, 10 thousand, 10 crore."
 msgstr ""
 
 #: ../framework/options/price-currency.php:60
@@ -10561,9 +10360,7 @@ msgid "Price Separator"
 msgstr ""
 
 #: ../framework/options/price-currency.php:153
-msgid ""
-"Provide what you want to show between price and price label. Example: / or "
-"empty space"
+msgid "Provide what you want to show between price and price label. Example: / or empty space"
 msgstr ""
 
 #: ../framework/options/print-property.php:5
@@ -10600,8 +10397,7 @@ msgid "Property Banner"
 msgstr ""
 
 #: ../framework/options/property-detail.php:14
-msgid ""
-"Select the banner version you want to display in the property detail page"
+msgid "Select the banner version you want to display in the property detail page"
 msgstr ""
 
 #: ../framework/options/property-detail.php:15
@@ -10617,9 +10413,7 @@ msgid "Property Banner Active Tab"
 msgstr ""
 
 #: ../framework/options/property-detail.php:68
-msgid ""
-"The property top banner has three tabs, the image/gallery, map view and "
-"street view. Select the one you want to display first"
+msgid "The property top banner has three tabs, the image/gallery, map view and street view. Select the one you want to display first"
 msgstr ""
 
 #: ../framework/options/property-detail.php:69
@@ -10652,8 +10446,7 @@ msgid "Full Width Property Content Layout"
 msgstr ""
 
 #: ../framework/options/property-detail.php:101
-msgid ""
-"If you select yes the property page will be full-width without the sidebar"
+msgid "If you select yes the property page will be full-width without the sidebar"
 msgstr ""
 
 #: ../framework/options/property-detail.php:102
@@ -10751,9 +10544,7 @@ msgid "Email address to receive message copy."
 msgstr ""
 
 #: ../framework/options/property-detail.php:200
-msgid ""
-"This email address will receive a copy of message sent to agent from "
-"property detail page."
+msgid "This email address will receive a copy of message sent to agent from property detail page."
 msgstr ""
 
 #: ../framework/options/property-detail.php:211
@@ -11091,9 +10882,7 @@ msgid "Walkscore API Key"
 msgstr ""
 
 #: ../framework/options/property-detail.php:785
-msgid ""
-"Enter your Walkscore API key code. <a target=\"_blank\" href=\"https://www."
-"walkscore.com/professional/api.php\">Get an API code</a>"
+msgid "Enter your Walkscore API key code. <a target=\"_blank\" href=\"https://www.walkscore.com/professional/api.php\">Get an API code</a>"
 msgstr ""
 
 #: ../framework/options/property-detail.php:793
@@ -11105,10 +10894,7 @@ msgid "Enable or disable Yelp on the property detail page."
 msgstr ""
 
 #: ../framework/options/property-detail.php:803
-msgid ""
-"Please note that Yelp is not working for all countries. See here <a "
-"target=\"_blank\" href=\"https://www.yelp.com/factsheet\">https://www.yelp."
-"com/factsheet</a> the list of countries where Yelp is available."
+msgid "Please note that Yelp is not working for all countries. See here <a target=\"_blank\" href=\"https://www.yelp.com/factsheet\">https://www.yelp.com/factsheet</a> the list of countries where Yelp is available."
 msgstr ""
 
 #: ../framework/options/property-detail.php:811
@@ -11116,9 +10902,7 @@ msgid "Yelp API Key"
 msgstr ""
 
 #: ../framework/options/property-detail.php:813
-msgid ""
-"Enter your Yelp API key code. <a target=\"_blank\" href=\"https://www.yelp."
-"com/developers/v3/manage_app\">Get an API code</a>"
+msgid "Enter your Yelp API key code. <a target=\"_blank\" href=\"https://www.yelp.com/developers/v3/manage_app\">Get an API code</a>"
 msgstr ""
 
 #: ../framework/options/property-detail.php:820
@@ -11155,9 +10939,7 @@ msgid "Time Slots"
 msgstr ""
 
 #: ../framework/options/property-detail.php:887
-msgid ""
-"Use the comma to separate the time slots. (For example: 12:00 am, 12:15 am, "
-"12:30 am)"
+msgid "Use the comma to separate the time slots. (For example: 12:00 am, 12:15 am, 12:30 am)"
 msgstr ""
 
 #: ../framework/options/property-detail.php:893
@@ -11389,9 +11171,7 @@ msgid "Next/Prev Property Navigation"
 msgstr ""
 
 #: ../framework/options/property-detail.php:1256
-msgid ""
-"Enable or disable the next/prev property navigation at the end of the "
-"property detail page"
+msgid "Enable or disable the next/prev property navigation at the end of the property detail page"
 msgstr ""
 
 #: ../framework/options/property-detail.php:1265
@@ -11413,9 +11193,7 @@ msgid "Disclaimer Text"
 msgstr ""
 
 #: ../framework/options/property-detail.php:1284
-msgid ""
-"Add disclaimer text globally for all properties, this can be also set on "
-"single property level when add/edit property"
+msgid "Add disclaimer text globally for all properties, this can be also set on single property level when add/edit property"
 msgstr ""
 
 #: ../framework/options/reCaptcha.php:4 ../framework/options/reCaptcha.php:22
@@ -11431,11 +11209,9 @@ msgid "Enable or disable Google reCaptcha on forms"
 msgstr ""
 
 #: ../framework/options/reCaptcha.php:24
-msgid ""
-"<p>If you do not have keys already then visit <kbd>\n"
+msgid "<p>If you do not have keys already then visit <kbd>\n"
 "            <a href = \"https://www.google.com/recaptcha/admin\">\n"
-"                https://www.google.com/recaptcha/admin</a></kbd> to generate "
-"them.\n"
+"                https://www.google.com/recaptcha/admin</a></kbd> to generate them.\n"
 "        Set the respective keys in <kbd>Site Key</kbd> and\n"
 "        <kbd>Secret Key</kbd></p>"
 msgstr ""
@@ -11624,8 +11400,7 @@ msgid "Select body background color"
 msgstr ""
 
 #: ../framework/options/styling.php:41
-msgid ""
-"Select body background color for listing grid v7, agents v2, agencies v2"
+msgid "Select body background color for listing grid v7, agents v2, agencies v2"
 msgstr ""
 
 #: ../framework/options/styling.php:49
@@ -11803,9 +11578,7 @@ msgid "Select the color of the social icons"
 msgstr ""
 
 #: ../framework/options/styling.php:488
-msgid ""
-"Transparent Menu Options (The transparent navigation is displayed on the "
-"splash page and when you select the trasparent header)"
+msgid "Transparent Menu Options (The transparent navigation is displayed on the splash page and when you select the trasparent header)"
 msgstr ""
 
 #: ../framework/options/styling.php:514
@@ -11962,8 +11735,7 @@ msgid "Half Map Text Color"
 msgstr ""
 
 #: ../framework/options/styling.php:930
-msgid ""
-"Text color for price range slider and other features for half map side search"
+msgid "Text color for price range slider and other features for half map side search"
 msgstr ""
 
 #: ../framework/options/styling.php:937
@@ -12027,9 +11799,7 @@ msgid "Open/Close Button Background Color"
 msgstr ""
 
 #: ../framework/options/styling.php:1022 ../framework/options/styling.php:1031
-msgid ""
-"This setting works for the advanced search over headers map, video, image, "
-"etc."
+msgid "This setting works for the advanced search over headers map, video, image, etc."
 msgstr ""
 
 #: ../framework/options/styling.php:1023
@@ -12183,9 +11953,7 @@ msgid "Taxonomies Layout"
 msgstr ""
 
 #: ../framework/options/taxonomies.php:7
-msgid ""
-"Select taxonomies (type, status, country, city, state, features, areas, "
-"labels) pages layout"
+msgid "Select taxonomies (type, status, country, city, state, features, areas, labels) pages layout"
 msgstr ""
 
 #: ../framework/options/taxonomies.php:35
@@ -12193,9 +11961,7 @@ msgid "Content Position"
 msgstr ""
 
 #: ../framework/options/taxonomies.php:36
-msgid ""
-"Select content position for taxonomies pages. Content can be added in "
-"desciption field for each taxonomy"
+msgid "Select content position for taxonomies pages. Content can be added in desciption field for each taxonomy"
 msgstr ""
 
 #: ../framework/options/taxonomies.php:38
@@ -12280,10 +12046,7 @@ msgid "Guide"
 msgstr ""
 
 #: ../framework/options/topbar.php:129
-msgid ""
-"Please find full list of available currencies at <a target=\"_blank\" "
-"href=\"https://openexchangerates.org/currencies\">https://openexchangerates."
-"org/currencies</a><br/>Add api key under Houzez -> Currency Converter API"
+msgid "Please find full list of available currencies at <a target=\"_blank\" href=\"https://openexchangerates.org/currencies\">https://openexchangerates.org/currencies</a><br/>Add api key under Houzez -> Currency Converter API"
 msgstr ""
 
 #: ../framework/options/topbar.php:134
@@ -12291,9 +12054,7 @@ msgid "Base Currency"
 msgstr ""
 
 #: ../framework/options/topbar.php:135
-msgid ""
-"Please select base currency which will use as base currency for all "
-"conversions."
+msgid "Please select base currency which will use as base currency for all conversions."
 msgstr ""
 
 #: ../framework/options/topbar.php:143
@@ -13544,9 +13305,7 @@ msgid "Make Featured text"
 msgstr ""
 
 #: ../framework/options/translation.php:1929
-msgid ""
-"To mark an image as featured, click the star icon. If no image is marked as "
-"featured, the first image will be considered the featured image."
+msgid "To mark an image as featured, click the star icon. If no image is marked as featured, the first image will be considered the featured image."
 msgstr ""
 
 #: ../framework/options/translation.php:1935
@@ -14029,9 +13788,7 @@ msgid "Listing IDs Tooltp"
 msgstr ""
 
 #: ../framework/options/translation.php:2573
-msgid ""
-"If the sub-properties are separated listings, use the box above to enter the "
-"listing IDs (Example: 4,5,6)"
+msgid "If the sub-properties are separated listings, use the box above to enter the listing IDs (Example: 4,5,6)"
 msgstr ""
 
 #: ../framework/options/translation.php:2595
@@ -14204,9 +13961,7 @@ msgid "Webhook URL"
 msgstr ""
 
 #: ../framework/options/webhooks.php:15
-msgid ""
-"Enter the integration URL (like Zapier) that will receive the form's "
-"submitted data."
+msgid "Enter the integration URL (like Zapier) that will receive the form's submitted data."
 msgstr ""
 
 #: ../framework/options/webhooks.php:16
@@ -14303,9 +14058,7 @@ msgid "Height of the space(px)"
 msgstr ""
 
 #: ../framework/vc_extend.php:186
-msgid ""
-"Set height of the space. You can add white space between elements to "
-"separate them beautifully."
+msgid "Set height of the space. You can add white space between elements to separate them beautifully."
 msgstr ""
 
 #: ../framework/vc_extend.php:209
@@ -14443,9 +14196,7 @@ msgstr "Istaknute nekretnine"
 #: ../framework/vc_extend.php:1763 ../framework/vc_extend.php:2000
 #: ../framework/vc_extend.php:2264 ../framework/vc_extend.php:2499
 #: ../framework/vc_extend.php:2964
-msgid ""
-"You can make a post featured by clicking featured properties checkbox while "
-"add/edit post"
+msgid "You can make a post featured by clicking featured properties checkbox while add/edit post"
 msgstr ""
 
 #: ../framework/vc_extend.php:346 ../framework/vc_extend.php:521
@@ -14826,10 +14577,7 @@ msgid "Blog Posts Carousel"
 msgstr ""
 
 #: ../framework/vc_extend.php:3752 ../framework/vc_extend.php:3862
-msgid ""
-"Please set an icon. The entire list of icons can be found at <a "
-"href='https://fontawesome.com/icons' target='_blank'>FontAwesome project "
-"page</a>."
+msgid "Please set an icon. The entire list of icons can be found at <a href='https://fontawesome.com/icons' target='_blank'>FontAwesome project page</a>."
 msgstr ""
 
 #: ../framework/vc_extend.php:3942
@@ -15251,14 +14999,11 @@ msgid "Agency Sidebar"
 msgstr ""
 
 #: ../functions.php:425
-msgid ""
-"Widgets in this area will be shown in agencies template and agency detail "
-"page."
+msgid "Widgets in this area will be shown in agencies template and agency detail page."
 msgstr ""
 
 #: ../functions.php:434
-msgid ""
-"Widgets in this area will be shown in agents template and angent detail page."
+msgid "Widgets in this area will be shown in agents template and angent detail page."
 msgstr ""
 
 #: ../functions.php:441
@@ -15757,9 +15502,7 @@ msgid "This listing expired"
 msgstr ""
 
 #: ../property-details/partials/login_required.php:33
-msgid ""
-"To view this listing please <a class=\"hhh_login\" href=\"#\" data-"
-"toggle=\"modal\" data-target=\"#login-register-form\">sign in</a>."
+msgid "To view this listing please <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal\" data-target=\"#login-register-form\">sign in</a>."
 msgstr ""
 
 #: ../property-details/partials/login_required.php:36
@@ -15768,9 +15511,7 @@ msgstr ""
 
 #: ../property-details/partials/login_required.php:41
 #: ../template-parts/reviews/form.php:47
-msgid ""
-"Don’t you have an account? <a class=\"hhh_regis\" href=\"#\" data-"
-"toggle=\"modal\" data-target=\"#login-register-form\">Register</a>"
+msgid "Don’t you have an account? <a class=\"hhh_regis\" href=\"#\" data-toggle=\"modal\" data-target=\"#login-register-form\">Register</a>"
 msgstr ""
 
 #: ../property-details/partials/yelp.php:23
@@ -16033,9 +15774,7 @@ msgid "Contact Name"
 msgstr ""
 
 #: ../template-parts/dashboard/board/deals/deal-item.php:50
-msgid ""
-"New Lead, Meeting Scheduled, Qualified, Proposal Sent, Called, Negotiation, "
-"Email Sent"
+msgid "New Lead, Meeting Scheduled, Qualified, Proposal Sent, Called, Negotiation, Email Sent"
 msgstr ""
 
 #: ../template-parts/dashboard/board/deals/deal-item.php:61
@@ -16044,8 +15783,7 @@ msgid "Next Action"
 msgstr ""
 
 #: ../template-parts/dashboard/board/deals/deal-item.php:64
-msgid ""
-"Qualification, Demo, Call, Send a Proposal, Send an Email, Follow Up, Meeting"
+msgid "Qualification, Demo, Call, Send a Proposal, Send an Email, Follow Up, Meeting"
 msgstr ""
 
 #: ../template-parts/dashboard/board/deals/deal-item.php:75
@@ -16697,9 +16435,7 @@ msgid "Do you have an account?"
 msgstr ""
 
 #: ../template-parts/dashboard/submit/account.php:10
-msgid ""
-"If you don't have an account you can create one below by entering your email "
-"address. Your account details will be confirmed via email. Otherwise you can "
+msgid "If you don't have an account you can create one below by entering your email address. Your account details will be confirmed via email. Otherwise you can "
 msgstr ""
 
 #: ../template-parts/dashboard/submit/account.php:20
@@ -16737,9 +16473,7 @@ msgstr ""
 
 #: ../template-parts/dashboard/submit/edit-property-form.php:50
 #: ../template-parts/dashboard/submit/submit-property-form.php:47
-msgid ""
-"Your current package doesn\\'t let you publish more properties! You need to "
-"upgrade your membership."
+msgid "Your current package doesn\\'t let you publish more properties! You need to upgrade your membership."
 msgstr ""
 
 #: ../template-parts/dashboard/submit/edit-property-form.php:51
@@ -16766,8 +16500,7 @@ msgid "<strong>Error!</strong> Upload at least one image."
 msgstr ""
 
 #: ../template-parts/dashboard/submit/edit-property-form.php:186
-msgid ""
-"You are not logged in or This property does not belong to logged in user."
+msgid "You are not logged in or This property does not belong to logged in user."
 msgstr ""
 
 #: ../template-parts/dashboard/submit/edit-property-form.php:189
@@ -16886,12 +16619,8 @@ msgid "Reset Password"
 msgstr "Reset lozinke"
 
 #: ../template-parts/login-register/modal-reset-password-form.php:12
-msgid ""
-"Please enter your username or email address. You will receive a link to "
-"create a new password via email."
-msgstr ""
-"Unesite svoje korisničko ime i adresu e-pošte. Na vašu adresu e-pošte "
-"poslati ćemo vam poruku s poveznicom za kreiranje nove lozinke."
+msgid "Please enter your username or email address. You will receive a link to create a new password via email."
+msgstr "Unesite svoje korisničko ime i adresu e-pošte. Na vašu adresu e-pošte poslati ćemo vam poruku s poveznicom za kreiranje nove lozinke."
 
 #: ../template-parts/login-register/modal-reset-password-form.php:15
 msgid "Enter your username or email"
@@ -16907,8 +16636,7 @@ msgstr ""
 
 #: ../template-parts/login-register/register-form.php:100
 #, php-format
-msgid ""
-"I agree with your <a target=\"_blank\" href=\"%s\">Terms & Conditions</a>"
+msgid "I agree with your <a target=\"_blank\" href=\"%s\">Terms & Conditions</a>"
 msgstr ""
 
 #: ../template-parts/login-register/register-form.php:149
@@ -17003,14 +16731,11 @@ msgstr ""
 #: ../template-parts/membership/payment-method.php:145
 #: ../template-parts/membership/payment-method.php:159
 #, php-format
-msgid ""
-"By clicking \"Complete Membership\" you agree to our <a target=\"_blank\"  "
-"href=\"%s\">Terms & Conditions</a>"
+msgid "By clicking \"Complete Membership\" you agree to our <a target=\"_blank\"  href=\"%s\">Terms & Conditions</a>"
 msgstr ""
 
 #: ../template-parts/membership/payment-method.php:149
-msgid ""
-"You have already used your free package, please choose different package."
+msgid "You have already used your free package, please choose different package."
 msgstr ""
 
 #: ../template-parts/membership/per-listing/payment-method.php:89
@@ -17019,9 +16744,7 @@ msgstr ""
 
 #: ../template-parts/membership/per-listing/payment-method.php:91
 #, php-format
-msgid ""
-"By clicking \"Complete Payment\" you agree to our <a target=\"_blank\"  "
-"href=\"%s\">Terms & Conditions</a>"
+msgid "By clicking \"Complete Payment\" you agree to our <a target=\"_blank\"  href=\"%s\">Terms & Conditions</a>"
 msgstr ""
 
 #: ../template-parts/membership/per-listing/price.php:22
@@ -17093,8 +16816,7 @@ msgstr ""
 
 #: ../template-parts/realtors/contact-form.php:111
 #, php-format
-msgid ""
-"Hi %s, I saw your profile on %s and wanted to see if i can get some help"
+msgid "Hi %s, I saw your profile on %s and wanted to see if i can get some help"
 msgstr ""
 
 #: ../template-parts/realtors/rating.php:28
@@ -17110,9 +16832,7 @@ msgid "Update Review"
 msgstr ""
 
 #: ../template-parts/reviews/form.php:40
-msgid ""
-"Review this listing <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal\" "
-"data-target=\"#login-register-form\">sign in</a>."
+msgid "Review this listing <a class=\"hhh_login\" href=\"#\" data-toggle=\"modal\" data-target=\"#login-register-form\">sign in</a>."
 msgstr ""
 
 #: ../template-parts/reviews/form.php:43
@@ -17190,9 +16910,7 @@ msgid "Log in | Register"
 msgstr ""
 
 #: ../template/template-login.php:36
-msgid ""
-"We are pleased to inform you that your email address has been successfully "
-"verified. You can now log in to your account."
+msgid "We are pleased to inform you that your email address has been successfully verified. You can now log in to your account."
 msgstr ""
 
 #: ../template/template-login.php:43
@@ -17218,9 +16936,7 @@ msgid "You don't have any favorite listings yet!"
 msgstr ""
 
 #: ../template/user_dashboard_gdpr.php:31
-msgid ""
-"An email will be sent to the user at this email address asking them to "
-"verify the request."
+msgid "An email will be sent to the user at this email address asking them to verify the request."
 msgstr ""
 
 #: ../template/user_dashboard_gdpr.php:33
@@ -17839,8 +17555,8 @@ msgstr ""
 
 #~ msgid "html_lang_attribute"
 #~ msgstr "hr"
-
 #~ msgctxt "text direction"
+
 #~ msgid "ltr"
 #~ msgstr "ltr"
 
@@ -17918,44 +17634,44 @@ msgstr ""
 
 #~ msgid "Run %s"
 #~ msgstr "Pokreni %s"
-
 #~ msgctxt "theme"
+
 #~ msgid "Activate %s"
 #~ msgstr "Aktiviraj %s"
-
 #~ msgctxt "plugin"
+
 #~ msgid "Installing %s..."
 #~ msgstr "Instaliranje %s..."
-
 #~ msgctxt "theme"
+
 #~ msgid "Installing %s..."
 #~ msgstr "Instaliranje %s..."
-
 #~ msgctxt "plugin"
+
 #~ msgid "%s installed!"
 #~ msgstr "%s instaliran!"
-
 #~ msgctxt "theme"
+
 #~ msgid "%s installed!"
 #~ msgstr "%s instalirana!"
-
 #~ msgctxt "plugin"
+
 #~ msgid "%s installation failed"
 #~ msgstr "Neuspjela instalacija %s"
-
 #~ msgctxt "theme"
+
 #~ msgid "%s installation failed"
 #~ msgstr "Neuspjela instalacija %s"
-
 #~ msgctxt "plugin"
+
 #~ msgid "Network Activate %s"
 #~ msgstr "Mrežno aktiviraj %s"
-
 #~ msgctxt "plugin"
+
 #~ msgid "Activate %s"
 #~ msgstr "Aktiviraj %s"
-
 #~ msgctxt "theme"
+
 #~ msgid "Network Activate %s"
 #~ msgstr "Mrežno aktiviraj %s"
 
@@ -17975,8 +17691,8 @@ msgstr ""
 
 #~ msgid "Sorry, you are not allowed to edit pages."
 #~ msgstr "Nažalost, nemate dopuštenje za uređivanje stranica."
-
 #~ msgctxt "Comment number declension: on or off"
+
 #~ msgid "off"
 #~ msgstr "on"
 
@@ -18043,8 +17759,8 @@ msgstr ""
 
 #~ msgid "Unable to retrieve the error message from MySQL"
 #~ msgstr "Nije moguće dohvatiti poruku greške iz MySQL"
-
 #~ msgctxt "site"
+
 #~ msgid "&larr; Back to %s"
 #~ msgstr "&larr; Povratak na %s"
 
@@ -18075,8 +17791,8 @@ msgstr ""
 
 #~ msgid "Sorry, you are not allowed to do that."
 #~ msgstr "Nažalost, nemate dopuštenje za tu radnju."
-
 #~ msgctxt "password strength"
+
 #~ msgid "Password strength unknown"
 #~ msgstr "Nepoznata jačina lozinke"
 
@@ -18130,6 +17846,7 @@ msgstr ""
 #~ msgstr "Neispravna vrijednost."
 
 #~ msgid "There is %s invalid setting."
+
 #~ msgid_plural "There are %s invalid settings."
 #~ msgstr[0] "Postoji %s neispravna postavka."
 #~ msgstr[1] "Postoje %s neispravne postavke."
@@ -18230,8 +17947,8 @@ msgstr ""
 #~ msgstr ""
 #~ "<strong>GREŠKA</strong>: Lozinka koju ste unijeli za adresu e-pošte %s je "
 #~ "netočna."
-
 #~ msgctxt "user dropdown"
+
 #~ msgid "%1$s (%2$s)"
 #~ msgstr "%1$s (%2$s)"
 
@@ -18243,8 +17960,8 @@ msgstr ""
 
 #~ msgid "Unregistering a built-in taxonomy is not allowed"
 #~ msgstr "Odregistrirati ugrađenu taksonomiju nije dozvoljeno."
-
 #~ msgctxt "post status"
+
 #~ msgid "Trash"
 #~ msgstr "Smeće"
 
@@ -18274,28 +17991,28 @@ msgstr ""
 #~ msgstr ""
 #~ "<strong>GREŠKA</strong>:Neispravno korisničko ime, adresa e-pošte ili "
 #~ "neispravna lozinka."
-
 #~ msgctxt "post password form"
+
 #~ msgid "Enter"
 #~ msgstr "Unos"
-
 #~ msgctxt "post status"
+
 #~ msgid "Published"
 #~ msgstr "Objavljeno"
-
 #~ msgctxt "post status"
+
 #~ msgid "Scheduled"
 #~ msgstr "Tempirano"
-
 #~ msgctxt "post status"
+
 #~ msgid "Draft"
 #~ msgstr "Skica"
-
 #~ msgctxt "post status"
+
 #~ msgid "Private"
 #~ msgstr "Privatno"
-
 #~ msgctxt "post status"
+
 #~ msgid "Pending"
 #~ msgstr "Na čekanju"
 
@@ -18330,16 +18047,16 @@ msgstr ""
 #~ msgstr ""
 #~ "Djelomični prikaz treba ispisati sadržaj (echo) ili vratiti niz sadržaja "
 #~ "(string ili array), ali ne oboje."
-
 #~ msgctxt "comment status"
+
 #~ msgid "Approved"
 #~ msgstr "Odobreno"
-
 #~ msgctxt "comment status"
+
 #~ msgid "Spam"
 #~ msgstr "Spam"
-
 #~ msgctxt "comment status"
+
 #~ msgid "Trash"
 #~ msgstr "Smeće"
 
@@ -18397,12 +18114,12 @@ msgstr ""
 
 #~ msgid "Invalid parameter."
 #~ msgstr "Neispravni parametar."
-
 #~ msgctxt "menu location"
+
 #~ msgid "(Current: %s)"
 #~ msgstr "(Trenutno: %s)"
-
 #~ msgctxt "menu"
+
 #~ msgid "(Currently set to: %s)"
 #~ msgstr "(Trenutno postavljeno na: %s)"
 
@@ -18456,32 +18173,32 @@ msgstr ""
 
 #~ msgid "Term ID is shared between multiple taxonomies"
 #~ msgstr "Više taksonomija dijeli ID pojma."
-
 #~ msgctxt "genitive"
+
 #~ msgid "June"
 #~ msgstr "lipnja"
-
 #~ msgctxt "genitive"
+
 #~ msgid "July"
 #~ msgstr "srpnja"
-
 #~ msgctxt "genitive"
+
 #~ msgid "August"
 #~ msgstr "kolovoza"
-
 #~ msgctxt "genitive"
+
 #~ msgid "September"
 #~ msgstr "rujna"
-
 #~ msgctxt "genitive"
+
 #~ msgid "October"
 #~ msgstr "listopada"
-
 #~ msgctxt "genitive"
+
 #~ msgid "November"
 #~ msgstr "studenoga"
-
 #~ msgctxt "genitive"
+
 #~ msgid "December"
 #~ msgstr "prosinca"
 
@@ -18489,28 +18206,28 @@ msgstr ""
 #~ "Term meta cannot be added to terms that are shared between taxonomies."
 #~ msgstr ""
 #~ "Meta podatak pojma ne može biti dodan pojmovima koje dijele taksonomije."
-
 #~ msgctxt "genitive"
+
 #~ msgid "January"
 #~ msgstr "siječnja"
-
 #~ msgctxt "genitive"
+
 #~ msgid "February"
 #~ msgstr "veljače"
-
 #~ msgctxt "genitive"
+
 #~ msgid "March"
 #~ msgstr "ožujka"
-
 #~ msgctxt "genitive"
+
 #~ msgid "April"
 #~ msgstr "travnja"
-
 #~ msgctxt "genitive"
+
 #~ msgid "May"
 #~ msgstr "svibnja"
-
 #~ msgctxt "decline months names: on or off"
+
 #~ msgid "off"
 #~ msgstr "on"
 
@@ -18777,87 +18494,87 @@ msgstr ""
 
 #~ msgid "Site names can only contain lowercase letters (a-z) and numbers."
 #~ msgstr "Imena web-stranica mogu sadržavati samo mala slova (a-z) i brojeve."
-
 #~ msgctxt "November abbreviation"
+
 #~ msgid "Nov"
 #~ msgstr "stu."
-
 #~ msgctxt "December abbreviation"
+
 #~ msgid "Dec"
 #~ msgstr "pro."
-
 #~ msgctxt "playlist item title"
+
 #~ msgid "&#8220;%s&#8221;"
 #~ msgstr "&#8220;%s&#8221;"
 
 #~ msgid "Usernames can only contain lowercase letters (a-z) and numbers."
 #~ msgstr "Korisnička imena mogu sadržavati samo mala slova (a-z) i brojeve."
-
 #~ msgctxt "July abbreviation"
+
 #~ msgid "Jul"
 #~ msgstr "srp."
-
 #~ msgctxt "August abbreviation"
+
 #~ msgid "Aug"
 #~ msgstr "kol."
-
 #~ msgctxt "September abbreviation"
+
 #~ msgid "Sep"
 #~ msgstr "ruj."
-
 #~ msgctxt "October abbreviation"
+
 #~ msgid "Oct"
 #~ msgstr "lis."
-
 #~ msgctxt "January abbreviation"
+
 #~ msgid "Jan"
 #~ msgstr "sij."
-
 #~ msgctxt "February abbreviation"
+
 #~ msgid "Feb"
 #~ msgstr "velj."
-
 #~ msgctxt "March abbreviation"
+
 #~ msgid "Mar"
 #~ msgstr "ožu."
-
 #~ msgctxt "April abbreviation"
+
 #~ msgid "Apr"
 #~ msgstr "tra."
-
 #~ msgctxt "May abbreviation"
+
 #~ msgid "May"
 #~ msgstr "svi."
-
 #~ msgctxt "June abbreviation"
+
 #~ msgid "Jun"
 #~ msgstr "lip."
-
 #~ msgctxt "Wednesday initial"
+
 #~ msgid "W"
 #~ msgstr "S"
-
 #~ msgctxt "Thursday initial"
+
 #~ msgid "T"
 #~ msgstr "Č"
-
 #~ msgctxt "Friday initial"
+
 #~ msgid "F"
 #~ msgstr "P"
-
 #~ msgctxt "Saturday initial"
+
 #~ msgid "S"
 #~ msgstr "S"
-
 #~ msgctxt "Sunday initial"
+
 #~ msgid "S"
 #~ msgstr "N"
-
 #~ msgctxt "Monday initial"
+
 #~ msgid "M"
 #~ msgstr "P"
-
 #~ msgctxt "Tuesday initial"
+
 #~ msgid "T"
 #~ msgstr "U"
 
@@ -18881,6 +18598,7 @@ msgstr ""
 #~ "Kopirajte i zalijepite ovaj kod u vašu web-stranicu kako bi ga ugradili."
 
 #~ msgid "%s <span class=\"screen-reader-text\">Comment</span>"
+
 #~ msgid_plural "%s <span class=\"screen-reader-text\">Comments</span>"
 #~ msgstr[0] "%s <span class=\"screen-reader-text\">komentar</span>"
 #~ msgstr[1] "%s <span class=\"screen-reader-text\">komentara</span>"
@@ -18967,8 +18685,8 @@ msgstr ""
 
 #~ msgid "Toggle section: %s"
 #~ msgstr "Odaberi dio: %s"
-
 #~ msgctxt "Word count type. Do not translate!"
+
 #~ msgid "words"
 #~ msgstr "words"
 
@@ -19010,20 +18728,20 @@ msgstr ""
 
 #~ msgid "Registration confirmation will be emailed to you."
 #~ msgstr "Potvrda registracije biti će poslana na adresu vaše e-pošte. "
-
 #~ msgctxt "password mismatch"
+
 #~ msgid "Mismatch"
 #~ msgstr "Neslaganje"
-
 #~ msgctxt "password strength"
+
 #~ msgid "Very weak"
 #~ msgstr "Vrlo slabo"
-
 #~ msgctxt "password strength"
+
 #~ msgid "Weak"
 #~ msgstr "Slabo"
-
 #~ msgctxt "password strength"
+
 #~ msgid "Strong"
 #~ msgstr "Jako"
 
@@ -19098,8 +18816,8 @@ msgstr ""
 
 #~ msgid "Close reorder mode"
 #~ msgstr "Zatvori način rada za preslagavanje"
-
 #~ msgctxt "Missing menu name."
+
 #~ msgid "(unnamed)"
 #~ msgstr "(neimenovano)"
 
@@ -19117,8 +18835,8 @@ msgstr ""
 
 #~ msgid "%1$s (%2$d)"
 #~ msgstr "%1$s (%2$d)"
-
 #~ msgctxt "HTML tag"
+
 #~ msgid "Preformatted"
 #~ msgstr "Predformatirano"
 
@@ -19272,8 +18990,8 @@ msgstr ""
 
 #~ msgid "Remove poster image"
 #~ msgstr "Ukloni poster sliku"
-
 #~ msgctxt "media"
+
 #~ msgid "Remove video track"
 #~ msgstr "Ukloni video zapis"
 
@@ -19282,16 +19000,16 @@ msgstr ""
 
 #~ msgid "Remove video source"
 #~ msgstr "Ukloni video izvor"
-
 #~ msgctxt "Comma-separated list of replacement words in your language"
+
 #~ msgid ""
 #~ "&#8217;tain&#8217;t,&#8217;twere,&#8217;twas,&#8217;tis,&#8217;twill,"
 #~ "&#8217;til,&#8217;bout,&#8217;nuff,&#8217;round,&#8217;cause,&#8217;em"
 #~ msgstr ""
 #~ "&#8217;tain&#8217;t,&#8217;twere,&#8217;twas,&#8217;tis,&#8217;twill,"
 #~ "&#8217;til,&#8217;bout,&#8217;nuff,&#8217;round,&#8217;cause,&#8217;em"
-
 #~ msgctxt "Comma-separated list of words to texturize in your language"
+
 #~ msgid "'tain't,'twere,'twas,'tis,'twill,'til,'bout,'nuff,'round,'cause,'em"
 #~ msgstr "'tain't,'twere,'twas,'tis,'twill,'til,'bout,'nuff,'round,'cause,'em"
 
@@ -19443,8 +19161,8 @@ msgstr ""
 
 #~ msgid "Menu item is now a sub-item"
 #~ msgstr "Stavka izbornika je sad pod-stavka"
-
 #~ msgctxt "nav menu home label"
+
 #~ msgid "Home"
 #~ msgstr "Naslovnica"
 
@@ -19477,12 +19195,12 @@ msgstr ""
 
 #~ msgid "Automatically add new top-level pages to this menu"
 #~ msgstr "Automatski dodaj nove glavne stranice u ovaj izbornik"
-
 #~ msgctxt "Cancel reordering menu items in Customizer"
+
 #~ msgid "Done"
 #~ msgstr "Gotovo"
-
 #~ msgctxt "Reorder menu items in Customizer"
+
 #~ msgid "Reorder"
 #~ msgstr "Presloži"
 
@@ -19539,8 +19257,8 @@ msgstr ""
 
 #~ msgid "Update Failed!"
 #~ msgstr "Ažuriranje nije uspjelo!"
-
 #~ msgctxt "theme"
+
 #~ msgid "Change"
 #~ msgstr "Promijeni"
 
@@ -19548,6 +19266,7 @@ msgstr ""
 #~ msgstr "Isključi ovu napomenu."
 
 #~ msgid "%1$s response to %2$s"
+
 #~ msgid_plural "%1$s responses to %2$s"
 #~ msgstr[0] "%1$s komentar na %2$s"
 #~ msgstr[1] "%1$s komentara na %2$s"
@@ -19561,6 +19280,7 @@ msgstr ""
 
 #~ msgid ""
 #~ "Your theme supports %s menu. Select which menu appears in each location."
+
 #~ msgid_plural ""
 #~ "Your theme supports %s menus. Select which menu appears in each location."
 #~ msgstr[0] ""
@@ -19657,8 +19377,8 @@ msgstr ""
 
 #~ msgid "Author: %1$s (IP: %2$s, %3$s)"
 #~ msgstr "Autor: %1$s (IP: %2$s, %3$s)"
-
 #~ msgctxt "revision date format"
+
 #~ msgid "F j, Y @ H:i:s"
 #~ msgstr "j. F Y. @ H:i:s"
 
@@ -19708,6 +19428,7 @@ msgstr ""
 #~ msgstr "1 komentar<span class=\"screen-reader-text\"> na %s</span>"
 
 #~ msgid "%1$s Comment<span class=\"screen-reader-text\"> on %2$s</span>"
+
 #~ msgid_plural ""
 #~ "%1$s Comments<span class=\"screen-reader-text\"> on %2$s</span>"
 #~ msgstr[0] "%1$s komentar<span class=\"screen-reader-text\"> za %2$s</span>"
@@ -19752,12 +19473,12 @@ msgstr ""
 
 #~ msgid "Live Preview"
 #~ msgstr "Pretpregled uživo"
-
 #~ msgctxt "previous post"
+
 #~ msgid "Previous"
 #~ msgstr "Prethodna"
-
 #~ msgctxt "next post"
+
 #~ msgid "Next"
 #~ msgstr "Slijedeća"
 
@@ -19812,8 +19533,8 @@ msgstr ""
 
 #~ msgid "A term with the name provided already exists in this taxonomy."
 #~ msgstr "Pojam s nazivom i slugom već postoji u ovoj taksonomiji."
-
 #~ msgctxt "verb"
+
 #~ msgid "Trash"
 #~ msgstr "Smeće"
 
@@ -19831,8 +19552,8 @@ msgstr ""
 
 #~ msgid "URL: %s"
 #~ msgstr "URL: %s"
-
 #~ msgctxt "noun"
+
 #~ msgid "Trash"
 #~ msgstr "Smeće"
 
@@ -19847,12 +19568,12 @@ msgstr ""
 
 #~ msgid "Older posts"
 #~ msgstr "Starije objave"
-
 #~ msgctxt "translations"
+
 #~ msgid "Available"
 #~ msgstr "Dostupni"
-
 #~ msgctxt "translations"
+
 #~ msgid "Installed"
 #~ msgstr "Instalirani"
 
@@ -19864,36 +19585,36 @@ msgstr ""
 
 #~ msgid "%1$s: %2$s"
 #~ msgstr "%1$s: %2$s"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Audio"
 #~ msgstr "Audio"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Chats"
 #~ msgstr "Čavrljanja"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Statuses"
 #~ msgstr "Statusi"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Links"
 #~ msgstr "Poveznice"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Videos"
 #~ msgstr "Videi"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Quotes"
 #~ msgstr "Citati"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Galleries"
 #~ msgstr "Galerije"
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Images"
 #~ msgstr "Slike"
 
@@ -19902,12 +19623,12 @@ msgstr ""
 
 #~ msgid "Day: %s"
 #~ msgstr "Dan: %s"
-
 #~ msgctxt "daily archives date format"
+
 #~ msgid "F j, Y"
 #~ msgstr "j. F Y."
-
 #~ msgctxt "post format archive title"
+
 #~ msgid "Asides"
 #~ msgstr "Crtice"
 
@@ -19939,12 +19660,12 @@ msgstr ""
 #~ msgstr ""
 #~ "Neispravna vrijednost %1$s za %2$s. Očekivana vrijednost bi trebala biti "
 #~ "između %3$s i %4$s."
-
 #~ msgctxt "vertical table cell alignment"
+
 #~ msgid "V Align"
 #~ msgstr "V poravnavanje"
-
 #~ msgctxt "horizontal table cell alignment"
+
 #~ msgid "H Align"
 #~ msgstr "H poravnavanje"
 
@@ -19953,8 +19674,8 @@ msgstr ""
 
 #~ msgid "No color"
 #~ msgstr "Bez boje"
-
 #~ msgctxt "label for custom color"
+
 #~ msgid "Custom..."
 #~ msgstr "Prilagođena..."
 
@@ -19972,32 +19693,32 @@ msgstr ""
 
 #~ msgid "Change File"
 #~ msgstr "Promijeni zapis"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "Format"
 #~ msgstr "Format"
-
 #~ msgctxt "add new on admin bar"
+
 #~ msgid "Page"
 #~ msgstr "Stranica"
-
 #~ msgctxt "add new from admin bar"
+
 #~ msgid "Link"
 #~ msgstr "Poveznica"
-
 #~ msgctxt "add new media"
+
 #~ msgid "Add New"
 #~ msgstr "Dodaj novi"
-
 #~ msgctxt "post type general name"
+
 #~ msgid "Media"
 #~ msgstr "Medijski zapisi"
-
 #~ msgctxt "add new on admin bar"
+
 #~ msgid "Post"
 #~ msgstr "Objava"
-
 #~ msgctxt "list style"
+
 #~ msgid "Default"
 #~ msgstr "Izvorno"
 
@@ -20035,8 +19756,8 @@ msgstr ""
 
 #~ msgid "Delete Selected"
 #~ msgstr "Obriši odabrano"
-
 #~ msgctxt "missing menu item navigation label"
+
 #~ msgid "(no label)"
 #~ msgstr "(nema etikete)"
 
@@ -20178,8 +19899,8 @@ msgstr ""
 
 #~ msgid "Shift-click to edit this widget."
 #~ msgstr "Shift-klik za uređivanje ovog widgeta."
-
 #~ msgctxt "HTML tag"
+
 #~ msgid "Address"
 #~ msgstr "Adresa"
 
@@ -20239,8 +19960,8 @@ msgstr ""
 
 #~ msgid "Genre"
 #~ msgstr "Žanr"
-
 #~ msgctxt "video or audio"
+
 #~ msgid "Length"
 #~ msgstr "Duljina"
 
@@ -20267,8 +19988,8 @@ msgstr ""
 
 #~ msgid "Edit Original"
 #~ msgstr "Uredi original"
-
 #~ msgctxt "table cell alignment attribute"
+
 #~ msgid "None"
 #~ msgstr "Nijedan"
 
@@ -20289,23 +20010,23 @@ msgstr ""
 
 #~ msgid "Image Title Attribute"
 #~ msgstr "Atribut naziva slike"
-
 #~ msgctxt "Move widget"
+
 #~ msgid "Move"
 #~ msgstr "Pomakni"
 
 #~ msgid "Set image"
 #~ msgstr "Postavi sliku"
-
 #~ msgctxt "TinyMCE"
+
 #~ msgid "Headings"
 #~ msgstr "Zaglavlja"
-
 #~ msgctxt "Reorder widgets in Customizer"
+
 #~ msgid "Reorder"
 #~ msgstr "Reorganizacija"
-
 #~ msgctxt "Cancel reordering widgets in Customizer"
+
 #~ msgid "Done"
 #~ msgstr "Gotovo"
 
@@ -20320,8 +20041,8 @@ msgstr ""
 
 #~ msgid "Save and preview changes before publishing them."
 #~ msgstr "Snimi i pretpregledaj promijene prije objave."
-
 #~ msgctxt "auto preload"
+
 #~ msgid "Auto"
 #~ msgstr "Auto"
 
@@ -20333,186 +20054,186 @@ msgstr ""
 
 #~ msgid "Tracks (subtitles, captions, descriptions, chapters, or metadata)"
 #~ msgstr "Zapisi (podnatpisi, natpisi, opisi, poglavlja ili metapodaci)"
-
 #~ msgctxt "TinyMCE"
+
 #~ msgid "Formats"
 #~ msgstr "Formati"
-
 #~ msgctxt "table column"
+
 #~ msgid "Column"
 #~ msgstr "Stupac"
-
 #~ msgctxt "TinyMCE"
+
 #~ msgid "Blocks"
 #~ msgstr "Blokovi"
-
 #~ msgctxt "HTML tag"
+
 #~ msgid "Div"
 #~ msgstr "Div"
-
 #~ msgctxt "HTML tag"
+
 #~ msgid "Pre"
 #~ msgstr "Pre"
 
 #~ msgid "Bulleted list"
 #~ msgstr "Nebrojčani popis"
-
 #~ msgctxt "list style"
+
 #~ msgid "Square"
 #~ msgstr "Četverokut"
-
 #~ msgctxt "list style"
+
 #~ msgid "Circle"
 #~ msgstr "Krug"
-
 #~ msgctxt "list style"
+
 #~ msgid "Disc"
 #~ msgstr "Disk"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Replace"
 #~ msgstr "Zamijeni"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Next"
 #~ msgstr "Sljedeće"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Prev"
 #~ msgstr "Prethodno"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Whole words"
 #~ msgstr "Cijele riječi"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Replace with"
 #~ msgstr "Zamijeni sa"
-
 #~ msgctxt "table cell"
+
 #~ msgid "Cell"
 #~ msgstr "Ćelija"
-
 #~ msgctxt "table header"
+
 #~ msgid "Header"
 #~ msgstr "Zaglavlje"
-
 #~ msgctxt "table body"
+
 #~ msgid "Body"
 #~ msgstr "Tijelo"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "Tools"
 #~ msgstr "Alati"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "View"
 #~ msgstr "Pregled"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "Table"
 #~ msgstr "Tablica"
 
 #~ msgid "Words: %s"
 #~ msgstr "Riječi: %s"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "Edit"
 #~ msgstr "Uredi"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Replace all"
 #~ msgstr "Zamijeni sve"
-
 #~ msgctxt "spellcheck"
+
 #~ msgid "Finish"
 #~ msgstr "Završi"
-
 #~ msgctxt "find/replace"
+
 #~ msgid "Find"
 #~ msgstr "Pronađi"
-
 #~ msgctxt "editor button"
+
 #~ msgid "Right to left"
 #~ msgstr "S desna na lijevo"
-
 #~ msgctxt "editor button"
+
 #~ msgid "Left to right"
 #~ msgstr "S lijeva na desno"
-
 #~ msgctxt "Link anchor (TinyMCE)"
+
 #~ msgid "Anchor"
 #~ msgstr "Sidro"
-
 #~ msgctxt "Link anchors (TinyMCE)"
+
 #~ msgid "Anchors"
 #~ msgstr "Sidra"
-
 #~ msgctxt "TinyMCE"
+
 #~ msgid "Templates"
 #~ msgstr "Predlošci"
-
 #~ msgctxt "editor button"
+
 #~ msgid "Show blocks"
 #~ msgstr "Prikaži blokove"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "Insert"
 #~ msgstr "Unesi"
-
 #~ msgctxt "table cell scope attribute"
+
 #~ msgid "Scope"
 #~ msgstr "Svrha"
-
 #~ msgctxt "HTML elements"
+
 #~ msgid "Inline"
 #~ msgstr "Inline"
-
 #~ msgctxt "list style"
+
 #~ msgid "Lower Greek"
 #~ msgstr "Mala grčka"
-
 #~ msgctxt "list style"
+
 #~ msgid "Lower Alpha"
 #~ msgstr "Mala alfanumerička"
-
 #~ msgctxt "list style"
+
 #~ msgid "Upper Alpha"
 #~ msgstr "Velika alfanumerička"
-
 #~ msgctxt "list style"
+
 #~ msgid "Upper Roman"
 #~ msgstr "Velika rimska"
-
 #~ msgctxt "list style"
+
 #~ msgid "Lower Roman"
 #~ msgstr "Mala rimska"
-
 #~ msgctxt "Name of link anchor (TinyMCE)"
+
 #~ msgid "Name"
 #~ msgstr "Naziv"
-
 #~ msgctxt "spellcheck"
+
 #~ msgid "Ignore all"
 #~ msgstr "Ignoriraj sve"
-
 #~ msgctxt "spellcheck"
+
 #~ msgid "Ignore"
 #~ msgstr "Ignoriraj"
-
 #~ msgctxt "table columns"
+
 #~ msgid "Cols"
 #~ msgstr "Stupci"
-
 #~ msgctxt "table footer"
+
 #~ msgid "Footer"
 #~ msgstr "Podnožje"
-
 #~ msgctxt "TinyMCE"
+
 #~ msgid "Insert template"
 #~ msgstr "Unesi predložak"
-
 #~ msgctxt "TinyMCE menu"
+
 #~ msgid "File"
 #~ msgstr "Zapis"
 
@@ -20548,8 +20269,8 @@ msgstr ""
 
 #~ msgid "Show Tracklist"
 #~ msgstr "Prikaži listu zapisa"
-
 #~ msgctxt "Search widget"
+
 #~ msgid "Search"
 #~ msgstr "Pretraga"
 
@@ -20673,8 +20394,8 @@ msgstr ""
 
 #~ msgid "Current header"
 #~ msgstr "Trenutno zaglavlje"
-
 #~ msgctxt "custom headers"
+
 #~ msgid "Suggested"
 #~ msgstr "Predloženo"
 
@@ -20822,8 +20543,8 @@ msgstr ""
 
 #~ msgid "No image set"
 #~ msgstr "Slika nije postavljena"
-
 #~ msgctxt "custom headers"
+
 #~ msgid "Previously uploaded"
 #~ msgstr "Prethodno prenijeto"
 
@@ -20853,20 +20574,20 @@ msgstr ""
 
 #~ msgid "An error has occurred. Please reload the page and try again."
 #~ msgstr "Dogodila se greška. Ponovno učitajte stranicu i pokušajte ponovno."
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Sunrise"
 #~ msgstr "Izlazak sunca"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Ectoplasm"
 #~ msgstr "Ektoplazma"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Ocean"
 #~ msgstr "Ocean"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Coffee"
 #~ msgstr "Kava"
 
@@ -20908,27 +20629,27 @@ msgstr ""
 
 #~ msgid "Your site&#8217;s most recent comments."
 #~ msgstr "Najnoviji komentari na vašoj web-stranici."
-
 #~ msgctxt "Open Sans font: on or off"
+
 #~ msgid "on"
 #~ msgstr "on"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Light"
 #~ msgstr "Svijetla"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Midnight"
 #~ msgstr "Ponoćna"
 
 #~ msgid "Use commas instead of %s to separate excluded terms."
 #~ msgstr "Koristite zareze umjesto %s za razdvajanje isključenih pojmova."
-
 #~ msgctxt "Open Sans font: add new subset (greek, cyrillic, vietnamese)"
+
 #~ msgid "no-subset"
 #~ msgstr "no-subset"
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Default"
 #~ msgstr "Izvorno"
 
@@ -20940,8 +20661,8 @@ msgstr ""
 
 #~ msgid "ERROR: This is not a valid feed template."
 #~ msgstr "GREŠKA: Ovo nije ispravan predložak kanala."
-
 #~ msgctxt "Comma-separated list of search stopwords in your language"
+
 #~ msgid ""
 #~ "about,an,are,as,at,be,by,com,for,from,how,in,is,it,of,on,or,that,the,this,"
 #~ "to,was,what,when,where,who,will,with,www"
@@ -20998,18 +20719,21 @@ msgstr ""
 #~ msgstr "Preuzmi zapis"
 
 #~ msgid "%s week"
+
 #~ msgid_plural "%s weeks"
 #~ msgstr[0] "%s tjedan"
 #~ msgstr[1] "%s tjedna"
 #~ msgstr[2] "%s tjedana"
 
 #~ msgid "%s month"
+
 #~ msgid_plural "%s months"
 #~ msgstr[0] "%s mjesec"
 #~ msgstr[1] "%s mjeseca"
 #~ msgstr[2] "%s mjeseci"
 
 #~ msgid "%s year"
+
 #~ msgid_plural "%s years"
 #~ msgstr[0] "%s godina"
 #~ msgstr[1] "%s godine"
@@ -21057,12 +20781,12 @@ msgstr ""
 #~ msgstr ""
 #~ "<strong>GREŠKA</strong>: Nije vas moguće registrirati... kontaktirajte <a "
 #~ "href=\"mailto:%s\">webmastera</a>!"
-
 #~ msgctxt "post revision title extra"
+
 #~ msgid "%1$s [Autosave]"
 #~ msgstr "%1$s [Automatski snimljeno]"
-
 #~ msgctxt "post revision title extra"
+
 #~ msgid "%1$s [Current Revision]"
 #~ msgstr "%1$s [Trenutna revizija]"
 
@@ -21095,23 +20819,23 @@ msgstr ""
 #~ msgstr ""
 #~ "Stranica za prijavu otvoriti će se u novom prozoru. Nakon što se "
 #~ "prijavite možete ju zatvoriti i vratiti se na ovu stranicu."
-
 #~ msgctxt "post revision title"
+
 #~ msgid "%1$s %2$s, %3$s ago (%4$s)"
 #~ msgstr "%1$s %2$s, prije %3$s, (%4$s)"
 
 #~ msgid "%s <span class=\"says\">says:</span>"
 #~ msgstr "%s <span class=\"says\">napisao:</span>"
-
 #~ msgctxt "label"
+
 #~ msgid "Search for:"
 #~ msgstr "Pretraži:"
-
 #~ msgctxt "placeholder"
+
 #~ msgid "Search &hellip;"
 #~ msgstr "Pretraži &hellip;"
-
 #~ msgctxt "submit button"
+
 #~ msgid "Search"
 #~ msgstr "Pretraži"
 
@@ -21120,8 +20844,8 @@ msgstr ""
 
 #~ msgid "No tags found."
 #~ msgstr "Nije pronađena nijedna oznaka."
-
 #~ msgctxt "meta widget link text"
+
 #~ msgid "WordPress.org"
 #~ msgstr "WordPress.org"
 
@@ -21152,8 +20876,8 @@ msgstr ""
 
 #~ msgid "Insert from URL"
 #~ msgstr "Dodaj s URL-a"
-
 #~ msgctxt "Links widget"
+
 #~ msgid "Random"
 #~ msgstr "Nasumice"
 
@@ -21198,18 +20922,21 @@ msgstr ""
 #~ msgstr "Prijenos"
 
 #~ msgid "Image <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Images <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Slika <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Slike <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Slika <span class=\"count\">(%s)</span>"
 
 #~ msgid "Audio <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Audio <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Audio <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Audio <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Audio <span class=\"count\">(%s)</span>"
 
 #~ msgid "Video <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Video <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Video <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Video <span class=\"count\">(%s)</span>"
@@ -21407,8 +21134,8 @@ msgstr ""
 
 #~ msgid "Could not insert term relationship into the database"
 #~ msgstr "Nije moguće unijeti vezani izraz u bazu podataka"
-
 #~ msgctxt "Display name based on first name and last name"
+
 #~ msgid "%1$s %2$s"
 #~ msgstr "%1$s %2$s"
 
@@ -21432,8 +21159,8 @@ msgstr ""
 
 #~ msgid "The role specified is not valid"
 #~ msgstr "Navedena uloga nije valjana."
-
 #~ msgctxt "Uploader: Drop files here - or - Select Files"
+
 #~ msgid "or"
 #~ msgstr "ili"
 
@@ -21469,8 +21196,8 @@ msgstr ""
 
 #~ msgid "Skip to toolbar"
 #~ msgstr "Skoči do alatne trake"
-
 #~ msgctxt "Name for the Text editor tab (formerly HTML)"
+
 #~ msgid "Text"
 #~ msgstr "Tekst"
 
@@ -21704,8 +21431,8 @@ msgstr ""
 
 #~ msgid "Sorry, you are not allowed to edit this post."
 #~ msgstr "Nažalost, nemate dopuštenje za uređivanje ove objave."
-
 #~ msgctxt "tag delimiter"
+
 #~ msgid ","
 #~ msgstr ","
 
@@ -21773,40 +21500,40 @@ msgstr ""
 
 #~ msgid "Sorry, you are not allowed to edit posts in this post type."
 #~ msgstr "Nažalost, nemate dopuštenje za uređivanje ovog tipa objava."
-
 #~ msgctxt "yearly archives date format"
+
 #~ msgid "Y"
 #~ msgstr "Y."
-
 #~ msgctxt "monthly archives date format"
+
 #~ msgid "F Y"
 #~ msgstr "F Y."
-
 #~ msgctxt "opening curly double quote"
+
 #~ msgid "&#8220;"
 #~ msgstr "&#8220;"
-
 #~ msgctxt "closing curly double quote"
+
 #~ msgid "&#8221;"
 #~ msgstr "&#8221;"
-
 #~ msgctxt "apostrophe"
+
 #~ msgid "&#8217;"
 #~ msgstr "&#8217;"
-
 #~ msgctxt "prime"
+
 #~ msgid "&#8242;"
 #~ msgstr "&#8242;"
-
 #~ msgctxt "double prime"
+
 #~ msgid "&#8243;"
 #~ msgstr "&#8243;"
-
 #~ msgctxt "opening curly single quote"
+
 #~ msgid "&#8216;"
 #~ msgstr "&#8216;"
-
 #~ msgctxt "closing curly single quote"
+
 #~ msgid "&#8217;"
 #~ msgstr "&#8217;"
 
@@ -21870,12 +21597,13 @@ msgstr ""
 
 #~ msgid "You are posting comments too quickly. Slow down."
 #~ msgstr "Prebrzo objavljujete komentare. Usporite malo."
-
 #~ msgctxt "admin bar menu group label"
+
 #~ msgid "New"
 #~ msgstr "Novo"
 
 #~ msgid "%s comment awaiting moderation"
+
 #~ msgid_plural "%s comments awaiting moderation"
 #~ msgstr[0] "%s komentar čeka moderiranje."
 #~ msgstr[1] "%s komentara čekaju moderiranje."
@@ -21893,16 +21621,16 @@ msgstr ""
 
 #~ msgid "Please try uploading this file with the %1$sbrowser uploader%2$s."
 #~ msgstr "Pokušajte prenijeti ovaj zapis s %1$sprijenosnikom preglednika%2$s."
-
 #~ msgctxt "links widget"
+
 #~ msgid "All Links"
 #~ msgstr "Sve poveznice"
-
 #~ msgctxt "en dash"
+
 #~ msgid "&#8211;"
 #~ msgstr "&#8211;"
-
 #~ msgctxt "em dash"
+
 #~ msgid "&#8212;"
 #~ msgstr "&#8212;"
 
@@ -21951,6 +21679,7 @@ msgstr ""
 #~ msgstr "Greška pri uspostavi veza s bazom podataka"
 
 #~ msgid "%s Comment"
+
 #~ msgid_plural "%s Comments"
 #~ msgstr[0] "%s komentar"
 #~ msgstr[1] "%s komentara"
@@ -21961,12 +21690,12 @@ msgstr ""
 
 #~ msgid "Network Admin: %s"
 #~ msgstr "Mrežni admin: %s"
-
 #~ msgctxt "taxonomy general name"
+
 #~ msgid "Tags"
 #~ msgstr "Oznake"
-
 #~ msgctxt "taxonomy singular name"
+
 #~ msgid "Tag"
 #~ msgstr "Oznaka"
 
@@ -21995,8 +21724,8 @@ msgstr ""
 
 #~ msgid "This file is not an image. Please try another."
 #~ msgstr "Ovaj zapis nije slika. Pokušajte s drugim."
-
 #~ msgctxt "admin color scheme"
+
 #~ msgid "Blue"
 #~ msgstr "Plava"
 
@@ -22006,12 +21735,12 @@ msgstr ""
 #~ msgstr ""
 #~ "Vremenska zona koju ste unijeli nije ispravna. Izaberite valjanu "
 #~ "vremensku zonu."
-
 #~ msgctxt "add new from admin bar"
+
 #~ msgid "User"
 #~ msgstr "Korisnik"
-
 #~ msgctxt "add new from admin bar"
+
 #~ msgid "Media"
 #~ msgstr "Medijski zapis"
 
@@ -22081,8 +21810,8 @@ msgstr ""
 #~ "There are no HTTP transports available which can complete the requested "
 #~ "request."
 #~ msgstr "Nema dostupnih HTTP veza koje mogu dovršiti ovaj zahtjev."
-
 #~ msgctxt "post format"
+
 #~ msgid "Format"
 #~ msgstr "Format"
 
@@ -22110,8 +21839,8 @@ msgstr ""
 
 #~ msgid "Permalink: %s"
 #~ msgstr "Stalna veza: %s"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Standard"
 #~ msgstr "Članak"
 
@@ -22120,8 +21849,8 @@ msgstr ""
 
 #~ msgid "Your address will be %s."
 #~ msgstr "Vaša adresa će biti %s."
-
 #~ msgctxt "Post format"
+
 #~ msgid "Audio"
 #~ msgstr "Audio"
 
@@ -22144,36 +21873,36 @@ msgstr ""
 #~ msgstr ""
 #~ "Propuštanje cijelog broja objava je zastarjelo. Propustite grupu "
 #~ "argumenata umjesto toga."
-
 #~ msgctxt "Post format"
+
 #~ msgid "Gallery"
 #~ msgstr "Galerija"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Image"
 #~ msgstr "Slika"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Status"
 #~ msgstr "Status"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Video"
 #~ msgstr "Video"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Aside"
 #~ msgstr "Crtica"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Quote"
 #~ msgstr "Citat"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Link"
 #~ msgstr "Poveznica"
-
 #~ msgctxt "Post format"
+
 #~ msgid "Chat"
 #~ msgstr "Čavrljanje"
 
@@ -22303,20 +22032,20 @@ msgstr ""
 #~ msgstr ""
 #~ "Vaš poslužitelj koristi PHP u inačici %1$s ali WordPress %2%s traži "
 #~ "najmanje inačicu %3$s."
-
 #~ msgctxt "Multisite active signup type"
+
 #~ msgid "user"
 #~ msgstr "korisnik"
-
 #~ msgctxt "Multisite active signup type"
+
 #~ msgid "blog"
 #~ msgstr "blog"
-
 #~ msgctxt "Multisite active signup type"
+
 #~ msgid "none"
 #~ msgstr "ništa"
-
 #~ msgctxt "Multisite active signup type"
+
 #~ msgid "all"
 #~ msgstr "sve"
 
@@ -22352,12 +22081,12 @@ msgstr ""
 
 #~ msgid "Choose from the most used tags"
 #~ msgstr "Odaberi između najkorištenijih oznaka"
-
 #~ msgctxt "taxonomy singular name"
+
 #~ msgid "Category"
 #~ msgstr "Kategorija"
-
 #~ msgctxt "taxonomy general name"
+
 #~ msgid "Categories"
 #~ msgstr "Kategorije"
 
@@ -22423,8 +22152,8 @@ msgstr ""
 #~ msgstr ""
 #~ "Poslali smo vam registracijski email na danu adresu. (Dva puta provjerite "
 #~ "svoju email adresu prije nastavljanja dalje.)"
-
 #~ msgctxt "post type general name"
+
 #~ msgid "Pages"
 #~ msgstr "Stranice"
 
@@ -22436,22 +22165,22 @@ msgstr ""
 
 #~ msgid "Add New Page"
 #~ msgstr "Dodaj novu stranicu"
-
 #~ msgctxt "post type singular name"
+
 #~ msgid "Page"
 #~ msgstr "Stranica"
 
 #~ msgid "Add New Post"
 #~ msgstr "Dodaj novu objavu"
-
 #~ msgctxt "post type general name"
+
 #~ msgid "Posts"
 #~ msgstr "Objave"
 
 #~ msgid "Search Posts"
 #~ msgstr "Pretraži objave"
-
 #~ msgctxt "post type singular name"
+
 #~ msgid "Post"
 #~ msgstr "Objava"
 
@@ -22712,12 +22441,14 @@ msgstr ""
 #~ msgstr "%d WordPress ažuriranje"
 
 #~ msgid "%d Theme Update"
+
 #~ msgid_plural "%d Theme Updates"
 #~ msgstr[0] "%d Tema ažurirana"
 #~ msgstr[1] "%d Teme ažurirane"
 #~ msgstr[2] "%d Tema ažurirano"
 
 #~ msgid "%d Plugin Update"
+
 #~ msgid_plural "%d Plugin Updates"
 #~ msgstr[0] "%d Ažuriranje dodatka"
 #~ msgstr[1] "%d Ažuriranja dodataka"
@@ -22997,8 +22728,8 @@ msgstr ""
 
 #~ msgid "Publish on:"
 #~ msgstr "Objavi na dan:"
-
 #~ msgctxt "password strength"
+
 #~ msgid "Medium"
 #~ msgstr "Srednja"
 
@@ -23041,18 +22772,21 @@ msgstr ""
 #~ msgstr "Predložak stranice  nije ispravan."
 
 #~ msgid "Private <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Private <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Privatna <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Privatne <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Privatnih <span class=\"count\">(%s)</span>"
 
 #~ msgid "Pending <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Pending <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Čeka pregled <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Čeka pregled <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Čeka pregled <span class=\"count\">(%s)</span>"
 
 #~ msgid "Draft <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Drafts <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Skica <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Skice <span class=\"count\">(%s)</span>"
@@ -23270,12 +23004,12 @@ msgstr ""
 
 #~ msgid "%1$s %2$d"
 #~ msgstr "%1$s %2$d"
-
 #~ msgctxt "calendar caption"
+
 #~ msgid "%1$s %2$s"
 #~ msgstr "%1$s %2$s"
-
 #~ msgctxt "feed link"
+
 #~ msgid "&raquo;"
 #~ msgstr "&raquo;"
 
@@ -23292,18 +23026,21 @@ msgstr ""
 #~ msgstr "&laquo; Natrag"
 
 #~ msgid "%s min"
+
 #~ msgid_plural "%s mins"
 #~ msgstr[0] "%s minuta"
 #~ msgstr[1] "%s minute"
 #~ msgstr[2] "%s minuta"
 
 #~ msgid "%s hour"
+
 #~ msgid_plural "%s hours"
 #~ msgstr[0] "%s sat"
 #~ msgstr[1] "%s sata"
 #~ msgstr[2] "%s sati"
 
 #~ msgid "%s day"
+
 #~ msgid_plural "%s days"
 #~ msgstr[0] "%s dan"
 #~ msgstr[1] "%s dana"
@@ -23338,8 +23075,8 @@ msgstr ""
 
 #~ msgid "Enter the RSS feed URL here:"
 #~ msgstr "Ovdje unesi URL RSS kanala:"
-
 #~ msgctxt "widgets"
+
 #~ msgid "%1$s on %2$s"
 #~ msgstr "%1$s o %2$s"
 
@@ -23583,18 +23320,21 @@ msgstr ""
 #~ msgstr "Slug &#8220;%s&#8221; je već u upotrebi za drugi izraz"
 
 #~ msgid "Published <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Published <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Objavljen <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Objavljena <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Objavljenih <span class=\"count\">(%s)</span>"
 
 #~ msgid "Scheduled <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Scheduled <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Tempiran <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Tempirana <span class=\"count\">(%s)</span>"
 #~ msgstr[2] "Tempiranih <span class=\"count\">(%s)</span>"
 
 #~ msgid "Trash <span class=\"count\">(%s)</span>"
+
 #~ msgid_plural "Trash <span class=\"count\">(%s)</span>"
 #~ msgstr[0] "Smeće <span class=\"count\">(%s)</span>"
 #~ msgstr[1] "Smeća <span class=\"count\">(%s)</span>"
@@ -23868,6 +23608,7 @@ msgstr ""
 #~ msgid ""
 #~ "Currently %s comment is waiting for approval. Please visit the moderation "
 #~ "panel:"
+
 #~ msgid_plural ""
 #~ "Currently %s comments are waiting for approval. Please visit the "
 #~ "moderation panel:"
@@ -24045,6 +23786,7 @@ msgstr ""
 #~ msgstr "Za pregled komentara unesite svoju lozinku."
 
 #~ msgid "%s topic"
+
 #~ msgid_plural "%s topics"
 #~ msgstr[0] "%s tema"
 #~ msgstr[1] "%s teme"
@@ -24155,8 +23897,8 @@ msgstr ""
 
 #~ msgid "Leave a Comment"
 #~ msgstr "Napiši komentar"
-
 #~ msgctxt "page"
+
 #~ msgid "Add New"
 #~ msgstr "Dodaj novu"
 
@@ -24319,8 +24061,8 @@ msgstr ""
 
 #~ msgid "URL"
 #~ msgstr "URL"
-
 #~ msgctxt "noun"
+
 #~ msgid "Comment"
 #~ msgstr "Komentar"
 
@@ -24383,8 +24125,8 @@ msgstr ""
 
 #~ msgid "New Page"
 #~ msgstr "Nova stranica"
-
 #~ msgctxt "post"
+
 #~ msgid "Add New"
 #~ msgstr "Dodaj novu"
 

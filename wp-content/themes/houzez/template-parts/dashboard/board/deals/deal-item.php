@@ -34,17 +34,17 @@ if( ! empty($lead) ) {
 
 ?>
 <tr data-id="<?php echo intval($deal_data->deal_id); ?>">
-	<th class="table-nowrap" data-label="<?php esc_html_e('Title', 'houzez'); ?>">
+	<td class="table-nowrap" data-label="<?php esc_html_e('Title', 'houzez'); ?>" style="min-width: 150px;">
 		<strong><?php echo esc_attr($deal_data->title); ?></strong>
-	</th>
+	</td>
 	<td class="table-nowrap" data-label="<?php esc_html_e('Contact Name', 'houzez'); ?>">
-		<?php echo  esc_attr($display_name); ?>
+		<?php echo esc_attr($display_name); ?>
 	</td>
 
 	<?php if( houzez_is_admin() ) { ?>
 	<td class="table-nowrap" data-label="<?php esc_html_e('Agent', 'houzez'); ?>">
 		<?php if(!empty($agent_name)) { ?>
-		<i class="houzez-icon icon-single-neutral-circle mr-2 grey"></i> <?php echo esc_attr($agent_name); ?>
+		<i class="houzez-icon icon-single-neutral-circle me-2 grey"></i> <?php echo esc_attr($agent_name); ?>
 		<?php } ?>
 	</td>
 	<?php } ?>
@@ -61,7 +61,7 @@ if( ! empty($lead) ) {
 				}
 			}
 			?>
-		</select><!-- selectpicker -->
+		</select>
 	</td>
 	<td class="table-nowrap" data-label="<?php esc_html_e('Next Action', 'houzez'); ?>">
 		<select class="selectpicker deal_next_action form-control bs-select-hidden" title="<?php esc_html_e('Select', 'houzez'); ?>">
@@ -75,7 +75,7 @@ if( ! empty($lead) ) {
 				}
 			}
 			?>
-		</select><!-- selectpicker -->
+		</select>
 	</td>
 	<td class="table-nowrap" data-label="<?php esc_html_e('Action Due Date', 'houzez'); ?>">
 		<input type="text" class="form-control deal_action_due" value="<?php echo esc_attr($action_due_date); ?>" placeholder="<?php esc_html_e('Select a Date', 'houzez'); ?>" readonly>
@@ -86,7 +86,7 @@ if( ! empty($lead) ) {
 	</td>
 
 	<td class="table-nowrap" data-label="<?php esc_html_e('Last Contact Date', 'houzez'); ?>">
-		<input type="text" class="form-control deal_last_contact" value="<?php echo esc_attr($last_contact_date); ?>" placeholder="<?php esc_html_e('Select a Date', 'houzez'); ?>" readonly>
+	<input type="text" class="form-control deal_last_contact" value="<?php echo esc_attr($last_contact_date); ?>" placeholder="<?php esc_html_e('Select a Date', 'houzez'); ?>" readonly>
 	</td>
 
 	<td class="table-nowrap" data-label="<?php esc_html_e('Phone', 'houzez'); ?>">
@@ -97,15 +97,15 @@ if( ! empty($lead) ) {
 		<a href="mailto:<?php echo esc_attr($lead_email); ?>"><strong><?php echo esc_attr($lead_email); ?></strong></a>
 	</td>
 
-	<td class="table-nowrap">
-		<div class="dropdown property-action-menu">
-			<button class="btn btn-primary-outlined dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<?php esc_html_e('Actions', 'houzez'); ?>
-			</button>
-			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-				<a class="crm-edit-deal-js dropdown-item open-close-slide-panel" data-id="<?php echo intval($deal_id)?>" href="#"><?php esc_html_e('Edit', 'houzez'); ?></a>
-				<a class="delete-deal-js dropdown-item" data-id="<?php echo intval($deal_id)?>" data-nonce="<?php echo wp_create_nonce('delete_deal_nonce') ?>" href="#"><?php esc_html_e('Delete', 'houzez'); ?></a>
-			</div>
+	<td class="table-nowrap text-lg-center text-start" data-label="<?php esc_html_e('Actions', 'houzez'); ?>">
+		<div class="dropdown" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="<?php esc_html_e('Actions', 'houzez'); ?>">
+			<a href="#" class="action-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="houzez-icon icon-navigation-menu-horizontal"></i>
+            </a>
+			<ul class="dropdown-menu dropdown-menu3">
+				<li><a class="dropdown-item crm-edit-deal-js" href="#" data-id="<?php echo intval($deal_id)?>" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDeal" aria-controls="offcanvasDeal"><i class="houzez-icon icon-pencil"></i><?php esc_html_e('Edit', 'houzez'); ?></a></li>
+				<li><a class="dropdown-item delete-deal-js" href="#" data-id="<?php echo intval($deal_id)?>" data-nonce="<?php echo wp_create_nonce('delete_deal_nonce') ?>"><i class="houzez-icon icon-bin"></i><?php esc_html_e('Delete', 'houzez'); ?></a></li> 
+			</ul> 
 		</div>
 	</td>
 </tr>

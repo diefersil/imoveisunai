@@ -45,28 +45,32 @@ if($total_review > 1) {
 
 $total_ratings = get_post_meta(get_the_ID(), 'houzez_total_rating', true);
 ?>
-<div class="property-review-wrap property-section-wrap" id="property-review-wrap">
-	<div class="block-title-wrap review-title-wrap d-flex align-items-center">
-		<h2><?php echo esc_attr($total_review); ?> <?php echo esc_attr($review_label); ?></h2>
-		<div class="rating-score-wrap flex-grow-1">
-			<?php echo houzez_get_stars($total_ratings, false); ?>
+<div class="property-review-wrap property-section-wrap mt-5" id="property-review-wrap">
+	<div class="block-title-wrap review-title-wrap d-flex align-items-start align-items-md-center justify-content-between flex-column flex-md-row m-0 pb-1 gap-3">
+		<div class="d-flex align-items-center gap-3">
+			<h2 itemprop="reviewCount"><?php echo esc_attr($total_review); ?> <?php echo esc_attr($review_label); ?></h2>
+			<div class="rating-score-wrap flex-grow-1" role="complementary">
+				<span class="star d-flex align-items-center" role="img">
+					<?php echo houzez_get_stars($total_ratings, false); ?>
 
-			<?php if(!empty($total_ratings)) { ?>
-			<span class="star-text star-text-right">
-	            (<span itemprop="ratingValue"><?php echo esc_attr(round($total_ratings, 2)); ?></span> <?php esc_html_e('out of', 'houzez'); ?> <span itemprop="bestRating">5</span>)
-	        </span>
-	    	<?php } ?>
+					<?php if(!empty($total_ratings)) { ?>
+						<span class="star-text star-text-right ms-2">
+							(<span itemprop="ratingValue"><?php echo esc_attr(round($total_ratings, 2)); ?></span> <?php esc_html_e('out of', 'houzez'); ?> <span itemprop="bestRating">5</span>)
+						</span>
+					<?php } ?>
+				</span>
+			</div>
+		</div>
+		<div class="d-flex align-items-center gap-3">
+			<?php get_template_part('template-parts/reviews/sortby'); ?>
+			<a class="btn hz-btn-lreview btn-primary btn-sm" href="#property-review-form"><?php esc_html_e('Leave a Review', 'houzez'); ?></a>
 		</div>	
-		
-		<?php get_template_part('template-parts/reviews/sortby'); ?>
-
-		<a class="btn hz-btn-lreview btn-primary btn-slim" href="#property-review-form"><?php esc_html_e('Leave a Review', 'houzez'); ?></a>
 	</div>
 
 	<input type="hidden" name="review_paged" id="review_paged" value="1">
 	<input type="hidden" name="total_pages" id="total_pages" value="<?php echo intval($total_pages); ?>">
 	
-	<ul id="houzez_reviews_container" class="review-list-wrap list-unstyled">
+	<ul id="houzez_reviews_container" class="review-list-wrap list-unstyled my-4 p-0" itemprop="review">
 		<?php 
         if ( $review_qry->have_posts() ) :
             while ( $review_qry->have_posts() ) : $review_qry->the_post();
@@ -88,14 +92,14 @@ $total_ratings = get_post_meta(get_the_ID(), 'houzez_total_rating', true);
 		<nav>
 			<ul class="pagination justify-content-center">
 				<li class="page-item">
-					<button class="page-link" disabled id="review_prev" aria-label="<?php esc_html_e('Previous', 'houzez'); ?>">
+					<a href="#" class="page-link" disabled id="review_prev" aria-label="<?php esc_html_e('Previous', 'houzez'); ?>">
 						<i class="houzez-icon icon-arrow-left-1"></i>
-					</button>
+				</a>
 				</li>
 				<li class="page-item">
-					<button class="page-link" id="review_next" aria-label="<?php esc_html_e('Next', 'houzez'); ?>">
+					<a href="#" class="page-link" id="review_next" aria-label="<?php esc_html_e('Next', 'houzez'); ?>">
 						<i class="houzez-icon icon-arrow-right-1"></i>
-					</button>
+					</a>
 				</li>
 			</ul><!-- pagination -->
 		</nav>

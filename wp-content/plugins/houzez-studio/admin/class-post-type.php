@@ -72,6 +72,7 @@ class Houzez_Studio_Post_Type {
 		if ( is_admin() ) {
 			add_filter( 'manage_fts_builder_posts_columns', array( $this, 'columns_head' ) );
 			add_action( 'manage_fts_builder_posts_custom_column', array( $this, 'columns_content' ), 10, 2 );
+			add_filter( 'views_edit-fts_builder', [ $this, 'admin_print_tabs' ] );
 		}
 
 	}
@@ -84,14 +85,29 @@ class Houzez_Studio_Post_Type {
      */
     public static function post_type() {
     	global $wp;
+
+    	register_taxonomy(
+            'fts_types',
+            ['fts_builder'],
+            [
+                'hierarchical' => false,
+                'public' => false,
+                'label' => _x( 'Type', 'Theme Builder', 'houzez-studio' ),
+                'show_ui' => false,
+                'show_admin_column' => false,
+                'query_var' => true,
+                'show_in_rest' => false,
+                'rewrite' => false,
+            ]
+        );
     	
 
         $labels = array(
-            'name' => __( 'Header & Footer Builder','houzez-studio'),
-            'singular_name' => __( 'Header & Footer Builder','houzez-studio' ),
-            'add_new_item' => __('Add New Header, Footer','houzez-studio'),
-            'edit_item' => __('Edit Header, Footer','houzez-studio'),
-            'all_items'     => esc_html__( 'All Header, Footer', 'houzez-studio' ),
+            'name' => __( 'Theme Builder','houzez-studio'),
+            'singular_name' => __( 'Theme Builder','houzez-studio' ),
+            'add_new_item' => __('Add New Layout','houzez-studio'),
+            'edit_item' => __('Edit Layout','houzez-studio'),
+            'all_items'     => esc_html__( 'All Layouts', 'houzez-studio' ),
         );
 
         $args = array(
@@ -102,6 +118,7 @@ class Houzez_Studio_Post_Type {
             'can_export' => true,
             'show_in_menu'        => false,
 			'show_in_nav_menus'   => false,
+			'taxonomies' => ['fts_types'],
             'menu_icon' => 'dashicons-editor-kitchensink',
             'supports'     => array( 'title', 'thumbnail', 'page-attributes' ),
             'show_in_rest'       => true,
@@ -147,7 +164,9 @@ class Houzez_Studio_Post_Type {
 
 	        case 'type':
 	            $type = get_post_meta($post_id, 'fts_template_type', true);
+	            $fts_hook = get_post_meta($post_id, 'fts_block_hook', true);
 	            $this->outputColumnHTML("fts-template-type", esc_html($type));
+	            $this->outputColumnHTML("fts-block-hook", esc_html($fts_hook));
 	            break;
 
 	        case 'display_rules':
@@ -224,12 +243,16 @@ class Houzez_Studio_Post_Type {
 	        $textMappings = array(
 	            'tmp_header'        => 'Header',
 	            'tmp_footer'        => 'Footer',
-	            'tmp_before_header' => 'Before Header',
-	            'tmp_after_header'  => 'After Header',
-	            'tmp_before_footer' => 'Before Footer',
-	            'tmp_after_footer'  => 'After Footer',
+	            'single-listing' => 'Single Listing',
+	            'single-agent' => 'Single Agent',
+	            'single-agency' => 'Single Agency',
+	            'single-post' => 'Single Post',
+	            'before_header' => ' - Before Header',
+	            'after_header'  => ' - After Header',
+	            'before_footer' => ' - Before Footer',
+	            'after_footer'  => ' - After Footer',
 	            'tmp_megamenu'      => 'Mega Menu',
-	            'tmp_custom_block'  => 'Custom Block',
+	            'tmp_custom_block'  => 'Block',
 	        );
 
 	        // Check if the text has a mapped value and update it accordingly
@@ -242,6 +265,56 @@ class Houzez_Studio_Post_Type {
 	    echo "</span>";
 	}
 
+
+	/**
+	 * Print Admin Tabs
+	 *
+	 * @param [type] $views
+	 * @return void
+	 * @since 1.1.0
+	 */
+	public function admin_print_tabs( $views ) 
+	{
+
+		$current_type = '';
+		$active_class = ' nav-tab-active';
+
+		if ( ! empty( $_REQUEST['fts_types'] ) ) {
+			$current_type = $_REQUEST['fts_types'];
+			$active_class = '';
+		}
+
+		$url_args = [
+			'post_type' => 'fts_builder',
+		];
+
+		$baseurl = add_query_arg( $url_args, admin_url( 'edit.php' ) );
+
+		$doc_types = houzez_tb_types();
+		?>
+
+        <div id="houzez-studio-wrapp"></div>
+		<div id="houzez-studio-theme-builder-tabs" class="nav-tab-wrapper">
+			<a class="nav-tab<?php echo $active_class; ?>" href="<?php echo $baseurl; ?>">
+				<?php echo  __( 'All', 'houzez-studio' ); ?>
+			</a>
+			<?php
+			foreach ( $doc_types as $type => $type_label ) :
+				$active_class = '';
+
+				if ( $current_type === $type ) {
+					$active_class = ' nav-tab-active';
+				}
+
+				$type_url = add_query_arg( 'fts_types', $type, $baseurl );
+
+				echo "<a class='nav-tab{$active_class}' href='{$type_url}'>{$type_label}</a>";
+			endforeach;
+			?>
+		</div>
+		<?php
+		return $views;
+	}
 
 }
 Houzez_Studio_Post_Type::instance();

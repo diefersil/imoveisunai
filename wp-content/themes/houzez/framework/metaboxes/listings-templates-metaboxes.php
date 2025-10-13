@@ -415,8 +415,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'name'    => esc_html__( 'Minimum Beds', 'houzez' ),
                     'type'    => 'number',
                     'step'    => 'any',
-                    'min'     => 0,
-                    'std'     => 0,
+                    'std'     => '',
                     'columns' => 3,
                 ),
 
@@ -426,7 +425,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'type'    => 'number',
                     'step'    => 'any',
                     'min'     => 0,
-                    'std'     => 0,
+                    'std'     => '',
                     'columns' => 3,
                 ),
 
@@ -436,7 +435,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'type'    => 'number',
                     'step'    => 'any',
                     'min'     => 0,
-                    'std'     => 0,
+                    'std'     => '',
                     'columns' => 3,
                 ),
 
@@ -446,7 +445,7 @@ if( !function_exists('houzez_listings_templates_metaboxes') ) {
                     'type'    => 'number',
                     'step'    => 'any',
                     'min'     => 0,
-                    'std'     => 0,
+                    'std'     => '',
                     'columns' => 3,
                 ),
             )

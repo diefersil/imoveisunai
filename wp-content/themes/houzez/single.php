@@ -57,9 +57,11 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 
                                     </div><!-- post-header-wrap -->
 
+                                    <?php if( houzez_option('blog_featured_image', 1)) { ?>
                                     <div class="post-thumbnail-wrap">
                                         <?php the_post_thumbnail('full', array('class' => 'img-fluid')); ?>
                                     </div><!-- post-thumbnail-wrap -->
+                                    <?php } ?>
 
                                     <div class="post-content-wrap">
                                         <?php the_content(); ?>

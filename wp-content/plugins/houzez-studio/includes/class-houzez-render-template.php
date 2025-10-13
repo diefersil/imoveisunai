@@ -91,6 +91,11 @@ class FTS_Render_Template {
 		add_action( 'houzez_footer_studio', array( $this, 'render_footer' ), 10 );
 		add_action( 'houzez_before_footer', array( $this, 'render_before_footer' ), 10 );
 		add_action( 'houzez_after_footer', array( $this, 'render_after_footer' ), 10 );
+
+		add_action( 'houzez_single_listing', array( $this, 'render_single_listing' ), 10 );
+		add_action( 'houzez_single_agent', array( $this, 'render_single_agent' ), 10 );
+		add_action( 'houzez_single_agency', array( $this, 'render_single_agency' ), 10 );
+		add_action( 'houzez_single_post', array( $this, 'render_single_post' ), 10 );
 		
 	}
 
@@ -150,6 +155,38 @@ class FTS_Render_Template {
 		fts_render_after_footer();
 	}
 
+	/**
+	 * Retrieve the single listing.
+	 */
+	public function render_single_listing() {
+
+		fts_render_single_listing();
+	}
+
+	/**
+	 * Retrieve the single agent.
+	 */
+	public function render_single_agent() {
+
+		fts_render_single_agent();
+	}
+
+	/**
+	 * Retrieve the single agency.
+	 */
+	public function render_single_agency() {
+
+		fts_render_single_agency();
+	}
+
+	/**
+	 * Retrieve the single post.
+	 */
+	public function render_single_post() {
+
+		fts_render_single_post();
+	}
+
 
 	/**
 	 * Retrieves plugin settings based on the provided option name.
@@ -159,9 +196,9 @@ class FTS_Render_Template {
 	 *
 	 * @return mixed Setting value or default value.
 	 */
-	public function fetch_plugin_settings($setting = '', $default = '') {
-	    if (in_array($setting, ['tmp_header', 'tmp_before_header', 'tmp_after_header', 'tmp_footer', 'tmp_before_footer', 'tmp_after_footer', 'tmp_megamenu', 'tmp_custom_block'])) {
-	        $templateId = $this->fetch_template_id($setting);
+	public function fetch_plugin_settings($setting = '', $hook = '', $default = '') {
+	    if (in_array($setting, ['tmp_header', 'tmp_before_header', 'tmp_after_header', 'tmp_footer', 'tmp_before_footer', 'tmp_after_footer', 'tmp_megamenu', 'tmp_custom_block', 'single-listing', 'single-agent', 'single-agency', 'single-post'])) {
+	        $templateId = $this->fetch_template_id($setting, $hook);
 	        return apply_filters("fts_fetch_plugin_settings_{$setting}", $templateId, $default);
 	    }
 
@@ -175,7 +212,7 @@ class FTS_Render_Template {
 	 *
 	 * @return mixed Template ID if found, else returns an empty string.
 	 */
-	public static function fetch_template_id($type) {
+	public static function fetch_template_id($type, $hook) {
 	    $options = [
 	        'included'  => 'fts_included_options',
 	        'exclusion' => 'fts_excluded_options',
@@ -184,7 +221,7 @@ class FTS_Render_Template {
 	    $templates = FieldManager\Favethemes_Field_Manager::instance()->fetch_posts_by_criteria('fts_builder', $options);
 
 	    foreach ($templates as $template) {
-	        if (self::is_matching_template($template['id'], $type)) {
+	        if (self::is_matching_template($template['id'], $type, $hook)) {
 	            return $template['id'];
 	        }
 	    }
@@ -192,16 +229,12 @@ class FTS_Render_Template {
 	    return '';
 	}
 
-	/**
-	 * Checks if a template matches the specified type and language settings.
-	 *
-	 * @param int    $templateId The ID of the template.
-	 * @param string $type       The type of the template.
-	 *
-	 * @return bool True if it matches, false otherwise.
-	 */
-	private static function is_matching_template($templateId, $type) {
-	    if (get_post_meta(absint($templateId), 'fts_template_type', true) !== $type) {
+	private static function is_matching_template($templateId, $type, $hook = '') {
+	    $template_type = get_post_meta(absint($templateId), 'fts_template_type', true);
+	    $block_hook = get_post_meta(absint($templateId), 'fts_block_hook', true);
+
+	    // Check if template type matches and, if a hook is provided, check for a hook match as well
+	    if ($template_type !== $type || ($hook && $block_hook !== $hook)) {
 	        return false;
 	    }
 

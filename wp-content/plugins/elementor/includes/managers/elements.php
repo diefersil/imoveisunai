@@ -35,7 +35,7 @@ class Elements_Manager {
 	 *
 	 * @access private
 	 *
-	 * @var
+	 * @var $categories
 	 */
 	private $categories;
 
@@ -67,7 +67,7 @@ class Elements_Manager {
 	 * @return Element_Base|null Element instance if element created, or null
 	 *                           otherwise.
 	 */
-	public function create_element_instance( array $element_data, array $element_args = [], Element_Base $element_type = null ) {
+	public function create_element_instance( array $element_data, array $element_args = [], ?Element_Base $element_type = null ) {
 		if ( null === $element_type ) {
 			if ( 'widget' === $element_data['elType'] ) {
 				$element_type = Plugin::$instance->widgets_manager->get_widget_types( $element_data['widgetType'] );
@@ -276,6 +276,10 @@ class Elements_Manager {
 	 */
 	private function init_categories() {
 		$this->categories = [
+			'v4-elements' => [
+				'title' => esc_html__( 'Atomic Elements', 'elementor' ),
+				'hideIfEmpty' => true,
+			],
 			'layout' => [
 				'title' => esc_html__( 'Layout', 'elementor' ),
 				'hideIfEmpty' => true,
@@ -289,6 +293,10 @@ class Elements_Manager {
 				'promotion' => [
 					'url' => esc_url( 'https://go.elementor.com/go-pro-section-pro-widget-panel/' ),
 				],
+			],
+			'helloplus' => [
+				'title' => esc_html__( 'Hello+', 'elementor' ),
+				'hideIfEmpty' => true,
 			],
 			'general' => [
 				'title' => esc_html__( 'General', 'elementor' ),
@@ -344,6 +352,12 @@ class Elements_Manager {
 			'icon' => 'eicon-wordpress',
 			'active' => false,
 		];
+	}
+
+	public function enqueue_elements_styles() {
+		foreach ( $this->get_element_types() as $element ) {
+			$element->enqueue_styles();
+		}
 	}
 
 	/**

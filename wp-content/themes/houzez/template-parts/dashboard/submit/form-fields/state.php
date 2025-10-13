@@ -6,8 +6,8 @@ if (houzez_edit_property()) {
 	$state = houzez_get_post_term_slug($property_data->ID, 'property_state');
 }
 ?>
-<div class="form-group">
-	<label for="administrative_area_level_1"><?php echo houzez_option('cl_state', 'County/State').houzez_required_field('state'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="administrative_area_level_1"><?php echo houzez_option('cl_state', 'County/State').houzez_required_field('state'); ?></label>
 
 	<?php
 	if(houzez_option('location_dropdowns') == 'yes') { ?>

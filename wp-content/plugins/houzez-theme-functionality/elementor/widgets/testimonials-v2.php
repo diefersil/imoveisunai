@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -11,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.0
  */
 class Houzez_Elementor_Testimonials_v2 extends Widget_Base {
+    use Houzez_Testimonials_Traits;
 
     /**
      * Get widget name.
@@ -95,61 +95,38 @@ class Houzez_Elementor_Testimonials_v2 extends Widget_Base {
             ]
         );
 
-        $this->add_control(
-            'posts_limit',
-            [
-                'label'     => esc_html__( 'Limit', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::TEXT,
-                'description'   => esc_html__( 'Number of testimonials to show.', 'houzez-theme-functionality' ),
-            ]
-        );
-
-        $this->add_control(
-            'offset',
-            [
-                'label'     => esc_html__( 'Offset posts', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::TEXT,
-                'description'   => '',
-            ]
-        );
-        $this->add_control(
-            'orderby',
-            [
-                'label'     => esc_html__( 'Order By', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => [
-                    'none'  => esc_html__( 'None', 'houzez-theme-functionality'),
-                    'ID'  => esc_html__( 'ID', 'houzez-theme-functionality'),
-                    'title'   => esc_html__( 'Title', 'houzez-theme-functionality'),
-                    'date'   => esc_html__( 'Date', 'houzez-theme-functionality'),
-                    'rand'   => esc_html__( 'Random', 'houzez-theme-functionality'),
-                    'menu_order'   => esc_html__( 'Menu Order', 'houzez-theme-functionality'),
-                ],
-                'default' => 'none',
-            ]
-        );
-        $this->add_control(
-            'order',
-            [
-                'label'     => esc_html__( 'Order', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::SELECT,
-                'options'   => [
-                    'ASC'  => esc_html__( 'ASC', 'houzez-theme-functionality'),
-                    'DESC'  => esc_html__( 'DESC', 'houzez-theme-functionality')
-                ],
-                'default' => 'ASC',
-            ]
-        );
+        $this->houzez_testimonials_content_controls();
         
         $this->end_controls_section();
 
         $this->start_controls_section(
-            'houzez_testi_v2_style',
+            'section_style_testimonial_content',
             [
-                'label' => esc_html__( 'Colors', 'homey-core' ),
-                'tab'   => Controls_Manager::TAB_STYLE,
+                'label' => esc_html__( 'Content', 'houzez-theme-functionality' ),
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
+
+        $this->add_control(
+            'content_content_color',
+            [
+                'label' => esc_html__( 'Text Color', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .testimonial-body' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'content_typography',
+                'selector' => '{{WRAPPER}} .testimonial-body',
+            ]
+        );
+
         $this->add_control(
             'houzez_testi_v2_text_color',
             [
@@ -157,10 +134,11 @@ class Houzez_Elementor_Testimonials_v2 extends Widget_Base {
                 'type'      => Controls_Manager::COLOR,
                 'default'   => '#ffffff',
                 'selectors' => [
-                    '{{WRAPPER}} .testimonial-item-v2' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .testimonial-item-v2 .icon-close-quote' => 'color: {{VALUE}}',
                 ],
             ]
         );
+
         $this->add_control(
             'houzez_testi_v2_bg_color',
             [
@@ -173,7 +151,50 @@ class Houzez_Elementor_Testimonials_v2 extends Widget_Base {
             ]
         );
 
+        $this->add_group_control(
+            Group_Control_Text_Shadow::get_type(),
+            [
+                'name' => 'content_shadow',
+                'selector' => '{{WRAPPER}} .testimonial-body',
+            ]
+        );
+
         $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_style_testimonial_image',
+            [
+                'label' => esc_html__( 'Image', 'houzez-theme-functionality' ),
+                'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_responsive_control(
+            'image_size',
+            [
+                'label' => esc_html__( 'Image Resolution', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+                'range' => [
+                    'px' => [
+                        'min' => 20,
+                        'max' => 200,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .testimonial-thumb img' => 'width: {{SIZE}}{{UNIT}};height: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->houzez_testimonials_image_style_controls();
+
+        $this->end_controls_section();
+
+         $this->houzez_testimonials_name_style_controls();
+
+        $this->houzez_testimonials_job_style_controls();
+
 
     }
 
@@ -200,51 +221,6 @@ class Houzez_Elementor_Testimonials_v2 extends Widget_Base {
         if( function_exists( 'houzez_testimonials_v2' ) ) {
             echo houzez_testimonials_v2( $args );
         }
-
-        if ( Plugin::$instance->editor->is_edit_mode() ) : 
-            $token = wp_generate_password(5, false, false);
-            ?>
-            <script>
-                var houzez_rtl = houzez_vars.houzez_rtl;
-
-                if( houzez_rtl == 'yes' ) {
-                    houzez_rtl = true;
-                } else {
-                    houzez_rtl = false;
-                }
-                
-                jQuery('.testimonials-slider-wrap-v2').slick({
-                    rtl: houzez_rtl,
-                    lazyLoad: 'ondemand',
-                    infinite: true,
-                    speed: 300,
-                    slidesToShow: 3,
-                    arrows: true,
-                    adaptiveHeight: true,
-                    dots: true,
-                    appendArrows: '.testimonials-module-slider-v2',
-                    prevArrow: jQuery('.slick-prev'),
-                    nextArrow: jQuery('.slick-next'),
-                    responsive: [{
-                            breakpoint: 992,
-                            settings: {
-                                slidesToShow: 2,
-                                slidesToScroll: 2
-                            }
-                        },
-                        {
-                            breakpoint: 769,
-                            settings: {
-                                slidesToShow: 1,
-                                slidesToScroll: 1
-                            }
-                        }
-                    ]
-                });
-            
-            </script>
-        
-        <?php endif;
 
     }
 

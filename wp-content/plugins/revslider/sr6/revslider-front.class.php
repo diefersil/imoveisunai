@@ -33,7 +33,7 @@ class RevSliderFront extends RevSliderFrontGlobal {
 		$load = apply_filters('revslider_include_libraries', $load);
 		$load = ($SR_GLOBALS['preview_mode'] === true) ? true : $load;
 		$load = ($inc_global === true) ? true : $load;
-		$load = (self::has_shortcode('rev_slider') === true) ? true : $load;
+		$load = (self::has_shortcode('rev_slider') === true || self::has_shortcode('sr7') === true) ? true : $load;
 		$load = ($widget !== false) ? true : $load;
 		
 		if($inc_global === false){
@@ -221,13 +221,11 @@ class RevSliderFront extends RevSliderFrontGlobal {
 	 * @updated: 6.4.12
 	 */
 	public static function add_defer_forscript($tag, $handle){
-		if(strpos($tag, 'rs6') === false && strpos($tag, 'rbtools.min.js') === false && strpos($tag, 'revolution.addon.') === false && strpos($tag, 'sr6/assets/js/libs/') === false && (strpos($tag, 'liquideffect') === false && strpos($tag, 'pixi.min.js') === false) && strpos($tag, 'rslottie-js') === false){
+		if(is_admin() || strpos($tag, 'rs6') === false && strpos($tag, 'rbtools.min.js') === false && strpos($tag, 'revolution.addon.') === false && strpos($tag, 'sr6/assets/js/libs/') === false && (strpos($tag, 'liquideffect') === false && strpos($tag, 'pixi.min.js') === false) && strpos($tag, 'rslottie-js') === false){
 			return $tag;
-		}elseif(is_admin()){
-			return $tag;
-		}else{
-			return str_replace(' id=', ' defer id=', $tag);
 		}
+
+		return str_replace(' id=', ' defer id=', $tag);
 	}
 
 	/**
@@ -236,30 +234,11 @@ class RevSliderFront extends RevSliderFrontGlobal {
 	 * @updated: 6.4.12
 	 */
 	public static function add_async_forscript($tag, $handle){
-		if(strpos($tag, 'rs6') === false && strpos($tag, 'rbtools.min.js') === false && strpos($tag, 'revolution.addon.') === false && strpos($tag, 'sr6/assets/js/libs/') === false && (strpos($tag, 'liquideffect') === false && strpos($tag, 'pixi.min.js') === false) && strpos($tag, 'rslottie-js') === false){
+		if(is_admin() || strpos($tag, 'rs6') === false && strpos($tag, 'rbtools.min.js') === false && strpos($tag, 'revolution.addon.') === false && strpos($tag, 'sr6/assets/js/libs/') === false && (strpos($tag, 'liquideffect') === false && strpos($tag, 'pixi.min.js') === false) && strpos($tag, 'rslottie-js') === false){
 			return $tag;
-		}elseif(is_admin()){
-			return $tag;
-		}else{
-			return str_replace(' id=', ' async id=', $tag);
 		}
-	}
-	
-	
-	/**
-	 * check the current post for the existence of a short code
-	 * @before: hasShortcode()
-	 */  
-	public static function has_shortcode($shortcode = ''){  
-		$found = false; 
 		
-		if(empty($shortcode)) return false;
-		if(!is_singular()) return false;
-		
-		$post = get_post(get_the_ID());  
-		if(stripos($post->post_content, '[' . $shortcode) !== false) $found = true;  
-		
-		return $found;  
+		return str_replace(' id=', ' async id=', $tag);
 	}
 	
 }

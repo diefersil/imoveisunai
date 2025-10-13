@@ -4,7 +4,7 @@ $site_breadcrumb = houzez_option('site_breadcrumb');
 $page_breadcrumb = get_post_meta( houzez_postid(), 'fave_page_breadcrumb', true);
 ?>
 
-<div class="breadcrumb-wrap">
+<div class="breadcrumb-wrap" role="navigation">
 <?php
 if($page_breadcrumb != 'hide') {
 	if( $site_breadcrumb != 0 ) {

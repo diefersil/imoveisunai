@@ -12,19 +12,21 @@ $current_user = wp_get_current_user();
 $userID = get_current_user_id();
 $packageUserId = $userID;
 
-$agent_agency_id = houzez_get_agent_agency_id( $userID );
-if( $agent_agency_id ) {
+// Get agent agency ID for package verification
+$agent_agency_id = houzez_get_agent_agency_id($userID);
+if ($agent_agency_id) {
     $packageUserId = $agent_agency_id;
 }
 
-if( is_user_logged_in() && !houzez_check_role() ) {
-    wp_redirect(  home_url() );
+// Redirect non-authorized users
+if (is_user_logged_in() && !houzez_check_role()) {
+    wp_redirect(home_url());
+    exit;
 }
 
+// Setup variables
 $user_email = $current_user->user_email;
-$admin_email =  get_bloginfo('admin_email');
-$panel_class = '';
-
+$admin_email = get_bloginfo('admin_email');
 $invalid_nonce = false;
 $submitted_successfully = false;
 $updated_successfully = false;
@@ -35,505 +37,524 @@ $payment_page_link = houzez_get_template_link('template/template-payment.php');
 $thankyou_page_link = houzez_get_template_link('template/template-thankyou.php');
 $select_packages_link = houzez_get_template_link('template/template-packages.php');
 $submit_property_link = houzez_get_template_link('template/user_dashboard_submit.php');
-
+$is_user_verification_required = Houzez_Property_Submit::is_user_verification_required($userID);
 $create_listing_login_required = houzez_option('create_listing_button');
-
-$sticky_sidebar = houzez_option('sticky_sidebar');
 $allowed_html = array();
 $submit_form_type = houzez_option('submit_form_type');
 
-if( $submit_form_type == 'one_step' ) {
-    $submit_form_main_class = 'houzez-one-step-form';
-    $is_multi_steps = 'active';
-} else {
-    $submit_form_main_class = 'houzez-m-step-form';
-    $is_multi_steps = 'form-step';
+// Set login requirement if verification is required
+if ($is_user_verification_required) {
+    $create_listing_login_required = 'yes';
 }
 
-if( isset( $_POST['action'] ) ) {
+// Form style configuration
+if ($submit_form_type == 'one_step') {
+    $submit_form_main_class = 'houzez-one-step-form';
+    $is_multi_steps = 'form-section-wrap active';
+} else {
+    $submit_form_main_class = 'houzez-m-step-form';
+    $is_multi_steps = 'form-section-wrap form-step';
+}
 
-    $submission_action = $_POST['action'];
-    $is_draft = $_POST['houzez_draft'] ?? '';
+// Process form submission
+if (isset($_POST['action'])) {
+    $submission_action = sanitize_text_field($_POST['action']);
+    $is_draft = isset($_POST['houzez_draft']) ? sanitize_text_field($_POST['houzez_draft']) : '';
 
     $new_property = array(
-        'post_type'	=> 'property'
+        'post_type' => 'property'
     );
 
-    if( $enable_paid_submission == 'per_listing' ) {
+    // Per listing payment
+    if ($enable_paid_submission == 'per_listing') {
+        // Guest user flow
+        if (!is_user_logged_in()) {
+            $email = sanitize_email($_POST['user_email']);
+            $errors = array();
 
-        if ( !is_user_logged_in() ) { 
-            $email = wp_kses( $_POST['user_email'], $allowed_html );
-            if( email_exists( $email ) ) {
+            // Validate email
+            if (email_exists($email)) {
                 $errors[] = $houzez_local['email_already_registerd'];
             }
 
-            if( !is_email( $email ) ) {
+            if (!is_email($email)) {
                 $errors[] = $houzez_local['invalid_email'];
             }
 
-            if( empty($errors) ) {
-                $username = explode("@", $email);
+            if (empty($errors)) {
+                // Create username from email
+                $username_parts = explode('@', $email);
+                $username = $username_parts[0];
 
-                if( username_exists( $username[0] ) ) {
-                    $username = $username[0].rand(5, 999);
-                } else {
-                    $username = $username[0];
+                if (username_exists($username)) {
+                    $username = $username . rand(5, 999);
                 }
 
-                $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
-                $user_id = wp_create_user( $username, $random_password, $email );
+                $random_password = wp_generate_password(12, false);
+                $user_id = wp_create_user($username, $random_password, $email);
 
-                if( !is_wp_error( $user_id ) ) {
-                    $user = get_user_by( 'id', $user_id );
+                if (!is_wp_error($user_id)) {
+                    $user = get_user_by('id', $user_id);
 
-                    houzez_update_profile( $user_id );
-                    houzez_wp_new_user_notification( $user_id, $random_password );
+                    houzez_update_profile($user_id);
+                    houzez_wp_new_user_notification($user_id, $random_password);
+                    
+                    // Register as agent if enabled
                     $user_as_agent = houzez_option('user_as_agent');
-                    if( $user_as_agent == 'yes' ) {
-                        houzez_register_as_agent ( $username, $email, $user_id );
+                    if ($user_as_agent == 'yes') {
+                        houzez_register_as_agent($username, $email, $user_id);
                     }
 
-                    if( !is_wp_error($user) ) {
+                    if (!is_wp_error($user)) {
                         wp_clear_auth_cookie();
-                        wp_set_current_user( $user->ID, $user->user_login );
-                        wp_set_auth_cookie( $user->ID );
-                        do_action( 'wp_login', $user->user_login );
+                        wp_set_current_user($user->ID, $user->user_login);
+                        wp_set_auth_cookie($user->ID);
+                        do_action('wp_login', $user->user_login);
 
-                        $property_id = apply_filters( 'houzez_submit_listing', $new_property );
+                        $property_id = apply_filters('houzez_submit_listing', $new_property);
 
-
-                        if( houzez_is_woocommerce() ) {
-                            if( ( $submission_action != 'update_property' ) || ( isset($_POST['houzez_draft']) && $_POST['houzez_draft'] == 'draft') ) {
-
+                        // WooCommerce integration
+                        if (houzez_is_woocommerce()) {
+                            if (($submission_action != 'update_property') || ($is_draft == 'draft')) {
                                 do_action('houzez_per_listing_woo_payment', $property_id);
-
                             } else {
                                 if (!empty($submit_property_link)) {
-                                    $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
+                                    $submit_property_link = add_query_arg('edit_property', $property_id, $submit_property_link);
                                     $separator = (parse_url($submit_property_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                                     $parameter = 'updated=1';
                                     wp_redirect($submit_property_link . $separator . $parameter);
+                                    exit;
                                 }
                             }
-
                         } else {
-                            if (!empty($payment_page_link)) {
+                            // Payment redirection
+                            if (!empty($payment_page_link) && $submission_action != 'update_property') {
                                 $separator = (parse_url($payment_page_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                                 $parameter = 'prop-id=' . $property_id;
                                 wp_redirect($payment_page_link . $separator . $parameter);
-
-                            } elseif( !empty($payment_page_link) && isset($_POST['houzez_draft']) ) {
+                                exit;
+                            } elseif (!empty($payment_page_link) && isset($_POST['houzez_draft'])) {
                                 $separator = (parse_url($payment_page_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                                 $parameter = 'prop-id=' . $property_id;
                                 wp_redirect($payment_page_link . $separator . $parameter);
-
+                                exit;
                             } else {
                                 if (!empty($dashboard_listings)) {
                                     $separator = (parse_url($dashboard_listings, PHP_URL_QUERY) == NULL) ? '?' : '&';
                                     $parameter = ($updated_successfully) ? '' : '';
                                     wp_redirect($dashboard_listings . $separator . $parameter);
+                                    exit;
                                 }
                             }
                         }
-                        exit();
                     }
-
                 }
-
             }
-
         } else {
+            // Logged in user flow
             $property_id = apply_filters('houzez_submit_listing', $new_property);
 
-            if( houzez_is_woocommerce() ) {
-                if( ( $submission_action != 'update_property' ) || ( isset($_POST['houzez_draft']) && $_POST['houzez_draft'] == 'draft') ) {
-
+            // WooCommerce integration
+            if (houzez_is_woocommerce()) {
+                if (($submission_action != 'update_property') || ($is_draft == 'draft')) {
                     do_action('houzez_per_listing_woo_payment', $property_id);
-
                 } else {
                     if (!empty($submit_property_link)) {
-                        $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
+                        $submit_property_link = add_query_arg('edit_property', $property_id, $submit_property_link);
                         $separator = (parse_url($submit_property_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                         $parameter = 'updated=1';
                         wp_redirect($submit_property_link . $separator . $parameter);
+                        exit;
                     }
                 }
-
             } else {
-
-                if (!empty($payment_page_link) && $submission_action != 'update_property' ) {
+                // Payment redirection
+                if (!empty($payment_page_link) && $submission_action != 'update_property') {
                     $separator = (parse_url($payment_page_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                     $parameter = 'prop-id=' . $property_id;
                     wp_redirect($payment_page_link . $separator . $parameter);
-
-                } elseif( !empty($payment_page_link) && isset($_POST['houzez_draft']) ) {
+                    exit;
+                } elseif (!empty($payment_page_link) && isset($_POST['houzez_draft'])) {
                     $separator = (parse_url($payment_page_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                     $parameter = 'prop-id=' . $property_id;
                     wp_redirect($payment_page_link . $separator . $parameter);
+                    exit;
                 } else {
                     if (!empty($submit_property_link)) {
-                        $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
+                        $submit_property_link = add_query_arg('edit_property', $property_id, $submit_property_link);
                         $separator = (parse_url($submit_property_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
                         $parameter = 'updated=1';
                         wp_redirect($submit_property_link . $separator . $parameter);
+                        exit;
                     }
                 }
             }
         }
 
-        if( $submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes' ) {
-
+        // Send admin notification for listing updates if enabled
+        if ($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes') {
             $args = array(
-                'listing_title'  =>  get_the_title($property_id),
-                'listing_id'     =>  $property_id,
-                'listing_url'    =>  get_permalink($property_id)
+                'listing_title' => get_the_title($property_id),
+                'listing_id'    => $property_id,
+                'listing_url'   => get_permalink($property_id)
             );
-            houzez_email_type( $admin_email, 'admin_update_listing', $args);
+            houzez_email_type($admin_email, 'admin_update_listing', $args);
         }
-    // End per listing if
-    } else if( $enable_paid_submission == 'membership' ) {
+    } 
+    // Membership payment
+    elseif ($enable_paid_submission == 'membership') {
+        // Guest user flow
+        if (!is_user_logged_in()) {
+            $email = sanitize_email($_POST['user_email']);
+            $errors = array();
 
-        if ( !is_user_logged_in() ) {
-            $email = wp_kses( $_POST['user_email'], $allowed_html );
-            if( email_exists( $email ) ) {
+            // Validate email
+            if (email_exists($email)) {
                 $errors[] = $houzez_local['email_already_registerd'];
             }
 
-            if( !is_email( $email ) ) {
+            if (!is_email($email)) {
                 $errors[] = $houzez_local['invalid_email'];
             }
 
-            if( empty($errors) ) {
-                $username = explode("@", $email);
+            if (empty($errors)) {
+                // Create username from email
+                $username_parts = explode('@', $email);
+                $username = $username_parts[0];
 
-                if( username_exists( $username[0] ) ) {
-                    $username = $username[0].rand(5, 999);
-                } else {
-                    $username = $username[0];
+                if (username_exists($username)) {
+                    $username = $username . rand(5, 999);
                 }
 
-                $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
-                $user_id = wp_create_user( $username, $random_password, $email );
+                $random_password = wp_generate_password(12, false);
+                $user_id = wp_create_user($username, $random_password, $email);
 
-                if( !is_wp_error( $user_id ) ) {
+                if (!is_wp_error($user_id)) {
+                    $user = get_user_by('id', $user_id);
 
-                    $user = get_user_by( 'id', $user_id );
-
-                    houzez_update_profile( $user_id );
-                    houzez_wp_new_user_notification( $user_id, $random_password );
+                    houzez_update_profile($user_id);
+                    houzez_wp_new_user_notification($user_id, $random_password);
+                    
+                    // Register as agent if enabled
                     $user_as_agent = houzez_option('user_as_agent');
-                    if( $user_as_agent == 'yes' ) {
-                        houzez_register_as_agent ( $username, $email, $user_id );
+                    if ($user_as_agent == 'yes') {
+                        houzez_register_as_agent($username, $email, $user_id);
                     }
 
-                    if( !is_wp_error($user) ) {
+                    if (!is_wp_error($user)) {
                         wp_clear_auth_cookie();
-                        wp_set_current_user( $user->ID, $user->user_login );
-                        wp_set_auth_cookie( $user->ID );
-                        do_action( 'wp_login', $user->user_login );
+                        wp_set_current_user($user->ID, $user->user_login);
+                        wp_set_auth_cookie($user->ID);
+                        do_action('wp_login', $user->user_login);
 
-                        $property_id = apply_filters( 'houzez_submit_listing', $new_property );
+                        $property_id = apply_filters('houzez_submit_listing', $new_property);
 
                         $args = array(
-                            'listing_title'  =>  get_the_title($property_id),
-                            'listing_id'     =>  $property_id,
-                            'listing_url'    =>  get_permalink($property_id),
+                            'listing_title' => get_the_title($property_id),
+                            'listing_id'    => $property_id,
+                            'listing_url'   => get_permalink($property_id),
                         );
 
-                        /*
-                         * Send email
-                         * */
-                        if( $submission_action != 'update_property' ) {
-                            houzez_email_type( $user_email, 'free_submission_listing', $args);
-                            houzez_email_type( $admin_email, 'admin_free_submission_listing', $args);
-                            
-                        } else if($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes' ) {
-                            houzez_email_type( $admin_email, 'admin_update_listing', $args);
+                        // Send email notifications
+                        if ($submission_action != 'update_property') {
+                            houzez_email_type($user_email, 'free_submission_listing', $args);
+                            houzez_email_type($admin_email, 'admin_free_submission_listing', $args);
+                        } elseif ($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes') {
+                            houzez_email_type($admin_email, 'admin_update_listing', $args);
                         }
 
+                        // Redirect to package selection
                         $separator = (parse_url($select_packages_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
-                        $parameter = '';//'prop-id=' . $property_id;
+                        $parameter = ''; // 'prop-id=' . $property_id removed as not needed per original
                         wp_redirect($select_packages_link . $separator . $parameter);
-                        exit();
+                        exit;
                     }
-
                 }
-
             }
-
-        // end is_user_logged_in if
         } else {
-            
+            // Logged in user flow
             $property_id = apply_filters('houzez_submit_listing', $new_property);
+            
             $args = array(
-                'listing_title'  =>  get_the_title($property_id),
-                'listing_id'     =>  $property_id,
-                'listing_url'    =>  get_permalink($property_id)
+                'listing_title' => get_the_title($property_id),
+                'listing_id'    => $property_id,
+                'listing_url'   => get_permalink($property_id)
             );
 
-            /*
-             * Send email
-             * */
-            if( $submission_action != 'update_property' ) {
-                houzez_email_type( $user_email, 'free_submission_listing', $args);
-                houzez_email_type( $admin_email, 'admin_free_submission_listing', $args);
-
-            } else if( $submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes' ) {
-                houzez_email_type( $admin_email, 'admin_update_listing', $args);
+            // Send email notifications
+            if ($submission_action != 'update_property') {
+                houzez_email_type($user_email, 'free_submission_listing', $args);
+                houzez_email_type($admin_email, 'admin_free_submission_listing', $args);
+            } elseif ($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes') {
+                houzez_email_type($admin_email, 'admin_update_listing', $args);
             }
 
+            // Check if user has active membership
             if (houzez_user_has_membership($packageUserId)) {
-                
                 if (!empty($submit_property_link)) {
-                    $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
+                    $submit_property_link = add_query_arg('edit_property', $property_id, $submit_property_link);
                     $separator = (parse_url($submit_property_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
 
                     $parameter = 'success=1';
-                    if($submission_action == 'update_property') {
+                    if ($submission_action == 'update_property') {
                         $parameter = 'updated=1';
                     }
                     
                     wp_redirect($submit_property_link . $separator . $parameter);
+                    exit;
                 }
-
-            } // end membership check
-            else {
+            } else {
+                // Redirect to package selection
                 $separator = (parse_url($select_packages_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
-                $parameter = '';//'prop-id=' . $property_id;
+                $parameter = ''; // 'prop-id=' . $property_id removed as not needed per original
                 wp_redirect($select_packages_link . $separator . $parameter);
-                exit();
+                exit;
             }
         }
+    } 
+    // Free submission
+    else {
+        // Guest user flow
+        if (!is_user_logged_in()) {
+            $email = sanitize_email($_POST['user_email']);
+            $errors = array();
 
-    // End membership else if
-    } else {
-
-        if ( !is_user_logged_in() ) {
-            $email = wp_kses( $_POST['user_email'], $allowed_html );
-            if( email_exists( $email ) ) {
-                $errors[] = $houzez_local['email_already_registerd'];
+            // Validate email
+            if (email_exists($email)) {
+                $errors[] = $houzez_local['email_already_registerd'] ?? 'Email already registered';
             }
 
-            if( !is_email( $email ) ) {
-                $errors[] = $houzez_local['invalid_email'];
+            if (!is_email($email)) {
+                $errors[] = $houzez_local['invalid_email'] ?? 'Invalid email';
             }
 
-            if( empty($errors) ) {
-                $username = explode("@", $email);
+            if (empty($errors)) {
+                // Create username from email
+                $username_parts = explode('@', $email);
+                $username = $username_parts[0];
 
-                if( username_exists( $username[0] ) ) {
-                    $username = $username[0].rand(5, 999);
-                } else {
-                    $username = $username[0];
+                if (username_exists($username)) {
+                    $username = $username . rand(5, 999);
                 }
 
-                $random_password = wp_generate_password( $length=12, $include_standard_special_chars=false );
-                $user_id = wp_create_user( $username, $random_password, $email );
+                $random_password = wp_generate_password(12, false);
+                $user_id = wp_create_user($username, $random_password, $email);
 
-                if( !is_wp_error( $user_id ) ) {
+                if (!is_wp_error($user_id)) {
+                    $user = get_user_by('id', $user_id);
 
-                    $user = get_user_by( 'id', $user_id );
-
-                    houzez_update_profile( $user_id );
-                    houzez_wp_new_user_notification( $user_id, $random_password );
+                    houzez_update_profile($user_id);
+                    houzez_wp_new_user_notification($user_id, $random_password);
+                    
+                    // Register as agent if enabled
                     $user_as_agent = houzez_option('user_as_agent');
-                    if( $user_as_agent == 'yes' ) {
-                        houzez_register_as_agent ( $username, $email, $user_id );
+                    if ($user_as_agent == 'yes') {
+                        houzez_register_as_agent($username, $email, $user_id);
                     }
 
-                    if( !is_wp_error($user) ) {
+                    if (!is_wp_error($user)) {
                         wp_clear_auth_cookie();
-                        wp_set_current_user( $user->ID, $user->user_login );
-                        wp_set_auth_cookie( $user->ID );
-                        do_action( 'wp_login', $user->user_login );
+                        wp_set_current_user($user->ID, $user->user_login);
+                        wp_set_auth_cookie($user->ID);
+                        do_action('wp_login', $user->user_login);
 
-                        $property_id = apply_filters( 'houzez_submit_listing', $new_property );
+                        $property_id = apply_filters('houzez_submit_listing', $new_property);
 
                         $args = array(
-                            'listing_title'  =>  get_the_title($property_id),
-                            'listing_id'     =>  $property_id,
-                            'listing_url'    =>  get_permalink($property_id)
+                            'listing_title' => get_the_title($property_id),
+                            'listing_id'    => $property_id,
+                            'listing_url'   => get_permalink($property_id)
                         );
 
-                        /*
-                         * Send email
-                         * */
-                        if( $submission_action != 'update_property' || ( $submission_action == 'update_property' && $is_draft == 'draft' ) ) {
-                            houzez_email_type( $user_email, 'free_submission_listing', $args);
-                            houzez_email_type( $admin_email, 'admin_free_submission_listing', $args);
-
-                        } else if( $submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes' ) {
-                            houzez_email_type( $admin_email, 'admin_update_listing', $args);
+                        // Send email notifications
+                        if ($submission_action != 'update_property' || ($submission_action == 'update_property' && $is_draft == 'draft')) {
+                            houzez_email_type($user_email, 'free_submission_listing', $args);
+                            houzez_email_type($admin_email, 'admin_free_submission_listing', $args);
+                        } elseif ($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes') {
+                            houzez_email_type($admin_email, 'admin_update_listing', $args);
                         }
 
+                        // Redirect after submission
                         if (!empty($thankyou_page_link)) {
                             wp_redirect($thankyou_page_link);
-
+                            exit;
                         } else {
                             if (!empty($dashboard_listings)) {
                                 $separator = (parse_url($dashboard_listings, PHP_URL_QUERY) == NULL) ? '?' : '&';
                                 $parameter = ($updated_successfully) ? '' : '';
                                 wp_redirect($dashboard_listings . $separator . $parameter);
+                                exit;
                             }
                         }
-                        exit();
                     }
-
                 }
-
             }
-
         } else {
-
+            // Logged in user flow
             $property_id = apply_filters('houzez_submit_listing', $new_property);
 
             $args = array(
-                'listing_title'  =>  get_the_title($property_id),
-                'listing_id'     =>  $property_id,
-                'listing_url'    =>  get_permalink($property_id)
+                'listing_title' => get_the_title($property_id),
+                'listing_id'    => $property_id,
+                'listing_url'   => get_permalink($property_id)
             );
 
-            /*
-             * Send email
-             * */
-            if( $submission_action != 'update_property' || ( $submission_action == 'update_property' && $is_draft == 'draft' ) ) {
-                houzez_email_type( $user_email, 'free_submission_listing', $args);
-                houzez_email_type( $admin_email, 'admin_free_submission_listing', $args);
-
-            } else if( $submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes' ) {
-                houzez_email_type( $admin_email, 'admin_update_listing', $args);
+            // Send email notifications
+            if ($submission_action != 'update_property' || ($submission_action == 'update_property' && $is_draft == 'draft')) {
+                houzez_email_type($user_email, 'free_submission_listing', $args);
+                houzez_email_type($admin_email, 'admin_free_submission_listing', $args);
+            } elseif ($submission_action == 'update_property' && houzez_option('edit_listings_admin_approved') == 'yes') {
+                houzez_email_type($admin_email, 'admin_update_listing', $args);
             }
 
+            // Redirect to the property edit page
             if (!empty($submit_property_link)) {
-                $submit_property_link = add_query_arg( 'edit_property', $property_id, $submit_property_link );
+                $submit_property_link = add_query_arg('edit_property', $property_id, $submit_property_link);
                 $separator = (parse_url($submit_property_link, PHP_URL_QUERY) == NULL) ? '?' : '&';
 
                 $parameter = 'success=1';
-                if($submission_action == 'update_property') {
+                if ($submission_action == 'update_property') {
                     $parameter = 'updated=1';
                 }
                 
                 wp_redirect($submit_property_link . $separator . $parameter);
+                exit;
             }
-
         }
     }
-
 }
 
-get_header(); 
-
-$houzez_loggedin = false;
-if ( is_user_logged_in() ) {
-    $houzez_loggedin = true;
+// Load the appropriate header
+if (is_user_logged_in()) {
+    get_header('dashboard');
+} else {
+    get_header();
 }
 
-$dash_main_class = "dashboard-add-new-listing";
-if (houzez_edit_property()) { 
-    $dash_main_class = "dashboard-edit-listing";
+$houzez_loggedin = is_user_logged_in();
+
+// Determine if sidebar should be shown
+$show_sidebar = false;
+$col_class = "col-12";
+if (houzez_edit_property() || houzez_can_manage() || houzez_is_editor()) { 
+    $col_class = "col-12 col-lg-10";
+    $show_sidebar = true;
 }
 
-if( is_user_logged_in() ) { ?> 
+// User is logged in
+if ($houzez_loggedin) { 
+?>
 
-    <header class="header-main-wrap dashboard-header-main-wrap">
-        <div class="dashboard-header-wrap">
-            <div class="d-flex align-items-center">
-                <div class="dashboard-header-left flex-grow-1">
-                    <?php get_template_part('template-parts/dashboard/submit/partials/snake-nav'); ?>
-                    <h1><?php echo houzez_option('dsh_create_listing', 'Create a Listing'); ?></h1>
-                </div><!-- dashboard-header-left -->
-                <div class="dashboard-header-right">
-                    <?php 
-                    if(houzez_edit_property()) { 
-                        $view_link = isset($_GET['edit_property']) ? get_permalink($_GET['edit_property']) : '';
-                    ?>
-                    <a class="btn btn-primary-outlined" target="_blank" href="<?php echo esc_url($view_link); ?>"><?php echo houzez_option('fal_view_property', esc_html__('View Property', 'houzez')); ?></a>
+<!-- Load the dashboard sidebar -->
+<?php get_template_part('template-parts/dashboard/sidebar'); ?>
 
-                    <?php if( get_post_status( $_GET['edit_property'] ) == 'draft' ) { ?>
-                    <button id="save_as_draft" class="btn btn-primary-outlined fave-load-more">
+<div class="dashboard-right">
+    <!-- Dashboard Topbar --> 
+    <?php get_template_part('template-parts/dashboard/topbar'); ?>
+
+    <div class="dashboard-content">
+        
+        <?php
+        // Show verification message if required
+        if ($is_user_verification_required) {
+            $verification_message = houzez_option('verification_message', esc_html__('Your account must be verified before you can add new properties. Please complete the verification process.', 'houzez'));
+            $profile_link = houzez_get_template_link_2('template/user_dashboard_profile.php');
+            $verification_link = add_query_arg('hpage', 'verification', $profile_link);
+            
+            echo '<div class="block-wrap">
+            <div class="block-content-wrap">';
+            
+            echo '<div class="alert alert-warning" role="alert">' . esc_html($verification_message) . '</div>';
+            echo '<a class="btn btn-primary verification-link" href="' . esc_url($verification_link) . '">' . esc_html__('Go to Verification', 'houzez') . '</a>';
+            
+            echo '</div>
+            </div>';
+            return;
+        }
+        ?>
+
+        <div class="heading d-flex align-items-center justify-content-between">
+            <div class="heading-text">
+                <h2><?php echo houzez_option('dsh_create_listing', 'Create a Listing'); ?></h2>
+            </div>
+
+            <?php 
+            // Show different buttons based on whether editing an existing property
+            if (houzez_edit_property()) { 
+                $view_link = isset($_GET['edit_property']) ? get_permalink(intval($_GET['edit_property'])) : '';
+            ?>
+                <div class="d-flex gap-2">
+                    <a href="<?php echo esc_url($view_link); ?>" target="_blank" class="btn btn-primary-outlined btn-sm-custom"><?php echo houzez_option('fal_view_property', esc_html__('View Property', 'houzez')); ?></a>
+                    <button id="save_as_draft" class="btn btn-primary btn-sm-custom" data-action="save_as_draft">
                         <?php get_template_part('template-parts/loader'); ?>
-                        <?php echo houzez_option('fal_save_draft', esc_html__('Save as Draft', 'houzez')); ?>        
+                        <?php echo houzez_option('fal_save_draft', 'Save'); ?>
                     </button>
-                    <?php } ?>
+                </div>
+                <style>
+                    @media (max-width: 767px) {
+                        .btn-sm-custom {
+                            padding: 5px 8px;
+                            font-size: 0.775rem;
+                            line-height: 20px;
+                        }
+                    }
+                </style>
+            <?php } else { ?>
+                <button id="save_as_draft" class="btn btn-primary-outlined" data-action="save_as_draft">
+                    <?php get_template_part('template-parts/loader'); ?>
+                    <?php echo houzez_option('fal_save_draft', 'Save as Draft'); ?>
+                </button>
+            <?php } ?>
+        </div>
 
-                    <?php } else { ?>
-
-                    <button id="save_as_draft" class="btn btn-primary-outlined fave-load-more">
-                        <?php get_template_part('template-parts/loader'); ?>
-                        <?php echo houzez_option('fal_save_draft', esc_html__('Save as Draft', 'houzez')); ?>        
-                    </button>
-
-                    <?php } ?>
-
-                </div><!-- dashboard-header-right -->
-            </div><!-- d-flex -->
-        </div><!-- dashboard-header-wrap -->
-    </header><!-- .header-main-wrap -->
-    <section class="dashboard-content-wrap <?php echo esc_attr($dash_main_class); ?>">
-        
-        
-        <div class="d-flex">
-            <div class="order-2">
-                <?php
-                if( houzez_edit_property() ) {
-                    get_template_part('template-parts/dashboard/submit/partials/menu-edit-property');
-                } else { 
-                    echo '<div class="menu-edit-property-wrap">';
-                    get_template_part( 'template-parts/dashboard/submit/partials/author');
-                    echo '</div>';
-                }?>
-            </div><!-- order-2 -->
-            <div class="order-1 flex-grow-1">
-        
-
-                <div class="dashboard-content-inner-wrap">
-                    
+        <div class="dashboard-content-block-wrap pt-4">
+            <div id="messages"></div>
+            <div class="row mb-4">
+                <div class="<?php echo esc_attr($col_class); ?>">
                     <?php
                     if (is_plugin_active('houzez-theme-functionality/houzez-theme-functionality.php')) {
                         if (houzez_edit_property()) {
-
                             get_template_part('template-parts/dashboard/submit/edit-property-form');
-
                         } else {
-
                             get_template_part('template-parts/dashboard/submit/submit-property-form');
-
-                        } /* end of add/edit property*/
+                        }
                     } else {
-                        echo $houzez_local['houzez_plugin_required'];
+                        echo $houzez_local['houzez_plugin_required'] ?? 'Houzez Theme Functionality plugin is required';
                     }
-                    
                     ?>
-                    
-                </div><!-- dashboard-content-inner-wrap -->
+                </div>
 
-            </div><!-- order-1 -->
-        </div><!-- d-flex -->
-        
-    </section><!-- dashboard-content-wrap -->
-
-    <section class="dashboard-side-wrap">
-        <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-    </section>
+                <?php if ($show_sidebar) { ?>  
+                <div class="col-2 d-none d-lg-block">
+                    <?php 
+                    if (houzez_edit_property()) {
+                        get_template_part('template-parts/dashboard/submit/partials/menu-edit-property');
+                    } else {
+                        get_template_part('template-parts/dashboard/submit/partials/author');
+                    }
+                    ?>
+                </div>
+                <?php } ?>
+            </div> <!-- row -->
+        </div> <!-- dashboard-content-block-wrap -->
+    </div> <!-- dashboard-content -->
+</div> <!-- dashboard-right -->
 
 <?php
-} else { // End if user logged-in ?>
+} else { // User is not logged in
+?>
 
-<section class="frontend-submission-page dashboard-content-inner-wrap">
-    
+<section class="dashboard-content-block-wrap pt-4">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <?php 
-                if( $create_listing_login_required == 'yes' ) {
-
+                if ($create_listing_login_required == 'yes') {
                     get_template_part('template-parts/dashboard/submit/partials/login-required');
-
                 } else {
-
                     get_template_part('template-parts/dashboard/submit/submit-property-form');
-                     
-                } ?>
+                }
+                ?>
             </div>
         </div><!-- row -->
     </div><!-- container -->
@@ -542,15 +563,21 @@ if( is_user_logged_in() ) { ?>
 <?php
 } // End logged-in else
 
-
-if(houzez_get_map_system() == 'google') {
-    if(houzez_option('googlemap_api_key') != "") {
-        wp_enqueue_script('houzez-submit-google-map',  get_theme_file_uri('/js/submit-property-google-map.js'), array('jquery'), HOUZEZ_THEME_VERSION, true);
+// Load map scripts based on the selected map system
+if (houzez_get_map_system() == 'google') {
+    if (houzez_option('googlemap_api_key') != "") {
+        wp_enqueue_script('houzez-submit-google-map', get_theme_file_uri('/js/submit-property-google-map.js'), array('jquery'), HOUZEZ_THEME_VERSION, true);
     }
-    
+} elseif (houzez_get_map_system() == 'mapbox') {
+    wp_enqueue_script('houzez-submit-mapbox', get_theme_file_uri('/js/submit-property-mapbox.js'), array('jquery', 'mapbox-gl', 'mapbox-gl-language'), HOUZEZ_THEME_VERSION, true);
 } else {
     wp_enqueue_script('houzez-submit-osm', get_theme_file_uri('/js/submit-property-osm.js'), array('jquery'), HOUZEZ_THEME_VERSION, true);
 }
-?>
 
-<?php get_footer();?>
+// Load the appropriate footer
+if (is_user_logged_in()) {
+    get_footer('dashboard');
+} else {
+    get_footer();
+}
+?>

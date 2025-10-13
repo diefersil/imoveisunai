@@ -1,8 +1,8 @@
 <?php global $houzez_local; ?>
-<div class="form-group">
-	<label for="lat"><?php echo houzez_option( 'cl_latitude', 'Latitude' ); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="latitude"><?php echo houzez_option( 'cl_latitude', 'Latitude' ); ?></label>
 
-	<input class="form-control" id="latitude" name="lat" value="<?php
+	<input class="form-control" id="latitude" name="latitude" value="<?php
     if (houzez_edit_property()) {
         $lat = houzez_get_field_meta('property_location');
         $lat = explode(",", $lat);

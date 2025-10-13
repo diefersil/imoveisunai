@@ -385,12 +385,12 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
+        $this->add_control(
+            'grid_image_size',
             [
-                'name' => 'grid_image',
-                'exclude' => [ 'custom', 'houzez-map-info', 'houzez-image_masonry', 'houzez-variable-gallery' ],
-                'include' => [],
+                'label' => esc_html__( 'Image Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
                 'default' => 'full',
                 'condition' => [
                     'grid_data' => 'dynamic',
@@ -434,133 +434,71 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
                     'grid-item-v1' => esc_html__('Landscape', 'houzez-theme-functionality'),
                     'grid-item-v2' => esc_html__('Square', 'houzez-theme-functionality'),
                     'grid-item-v3' => esc_html__('Portrait', 'houzez-theme-functionality'),
+                    'grid-item-v4' => esc_html__('Custom', 'houzez-theme-functionality'),
                 ],
                 'default' => 'grid-item-v1'
             ]
         );
 
         $this->add_responsive_control(
-            'grid_v3_height',
+            'grid_height',
             [
-                'label' => esc_html__( 'Height(%)', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Height', 'houzez-theme-functionality' ),
                 'type' => Controls_Manager::SLIDER,
+                'size_units' => [ '%', 'px' ],
                 'range' => [
                     '%' => [
                         'min' => 0,
-                        'max' => 200,
+                        'max' => 300,
                     ],
                 ],
                 'devices' => [ 'desktop', 'tablet', 'mobile' ],
                 'desktop_default' => [
-                    'size' => '200',
+                    'size' => 100,
                     'unit' => '%',
                 ],
                 'tablet_default' => [
-                    'size' => '200',
+                    'size' => 100,
                     'unit' => '%',
                 ],
                 'mobile_default' => [
-                    'size' => '100',
+                    'size' => 100,
                     'unit' => '%',
                 ],
+                'default' => [
+                    'unit' => '%',
+                    'size' => 100,
+                ],
                 'condition' => [
-                    'grid_type' => 'grid-item-v3',
+                    'grid_type' => 'grid-item-v4',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .grid-item-v3' => 'padding-bottom: calc({{SIZE}}{{UNIT}} + 30px);',
+                    '{{WRAPPER}} .grid-item:not([data-ratio])' => 'padding-top: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
 
         $this->add_responsive_control(
-            'grid_v2_height',
+            'margin_bottom',
             [
-                'label' => esc_html__( 'Height(%)', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Margin Bottom', 'houzez-theme-functionality' ),
                 'type' => Controls_Manager::SLIDER,
-                'range' => [
-                    '%' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
-                'devices' => [ 'desktop', 'tablet', 'mobile' ],
-                'desktop_default' => [
-                    'size' => '100',
-                    'unit' => '%',
-                ],
-                'tablet_default' => [
-                    'size' => '100',
-                    'unit' => '%',
-                ],
-                'mobile_default' => [
-                    'size' => '100',
-                    'unit' => '%',
-                ],
-                'condition' => [
-                    'grid_type' => 'grid-item-v2',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .grid-item-v2' => 'padding-bottom: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'grid_v1_height',
-            [
-                'label' => esc_html__( 'Height(%)', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SLIDER,
-                'range' => [
-                    '%' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
-                'devices' => [ 'desktop', 'tablet', 'mobile' ],
-                'desktop_default' => [
-                    'size' => '75',
-                    'unit' => '%',
-                ],
-                'tablet_default' => [
-                    'size' => '75',
-                    'unit' => '%',
-                ],
-                'mobile_default' => [
-                    'size' => '75',
-                    'unit' => '%',
-                ],
-                'condition' => [
-                    'grid_type' => 'grid-item-v1',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .grid-item-v1' => 'padding-bottom: calc({{SIZE}}{{UNIT}} + 7.5px);',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'grid_item_margin',
-            [
-                'label' => esc_html__( 'Margin Bottom(px)', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ '%', 'px', 'rem' ],
                 'range' => [
                     'px' => [
                         'min' => 0,
-                        'max' => 50,
+                        'max' => 100,
+                        'step' => 1,
                     ],
-                ],
-                'devices' => [ 'desktop', 'tablet', 'mobile' ],
-                'desktop_default' => [
-                    'size' => '30',
-                    'unit' => 'px',
-                ],
-                'tablet_default' => [
-                    'size' => '30',
-                    'unit' => 'px',
-                ],
-                'mobile_default' => [
-                    'size' => '30',
-                    'unit' => 'px',
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                    'rem' => [
+                        'min' => 0,
+                        'max' => 100,
+                        'step' => 0.1,
+                    ],
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .grid-item' => 'margin-bottom: {{SIZE}}{{UNIT}};',
@@ -569,12 +507,39 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
         );
 
         $this->add_responsive_control(
+            'padding_bottom',
+            [
+                'label' => esc_html__( 'Padding Bottom', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ '%', 'px', 'rem' ],
+                'range' => [
+                    'px' => [
+                        'min' => 0,
+                        'max' => 100,
+                        'step' => 1,
+                    ],
+                    '%' => [
+                        'min' => 0,
+                        'max' => 100,
+                    ],
+                    'rem' => [
+                        'min' => 0,
+                        'max' => 100,
+                        'step' => 0.1,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .grid-item' => 'padding-bottom: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
             'grid_padding',
             [
-                'label' => esc_html__( 'Padding(px)', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Text Padding(px)', 'houzez-theme-functionality' ),
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%', 'em' ],
-
                 'devices' => [ 'desktop', 'tablet', 'mobile' ],
                 'selectors' => [
                     '{{WRAPPER}} .grid-item-text-wrap' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
@@ -727,7 +692,7 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
 
                 if($tax_image_type == 'yes') {
                     $term_img_id = get_term_meta($term->term_id, 'fave_taxonomy_img', true);
-                    $image_size = $settings['grid_image_size'];
+                    $image_size = $settings['grid_image_size'] === 'global' ? 'full' : $settings['grid_image_size'];
                     $thumb_url_array = wp_get_attachment_image_src( $term_img_id, $image_size, true );
                     $image = $thumb_url_array[0];
 
@@ -750,27 +715,39 @@ class Houzez_Elementor_Grid_Builder extends Widget_Base {
         if ( ! Plugin::$instance->editor->is_edit_mode() ) {
             $lazyloadbg = houzez_get_lazyload_for_bg();
         }
-        
+
+        $data_ratio = '';
+        $grid_type = $settings['grid_type'];
+        if($grid_type == 'grid-item-v1') {
+            $data_ratio = 'data-ratio="landscape"';
+        } else if($grid_type == 'grid-item-v2') {
+            $data_ratio = 'data-ratio="square"';
+        } else if($grid_type == 'grid-item-v3') {
+            $data_ratio = 'data-ratio="vertical"';
+        }
 
         ?>
 
-        <div class="grid-item <?php echo $lazyloadbg; ?> <?php echo esc_attr($settings['grid_type']); ?>" style="background-image: url(<?php echo esc_url($image); ?>)">
+        <div class="grid-item <?php echo $lazyloadbg; ?> <?php echo esc_attr($grid_type); ?>" <?php echo $data_ratio; ?> style="background-image: url(<?php echo esc_url($image); ?>)">
             <a class="grid-item-link hover-effect-flat" <?php echo $target; ?> href="<?php echo esc_url($more_link); ?>">
-                <div class="grid-item-text-wrap">
+                <div class="grid-item-text-wrap d-flex flex-column justify-content-between w-100 h-100">
+                    <div class="d-flex flex-column">
+                        <?php if(!empty($subtitle)) { ?>
+                        <div class="grid-item-subtitle mb-1"><?php echo esc_attr($subtitle); ?></div>
+                        <?php } ?>
 
-                    <?php if(!empty($subtitle)) { ?>
-                    <div class="grid-item-subtitle"><?php echo esc_attr($subtitle); ?></div>
-                    <?php } ?>
-
-                    <?php if(!empty($title)) { ?>
-                    <div class="grid-item-title"><?php echo esc_attr($title); ?></div>
-                    <?php } ?>
+                        <?php if(!empty($title)) { ?>
+                        <div class="grid-item-title"><?php echo esc_attr($title); ?></div>
+                        <?php } ?>
+                    </div>
                     
                     <?php if(!empty($more_text)) { ?>
+                    <div class="d-flex align-items-center justify-content-between">
                         <div class="grid-item-text-link"><?php echo esc_attr($more_text); ?></div>
                         <div class="grid-item-icon">
                             <i class="houzez-icon icon-arrow-button-right-2"></i>
                         </div>
+                    </div>
                     <?php } ?>
                 </div><!-- taxonomy-text-wrap -->
             </a>

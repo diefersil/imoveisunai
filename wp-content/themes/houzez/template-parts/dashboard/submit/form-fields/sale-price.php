@@ -11,18 +11,17 @@ if (houzez_edit_property()) {
     }
 }
 ?>
-<div class="form-group">
-	<label for="prop_price">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_price">
 		<?php echo houzez_option('cl_sale_price', 'Sale or Rent Price').houzez_required_field('sale_rent_price'); ?>	
 	</label>
 
-	<input class="form-control" name="prop_price" <?php houzez_required_field_2('sale_rent_price'); ?> id="prop_price" value="<?php echo esc_attr( $property_price ); ?>" placeholder="<?php echo houzez_option('cl_sale_price_plac', 'Enter the price'); ?>" type="text">
+	<input class="form-control" name="property_price" <?php houzez_required_field_2('sale_rent_price'); ?> id="property_price" value="<?php echo esc_attr( $property_price ); ?>" placeholder="<?php echo houzez_option('cl_sale_price_plac', 'Enter the price'); ?>" type="text">
 
     <?php if( isset( $hide_prop_fields['price_placeholder'] ) && $hide_prop_fields['price_placeholder'] != 1 ) { ?>
-    <label class="control control--checkbox hz-price-placeholder">
-    	<input type="checkbox" id="show_price_placeholder" name="show_price_placeholder" <?php echo $checked; ?>>
-    	<span class="control__indicator"></span>
-    	<?php echo houzez_option('cl_show_price_placeholder', 'Enable Price Placeholder'); ?>
+    <label class="control control--checkbox hz-price-placeholder mt-1">
+    	<input type="checkbox" id="show_price_placeholder" name="show_price_placeholder" <?php echo $checked; ?>> 
+    	<span class="control__indicator"></span> <span class="control__label"><?php echo houzez_option('cl_show_price_placeholder', 'Enable Price Placeholder'); ?></span>
     </label>
 	<?php } ?>
 </div>

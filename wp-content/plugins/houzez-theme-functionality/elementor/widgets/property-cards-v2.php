@@ -11,8 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.0
  */
 class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
-    use Houzez_Property_Card_Common_Filters;
-    use Houzez_Property_Filters_2;
+    use Houzez_Filters_Traits;
+    use Houzez_Property_Cards_Traits;
+     
 
     /**
      * Get widget name.
@@ -98,17 +99,9 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
-            [
-                'name' => 'listing_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
-                'default' => 'houzez-item-image-1',
-            ]
-        );
+        $this->listings_cards_thumb_size_control();
 
-        $this->register_common_filter_controls_2();
+        $this->listings_cards_general_filters();
 
         $this->add_control(
             'pagination_type',
@@ -118,6 +111,20 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                 'options'   => houzez_pagination_type(),
                 'description' => '',
                 'default' => 'loadmore',
+            ]
+        );
+
+        $this->add_control(
+            'warning_panel_notice',
+            [
+                'type' => \Elementor\Controls_Manager::NOTICE,
+                'notice_type' => 'warning',
+                'dismissible' => false,
+                'heading' => esc_html__( 'Warning', 'textdomain' ),
+                'content' => esc_html__( 'Infinite Scroll works with only one widget per page; enabling it for multiple widgets on the same page will cause issues.', 'houzez-theme-functionality' ),
+                'condition' => [
+                    'pagination_type' => 'infinite_scroll'
+                ]
             ]
         );
         
@@ -134,7 +141,7 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
             ]
         );
         
-        $this->register_common_filters_controls();
+        $this->listings_cards_filters();
 
         $this->end_controls_section();
 
@@ -148,6 +155,8 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                 'tab'       => Controls_Manager::TAB_CONTENT,
             ]
         );
+
+        $this->Property_Cards_Show_Hide_Traits();
 
         $this->add_control(
             'hide_excerpt',
@@ -165,96 +174,6 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
         );
 
         $this->add_control(
-            'hide_compare',
-            [
-                'label' => esc_html__( 'Hide Compare Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .item-tools .item-compare' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'hide_favorite',
-            [
-                'label' => esc_html__( 'Hide Favorite Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .item-tools .item-favorite' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'hide_preview',
-            [
-                'label' => esc_html__( 'Hide Preview Button', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .item-tools .item-preview' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'hide_featured_label',
-            [
-                'label' => esc_html__( 'Hide Featured Label', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .label-featured' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'hide_status',
-            [
-                'label' => esc_html__( 'Hide Status', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .labels-wrap .label-status' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'hide_label',
-            [
-                'label' => esc_html__( 'Hide Labels', 'houzez-theme-functionality' ),
-                'type' => Controls_Manager::SWITCHER,
-                'label_on' => esc_html__( 'Yes', 'houzez-theme-functionality' ),
-                'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
-                'return_value' => 'none',
-                'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .labels-wrap .hz-label' => 'display: {{VALUE}};',
-                ],
-            ]
-        );
-
-        $this->add_control(
             'hide_author_date',
             [
                 'label' => esc_html__( 'Hide Date & Agent', 'houzez-theme-functionality' ),
@@ -263,11 +182,6 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                 'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
                 'return_value' => 'none',
                 'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .property-cards-module .item-footer' => 'display: {{VALUE}};',
-                    '{{WRAPPER}} .property-cards-module .item-author' => 'display: {{VALUE}};',
-                    '{{WRAPPER}} .property-cards-module .item-date' => 'display: {{VALUE}};',
-                ],
             ]
         );
 
@@ -425,7 +339,7 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .item-title' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .item-title' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
                 ],
             ]
         );
@@ -455,7 +369,7 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .item-address' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .item-address' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
                 ],
             ]
         );
@@ -485,7 +399,7 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .item-short-description' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .item-short-description' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
                 ],
                 'condition' => [
                     'hide_Excerpt' => ''
@@ -538,23 +452,32 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
         $this->end_controls_section();
 
         /*--------------------------------------------------------------------------------
-        * Box Shadow
+        * Card Box
         * -------------------------------------------------------------------------------*/
         $this->start_controls_section(
             'hz_grid_box_shadow',
             [
-                'label' => esc_html__( 'Box Shadow', 'houzez-theme-functionality' ),
+                'label' => esc_html__( 'Card Box', 'houzez-theme-functionality' ),
                 'tab'   => Controls_Manager::TAB_STYLE,
             ]
         );
-        $this->add_group_control(
-            Group_Control_Box_Shadow::get_type(),
+
+        $this->Property_Cards_Box_Traits();
+
+        $this->end_controls_section();
+
+        /*--------------------------------------------------------------------------------
+        * Image 
+        * -------------------------------------------------------------------------------*/
+        $this->start_controls_section(
+            'hz_grid_images_styles',
             [
-                'name'     => 'box_shadow',
-                'label'    => esc_html__( 'Box Shadow', 'houzez-theme-functionality' ),
-                'selector' => '{{WRAPPER}} .item-wrap',
+                'label' => esc_html__( 'Image Radius', 'houzez-theme-functionality' ),
+                'tab'   => Controls_Manager::TAB_STYLE,
             ]
         );
+
+        $this->Property_Cards_Image_Traits();
 
         $this->end_controls_section();
 
@@ -569,102 +492,7 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
             ]
         );
 
-        $this->add_control(
-            'grid_bg_color',
-            [
-                'label'     => esc_html__( 'Grid Background', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-wrap' => 'background-color: {{VALUE}}',
-                    '{{WRAPPER}} .item-footer' => 'background-color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'price_color',
-            [
-                'label'     => esc_html__( 'Price', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-price-wrap' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'buttons_bg_color',
-            [
-                'label'     => esc_html__( 'Item Tools Background Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-tool > span' => 'background-color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'buttons_bg_color_hover',
-            [
-                'label'     => esc_html__( 'Item Tools Background Color Hover', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-tool > span:hover' => 'background-color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'buttons_color',
-            [
-                'label'     => esc_html__( 'Item Tools Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-tool > span' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'buttons_color_hover',
-            [
-                'label'     => esc_html__( 'Item Tools Color Hover', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-tool > span:hover' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'title_color',
-            [
-                'label'     => esc_html__( 'Title Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-title a' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'address_color',
-            [
-                'label'     => esc_html__( 'Address Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-address' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
+        $this->Property_Cards_Colors_Traits();
 
         $this->add_control(
             'excerpt_color',
@@ -677,46 +505,11 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
                 ],
                 'condition' => [
                     'hide_excerpt' => ''
-                ]
+                ],
+                'separator' => 'before',
             ]
         );
 
-        $this->add_control(
-            'icons_color',
-            [
-                'label'     => esc_html__( 'Icons', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-amenities i' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'figure_color',
-            [
-                'label'     => esc_html__( 'Figure', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .hz-figure' => 'color: {{VALUE}}'
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'labels_color',
-            [
-                'label'     => esc_html__( 'Labels', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .item-wrap-v2 .item-amenities li' => 'color: {{VALUE}}',
-                    '{{WRAPPER}} .area_postfix' => 'color: {{VALUE}}'
-                ],
-            ]
-        );
         $this->add_control(
             'author_color',
             [
@@ -731,128 +524,13 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
             ]
         );
 
-    
         $this->end_controls_section();
 
         /*--------------------------------------------------------------------------------
         * Pagination
         * -------------------------------------------------------------------------------*/
-        $this->start_controls_section(
-            'hz_pagination',
-            [
-                'label' => esc_html__( 'Pagination', 'houzez-theme-functionality' ),
-                'tab'   => Controls_Manager::TAB_STYLE,
-            ]
-        );
-        $this->add_control(
-            'pagi_bg_color',
-            [
-                'label'     => esc_html__( 'Background Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-link' => 'background-color: {{VALUE}}',
-                    '{{WRAPPER}} .btn-load-more' => 'background-color: {{VALUE}}',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagi_color',
-            [
-                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-link' => 'color: {{VALUE}}',
-                    '{{WRAPPER}} .btn-load-more' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'pagi_bg_color_hover',
-            [
-                'label'     => esc_html__( 'Background Color Hover', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-link:hover' => 'background-color: {{VALUE}}',
-                    '{{WRAPPER}} .btn-load-more:hover' => 'background-color: {{VALUE}}',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagi_color_hover',
-            [
-                'label'     => esc_html__( 'Color Hover', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-link:hover' => 'color: {{VALUE}}',
-                    '{{WRAPPER}} .btn-load-more:hover' => 'color: {{VALUE}}',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'pagi_bg_color_active',
-            [
-                'label'     => esc_html__( 'Background Color Active', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-item.active .page-link' => 'background-color: {{VALUE}}; border-color: {{VALUE}}',
-                ],
-                'condition' => [
-                    'pagination_type' => 'number',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagi_color_active',
-            [
-                'label'     => esc_html__( 'Color Active', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .page-item.active .page-link' => 'color: {{VALUE}}',
-                ],
-                'condition' => [
-                    'pagination_type' => 'number',
-                ],
-            ]
-        );
-
-        $this->add_control(
-            'pagi_bg_border_color',
-            [
-                'label'     => esc_html__( 'Border Color', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .btn-load-more' => 'border-color: {{VALUE}}',
-                ],
-                'condition' => [
-                    'pagination_type' => 'loadmore',
-                ],
-            ]
-        );
-        $this->add_control(
-            'pagi_border_color_hover',
-            [
-                'label'     => esc_html__( 'Border Color Hover', 'houzez-theme-functionality' ),
-                'type'      => Controls_Manager::COLOR,
-                'default'   => '',
-                'selectors' => [
-                    '{{WRAPPER}} .btn-load-more:hover' => 'border-color: {{VALUE}}',
-                ],
-                'condition' => [
-                    'pagination_type' => 'loadmore',
-                ],
-            ]
-        );
-
-        $this->end_controls_section();
+        
+        $this->Property_Cards_Pagination_Traits();
 
     }
 
@@ -865,72 +543,15 @@ class Houzez_Elementor_Property_Card_V2 extends Widget_Base {
      * @access protected
      */
     protected function render() {
-
         $settings = $this->get_settings_for_display();
-        $property_type = $property_status = $property_label = $property_country = $property_state = $property_city = $property_area = $properties_by_agents = $properties_by_agencies = '';
 
-        if(!empty($settings['property_type'])) {
-            $property_type = implode (",", $settings['property_type']);
-        }
-
-        if(!empty($settings['property_status'])) {
-            $property_status = implode (",", $settings['property_status']);
-        }
-
-        if(!empty($settings['property_label'])) {
-            $property_label = implode (",", $settings['property_label']);
-        }
-
-        if(!empty($settings['property_country'])) {
-            $property_country = implode (",", $settings['property_country']);
-        }
-
-        if(!empty($settings['property_state'])) {
-            $property_state = implode (",", $settings['property_state']);
-        }
-
-        if(!empty($settings['property_city'])) {
-            $property_city = implode (",", $settings['property_city']);
-        }
-
-        if(!empty($settings['property_area'])) {
-            $property_area = implode (",", $settings['property_area']);
-        }
-
-        if( !empty($settings['properties_by_agents']) ) {
-            $properties_by_agents = $settings['properties_by_agents'];
-        }
-
-        if( !empty($settings['properties_by_agencies']) ) {
-            $properties_by_agencies = $settings['properties_by_agencies'];
-        }
-
-        $args['module_type'] =  $settings['module_type'];
-        $args['houzez_user_role'] =  $settings['houzez_user_role'];
-        $args['featured_prop'] =  $settings['featured_prop'];
-        $args['posts_limit'] =  $settings['posts_limit'];
-        $args['sort_by'] =  $settings['sort_by'];
-        $args['offset'] =  $settings['offset'];
-        $args['pagination_type'] =  $settings['pagination_type'];
-        $args['post_status'] =  $settings['post_status'];
-
-        $args['property_type']   =  $property_type;
-        $args['property_status']   =  $property_status;
-        $args['property_label']   =  $property_label;
-        $args['property_country']   =  $property_country;
-        $args['property_state']   =  $property_state;
-        $args['property_city']   =  $property_city;
-        $args['property_area']   =  $property_area;
-        $args['thumb_size'] = $settings['listing_thumb_size'];
-        $args['properties_by_agents'] = $properties_by_agents;
-        $args['properties_by_agencies'] = $properties_by_agencies;
-        $args['min_price'] = $settings['min_price'];
-        $args['max_price'] = $settings['max_price'];
-
-       
-        if( function_exists( 'houzez_property_card_v2' ) ) {
-            echo houzez_property_card_v2( $args );
-        }
+        // Convert Elementor settings to shortcode attributes format
+        $args = $this->listings_cards_args($settings);
+        $card_version = 'v2';
+        $module_type = $settings['module_type'];
+        
+        // Use the core function to render property cards
+        echo houzez_get_property_cards($args, $module_type, $card_version);
 
     }
 

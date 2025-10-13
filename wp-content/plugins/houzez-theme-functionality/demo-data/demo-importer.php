@@ -720,6 +720,104 @@ function Houzez_Import_Files() {
       'preview_url'                  => 'http://demo37.houzez.co',
     ),
 
+    array(
+      'import_file_name'             => 'Houzez38',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez38/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez38/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez38/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez38/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo38.houzez.co',
+    ),
+
+    array(
+      'import_file_name'             => 'Houzez39',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez39/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez39/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez39/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez39/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo39.houzez.co',
+    ),
+    array(
+      'import_file_name'             => 'Houzez40',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez40/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez40/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez40/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez40/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo40.houzez.co',
+    ),
+    array(
+      'import_file_name'             => 'Houzez41',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez41/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez41/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez41/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez41/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo41.houzez.co',
+    ),
+    array(
+      'import_file_name'             => 'Houzez42',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez42/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez42/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez42/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez42/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo42.houzez.co',
+    ),
+    array(
+      'import_file_name'             => 'Houzez43',
+      'import_file_url'            => 'https://plugins.houzez.co/demo-data/houzez43/content.xml',
+      'import_widget_file_url'     => 'https://plugins.houzez.co/demo-data/houzez43/widgets.json',
+      'import_customizer_file_url' => '',
+      'import_redux'           => array(
+        array(
+          'file_url'   => 'https://plugins.houzez.co/demo-data/houzez43/theme-options.json',
+          'option_name' => 'houzez_options',
+        ),
+      ),
+
+      'import_preview_image_url'     => 'https://plugins.houzez.co/demo-data/houzez43/thumbnail.png',
+      'import_notice'                => __( 'After you import this demo, you will have to setup the slider separately.', 'homey' ),
+      'preview_url'                  => 'http://demo43.houzez.co',
+    ),
+
   );
 }
 add_filter( 'pt-ocdi/import_files', 'Houzez_Import_Files' );
@@ -825,7 +923,7 @@ function houzez_after_import_setup($selected_import) {
     $demo_name = $selected_import['import_file_name'];
     $front_page_id = $blog_page_id = $main_menu = '';
 
-    if ( 'Houzez01' === $demo_name || 'Houzez02' === $demo_name || 'Houzez03' === $demo_name || 'Houzez04' === $demo_name || 'Houzez33' === $demo_name || 'Houzez33 - English' === $demo_name || 'Houzez34' === $demo_name || 'Houzez35' === $demo_name || 'Houzez36' === $demo_name || 'Houzez37' === $demo_name ) {
+    if ( 'Houzez01' === $demo_name || 'Houzez02' === $demo_name || 'Houzez03' === $demo_name || 'Houzez04' === $demo_name || 'Houzez33' === $demo_name || 'Houzez33 - English' === $demo_name || 'Houzez34' === $demo_name || 'Houzez35' === $demo_name || 'Houzez36' === $demo_name || 'Houzez37' === $demo_name || 'Houzez38' === $demo_name || 'Houzez40' === $demo_name || 'Houzez41' === $demo_name || 'Houzez43' === $demo_name ) {
         $footer_menu = get_term_by( 'name', 'Footer Menu', 'nav_menu' );
         $main_menu = get_term_by( 'name', 'Main Menu', 'nav_menu' );
         $front_page_id = houzez_get_page_id_by_title( 'Home Default' );
@@ -837,7 +935,7 @@ function houzez_after_import_setup($selected_import) {
         $front_page_id = houzez_get_page_id_by_title( 'Homepage Default' );
         $blog_page_id  = houzez_get_page_id_by_title( 'Blog' );
 
-    } elseif ( 'Houzez05' === $demo_name || 'Houzez06' === $demo_name || 'Houzez07' === $demo_name || 'Houzez09' === $demo_name || 'Houzez10' === $demo_name || 'Houzez11' === $demo_name || 'Houzez12' === $demo_name || 'Houzez14' === $demo_name || 'Houzez16' === $demo_name || 'Houzez17' === $demo_name || 'Houzez19' === $demo_name || 'Houzez20' === $demo_name ) {
+    } elseif ( 'Houzez05' === $demo_name || 'Houzez06' === $demo_name || 'Houzez07' === $demo_name || 'Houzez09' === $demo_name || 'Houzez10' === $demo_name || 'Houzez11' === $demo_name || 'Houzez12' === $demo_name || 'Houzez14' === $demo_name || 'Houzez16' === $demo_name || 'Houzez17' === $demo_name || 'Houzez19' === $demo_name || 'Houzez20' === $demo_name || 'Houzez39' === $demo_name || 'Houzez42' === $demo_name) {
         $footer_menu = get_term_by( 'name', 'Footer Menu', 'nav_menu' );
         $main_menu = get_term_by( 'name', 'Main Menu', 'nav_menu' );
         $front_page_id = houzez_get_page_id_by_title( 'Homepage' );

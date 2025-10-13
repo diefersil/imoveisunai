@@ -1,5 +1,5 @@
-<div class="form-group">
-	<label for="epc_current_rating"><?php echo houzez_option('cl_energy_ecp_rating', 'EPC Current Rating'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="epc_current_rating"><?php echo houzez_option('cl_energy_ecp_rating', 'EPC Current Rating'); ?></label>
 
 	<input class="form-control" id="epc_current_rating" name="epc_current_rating" value="<?php
     if (houzez_edit_property()) {

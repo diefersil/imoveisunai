@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.7.32"; /* Used for version number of the file */
+  font-family: "2.8.7"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -71,6 +71,10 @@ hr {
   background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
   color: #666;
   cursor: pointer;
+}
+
+input.ai-button-exception.ui-button.ui-corner-all.ui-widget[type=submit] {
+  padding: 1px 3px !important;
 }
 
 /*.ai-button.ui-button.ui-corner-all.ui-widget {*/
@@ -155,7 +159,7 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
 
 .ai-settings-table.left {
   float: left;
-  width: 63%
+  width: 70%
 }
 
 .ai-settings-table.left td.label {
@@ -164,7 +168,7 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
 
 .ai-settings-table.right {
   float: right;
-  width: 37%
+  width: 30%
 }
 
 .ai-settings-table.ai-values td:first-child {
@@ -1948,16 +1952,94 @@ table.ai-page-types td.ai-page-type.ai-unavailable label {
   background: #fff;
 }
 
+#ai-list-table td.ai-block-option.odd {
+  background: #fff;
+}
+
 #ai-list-table tr.even {
   background: #eee;
+}
+
+#ai-list-table td.ai-block-option.even {
+  background: #f8f8f8;
 }
 
 #ai-list-table tr.odd.ai-block-active {
   background: #efe;
 }
 
+#ai-list-table tr.ai-block-active td.ai-block-option.odd {
+  background: #e8ffe8;
+}
+
 #ai-list-table tr.even.ai-block-active {
   background: #ded;
 }
 
+#ai-list-table tr.ai-block-active td.ai-block-option.even {
+  background: #e8f8e8;
+}
+
+#ai-list-table tr.ai-block-active td.ai-block-option.even {
+  background: #e8f8e8;
+}
+
+.checkbox-button.report-button {
+  background: transparent;
+  width: 12px;
+  height: 14px;
+  line-height: 15px;
+  font-size: 16px;
+  padding: 1px 0 0 0;
+  border: 0;
+  color: #333333;
+}
+
+.checkbox-button.report-button.on {
+  color: #43e500;
+}
+
+.checkbox-button.report-button.off {
+  color: #666  ;
+}
+
+.checkbox-button.report-button.add-option {
+  color: #42c0fb80;
+}
+
+.checkbox-button.report-button.add {
+  color: #42c0fbc0;
+}
+
+#ai-reports-table {
+ width: 100%;
+ line-height: 16px;
+}
+
+#ai-reports-table tr.report-name td {
+ line-height: 28px;
+ font-size: 16px !important;
+ font-weight: 700;
+}
+
+#ai-reports-table tr.report-name td:empty::after {
+  content:"\00a0";
+}
+
+#ai-reports-table tr.odd {
+  background: #fff;
+}
+
+#ai-reports-table tr.even {
+  background: #eee;
+}
+
+#ai-reports-table tr.selected {
+  background: #e3f7ff;
+}
+
+#ai-reports-table td.report-status {
+  width: 15px;
+  padding-left: 20px;
+}
 

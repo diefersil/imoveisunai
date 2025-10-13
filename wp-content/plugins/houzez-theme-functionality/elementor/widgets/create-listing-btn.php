@@ -1,6 +1,6 @@
 <?php
 namespace Elementor;
-use Elementor\Controls_Manager;
+use Elementor\Controls_Manager; 
 use Elementor\Core\Schemes;
 use Elementor\Group_Control_Typography;
 
@@ -100,7 +100,6 @@ class Houzez_Create_Listing_Btn extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			[
 				'name' => 'btn_typography',
-				'scheme' => Schemes\Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} .btn-create-listing',
 			]
 		);

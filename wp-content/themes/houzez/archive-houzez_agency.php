@@ -66,7 +66,7 @@ if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
 
                 <div class="col-lg-12 col-md-12">
                     
-                    <div class="agencies-grid-view agencies-grid-view-4cols">
+                    <div class="agencies-grid-view row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3" role="list">
                         <?php
                         if ( have_posts() ) :
                         while ( have_posts() ) : the_post();
@@ -76,7 +76,7 @@ if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
                         endwhile;
                         
                         else:
-                            get_template_part('template-parts/realtors/agency/none');
+                            get_template_part('template-parts/realtors/realtor-none');
                         endif;
                         ?>
                     </div><!-- listing-view -->
@@ -86,7 +86,7 @@ if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
             <?php } else { ?>
                 <div class="col-lg-8 col-md-12 bt-content-wrap right-bt-content-wrap">
 
-                    <div class="agents-list-view">
+                    <div class="agents-list-view" role="list">
                         <?php
                         if ( have_posts() ) :
                         while ( have_posts() ) : the_post();
@@ -96,7 +96,7 @@ if( isset( $_GET['agencies-layout'] ) && $_GET['agencies-layout'] != "" ) {
                         endwhile;
                         
                         else:
-                            get_template_part('template-parts/realtors/agency/none');
+                            get_template_part('template-parts/realtors/realtor-none');
                         endif;
                         ?>
                     </div><!-- listing-view -->

@@ -1,6 +1,6 @@
-<div class="form-group">
-    <label for="prop_video_url"><?php echo houzez_option('cl_video_url', 'Video URL'); ?></label>
-    <input class="form-control" name="prop_video_url" value="<?php
+<div class="form-group mb-3">
+    <label class="form-label" for="property_video_url"><?php echo houzez_option('cl_video_url', 'Video URL'); ?></label>
+    <input class="form-control" name="property_video_url" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('video_url');
     }

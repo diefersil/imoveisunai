@@ -1,14 +1,11 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: waqasriaz
- * Date: 23/01/16
- * Time: 11:33 PM
+ * Only use for WP Bakery page builder
  */
 if( !function_exists('houzez_blog_posts') ) {
     function houzez_blog_posts($atts, $content = null)
     {
-        extract(shortcode_atts(array(
+        extract(shortcode_atts(array( 
             'grid_style' => '',
             'category_id' => '',
             'posts_limit' => '',
@@ -43,13 +40,11 @@ if( !function_exists('houzez_blog_posts') ) {
         <?php if ($grid_style == 'style_1') { ?>
 
             <div class="blog-posts-module blog-posts-module-v1">
-                <div class="row module-row">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
                     <?php 
                     if ($the_query->have_posts()): 
                         while ($the_query->have_posts()): $the_query->the_post(); ?>
-                        <div class="col-lg-3 col-md-6">
                             <?php get_template_part('content-grid-1'); ?>
-                        </div>
                     <?php endwhile; 
                     endif;
                     wp_reset_postdata(); ?>
@@ -60,13 +55,11 @@ if( !function_exists('houzez_blog_posts') ) {
         elseif ($grid_style == 'style_2') { ?>
 
             <div class="blog-posts-module blog-posts-module-v2">
-                <div class="row module-row">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
                     <?php 
                     if ($the_query->have_posts()): 
                         while ($the_query->have_posts()): $the_query->the_post(); ?>
-                        <div class="col-lg-3 col-md-6">
                             <?php get_template_part('content-grid-2'); ?>
-                        </div>
                     <?php endwhile; 
                     endif;
                     wp_reset_postdata(); ?>

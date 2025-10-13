@@ -43,13 +43,12 @@ if( !function_exists('houzez_advance_search') ) {
         <div class="advanced-search-module">
             <?php if(!empty($search_title)) { ?>
             <div class="advanced-search-module-title">
-                <i class="houzez-icon icon-search mr-2"></i> <?php echo esc_attr($search_title); ?>
+                <i class="houzez-icon icon-search me-2"></i> <?php echo esc_attr($search_title); ?>
             </div>
             <?php } ?>
             <form class="houzez-search-form-js" method="get" autocomplete="off" action="<?php echo esc_url( houzez_get_search_template_link() ); ?>">
                 <div class="advanced-search-v1">
-                    <div class="row">
-    
+                    <div class="row g-2">
                         <?php
                         $i = 0;
                         if ($layout) {
@@ -80,7 +79,7 @@ if( !function_exists('houzez_advance_search') ) {
                                 } else {
 
                                     echo '<div class="col-md-2 col-6">';
-                                        houzez_get_custom_search_field($key);
+                                        Houzez_Property_Search::get_custom_search_field($key);
                                     echo '</div>';
                                     
                                 }
@@ -99,8 +98,8 @@ if( !function_exists('houzez_advance_search') ) {
                 </div><!-- advanced-search-v1 -->
 
                 <?php if(houzez_is_price_range_search()) { ?>
-                <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                <div class="row my-4">
+                    <div class="col-12 col-lg-6">
                         <?php get_template_part('template-parts/search/fields/price-range'); ?>   
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The Sanitizer class
  */
@@ -10,6 +11,7 @@ defined('ABSPATH') || die('No direct access.');
 /**
  * Class for sanitizing various data types.
  */
+
 class Sanitizer
 {
     /**
@@ -37,7 +39,7 @@ class Sanitizer
             } elseif (is_int($value) || is_float($value)) {
                 return $value;
             } else {
-                return \sanitize_text_field($value);
+                return \sanitize_textarea_field($value);
             }
         }, $array);
     }
@@ -75,6 +77,25 @@ class Sanitizer
     }
 
     /**
+     * This function will sanitize a text field that may contain
+     * the <strong>, <em> and <del> HTML tags, allowing the tags in
+     * the final result.
+     *
+     * @param string $text - The string we need to sanitize.
+     * @return string
+     */
+    public static function sanitizeTextWithFormattingTags($text)
+    {
+        $allowedTags = [
+            'strong'  => [],
+            'em'      => [],
+            'del'     => [],
+        ];
+
+        return \wp_kses($text, $allowedTags);
+    }
+
+    /**
      * This function will sanitize a textarea field.
      *
      * @param string $text - The strings we need to sanitize.
@@ -83,6 +104,18 @@ class Sanitizer
     public static function sanitizeTextarea($text)
     {
         return \sanitize_textarea_field($text);
+    }
+
+    /**
+     * This function will sanitize a gutenberg block.
+     *
+     * @param string $blockString - The strings we need to sanitize.
+     * @return string
+     */
+    public static function sanitizeBlocks($blockString)
+    {
+        $parsed = parse_blocks($blockString);
+        return \serialize_blocks($parsed);
     }
 
     /**

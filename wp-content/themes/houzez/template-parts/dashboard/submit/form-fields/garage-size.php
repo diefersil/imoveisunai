@@ -1,7 +1,7 @@
-<div class="form-group">
-	<label for="prop_garage_size"><?php echo houzez_option('cl_garage_size', 'Garages Size'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="property_garage_size"><?php echo houzez_option('cl_garage_size', 'Garages Size'); ?></label>
 
-	<input class="form-control" id="prop_garage_size" name="prop_garage_size" value="<?php
+	<input class="form-control" id="property_garage_size" name="property_garage_size" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_garage_size');
     }

@@ -9,7 +9,7 @@ if( isset( $_GET['agent_form']) && $_GET['agent_form'] == 'yes' ) {
 }
 ?>
 
-<aside id="sidebar" class="sidebar-wrap">
+<aside id="sidebar" class="sidebar-wrap mb-4">
     <?php
     if( is_singular('property') ) { 
 
@@ -18,7 +18,9 @@ if( isset( $_GET['agent_form']) && $_GET['agent_form'] == 'yes' ) {
             if( $agent_form_sidebar_tabs == 1 ) {
                 get_template_part( 'property-details/agent', 'form-tabs' );
             } else {
+                echo '<div class="widget widget-wrap p-4 mb-4 widget-property-form">';
                 get_template_part( 'property-details/agent', 'form' );
+                echo '</div>';
             }
             
         } 

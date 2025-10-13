@@ -4,7 +4,7 @@ $property_features = wp_get_post_terms( get_the_ID(), 'property_feature', array(
 
 if (!empty($property_features)):
 ?>
-<div class="property-features-wrap property-section-wrap" id="property-features-wrap">
+<div class="property-features-wrap property-section-wrap" id="property-features-wrap" role="region">
 	<div class="block-wrap">
 		<div class="block-title-wrap d-flex justify-content-between align-items-center">
 			<h2><?php echo houzez_option('sps_features', 'Features'); ?></h2>

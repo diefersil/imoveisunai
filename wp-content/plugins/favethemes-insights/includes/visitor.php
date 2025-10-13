@@ -229,46 +229,103 @@ if(!class_exists('Fave_Visitor')) {
         }
 
         /**
-         * Get user country and city if available
-         * through IP-based geolocation.
+         * Get user country and city (best-effort) via IP-based geolocation.
+         * Replaces geoplugin.net (now paid) with free HTTPS providers.
          *
-         * @link  http://www.geoplugin.net
-         * @access public
-         * @return city|country
+         * Priority:
+         * 1) Cloudflare country header (if available)
+         * 2) ipwho.is
+         * 3) ipapi.co
+         *
+         * Return format: "City,Country Name,Country Code" (or best available)
          */
         public static function get_location() {
             $cookie_obj = new FTI_Cookies();
-            $cookie = $cookie_obj->get(md5('fave_visitor_location'));
-
+            $cookie_key = md5('fave_visitor_location');
+            $cookie = $cookie_obj->get($cookie_key);
             if (!empty($cookie)) {
                 return $cookie;
             }
 
-            $transient_key = 'fave_visitor_location_' . self::get_ip();
+            $ip = self::get_ip();
+            $transient_key = 'fave_visitor_location_' . $ip;
             $location_data = get_transient($transient_key);
+            if ($location_data !== false && !empty($location_data)) {
+                $cookie_obj->set($cookie_key, $location_data, time() + DAY_IN_SECONDS);
+                return $location_data;
+            }
 
-            if ($location_data === false) {
-                
-                $response = wp_remote_get("http://www.geoplugin.net/json.gp?ip=" . self::get_ip(), array(
-                    'timeout'     => 60,
-                ));
+            $timeout_args = [
+                'timeout'   => 4,         // be snappy
+                'sslverify' => true,
+                'headers'   => [
+                    'Accept' => 'application/json',
+                ],
+            ];
 
-                if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) == 200) {
-                    $ipdat = json_decode(wp_remote_retrieve_body($response));
+            // 1) Fast path: Cloudflare country header (no city, but instant)
+            // If your site is behind Cloudflare, this header is present.
+            if (!empty($_SERVER['HTTP_CF_IPCOUNTRY'])) {
+                $cc = sanitize_text_field($_SERVER['HTTP_CF_IPCOUNTRY']);
+                // Country name not provided by CF header; keep city empty.
+                $location_data = implode(',', array_filter(['', '', strtoupper($cc)]));
+                set_transient($transient_key, $location_data, DAY_IN_SECONDS);
+                $cookie_obj->set($cookie_key, $location_data, time() + DAY_IN_SECONDS);
+                return $location_data;
+            }
 
-                    if ($ipdat != '') {
-                        $location_data = $ipdat->geoplugin_city . ',' . $ipdat->geoplugin_countryName . ',' . $ipdat->geoplugin_countryCode;
-                    }
+            // Helper to safely build the final string
+            $build = function($city, $countryName, $countryCode) {
+                $city        = is_string($city) ? trim($city) : '';
+                $countryName = is_string($countryName) ? trim($countryName) : '';
+                $countryCode = is_string($countryCode) ? strtoupper(trim($countryCode)) : '';
+                // Prefer having at least a country code/name
+                if ($city === '' && $countryName === '' && $countryCode === '') {
+                    return '';
+                }
+                return "{$city},{$countryName},{$countryCode}";
+            };
 
-                    set_transient($transient_key, $location_data, DAY_IN_SECONDS);
+            // 2) ipwho.is (no key, HTTPS)
+            $resp = wp_remote_get("https://ipwho.is/" . rawurlencode($ip) . "?fields=city,country,country_code,success", $timeout_args);
+            if (!is_wp_error($resp) && wp_remote_retrieve_response_code($resp) === 200) {
+                $json = json_decode(wp_remote_retrieve_body($resp), true);
+                if (!empty($json) && (!isset($json['success']) || $json['success'] === true)) {
+                    $location_data = $build(
+                        $json['city'] ?? '',
+                        $json['country'] ?? '',
+                        $json['country_code'] ?? ''
+                    );
                 }
             }
 
-            $cookie_obj->set(md5('fave_visitor_location'), $location_data, time() + DAY_IN_SECONDS);
+            // 3) Fallback: ipapi.co (free tier, HTTPS, no key for basics)
+            if (empty($location_data)) {
+                $resp2 = wp_remote_get("https://ipapi.co/" . rawurlencode($ip) . "/json/", $timeout_args);
+                if (!is_wp_error($resp2) && wp_remote_retrieve_response_code($resp2) === 200) {
+                    $j2 = json_decode(wp_remote_retrieve_body($resp2), true);
+                    if (!empty($j2) && empty($j2['error'])) {
+                        $location_data = $build(
+                            $j2['city'] ?? '',
+                            $j2['country_name'] ?? '',
+                            $j2['country_code'] ?? ''
+                        );
+                    }
+                }
+            }
 
+            // If we still have nothing, set a minimal placeholder to avoid repeated calls
+            if (empty($location_data)) {
+                // Last resort: just cache an empty string briefly to prevent hammering
+                $location_data = '';
+                set_transient($transient_key, $location_data, HOUR_IN_SECONDS);
+            } else {
+                set_transient($transient_key, $location_data, DAY_IN_SECONDS);
+            }
+
+            $cookie_obj->set($cookie_key, $location_data, time() + DAY_IN_SECONDS);
             return $location_data;
         }
-
 
     }
 }

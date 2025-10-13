@@ -82,13 +82,13 @@ class Houzez_Elementor_Blog_Posts_v2 extends \Elementor\Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            \Elementor\Group_Control_Image_Size::get_type(),
+        $this->add_control(
+            'post_thumb_size',
             [
-                'name' => 'post_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
-                'default' => 'houzez-item-image-1',
+                'label' => esc_html__( 'Thumbnail Size', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
+                'default' => 'global',
             ]
         );
 
@@ -101,6 +101,16 @@ class Houzez_Elementor_Blog_Posts_v2 extends \Elementor\Widget_Base {
                 'multiple'   => true,
                 'description' => '',
                 'default' => '',
+            ]
+        );
+
+        $this->add_control(
+            'post_limit',
+            [
+                'label'     => 'Post Limit',
+                'type'      => \Elementor\Controls_Manager::NUMBER,
+                'description' => '',
+                'default' => 4,
             ]
         );
 
@@ -440,6 +450,49 @@ class Houzez_Elementor_Blog_Posts_v2 extends \Elementor\Widget_Base {
             ]
         );
 
+        /*----------------- Continue Reading -----------------*/
+        $this->add_control(
+            'continue_reading_style',
+            [
+                'label' => esc_html__( 'Continue Reading', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'continue_reading_color',
+            [
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-link a' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_hover_color',
+            [
+                'label'     => esc_html__( 'Hover Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-link a:hover' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name'     => 'continue_reading_typo',
+                'label'    => esc_html__( 'Typography', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .blog-post-link',
+            ]
+        );
+
         $this->end_controls_section();
 
     }
@@ -455,25 +508,36 @@ class Houzez_Elementor_Blog_Posts_v2 extends \Elementor\Widget_Base {
     protected function render() {
         global $ele_settings, $houzez_local;
         $settings = $this->get_settings_for_display();
+
         $ele_settings = $settings;
+        
+        $post_thumb_size = $settings['post_thumb_size'];
+        if ($post_thumb_size === 'global' ) {
+            $ele_settings['post_thumb_size'] = '';
+        }
+        
         $houzez_local = houzez_get_localization();
 
         $category_id =  $settings['category_id'];
-        $thumb_size  = $settings['post_thumb_size'];
 
         $wp_query_args = array(
             'ignore_sticky_posts' => 1,
             'post_type' => 'post'
         );
+        
         if (!empty($category_id)) {
-            $wp_query_args['cat'] = $category_id;
+            if (is_array($category_id)) {
+                $wp_query_args['category__in'] = $category_id;
+            } else {
+                $wp_query_args['cat'] = $category_id;
+            }
         }
         if (! empty( $settings['offset'] ) ) {
             $wp_query_args['offset'] = $settings['offset'];
         }
         $wp_query_args['post_status'] = 'publish';
 
-        $posts_limit = 5;
+        $posts_limit = $settings['post_limit'] ?? 4;
 
         $wp_query_args['posts_per_page'] = $posts_limit;
 
@@ -490,19 +554,21 @@ class Houzez_Elementor_Blog_Posts_v2 extends \Elementor\Widget_Base {
 
                         // For the first post, open the left column wrapper
                         if($i == 1) {
-                            echo '<div class="col-md-5 col-sm-12"><div class="blog-posts-module-v3-left-wrap">';
-                            get_template_part('content-grid-3');
+                            echo '<div class="col-md-5 col-12"><div class="blog-posts-module-v3-left-wrap">';
+                            // Pass post_position as 'first' for the first post
+                            get_template_part('content-grid-3', null, array('post_position' => 'first'));
                             echo '</div></div>'; // Close the left column wrapper after the first post
                         }
 
                         // After the first post, open the right column wrapper
                         if($i == 2) {
-                            echo '<div class="col-md-7 col-sm-12"><div class="blog-posts-module-v3-right-wrap">';
+                            echo '<div class="col-md-7 col-12"><div class="blog-posts-module-v3-right-wrap">';
                         }
 
-                        // For all posts after the first, use the right column template part
+                        // For all posts after the first, set post position and use the same template
                         if($i > 1) {
-                            get_template_part('content-grid-3');
+                            // Pass post_position as 'subsequent' for posts after the first
+                            get_template_part('content-grid-3', null, array('post_position' => 'subsequent'));
                         }
 
                         // After the last post, close the right column wrapper

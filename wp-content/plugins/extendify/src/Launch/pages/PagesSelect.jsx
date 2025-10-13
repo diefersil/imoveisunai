@@ -10,24 +10,7 @@ import { PageLayout } from '@launch/layouts/PageLayout';
 import { pageState } from '@launch/state/factory';
 import { usePagesSelectionStore } from '@launch/state/pages-selections';
 import { useUserSelectionStore } from '@launch/state/user-selections';
-
-const fetcher = getPageTemplates;
-const fetchData = () => {
-	const { siteType, siteStructure, siteStrings, siteImages, goals } =
-		useUserSelectionStore?.getState() || {};
-	const {
-		style: { siteStyle },
-	} = usePagesSelectionStore.getState();
-	return {
-		key: 'pages-list',
-		siteType,
-		siteStructure,
-		siteStrings,
-		siteImages,
-		siteStyle,
-		goals,
-	};
-};
+import { buildRecommendedPagesParams } from '@launch/utils/buildRecommendedPagesParams';
 
 export const state = pageState('Pages', () => ({
 	ready: true,
@@ -41,10 +24,14 @@ export const state = pageState('Pages', () => ({
 }));
 
 export const PagesSelect = () => {
-	const { data: availablePages, loading, error } = useFetch(fetchData, fetcher);
+	const {
+		data: availablePages,
+		loading,
+		error,
+	} = useFetch(buildRecommendedPagesParams, getPageTemplates);
 	const [previewing, setPreviewing] = useState();
 	const [expandMore, setExpandMore] = useState();
-	const { siteInformation } = useUserSelectionStore();
+	const { siteInformation, siteObjective } = useUserSelectionStore();
 	const { pages, remove, removeAll, add, has, style } =
 		usePagesSelectionStore();
 	const pagePreviewRef = useRef();
@@ -122,6 +109,7 @@ export const PagesSelect = () => {
 							{previewing && (
 								<PagePreview
 									ref={pagePreviewRef}
+									showNav={siteObjective !== 'landing-page'}
 									style={styleMemo}
 									siteTitle={siteInformation.title}
 									loading={loading}
@@ -176,7 +164,7 @@ export const PagesSelect = () => {
 								type="button"
 								data-test="expand-more"
 								onClick={setExpandMore}
-								className="button-focus my-4 cursor-pointer bg-transparent text-center text-sm font-medium text-gray-900 hover:text-design-main">
+								className="button-focus my-4 bg-transparent text-center text-sm font-medium text-gray-900 hover:text-design-main">
 								{__('View more pages', 'extendify-local')}
 							</button>
 						</div>

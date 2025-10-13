@@ -79,17 +79,17 @@ if( !function_exists('houzez_agents') ) {
 
         $wp_qry = new WP_Query($args);
 
-        $module_class = 'module-3cols';
+        $module_class = 'grid-view row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3';
         if($columns == "4") {
-            $module_class = 'module-4cols';
+            $module_class = 'grid-view row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4';
         }
         ?>
 
         <!--start agents module-->
         <?php 
         if ($agents_type == 'grid') { ?>
-
-            <div class="agent-module <?php echo esc_attr($module_class); ?> clearfix">
+            <div class="agent-module agents-grid">
+                <div class="<?php echo esc_attr($module_class); ?>">
 
                 <?php 
                 if ($wp_qry->have_posts()): 
@@ -100,6 +100,7 @@ if( !function_exists('houzez_agents') ) {
                 endif;
                 wp_reset_postdata();
                 ?>
+                </div>
             </div><!-- agent-module -->
 
         <?php 
@@ -127,7 +128,7 @@ if( !function_exists('houzez_agents') ) {
                             slidesToShow: <?php echo intval($columns); ?>,
                             arrows: true,
                             adaptiveHeight: true,
-                            dots: true,
+                            dots: false,
                             appendArrows: '.agents-module-slider',
                             prevArrow: $('.agents-prev-js'),
                             nextArrow: $('.agents-next-js'),

@@ -3,8 +3,8 @@ Contributors: Ibericode, DvanKooten, hchouhan, lapzor
 Donate link: https://www.mc4wp.com/contribute/#utm_source=wp-plugin-repo&utm_medium=mailchimp-for-wp&utm_campaign=donate-link
 Tags: mailchimp, subscribe, email, newsletter, form
 Requires at least: 4.6
-Tested up to: 6.7
-Stable tag: 4.10.1
+Tested up to: 6.8
+Stable tag: 4.10.7
 License: GPL-3.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -42,7 +42,7 @@ This plugins helps you grow your email list in Mailchimp. You can use it to crea
   - HTML Forms
   - AffiliateWP
 
-- Is the plugin you want to integrate with not listed above? You can probably still use our [custom integration](https://www.mc4wp.com/kb/add-subscribe-checkbox-custom-form/) feature. Alternatively, the plugin comes with a PHP API to programmatically add a new subscriber to Mailchimp.
+- Is the plugin you want to integrate with not listed above? You can probably still use our [custom integration](https://www.mc4wp.com/kb/subscribe-mailchimp-custom-html-form/) feature. Alternatively, the plugin comes with a PHP API to programmatically add a new subscriber to Mailchimp.
 
 - [Mailchimp for WordPress Premium](https://www.mc4wp.com/): Send your WooCommerce orders to Mailchimp so you can see exactly what each subscriber purchased and how much revenue your email campaigns are generating.
 
@@ -187,6 +187,44 @@ The plugin provides various filter and action hooks that allow you to modify or 
 9. Settings page for e-commerce integration with Mailchimp. Requires [Mailchimp for WordPress Premium](https://www.mc4wp.com/).
 
 == Changelog ==
+
+
+#### 4.10.7 - Sep 05, 2025
+
+- Handle renewing lists through server-side redirect instead of JS component.
+
+
+#### 4.10.6 - Jul 23, 2025
+
+- [WooCommerce Checkout] Fix checkbox from showing up in order confirmation email if using Checkout Block.
+- [Forms] Fix `{response}` tag being escaped.
+
+
+#### 4.10.5 - Jun 25, 2025
+
+- [Ninja Forms] Always show at least one list option so that onchange event fires properly (to load Audience fields).
+- Update third-party JS dependencies.
+- Optimize SVG icons for reduced file sizes.
+
+
+#### 4.10.4 - May 26, 2025
+
+- Improved context-dependent escaping in dynamic content tags. 
+
+
+#### 4.10.3 - Apr 16, 2025
+
+- Update third-party JS dependencies.
+- Add message setting for when a form submission is marked as spam.
+- Log exact anti-spam rule when a form submission is marked as spam.
+- Handle potential Prosopo connection errors gracefully.
+
+
+#### 4.10.2 - Feb 28, 2025
+
+- Fix WPForms parameter type change causing a fatal error if using WPForms with a Mailchimp sign-up field.
+- Add Mailchimp data to Personal Data exporter. Contributed by [David Anderson from UpdraftPlus](https://updraftplus.com/).
+- Prevent PHP notices in lists overview on general settings page.
 
 
 #### 4.10.1 - Feb 06, 2025
@@ -1115,52 +1153,7 @@ Please note that installing this update requires you to also update any add-ons 
 
 **Fixes**
 
-- Ninja Forms integration not working when using PayPal integration.
-
-**Improvements**
-
-- Show connection errors on Mailchimp settings page.
-
-**Additions**
-
-- Add pre-checked option to Ninja Forms integration.
-- You can now [conditionally hide fields or elements](https://www.mc4wp.com/kb/conditional-fields-elements/) using the `data-show-if` attribute.
-
-
-#### 4.0.2 - August 10, 2016
-
-**Fixes**
-
-- Hidden fields which referenced interest groups by name were not sent to Mailchimp.
-- Adding hidden field to form would reset value on every change.
-
-**Improvements**
-
-- Decrease file size of JavaScript for forms by about 30%.
-
-
-#### 4.0 & 4.0.1 - August 9, 2016
-
-This release updates the plugin to version 3 of the Mailchimp API. Please [read through the upgrade guide](https://www.mc4wp.com/kb/upgrading-to-4-0/) before updating to make sure things keep working as expected for you.
-
-**Changes**
-
-- "Send welcome email" is now handled from your list settings in Mailchimp.
-- Filter `mc4wp_form_merge_vars` is now called `mc4wp_form_data`.
-- Filter `mc4wp_integration_merge_vars` is now called `mc4wp_integration_data`.
-- New format for GROUPING fields in forms & filter hooks.
-- Value delimiter in hidden fields is now a pipe `|` character.
-
-**Additions**
-
-- New filter: `mc4wp_form_subscriber_data`.
-- New filter: `mc4wp_integration_subscriber_data`.
-- New form tag: `{cookie name="mycookie"}`
-
-**Improvements**
-
-- The plugin now communicates with the latest & greatest Mailchimp API.
-- Previously unsubscribed subscribers can ...
+- Ninja Forms integration not working when using PayPal ...
 
 == Upgrade Notice ==
 

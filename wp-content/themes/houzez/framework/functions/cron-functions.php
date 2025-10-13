@@ -465,7 +465,7 @@ if( !function_exists('houzez_compose_send_email') ):
                     $price_prefix = '<span class="price-start">'.$price_prefix.'</span>';
                 }
 
-                $thumbnail = houzez_get_image_url('houzez-item-image-1', $post_id);
+                $thumbnail = houzez_get_image_url('houzez-item-image-6', $post_id);
 
 
                 $mail_content .= '

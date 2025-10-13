@@ -13,11 +13,10 @@
 	margin: 0 auto;
 	align-items: center;
 	border-block-start: 1px solid var(--hr-color);
-	padding-block-start: spacing(16);
-	padding-block-end: spacing(16);
+	padding-block: spacing(16);
 	padding-inline: spacing(30);
 }
 
-.eps-app__content {
+.eps-app__content:has(.e-site-editor__content_container_main) {
 	padding: 0;
 }

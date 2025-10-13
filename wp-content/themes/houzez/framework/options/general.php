@@ -96,7 +96,7 @@ Redux::setSection( $houzez_opt_name, array(
                 '1410px' => '1370px',
                 '1480px' => '1440px',
             ),
-            'default'  => '1210px',
+            'default'  => '1310px',
         ),
         array(
             'id'       => 'backtotop',
@@ -117,6 +117,54 @@ Redux::setSection( $houzez_opt_name, array(
             'default'  => 0,
             'on'       => esc_html__( 'Yes', 'houzez' ),
             'off'      => esc_html__( 'No', 'houzez' ), 
+        ),
+        array(
+            'id'       => 'auto_excerpt_section',
+            'type'     => 'section',
+            'title'    => esc_html__( 'Automatic Excerpt Settings', 'houzez' ),
+            'subtitle' => esc_html__( 'Configure automatic excerpt for property descriptions', 'houzez' ),
+            'indent'   => true,
+        ),
+
+        array(
+            'id'       => 'enable_auto_excerpt',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Enable Automatic Excerpt', 'houzez' ),
+            'subtitle' => esc_html__( 'Automatically add "Read More" after specified words/lines', 'houzez' ),
+            'desc'     => esc_html__( 'If enabled, will automatically truncate long descriptions', 'houzez' ),
+            'default'  => 1,
+            'on'       => esc_html__( 'Enabled', 'houzez' ),
+            'off'      => esc_html__( 'Disabled', 'houzez' ),
+        ),
+
+        array(
+            'id'       => 'excerpt_length',
+            'type'     => 'spinner',
+            'required' => array( 'enable_auto_excerpt', '=', '1' ),
+            'title'    => esc_html__( 'Excerpt Length', 'houzez' ),
+            'subtitle' => esc_html__( 'Number of words to show before "Read More"', 'houzez' ),
+            'desc'     => esc_html__( 'Enter number of words (minimum: 20, default: 75)', 'houzez' ),
+            'default'  => '75',
+            'min'      => '20',
+            'max'      => '500',
+            'step'     => '5',
+            'validate' => 'numeric'
+        ),
+
+        array(
+            'id'       => 'read_more_text',
+            'type'     => 'text',
+            'required' => array( 'enable_auto_excerpt', '=', '1' ),
+            'title'    => esc_html__( 'Read More Text', 'houzez' ),
+            'subtitle' => esc_html__( 'Text for the read more link', 'houzez' ),
+            'desc'     => esc_html__( 'Customize the "Read More" link text', 'houzez' ),
+            'default'  => 'Read More'
+        ),
+
+        array(
+            'id'     => 'auto_excerpt_section_end',
+            'type'   => 'section',
+            'indent' => false,
         ),
         array(
             'id'       => 'halfmap-footer',

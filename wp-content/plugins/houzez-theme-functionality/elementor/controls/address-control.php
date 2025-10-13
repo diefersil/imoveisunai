@@ -47,7 +47,23 @@ class Houzez_Address_Control extends \Elementor\Base_Control {
 		$data_fields = apply_filters( 'houzez_address_sort_fields', $data_fields );
 
 		if ( ! empty( $sort_fields ) && is_array( $sort_fields ) ) {
-			$data_fields = array_merge( array_flip( $sort_fields ), $data_fields );
+			$ordered_data_fields = array();
+			$source_data_fields = $data_fields; // Keep a reference to $data_fields after filters
+
+			// Add fields in the order specified by $sort_fields, if they are valid
+			foreach ( $sort_fields as $field_key_from_sort ) {
+				if ( is_string( $field_key_from_sort ) && array_key_exists( $field_key_from_sort, $source_data_fields ) ) {
+					$ordered_data_fields[ $field_key_from_sort ] = $source_data_fields[ $field_key_from_sort ];
+				}
+			}
+
+			// Add any remaining valid fields from $source_data_fields that were not in $sort_fields
+			foreach ( $source_data_fields as $original_key => $original_label ) {
+				if ( ! array_key_exists( $original_key, $ordered_data_fields ) ) {
+					$ordered_data_fields[ $original_key ] = $original_label;
+				}
+			}
+			$data_fields = $ordered_data_fields;
 		}
 		?>
 

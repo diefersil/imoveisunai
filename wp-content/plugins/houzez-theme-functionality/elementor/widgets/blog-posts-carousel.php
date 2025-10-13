@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -260,7 +259,7 @@ class Houzez_Elementor_Blog_Posts_Carousel extends Widget_Base {
                     
                 ],
                 "description" => '',
-                'default' => 'true',
+                'default' => 'false',
             ]
         );
         
@@ -347,30 +346,6 @@ class Houzez_Elementor_Blog_Posts_Carousel extends Widget_Base {
                 ],
             ]
         );
-
-        $this->add_responsive_control(
-            'box_margin_bottom',
-            [
-                'label' => esc_html__( 'Margin Bottom', 'houzez-theme-functionality' ),
-                'type' => \Elementor\Controls_Manager::SLIDER,
-                'default' => [
-                    'size' => 8,
-                ],
-                'range' => [
-                    'px' => [
-                        'min' => 0,
-                        'max' => 100,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .blog-post-item-v1' => 'margin-bottom: {{SIZE}}{{UNIT}};'
-                ],
-                'condition' => [
-                    'grid_style' => 'style_1'
-                ],
-            ]
-        );
-
 
         $this->add_control(
             'post_image',
@@ -542,7 +517,7 @@ class Houzez_Elementor_Blog_Posts_Carousel extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .blog-post-body' => 'margin-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}} .blog-post-body' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;'
                 ],
                 'condition' => [
                     'grid_style' => 'style_1'
@@ -645,6 +620,48 @@ class Houzez_Elementor_Blog_Posts_Carousel extends Widget_Base {
                 'selectors' => [
                     '{{WRAPPER}} .blog-post-item .blog-post-meta' => 'margin-bottom: {{SIZE}}{{UNIT}};'
                 ],
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_heading',
+            [
+                'label' => esc_html__( 'Continue Link', 'houzez-theme-functionality' ),
+                'type' => \Elementor\Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_color',
+            [
+                'label'     => esc_html__( 'Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-item .blog-post-link a' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'continue_link_hover_color',
+            [
+                'label'     => esc_html__( 'Hover Color', 'houzez-theme-functionality' ),
+                'type'      => \Elementor\Controls_Manager::COLOR,
+                'default'   => '',
+                'selectors' => [
+                    '{{WRAPPER}} .blog-post-item .blog-post-link a:hover' => 'color: {{VALUE}}',
+                ]
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name'     => 'continue_link_typo',
+                'label'    => esc_html__( 'Typography', 'houzez-theme-functionality' ),
+                'selector' => '{{WRAPPER}} .blog-post-item .blog-post-link',
             ]
         );
 
@@ -998,12 +1015,12 @@ class Houzez_Elementor_Blog_Posts_Carousel extends Widget_Base {
             </style>
             <script>
 
-                var slides_to_show = <?php echo $settings['slides_to_show']; ?>,
-                    navigation = <?php echo $settings['navigation']; ?>,
-                    auto_play = <?php echo $settings['slide_auto']; ?>,
-                    auto_play_speed = parseInt(<?php echo $settings['auto_speed']; ?>),
-                    dots = <?php echo $settings['slide_dots']; ?>,
-                    slide_infinite =  <?php echo $settings['slide_infinite']; ?>;
+                var slides_to_show = <?php echo absint($settings['slides_to_show']); ?>,
+                    navigation = <?php echo ($settings['navigation'] === 'true') ? 'true' : 'false'; ?>,
+                    auto_play = <?php echo ($settings['slide_auto'] === 'true') ? 'true' : 'false'; ?>,
+                    auto_play_speed = <?php echo absint($settings['auto_speed']); ?>,
+                    dots = <?php echo ($settings['slide_dots'] === 'true') ? 'true' : 'false'; ?>,
+                    slide_infinite = <?php echo ($settings['slide_infinite'] === 'true') ? 'true' : 'false'; ?>;
 
                 var owl_post_card = jQuery('#carousel-post-card-<?php echo esc_attr( $token ); ?>');
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 use Elementor\Controls_Manager;
 use Elementor\Core\Schemes;
@@ -14,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 3.0
  */
 class Houzez_Taxonomies_Grids extends Widget_Base {
-    use Houzez_Property_Taxonomies;
+    use Houzez_Filters_Traits;
 
     /**
      * Get widget name.
@@ -85,12 +84,13 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
             ]
         );
 
-        $this->add_control(
+        $this->add_responsive_control(
             'houzez_cards_columns',
             [
                 'label'     => esc_html__( 'Columns', 'houzez-theme-functionality' ),
                 'type'      => Controls_Manager::SELECT,
                 'options'   => [
+                    '1cols'  => '1 Column',
                     '2cols'  => '2 Columns',
                     '3cols'  => '3 Columns',
                     '4cols'  => '4 Columns',
@@ -99,15 +99,17 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
                 ],
                 'description' => '',
                 'default' => '4cols',
+                'tablet_default' => '2cols',
+                'mobile_default' => '1cols',
             ]
         );
 
-        $this->add_group_control(
-            Group_Control_Image_Size::get_type(),
+        $this->add_control(
+            'tax_thumb_size',
             [
-                'name' => 'tax_thumb',
-                'exclude' => [ 'custom', 'thumbnail', 'houzez-image_masonry', 'houzez-map-info', 'houzez-variable-gallery', 'houzez-gallery' ],
-                'include' => [],
+                'label' => esc_html__( 'Image Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
                 'default' => 'houzez-top-v7',
             ]
         );
@@ -131,7 +133,7 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
             ]
         );
 
-        $this->register_houzez_taxonomies_controls();
+        $this->listing_taxonomies_controls();
         
         $this->end_controls_section();
 
@@ -218,7 +220,7 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
                     ],
                 ],
                 'selectors'      => [
-                    '{{WRAPPER}} .taxonomy-grids-module .taxonomy-item' => 'padding-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .taxonomy-grids-module-v5 .taxonomy-item' => 'padding-bottom: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -235,7 +237,7 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
                     ],
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .taxonomy-grids-module' => 'grid-gap: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .taxonomy-grids-module-grid' => 'grid-gap: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -414,13 +416,15 @@ class Houzez_Taxonomies_Grids extends Widget_Base {
 
         $args['houzez_cards_from'] =  $settings['houzez_cards_from'];
         $args['houzez_cards_columns'] =  $settings['houzez_cards_columns'];
+        $args['houzez_cards_columns_tablet'] =  $settings['houzez_cards_columns_tablet'] ?? $settings['houzez_cards_columns'];
+        $args['houzez_cards_columns_mobile'] =  $settings['houzez_cards_columns_mobile'] ?? $settings['houzez_cards_columns'];
         $args['houzez_show_child'] =  $settings['houzez_show_child'];
         $args['houzez_hide_count'] =  $settings['houzez_hide_count'];
         $args['orderby'] =  $settings['orderby'];
         $args['order'] =  $settings['order'];
         $args['houzez_hide_empty'] =  $settings['houzez_hide_empty'];
         $args['no_of_terms'] =  $settings['no_of_terms'];
-        $args['thumb_size'] = $settings['tax_thumb_size'];
+        $args['thumb_size'] = $settings['tax_thumb_size'] === 'global' ? 'houzez-top-v7' : $settings['tax_thumb_size'];
 
         $args['property_type']   =  $property_type;
         $args['property_status']   =  $property_status;

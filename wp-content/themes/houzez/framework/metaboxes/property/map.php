@@ -63,8 +63,9 @@ function houzez_map_metabox_fields( $metabox_fields ) {
             'std' => houzez_option('map_default_lat', 25.686540).','.houzez_option('map_default_long', -80.431345).',15',
             'style' => 'width: 100%; height: 410px',
             'address_field' => "{$houzez_prefix}property_map_address",
-            'api_key'       => houzez_map_api_key(),
+            'api_key'  => houzez_map_api_key(), // Get API key from houzez_vars
             'language' => get_locale(),
+            'region' => houzez_metabox_map_region(),
             'columns' => 12,
             'tab' => 'property_map',
         ),

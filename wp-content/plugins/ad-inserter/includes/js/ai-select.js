@@ -51,6 +51,10 @@ if (typeof ai_selection_block != 'undefined') {
   }
 
   function getElementSelector (el) {
+    if (! (el instanceof HTMLElement)) {
+      return '';
+    }
+
     var selector = el.nodeName.toLowerCase ();
 
     if (el.hasAttribute ('id') && el.id != '') {

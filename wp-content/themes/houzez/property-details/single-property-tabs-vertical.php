@@ -21,38 +21,38 @@ $video_url = get_post_meta( $post->ID, 'fave_video_url', true );
 $virtual_tour = get_post_meta( $post->ID, 'fave_virtual_tour', true );
 
 $tab_end = '</div>';
-$li_start = '<li class="nav-item">';
+$li_start = '<li class="nav-item" role="presentation">';
 $li_end = '</li>';
 ?>
 
 <!--start detail content tabber-->
-<div class="listing-tabs vertical-listing-tabs">
-    <ul class="nav nav-tabs nav-justified">
+<div class="listing-tabs vertical-listing-tabs" role="tablist">
+    <ul class="nav nav-tabs d-flex flex-column">
         <?php
         $i = 0;
         if ($layout): foreach ($layout as $key => $value) {
 
-            if( $i == 0 ) { $a_active = 'active'; } else { $a_active = ''; }
+            if( $i == 0 ) { $a_active = 'active'; $a_selected = 'true'; } else { $a_active = ''; $a_selected = 'false'; }
 
             switch($key) {
 
                 case 'description':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-description" data-toggle="tab"><i class="houzez-icon icon-task-list-plain-1"></i></a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-description" type="button" role="tab" aria-controls="property-description" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-task-list-plain-1"></i></button>';
                     echo $li_end;
                     $i++;
                     break;
 
                 case 'address':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-address" data-toggle="tab"><i class="houzez-icon icon-maps"></i></a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-address" type="button" role="tab" aria-controls="property-address" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-maps"></i></button>';
                     echo $li_end;
                     $i++;
                     break;
 
                 case 'details':
                     echo $li_start;
-                    echo '<a class="nav-link '.$a_active.'" href="#property-details" data-toggle="tab"><i class="houzez-icon icon-house-nature"></i></a>';
+                    echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-details" type="button" role="tab" aria-controls="property-details" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-house-nature"></i></button>';
                     echo $li_end;
                     $i++;
                     break;
@@ -63,7 +63,7 @@ $li_end = '</li>';
 
                     if( ! empty($property_features) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-features" data-toggle="tab"><i class="houzez-icon icon-cog"></i></a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-features" type="button" role="tab" aria-controls="property-features" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-cog"></i></button>';
                         echo $li_end;
                         $i++;
                     }
@@ -72,7 +72,7 @@ $li_end = '</li>';
                 case 'floor_plans':
                     if( isset($floor_plans[0]['fave_plan_title']) && !empty( $floor_plans[0]['fave_plan_title'] ) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-floor-plans" data-toggle="tab"><i class="houzez-icon icon-real-estate-dimensions-plan-1"></i></a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-floor-plans" type="button" role="tab" aria-controls="property-floor-plans" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-real-estate-dimensions-plan-1"></i></button>';
                         echo $li_end;
                         $i++;
                     }
@@ -82,7 +82,7 @@ $li_end = '</li>';
 
                     if( !empty($video_url ) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-video" data-toggle="tab"><i class="houzez-icon icon-social-video-youtube-clip"></i></a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-video" type="button" role="tab" aria-controls="property-video" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-social-video-youtube-clip"></i></button>';
                         echo $li_end;
                         $i++;
                     }
@@ -91,7 +91,7 @@ $li_end = '</li>';
                 case 'virtual_tour':
                     if( !empty($virtual_tour) ) {
                         echo $li_start;
-                        echo '<a class="nav-link '.$a_active.'" href="#property-virtual-tour" data-toggle="tab"><i class="houzez-icon icon-social-video-youtube-clip"></i></a>';
+                        echo '<button class="nav-link '.$a_active.'" data-bs-toggle="tab" data-bs-target="#property-virtual-tour" type="button" role="tab" aria-controls="property-virtual-tour" aria-selected="'.$a_selected.'"><i class="houzez-icon icon-social-video-youtube-clip"></i></button>';
                         echo $li_end;
                         $i++;
                     }
@@ -106,7 +106,7 @@ $li_end = '</li>';
 </div>
 
 <!--start tab-content-->
-<div class="tab-content vertical-tab-content" id="property-tab-content">
+<div class="tab-content vertical-tab-content my-4" id="property-tab-content">
     <?php
     $j = 0;
     if ($layout): foreach ($layout as $key=>$value) {

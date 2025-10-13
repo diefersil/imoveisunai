@@ -1,7 +1,7 @@
-<div class="form-group">
-	<label for="prop_price_prefix"><?php echo houzez_option('cl_price_prefix', 'Price Prefix'); ?></label>
+<div class="form-group mb-3">
+	<label class="form-label" for="property_price_prefix"><?php echo houzez_option('cl_price_prefix', 'Price Prefix'); ?></label>
 
-	<input class="form-control" id="prop_price_prefix" name="prop_price_prefix" value="<?php
+	<input class="form-control" id="property_price_prefix" name="property_price_prefix" value="<?php
     if (houzez_edit_property()) {
         houzez_field_meta('property_price_prefix');
     }

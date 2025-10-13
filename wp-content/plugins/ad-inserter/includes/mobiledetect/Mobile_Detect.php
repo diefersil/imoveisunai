@@ -629,7 +629,7 @@ class ai_Mobile_Detect
         'Coast'         => array('Coast/[VER]'),
         'Dolfin'        => 'Dolfin/[VER]',
         // @reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent/Firefox
-        'Firefox'       => array('Firefox/[VER]', 'FxiOS/[VER]'), 
+        'Firefox'       => array('Firefox/[VER]', 'FxiOS/[VER]'),
         'Fennec'        => 'Fennec/[VER]',
         // http://msdn.microsoft.com/en-us/library/ms537503(v=vs.85).aspx
         // https://msdn.microsoft.com/en-us/library/ie/hh869301(v=vs.85).aspx
@@ -690,7 +690,7 @@ class ai_Mobile_Detect
      *                          from the $headers array instead.
      */
     public function __construct(
-        array $headers = null,
+        ?array $headers = null,
         $userAgent = null
     ) {
         $this->setHttpHeaders($headers);
@@ -1262,7 +1262,8 @@ class ai_Mobile_Detect
      */
     public function match($regex, $userAgent = null)
     {
-        $match = (bool) preg_match(sprintf('#%s#is', $regex), (false === empty($userAgent) ? $userAgent : $this->userAgent), $matches);
+//        $match = (bool) preg_match(sprintf('#%s#is', $regex), (false === empty($userAgent) ? $userAgent : $this->userAgent), $matches);
+        $match = (bool) preg_match(sprintf('#%s#is', $regex), (false === empty($userAgent) ? $userAgent : (is_string($this->userAgent) ? $this->userAgent : '')), $matches);
         // If positive match is found, store the results for debug.
         if ($match) {
             $this->matchingRegex = $regex;

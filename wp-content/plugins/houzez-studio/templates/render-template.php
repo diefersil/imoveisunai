@@ -17,20 +17,50 @@
 </head>
 
 <body <?php body_class(); ?>>
-	<main class="main-wrap">
+<?php wp_body_open(); ?>
 
-		<?php
-		while ( have_posts() ) :
-			the_post();
+<main id="main-wrap" <?php houzez_main_wrap_class('main-wrap'); ?>>
 
-			fts_load_template_part();
+	<?php 
+	do_action( 'houzez_before_header' );
 
-		endwhile;
-		wp_reset_postdata();
-		?>
+	if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) {
+		
+		if( function_exists('fts_header_enabled') && fts_header_enabled() ) {
+			do_action( 'houzez_header_studio' );
+		} else { 
+			do_action( 'houzez_header' );
+		}
+	}
 
-	</main>
+	do_action( 'houzez_after_header' );
+	?>
+
+	<div class="houzez-themebuilder-wrapper houzez-themebuilder-<?php the_ID(); ?>">
+	    <?php \Elementor\Plugin::$instance->modules_manager->get_modules( 'page-templates' )->print_content(); ?>
+	</div>
+
+</main><!-- .main-wrap start in header.php-->
+
+<?php 
+do_action( 'houzez_before_footer' );
+
+if ((!function_exists('elementor_theme_do_location') || !elementor_theme_do_location('footer'))) {
+    
+    if( function_exists('fts_footer_enabled') && fts_footer_enabled() ) {
+        do_action( 'houzez_footer_studio' );
+    } else { 
+        do_action( 'houzez_footer' );
+    }
+}
+
+do_action( 'houzez_after_footer' );
+
+do_action( 'houzez_before_wp_footer' );
+
+wp_footer(); ?>
+
 </body>
-<?php
-wp_footer();
+</html>
+
 

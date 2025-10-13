@@ -1,6 +1,6 @@
 <?php global $houzez_local; ?>
-<div class="form-group">
-	<label for="property_map_address">
+<div class="form-group mb-3">
+	<label class="form-label" for="property_map_address">
 		<?php echo houzez_option('cl_address', 'Address').houzez_required_field('property_map_address'); ?>		
 	</label>
 

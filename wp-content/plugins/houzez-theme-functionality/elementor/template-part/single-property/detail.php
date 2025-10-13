@@ -1,7 +1,28 @@
-<?php 
-global $sorting_settings, $settings; 
+<?php
+global $sorting_settings, $settings;
+
+// Include security helpers if not already loaded
+if ( ! function_exists( 'houzez_sanitize_template_slug' ) ) {
+    require_once HOUZEZ_PLUGIN_DIR . '/functions/security-helpers.php';
+} 
 $section_title = isset($settings['section_title']) && !empty($settings['section_title']) ? $settings['section_title'] : houzez_option('sps_details', 'Details');
 $additional_section_title = isset($settings['additional_section_title']) && !empty($settings['additional_section_title']) ? $settings['additional_section_title'] : houzez_option('sps_additional_details', 'Additional details');
+
+// Set column class based on the data_columns setting
+$column_class = 'col-md-6'; // default
+if($settings['data_columns'] == 'list-1-cols') {
+    $column_class = 'col-md-12';
+} elseif($settings['data_columns'] == 'list-3-cols') {
+    $column_class = 'col-xl-4 col-lg-6 col-md-6 col-sm-12';
+}
+
+// Set column class for additional details
+$additional_column_class = 'col-md-6'; // default
+if($settings['additional_data_columns'] == 'list-1-cols') {
+    $additional_column_class = 'col-md-12';
+} elseif($settings['additional_data_columns'] == 'list-3-cols') {
+    $additional_column_class = 'col-xl-4 col-lg-6 col-md-6 col-sm-12';
+}
 
 $default_fields = array(
 		'property_id',
@@ -35,12 +56,17 @@ $default_fields = array(
                 $details_data = explode(',', $sorting_settings);  
 
                 echo '<div class="detail-wrap">';
-                echo '<ul class="'.esc_attr($settings['data_columns']).' list-unstyled">';
+                echo '<ul class="row list-lined list-unstyled" role="list">';
 
                 foreach ( $details_data as $data ) {
 
                 	if( in_array( $data, $default_fields ) ) {
-	                	htf_get_template_part('elementor/template-part/single-property/partials/details/'. $data);
+	                	// Sanitize the data variable before using in file path
+	                	$sanitized_data = houzez_sanitize_template_slug( $data );
+	                	if ( ! empty( $sanitized_data ) && houzez_is_allowed_template_field( $sanitized_data ) ) {
+	                		$args = array('column_class' => $column_class);
+	                		htf_get_template_part('elementor/template-part/single-property/partials/details/'. $sanitized_data, null, $args);
+	                	}
 
 	                } else {
 
@@ -65,10 +91,14 @@ $default_fields = array(
 	                	$field_title = houzez_wpml_translate_single_string($field_title);
 
 	                	if( !empty($data_value) && !empty($field_title) ) {
-	                        echo '<li><strong>'.esc_attr($field_title).'</strong> <span>'.esc_attr( $data_value ).'</span></li>';
+	                        echo '<li class="'.$column_class.'">
+                                    <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+                                        <strong>'.esc_attr($field_title).'</strong> <span>'.esc_attr( $data_value ).'</span>
+                                    </div>
+                                </li>';
 	                    }
 	                }
-	                
+
 	            }
 
                 echo '</ul>';
@@ -77,11 +107,15 @@ $default_fields = array(
             } else {
 
             	echo '<div class="detail-wrap">';
-                echo '<ul class="'.esc_attr($settings['data_columns']).' list-unstyled">';
+                echo '<ul class="row list-lined list-unstyled" role="list">';
 
                 foreach ( $default_fields as $data) {
-
-                	htf_get_template_part('elementor/template-part/single-property/partials/details/'. $data);
+                	// Sanitize the data variable before using in file path
+                	$sanitized_data = houzez_sanitize_template_slug( $data );
+                	if ( ! empty( $sanitized_data ) && houzez_is_allowed_template_field( $sanitized_data ) ) {
+                		$args = array('column_class' => $column_class);
+                		htf_get_template_part('elementor/template-part/single-property/partials/details/'. $sanitized_data, null, $args);
+                	}
 	                
 	            }
 
@@ -102,10 +136,14 @@ $default_fields = array(
 				</div><!-- block-title-wrap -->
 				<?php } ?>
 
-				<ul class="<?php echo esc_attr($settings['additional_data_columns']); ?> additional-details-ul list-unstyled">
+				<ul class="row list-lined list-unstyled additional-details-ul">
 					<?php
 			        foreach( $additional_features as $ad_del ):
-			            echo '<li><strong>'.esc_attr( $ad_del['fave_additional_feature_title'] ).'</strong> <span>'.esc_attr( $ad_del['fave_additional_feature_value'] ).'</span></li>';
+			            echo '<li class="'.$additional_column_class.'">
+                                <div class="list-lined-item w-100 d-flex justify-content-between py-2">
+                                    <strong>'.esc_attr( $ad_del['fave_additional_feature_title'] ).'</strong> <span>'.esc_attr( $ad_del['fave_additional_feature_value'] ).'</span>
+                                </div>
+                            </li>';
 			        endforeach;
 			        ?>
 				</ul>	

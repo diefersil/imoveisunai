@@ -40,7 +40,7 @@ if($banner_search) { ?>
 
 	<div class="search-banner-wrap">
 		
-		<div class="d-flex flex-sm-max-column">
+		<div class="d-flex flex-sm-max-column gap-2">
 			
 			<div class="flex-search">
 				<?php get_template_part('template-parts/search/fields/'.$field_name); ?>

@@ -5,7 +5,7 @@
  *
  * This file is read by WordPress to generate the plugin information in the plugin
  * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
+ * registers the activation and deactivation functions, and defines a function 
  * that starts the plugin.
  *
  * @link              https://themeforest.net/user/favethemes
@@ -16,7 +16,7 @@
  * Plugin Name:       Houzez Studio
  * Plugin URI:        https://studio.houzez.co
  * Description:       Add header, footer, menu builder for favethemes themes
- * Version:           1.0.2
+ * Version:           1.3.1
  * Author:            Favethemes, Waqas Riaz
  * Author URI:        https://themeforest.net/user/favethemes/
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'FTS_VERSION', '1.0.2' );
+define( 'FTS_VERSION', '1.2.1' );
 define( 'FTS_NOTICE_MIN_PHP_VERSION', '7.0' );
 define( 'FTS_NOTICE_MIN_WP_VERSION', '6.0' );
 define( 'FTS_DELIMITER', '|' );

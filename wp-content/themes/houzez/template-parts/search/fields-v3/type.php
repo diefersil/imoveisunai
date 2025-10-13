@@ -1,8 +1,8 @@
-<div class="btn-group">
-	<button type="button" class="btn btn-light-grey-outlined" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div class="btn-group" role="group">
+	<button type="button" class="btn btn-light-grey-outlined" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false" aria-controls="type-dropdown">
 		<?php echo houzez_option('srh_type', 'Type'); ?>
 	</button>
-	<div class="dropdown-menu dropdown-menu-small dropdown-menu-right advanced-search-dropdown clearfix">
+	<div id="type-dropdown" class="dropdown-menu dropdown-menu-small dropdown-menu-right advanced-search-dropdown clearfix" role="menu">
 		
 		<?php
 		if( taxonomy_exists('property_type') ) {
@@ -37,8 +37,8 @@
 		       
 		            echo '<label class="control control--checkbox">';
 		            echo '<input class="'.houzez_get_ajax_search().'" name="type[]" type="checkbox" '.$checked_type.' value="' . esc_attr( $type->slug ) . '">';
-		            echo esc_attr( $type->name );
 		            echo '<span class="control__indicator"></span>';
+					echo '<span class="control__label">'.esc_attr( $type->name ).'</span>';
 
 		            $get_child = get_terms('property_type', array(
                         'hide_empty' => false,
@@ -56,8 +56,8 @@
 
                             echo '<label class="control control--checkbox hz-checkbox-'.$count.'">';
                                 echo '<input class="'.houzez_get_ajax_search().'" name="type[]" type="checkbox" '.$checked_type2.' value="' . esc_attr( $child->slug ) . '">';
-					            echo esc_attr( $child->name );
 					            echo '<span class="control__indicator"></span>';
+								echo '<span class="control__label">'.esc_attr( $child->name ).'</span>';
                             echo '</label>';
                             $count++;
                         }
@@ -68,7 +68,9 @@
 		    }
 		} ?>
 
-		<button class="btn btn-clear clear-checkboxes"><?php echo houzez_option('srh_clear', 'Clear'); ?></button> 
-		<button class="btn btn-apply"><?php echo houzez_option('srh_apply', 'Apply'); ?></button>
+		<div class="d-flex gap-2 mt-2 justify-content-start">
+			<button class="btn btn-apply btn-primary" type="button"><?php echo houzez_option('srh_apply', 'Apply'); ?></button>
+			<button class="btn btn-clear clear-checkboxes btn-primary-outlined" type="button"><?php echo houzez_option('srh_clear', 'Clear'); ?></button>
+		</div>
 	</div><!-- advanced-search-dropdown -->
 </div><!-- btn-group -->

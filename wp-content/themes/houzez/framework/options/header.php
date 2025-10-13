@@ -103,7 +103,7 @@ Redux::setSection( $houzez_opt_name, array(
             'required' => array('header_style', '=', '1'),
             'title'    => esc_html__( 'Header Height', 'houzez' ),
             'subtitle' => '',
-            'default'    => '60',
+            'default'    => '70',
             'validate' => 'numeric',
         ),
         array(
@@ -184,6 +184,17 @@ Redux::setSection( $houzez_opt_name, array(
             'on'       => esc_html__( 'Enabled', 'houzez' ),
             'off'      => esc_html__( 'Disabled', 'houzez' ),
         ),
+
+        array(
+            'id'       => 'mobile-menu-sticky',
+            'type'     => 'switch',
+            'title'    => esc_html__( 'Sticky Menu - Mobile Devices', 'houzez' ),
+            'desc' => esc_html__( 'Enable or disable the sticky menu on mobile devices', 'houzez' ),
+            'default'  => 0,
+            'on'       => esc_html__( 'Enabled', 'houzez' ),
+            'off'      => esc_html__( 'Disabled', 'houzez' ),
+        ),
+
         array(
             'id'       => 'header_4_width',
             'type'     => 'select',
@@ -539,14 +550,6 @@ Redux::setSection( $houzez_opt_name, array(
             'desc' => esc_html__( 'Enter the Telegram username', 'houzez' ),
             'default'  => false,
         ),
-        array(
-            'id'       => 'hs-skype',
-            'type'     => 'text',
-            'required' => array( 'social-header', '=', '1' ),
-            'title'    => esc_html__( 'Skype', 'houzez' ),
-            'desc' => esc_html__( 'Enter the Skype username', 'houzez' ),
-            'default'  => false,
-        ),
     )
 ) );
 
@@ -565,18 +568,6 @@ Redux::setSection( $houzez_opt_name, array(
             'on'       => esc_html__( 'Enabled', 'houzez' ),
             'off'      => esc_html__( 'Disabled', 'houzez' ),
         ),
-        array(
-            'id'       => 'create_listing_button',
-            'type'     => 'select',
-            'title'    => esc_html__( 'Button Behavior', 'houzez' ),
-            'desc' => esc_html__('Is the login required to create a new listing?', 'houzez'),
-            'default'  => 'no',
-            'options'  => array(
-                'no' => esc_html__('No', 'houzez'),
-                'yes' => esc_html__('Yes', 'houzez'),
-            )
-        ),
-
         array(
             'id'       => 'custom_create_lisiting_btn',
             'type'     => 'switch',

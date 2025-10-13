@@ -25,7 +25,6 @@ $keyword = isset($_GET['keyword']) ? sanitize_text_field($_GET['keyword']) : '';
 
 			<input name="keyword" type="text" class="houzez-keyword-autocomplete form-control" value="<?php echo esc_attr($keyword); ?>" placeholder="<?php echo esc_attr($keyword_placeholder); ?>">
 			<div id="auto_complete_ajax" class="auto-complete"></div>
-
 		<?php } ?>
 	</div><!-- search-icon -->
 </div><!-- form-group -->

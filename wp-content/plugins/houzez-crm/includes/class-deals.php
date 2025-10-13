@@ -520,11 +520,19 @@ if ( ! class_exists( 'Houzez_Deals' ) ) {
 
 		    $deal_group = sanitize_text_field($group);
 		    
-		    $sql = $wpdb->prepare(
-		        "SELECT COUNT(*) FROM {$table_name} WHERE user_id = %d AND deal_group = %s",
-		        get_current_user_id(), 
-		        $deal_group
-		    );
+			if( $deal_group == 'all' ){
+
+				$sql = $wpdb->prepare(
+					"SELECT COUNT(*) FROM {$table_name} WHERE user_id = %d",
+					get_current_user_id());
+
+			} else {
+				$sql = $wpdb->prepare(
+					"SELECT COUNT(*) FROM {$table_name} WHERE user_id = %d AND deal_group = %s",
+					get_current_user_id(), 
+					$deal_group
+				);
+			}
 		    $total = $wpdb->get_var($sql);
 		    
 		    $total_records = $total;

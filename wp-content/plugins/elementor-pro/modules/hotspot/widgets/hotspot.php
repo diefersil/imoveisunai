@@ -41,6 +41,10 @@ class Hotspot extends Widget_Image {
 		return false;
 	}
 
+	public function has_widget_inner_wrapper(): bool {
+		return true;
+	}
+
 	/**
 	 * Get style dependencies.
 	 *
@@ -265,7 +269,7 @@ class Hotspot extends Widget_Image {
 		$repeater->start_controls_tab(
 			'hotspot_position_tab',
 			[
-				'label' => esc_html__( 'POSITION', 'elementor-pro' ),
+				'label' => esc_html__( 'Position', 'elementor-pro' ),
 			]
 		);
 

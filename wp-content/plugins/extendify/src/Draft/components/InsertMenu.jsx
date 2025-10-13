@@ -5,7 +5,7 @@ import {
 	MenuItem,
 	__experimentalDivider as Divider,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, select, dispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
@@ -71,7 +71,7 @@ export const InsertMenu = ({
 		return blocks;
 	};
 
-	const insertCompletion = ({ replaceContent = false, position }) => {
+	const insertCompletion = async ({ replaceContent = false, position }) => {
 		setPrompt({ text: '', promptType: '', systemMessageKey: '' });
 
 		const targetBlockId = selectedBlock
@@ -79,14 +79,42 @@ export const InsertMenu = ({
 			: selectedBlockIds[0];
 		const targetBlock = getBlock(targetBlockId);
 
+		const renderingModes =
+			select('core/preferences').get('core', 'renderingModes') || {};
+		const currentTheme = select('core').getCurrentTheme()?.stylesheet;
+		const isTemplateShown =
+			renderingModes?.[currentTheme]?.page === 'template-locked';
+
+		const { set: setPreference } = dispatch('core/preferences');
+		const setRenderingMode = (mode) =>
+			setPreference('core', 'renderingModes', {
+				...renderingModes,
+				[currentTheme]: { ...(renderingModes[currentTheme] || {}), page: mode },
+			});
+
 		const blocks = plainTextToBlocks(completion);
-		if (!targetBlockId || position === 'end') {
-			insertBlocks(blocks);
-			return;
-		}
-		if (position === 'top') {
-			insertBlocks(blocks, 0);
-			return;
+		try {
+			if (!targetBlockId || position === 'end') {
+				if (isTemplateShown) {
+					setRenderingMode('post-only');
+					await new Promise((resolve) => requestAnimationFrame(resolve));
+				}
+
+				insertBlocks(blocks);
+				return;
+			}
+
+			if (position === 'top') {
+				if (isTemplateShown) {
+					setRenderingMode('post-only');
+					await new Promise((resolve) => requestAnimationFrame(resolve));
+				}
+
+				insertBlocks(blocks, 0);
+				return;
+			}
+		} finally {
+			if (isTemplateShown) setRenderingMode('template-locked');
 		}
 
 		const targetIsEmpty = targetBlock?.attributes?.content === '';
@@ -102,13 +130,13 @@ export const InsertMenu = ({
 			Object.prototype.hasOwnProperty.call(one?.attributes, 'content') &&
 			Object.prototype.hasOwnProperty.call(two?.attributes, 'content');
 		// If both have content, and it's only one block, they can be merged
-		const mergable =
+		const mergeable =
 			blocks.length === 1 && bothHaveContent(targetBlock, blocks[0]);
 
 		// Apply formatting to all the blocks
 		const formattedBlocks = blocks.map((incomingBlock) => ({
 			...incomingBlock,
-			name: mergable ? targetBlock.name : incomingBlock.name,
+			name: mergeable ? targetBlock.name : incomingBlock.name,
 			attributes: {
 				...targetBlock.attributes,
 				content:
@@ -160,8 +188,11 @@ export const InsertMenu = ({
 				disabled={loading || !canReplaceContent()}
 				icon={replace}
 				iconPosition="left"
-				data-test="replace-selected">
-				{__('Replace selected block text', 'extendify-local')}
+				data-test="replace-selected"
+				className="h-auto min-h-10 items-start">
+				<span className="whitespace-normal break-words text-start">
+					{__('Replace selected block text', 'extendify-local')}
+				</span>
 			</MenuItem>
 			<MenuItem
 				onClick={() =>
@@ -169,11 +200,14 @@ export const InsertMenu = ({
 				}
 				disabled={loading}
 				iconPosition="left"
-				data-test="insert-top">
+				data-test="insert-top"
+				className="h-auto min-h-10 items-start">
 				<div className={isRTL() ? '-mr-1' : '-ml-1'}>
 					<Icon icon={addSubmenu} className="rotate-180" />
 				</div>
-				<div className="px-1">{__('Insert at top', 'extendify-local')}</div>
+				<div className="whitespace-normal break-words px-1 text-start">
+					{__('Insert at top', 'extendify-local')}
+				</div>
 			</MenuItem>
 			<MenuItem
 				onClick={() => insertCompletion({ replaceContent: false })}
@@ -182,8 +216,11 @@ export const InsertMenu = ({
 				disabled={loading || !canInsertAfter()}
 				icon={insertAfter}
 				iconPosition="left"
-				data-test="insert-after">
-				{__('Insert after the selected text', 'extendify-local')}
+				data-test="insert-after"
+				className="h-auto min-h-10 items-start">
+				<span className="whitespace-normal break-words text-start">
+					{__('Insert after the selected text', 'extendify-local')}
+				</span>
 			</MenuItem>
 			<MenuItem
 				onClick={() =>

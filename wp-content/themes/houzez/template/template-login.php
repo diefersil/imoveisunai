@@ -42,37 +42,37 @@ if( isset($_GET['fid']) && !empty( $_GET['fid'] ) ) {
             <img src="<?php echo esc_url($picture_url); ?>" alt="<?php echo esc_attr($username); ?>">
         </div><!-- .hz-fb-avatar-wrap -->
         
-        <div class="main-step-wrap">
-	        <div class="hz-fb-header-wrap">
-	            <div class="hz-fb-welcome-message">
-	                <i class="houzez-icon icon-social-media-facebook"></i> <?php esc_html_e('Hi', 'houzez'); ?> <?php echo esc_html( $first_name ).' '.esc_html( $last_name ); ?>
-	            </div>
-	            <p><?php esc_html_e('You\'re now signed in with your Facebook account but you are still one step away of getting into our website.', 'houzez'); ?></p>
-	        </div><!-- .hz-fb-header-wrap -->
-	        <div class="hz-fb-footer-wrap">
-	            <div class="hz-fb-footer-columns">
-	                <div class="hz-fb-footer-title">
-	                    <strong><?php esc_html_e('Already have an account?', 'houzez'); ?></strong>
-	                </div>
-	                <div>
-	                    <p><?php esc_html_e('Link your existing account on your website to you Facebook ID.', 'houzez'); ?></p>
-	                </div>
-	                <button class="btn-link-account btn btn-primary"><?php esc_html_e('Link my account', 'houzez'); ?></button>
-	            </div><!-- .hz-fb-footer-columns -->
-	            <div class="hz-fb-footer-columns">
-	                <div class="hz-fb-footer-title">
-	                    <strong><?php esc_html_e('New to our website?', 'houzez'); ?></strong>
-	                </div>
-	                <div>
-	                    <p><?php esc_html_e('Create a new account and it will be associated with your Facebook ID.', 'houzez'); ?></p>
-	                </div>
-	                <button class="btn-create-account btn btn-primary"><?php esc_html_e('Create a new account', 'houzez'); ?></button>
-	            </div><!-- .hz-fb-footer-columns -->
-	        </div><!-- .hz-fb-footer-wrap -->
-	    </div>
+		<div class="main-step-wrap">
+			<div class="hz-fb-header-wrap">
+				<div class="hz-fb-welcome-message">
+					<i class="houzez-icon icon-social-media-facebook"></i> <?php esc_html_e('Hi', 'houzez'); ?> <?php echo esc_html( $first_name ).' '.esc_html( $last_name ); ?>
+				</div>
+				<p><?php esc_html_e('You\'re now signed in with your Facebook account but you are still one step away of getting into our website.', 'houzez'); ?></p>
+			</div><!-- .hz-fb-header-wrap -->
+			<div class="hz-fb-footer-wrap">
+				<div class="hz-fb-footer-columns">
+					<div class="hz-fb-footer-title">
+						<strong><?php esc_html_e('Already have an account?', 'houzez'); ?></strong>
+					</div>
+					<div>
+						<p><?php esc_html_e('Link your existing account on your website to you Facebook ID.', 'houzez'); ?></p>
+					</div>
+					<button class="btn-link-account btn btn-primary"><?php esc_html_e('Link my account', 'houzez'); ?></button>
+				</div><!-- .hz-fb-footer-columns -->
+				<div class="hz-fb-footer-columns">
+					<div class="hz-fb-footer-title">
+						<strong><?php esc_html_e('New to our website?', 'houzez'); ?></strong>
+					</div>
+					<div>
+						<p><?php esc_html_e('Create a new account and it will be associated with your Facebook ID.', 'houzez'); ?></p>
+					</div>
+					<button class="btn-create-account btn btn-primary"><?php esc_html_e('Create a new account', 'houzez'); ?></button>
+				</div><!-- .hz-fb-footer-columns -->
+			</div><!-- .hz-fb-footer-wrap -->
+		</div><!-- .main-step-wrap -->
 
         <!--************* Link Account Form *************-->
-        <div class="link-account-wrap">
+        <div class="link-account-wrap" style="display: none;">
 	        <div class="hz-fb-header-wrap">
 	            <div class="hz-fb-welcome-message">
 	                <?php esc_html_e( 'Already have an account?', 'houzez' ); ?>
@@ -111,7 +111,7 @@ if( isset($_GET['fid']) && !empty( $_GET['fid'] ) ) {
 	    </div>
 
         <!--************* Create Account Form *************-->
-        <div class="new-account-wrap">
+        <div class="new-account-wrap" style="display: none;">
 	        <div class="hz-fb-header-wrap">
 	            <div class="hz-fb-welcome-message">
 	                <?php esc_html_e( 'New to our website?', 'houzez' ); ?>
@@ -152,7 +152,7 @@ if( isset($_GET['fid']) && !empty( $_GET['fid'] ) ) {
 
     </div><!-- .hz-fb-wrap -->
     <a href="<?php echo home_url('/');?>" class="hz-fb-help-link"><i class="houzez-icon icon-arrow-left-1"></i> <?php echo esc_html__('Back to', 'houzez').' '.get_bloginfo('name'); ?></a> 
-</div><!-- .hz-fb-wrap -->
+</div><!-- .hz-fb-main-wrap -->
 <?php wp_footer(); ?>
 </body>
 <?php } else { ?>
@@ -204,11 +204,11 @@ if( isset($_GET['fid']) && !empty( $_GET['fid'] ) ) {
 			                <div class="login-register-tabs">
 			                    <ul class="nav nav-tabs">
 			                        <li class="nav-item">
-			                            <a class="modal-toggle-1 nav-link active" data-toggle="tab" href="#login-form-tab" role="tab"><?php esc_html_e('Login', 'houzez'); ?></a>
+			                            <a class="modal-toggle-1 nav-link active" data-bs-toggle="tab" href="#login-form-tab" role="tab"><?php esc_html_e('Login', 'houzez'); ?></a>
 			                        </li>
 			                        <?php if( houzez_option('header_register') ) { ?>
 			                        <li class="nav-item">
-			                            <a class="modal-toggle-2 nav-link" data-toggle="tab" href="#register-form-tab" role="tab"><?php esc_html_e('Register', 'houzez'); ?></a>
+			                            <a class="modal-toggle-2 nav-link" data-bs-toggle="tab" href="#register-form-tab" role="tab"><?php esc_html_e('Register', 'houzez'); ?></a>
 			                        </li>
 			                    	<?php } ?>
 			                    </ul>    

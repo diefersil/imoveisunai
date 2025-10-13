@@ -11,7 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.3.0
  */
 class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
-
+    use Houzez_Filters_Traits;
+    use Houzez_Property_Cards_Traits;
     /**
      * Get widget name.
      *
@@ -34,7 +35,7 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
      * @return string Widget title.
      */
     public function get_title() {
-        return esc_html__( 'Recent Viewd Properties', 'houzez-theme-functionality' );
+        return esc_html__( 'Recently Viewed Properties', 'houzez-theme-functionality' );
     }
 
     /**
@@ -119,6 +120,16 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                 'type'      => Controls_Manager::NUMBER,
                 'description' => '',
                 'default' => '3',
+            ]
+        );
+
+        $this->add_control(
+            'listing_thumb_size',
+            [
+                'label' => esc_html__( 'Thumbnail Size', 'houzez-theme-functionality' ),
+                'type' => Controls_Manager::SELECT,
+                'options' => \Houzez_Image_Sizes::get_enabled_image_sizes_for_elementor(),
+                'default' => 'global',
             ]
         );
 
@@ -235,9 +246,6 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                 'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
                 'return_value' => 'none',
                 'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .recent-viewed-properties-module .item-body .btn-item' => 'display: {{VALUE}};',
-                ],
             ]
         );
 
@@ -250,12 +258,6 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                 'label_off' => esc_html__( 'No', 'houzez-theme-functionality' ),
                 'return_value' => 'none',
                 'default' => '',
-                'selectors' => [
-                    '{{WRAPPER}} .recent-viewed-properties-module .item-footer' => 'display: {{VALUE}};',
-                    '{{WRAPPER}} .recent-viewed-properties-module .item-author' => 'display: {{VALUE}};',
-                    '{{WRAPPER}} .recent-viewed-properties-module .item-date' => 'display: {{VALUE}};',
-                    '{{WRAPPER}} .recent-viewed-properties-module .btn-item' => 'bottom: 20px;',
-                ],
             ]
         );
 
@@ -409,7 +411,7 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .item-title' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .item-title' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
                 ],
             ]
         );
@@ -439,7 +441,7 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
                     'unit' => 'px',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .item-address' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .item-address' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
                 ],
             ]
         );
@@ -744,14 +746,17 @@ class Houzez_Elementor_Property_Recent_Viewed extends Widget_Base {
     protected function render() {
 
         $settings = $this->get_settings_for_display();
-                
+        
+        $args = $this->listings_cards_args($settings);
         $args['prop_grid_style'] =  $settings['prop_grid_style'];
         $args['columns']     =  $settings['columns'];
         $args['posts_limit']     =  $settings['posts_limit'];
        
-        if( function_exists( 'houzez_recent_viewed_properties' ) ) {
-            echo houzez_recent_viewed_properties( $args );
-        }
+        $card_version = $settings['prop_grid_style'];
+        $module_type = $settings['columns'];
+        
+        // Use the core function to render property cards
+        echo houzez_get_property_cards($args, $module_type, $card_version);
 
     }
 

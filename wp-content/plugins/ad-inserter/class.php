@@ -2974,8 +2974,15 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           foreach ($codes as $viewport_code_index => $viewport_code) {
 
             $viewport_code = $this->ai_processFallbackSeparator ($viewport_code);
+            $viewport_text = strtolower ($viewport_parameters [$viewport_code_index]['viewport']);
 
-            $separator_viewports = explode (',', strtolower ($viewport_parameters [$viewport_code_index]['viewport']));
+            $viewport_list_type = AI_WHITE_LIST;
+            if ($viewport_text [0] == '^') {
+              $viewport_list_type = AI_BLACK_LIST;
+              $viewport_text = substr ($viewport_text, 1);
+            }
+
+            $separator_viewports = explode (',', $viewport_text);
             foreach ($separator_viewports as $index => $separator_viewport) {
               $separator_viewports [$index] = trim ($separator_viewport);
             }
@@ -2987,6 +2994,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
               if ($viewport_name != '') {
                 $viewport_found = in_array ($viewport_name, $separator_viewports);
+
+                if ($viewport_list_type == AI_BLACK_LIST) {
+                  $viewport_found = !$viewport_found;
+                }
+
                 if ($viewport_found) {
                   $viewport_classes .= " ai-viewport-" . $viewport;
                 } else {
@@ -3663,8 +3675,32 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         $version_times = array ();
         $version_scheduling = array ();
         $version_groups = array ();
+        $rotation_dynamic_blocks = $dynamic_blocks;
 
         foreach ($rotate_parameters as $index => $rotate_parameter) {
+          if (isset ($rotate_parameter ['rotate'])) {
+            $rotate_options = explode (',', str_replace (' ', '', strtolower ($rotate_parameter ['rotate'])));
+            foreach ($rotate_options as $rotate_option) {
+              switch ($rotate_option) {
+                case 'unique':
+                  $unique = true;
+                  break;
+                case 'server-side':
+                  $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
+                  break;
+                case 'server-side-w3tc':
+                  $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC;
+                  break;
+                case 'client-side-show':
+                  $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW;
+                  break;
+                case 'client-side-insert':
+                  $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_CLIENT_SIDE_INSERT;
+                  break;
+              }
+            }
+          }
+
           if ((isset ($rotate_parameter ['code']) && trim ($rotate_parameter ['code']) != '')) {
             switch (strtolower ($rotate_parameter ['code'])) {
               case 'prepend':
@@ -3749,7 +3785,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
               $version_scheduling []= $option_scheduling ? trim ($option ['scheduling']) : - 1;
             }
 
-          if (isset ($option ['rotate']) && strtolower ($option ['rotate']) == 'unique') $unique = true;
+//          if (isset ($option ['rotate']) && strtolower ($option ['rotate']) == 'unique') $unique = true;
         }
 
         if ($unique && !isset ($ai_wp_data [AI_ROTATION_SEED])) {
@@ -3843,11 +3879,17 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         }
 
         if ($times) {
-          if ($dynamic_blocks != AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW && $dynamic_blocks != AI_DYNAMIC_BLOCKS_CLIENT_SIDE_INSERT) $dynamic_blocks = AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW;
+          if ($rotation_dynamic_blocks != AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW && $rotation_dynamic_blocks != AI_DYNAMIC_BLOCKS_CLIENT_SIDE_INSERT) $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW;
           $ai_wp_data [AI_CLIENT_SIDE_ROTATION] = true;
         }
 
-        $rotation_dynamic_blocks = $dynamic_blocks;
+        if ($rotation_dynamic_blocks == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC) {
+          if (!defined ('W3TC_DYNAMIC_SECURITY')) {
+            check_w3tc ();
+          }
+          if (defined ('AI_NO_W3TC')) $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
+        }
+
         if ($ai_wp_data [AI_FORCE_SERVERSIDE_CODE] || ($rotation_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE_SHOW || $rotation_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE_INSERT) && $ai_wp_data [AI_WP_AMP_PAGE]) $rotation_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
 
         $groups_marker = "#<span data-ai-groups=\"([^\"]+?)\"></span>#";
@@ -4910,7 +4952,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
             // All viewports selected
             if ($viewport_classes == '' && $invisible_viewport_classes == 'ai-viewport-0') {
-              // $processed_code already contains code for isnertion
+              // $processed_code already contains code for insertion
             } else
             // No viewport selected
             if ($viewport_classes == 'ai-viewport-0' && $invisible_viewport_classes == '') {
@@ -6730,6 +6772,15 @@ echo '</body>
 
     get_paragraph_start_positions ($content, $multibyte, $dummy, $paragraph_start_strings, $paragraph_positions, $active_paragraph_positions);
 
+    if (!isset ($paragraph_end_positions)) {
+      // Prepare end positions and sort them before sorting start positions
+      $paragraph_end_positions = array ();
+      $dummy = array ();
+      get_paragraph_end_positions ($content, $multibyte, $paragraph_positions, $paragraph_start_strings, $paragraph_end_positions, $dummy);
+
+      sort ($paragraph_end_positions);
+    }
+
     // Nothing to do
     $ai_last_check = AI_CHECK_PARAGRAPHS_WITH_TAGS;
     if (array_sum ($active_paragraph_positions) == 0) return $content;
@@ -6936,10 +6987,14 @@ echo '</body>
 
         if (!isset ($paragraph_end_positions)) {
           $paragraph_end_positions = array ();
+          $dummy = array ();
           get_paragraph_end_positions ($content, $multibyte, $paragraph_positions, $paragraph_start_strings, $paragraph_end_positions, $dummy);
         }
 
         foreach ($paragraph_positions as $index => $paragraph_position) {
+
+          // check for undefined array key
+          if (!isset ($active_paragraph_positions [$index]) || !isset ($paragraph_end_positions [$index])) continue;
 
           if ($active_paragraph_positions [$index] == 0) continue;
 
@@ -6963,6 +7018,7 @@ echo '</body>
 
         if (!isset ($paragraph_end_positions)) {
           $paragraph_end_positions = array ();
+          $dummy = array ();
           get_paragraph_end_positions   ($content, $multibyte, $paragraph_positions, $paragraph_start_strings, $paragraph_end_positions, $dummy);
         }
 
@@ -6971,6 +7027,8 @@ echo '</body>
         foreach ($paragraph_positions as $index => $paragraph_position) {
 
           if ($active_paragraph_positions [$index] == 0) continue;
+
+          if (!isset ($paragraph_end_positions [$index])) continue;
 
           if ($multibyte) {
             $paragraph_code = mb_substr ($content, $paragraph_position, $paragraph_end_positions [$index] - $paragraph_position + 1);
@@ -7077,12 +7135,17 @@ echo '</body>
 //    if ($position_preview || $position_text == '') {        // Prepare always
       if (!isset ($paragraph_end_positions)) {
         $paragraph_end_positions = array ();
+        $dummy = array ();
         get_paragraph_end_positions ($content, $multibyte, $paragraph_positions, $paragraph_start_strings, $paragraph_end_positions, $dummy);
       }
 
       $filtered_paragraph_end_positions = array ();
       // Use $paragraph_positions for counting as it is checked for consistency
       foreach ($paragraph_positions as $index => $paragraph_position) {
+
+        // check for undefined array key
+        if (!isset ($active_paragraph_positions [$index]) || !isset ($paragraph_end_positions [$index])) continue;
+
         if ($active_paragraph_positions [$index]) $filtered_paragraph_end_positions [] = $paragraph_end_positions [$index];
       }
       $paragraph_end_positions = $filtered_paragraph_end_positions;
@@ -7095,6 +7158,10 @@ echo '</body>
 
     $filtered_paragraph_positions = array ();
     foreach ($paragraph_positions as $index => $paragraph_position) {
+
+      // check for undefined array key
+      if (!isset ($active_paragraph_positions [$index])) continue;
+
       if ($active_paragraph_positions [$index]) $filtered_paragraph_positions [] = $paragraph_position;
     }
     $paragraph_positions = $filtered_paragraph_positions;
@@ -7409,6 +7476,7 @@ echo '</body>
 
 //      if (!isset ($paragraph_end_positions)) {
 //        $paragraph_end_positions = array ();
+//        $dummy = array ();
 //        get_paragraph_end_positions ($content, $multibyte, $paragraph_positions, $paragraph_start_strings, $paragraph_end_positions, $dummy);
 //      }
 
@@ -7795,7 +7863,17 @@ echo '</body>
     $ai_last_check = AI_CHECK_PARAGRAPH_TAGS;
     if (count ($paragraph_end_strings) == 0) return $content;
 
+    $dummy = array ();
     get_paragraph_end_positions ($content, $multibyte, $dummy, $paragraph_end_strings, $paragraph_positions, $active_paragraph_positions);
+
+    if (!isset ($paragraph_start_positions)) {
+      // Prepare start positions and sort them before sorting end positions
+      $paragraph_start_positions = array ();
+      $dummy = array ();
+      get_paragraph_start_positions ($content, $multibyte, $paragraph_positions, $paragraph_end_strings, $paragraph_start_positions, $dummy);
+
+      sort ($paragraph_start_positions);
+    }
 
     // Nothing to do
     $ai_last_check = AI_CHECK_PARAGRAPHS_WITH_TAGS;
@@ -8002,10 +8080,14 @@ echo '</body>
 
         if (!isset ($paragraph_start_positions)) {
           $paragraph_start_positions = array ();
+          $dummy = array ();
           get_paragraph_start_positions ($content, $multibyte, $paragraph_positions, $paragraph_end_strings, $paragraph_start_positions, $dummy);
         }
 
         foreach ($paragraph_positions as $index => $paragraph_position) {
+
+          // check for undefined array key
+          if (!isset ($active_paragraph_positions [$index]) || !isset ($paragraph_start_positions [$index])) continue;
 
           if ($active_paragraph_positions [$index] == 0) continue;
 
@@ -8030,6 +8112,7 @@ echo '</body>
 
         if (!isset ($paragraph_start_positions)) {
           $paragraph_start_positions = array ();
+          $dummy = array ();
           get_paragraph_start_positions ($content, $multibyte, $paragraph_positions, $paragraph_end_strings, $paragraph_start_positions, $dummy);
         }
 
@@ -8038,6 +8121,8 @@ echo '</body>
         foreach ($paragraph_positions as $index => $paragraph_position) {
 
           if ($active_paragraph_positions [$index] == 0) continue;
+
+          if (!isset ($paragraph_start_positions [$index])) continue;
 
           if ($multibyte) {
             $paragraph_code = mb_substr ($content, $paragraph_start_positions [$index], $paragraph_position - $paragraph_start_positions [$index] + 1);
@@ -8143,12 +8228,17 @@ echo '</body>
 //    if ($position_preview || $position_text == '') {            // Prepare always
       if (!isset ($paragraph_start_positions)) {
         $paragraph_start_positions = array ();
+        $dummy = array ();
         get_paragraph_start_positions ($content, $multibyte, $paragraph_positions, $paragraph_end_strings, $paragraph_start_positions, $dummy);
       }
 
       $filtered_paragraph_positions = array ();
       // Use $paragraph_positions for counting as it is checked for consistency
       foreach ($paragraph_positions as $index => $paragraph_position) {
+
+        // check for undefined array key
+        if (!isset ($active_paragraph_positions [$index]) || !isset ($paragraph_start_positions [$index])) continue;
+
         if ($active_paragraph_positions [$index]) $filtered_paragraph_positions [] = $paragraph_start_positions [$index];
       }
       $paragraph_start_positions = $filtered_paragraph_positions;
@@ -8161,6 +8251,10 @@ echo '</body>
 
     $filtered_paragraph_positions = array ();
     foreach ($paragraph_positions as $index => $paragraph_position) {
+
+      // check for undefined array key
+      if (!isset ($active_paragraph_positions [$index])) continue;
+
       if ($active_paragraph_positions [$index]) $filtered_paragraph_positions [] = $paragraph_position;
     }
     $paragraph_positions = $filtered_paragraph_positions;
@@ -8478,6 +8572,7 @@ echo '</body>
       // Not needed anymore
 //      if (!isset ($paragraph_start_positions)) {
 //        $paragraph_start_positions = array ();
+//        $dummy = array ();
 //        get_paragraph_start_positions ($content, $multibyte, $paragraph_positions, $paragraph_end_strings, $paragraph_start_positions, $dummy);
 //      }
 
@@ -8897,6 +8992,7 @@ echo '</body>
     switch ($ai_wp_data [AI_WP_PAGE_TYPE]) {
       case AI_PT_STATIC:
       case AI_PT_POST:
+      case AI_PT_FEED:
         $wp_categories = get_the_category ();
         break;
       default:
@@ -9008,11 +9104,20 @@ echo '</body>
 
     if ($tags == AD_EMPTY_DATA) return true;
 
+    if ($tags == '*') {
+      $has_any_tag = has_tag ('', ai_get_post_id ());
+
+      if ($tag_type == AI_BLACK_LIST) {
+        return !$has_any_tag;
+      } else {
+          return $has_any_tag;
+        }
+    }
+
     $tags_listed = explode (",", $tags);
     foreach ($tags_listed as $index => $tag_listed) {
       $tags_listed [$index] = trim ($tag_listed);
     }
-//    $has_any_of_the_given_tags = has_tag ($tags_listed);
     $has_any_of_the_given_tags = has_tag ($tags_listed, ai_get_post_id ());
 
     if ($tag_type == AI_BLACK_LIST) {
@@ -9114,6 +9219,13 @@ echo '</body>
           } else {
               if (get_post_meta (get_the_id (), $meta_data [0], true) != '') return false;
             }
+        }
+        elseif (strpos ($taxonomy_disabled, 'wpml-current-language:') === 0) {
+          if (has_filter ('wpml_current_language') !== false) {
+            $wpml_current_language = apply_filters ('wpml_current_language', null);
+            $current_language = explode (':', $taxonomy_disabled);
+            if ($current_language [1] == $wpml_current_language) return false;
+          }
         }
 
         $taxonomy_names = get_post_taxonomies ();
@@ -9224,6 +9336,13 @@ echo '</body>
             } else {
                 if (get_post_meta (get_the_id (), $meta_data [0], true) != '') return true;
               }
+          }
+          elseif (strpos ($taxonomy_enabled, 'wpml-current-language:') === 0) {
+            if (has_filter ('wpml_current_language') !== false) {
+              $wpml_current_language = apply_filters ('wpml_current_language', null);
+              $current_language = explode (':', $taxonomy_enabled);
+              if ($current_language [1] == $wpml_current_language) return true;
+            }
           }
 
           $taxonomy_names = get_post_taxonomies ();
@@ -10052,7 +10171,8 @@ class ai_code_generator {
             $code = '';
             break;
           default:
-              $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
+//              $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
+              $code = '<script async src="' . $data ['adsense-script'] . '" crossorigin="anonymous"></script>';
               if ($data ['adsense-comment']) $code .= "\n<!-- " . $data ['adsense-comment'] . " -->";
 
               $adsense_full_width_responsive = $data ['adsense-full-width-responsive'] != '' ? "\n".'     data-full-width-responsive="' . esc_html ($data ['adsense-full-width-responsive']) . '"' : '';
@@ -10420,7 +10540,8 @@ class ai_code_generator {
     try {
       $dom = new DOMDocument ();
       libxml_use_internal_errors (true);
-      $dom->loadHTML ($code);
+//      $dom->loadHTML ($code);
+      $dom->loadHTML ("<meta http-equiv='Content-Type' content='charset=utf-8' />$code");
       libxml_clear_errors ();
     } catch (Exception $e) {
         echo 'ERROR: ', $e->getMessage();
@@ -10429,6 +10550,9 @@ class ai_code_generator {
 
     // AdSense
     if (strpos ($code, 'data-ad-client') !== false) {
+      $adsense_script = $dom->getElementsByTagName ('script');
+      $adsense_script_src = $adsense_script->item (0) != null && $adsense_script->item (0)->getAttribute ('src') != null ? $adsense_script->item (0)->getAttribute ('src') : '';
+
       $adsense_code     = $dom->getElementsByTagName ('ins');
       $adsense_code_amp = $dom->getElementsByTagName ('amp-ad');
       $adsense_code_amp_sticky = $dom->getElementsByTagName ('amp-sticky-ad');
@@ -10476,6 +10600,7 @@ class ai_code_generator {
       if ($adsense_code->length != 0) {
         $data = array (
           'type' => AI_CODE_ADSENSE,
+          'adsense-script' => $adsense_script_src,
           'adsense-publisher-id' => '',
           'adsense-ad-slot-id' => '',
           'adsense-type' => AI_ADSENSE_STANDARD,
@@ -10836,7 +10961,7 @@ class ai_code_generator {
       $options = explode (AD_ROTATE_SEPARATOR, $code);
       $data ['options'] = array ();
       foreach ($options as $index => $option) {
-        $option_code = trim ($option, "\n");
+        $option_code = trim ($option, " \n");
 
         $rotation_groups = 0;
         if (isset ($rotate_parameters [$index - 1]['group']) && $rotate_parameters [$index - 1]['group'] != '') {
@@ -10846,8 +10971,11 @@ class ai_code_generator {
           $option_time  = '';
           $option_index  = '';
           $option_scheduling  = '';
+          $option_append_prepend = '';
         } else {
+            $option_share = '';
             $option_name = isset ($rotate_parameters [$index - 1]['name']) ? $rotate_parameters [$index - 1]['name'] : '';
+            $option_append_prepend = isset ($rotate_parameters [$index - 1]['code']) ? $rotate_parameters [$index - 1]['code'] : '';
             if (isset ($rotate_parameters [$index - 1]['share'])) {
               if (is_numeric ($rotate_parameters [$index - 1]['share'])) {
                 $option_share = intval ($rotate_parameters [$index - 1]['share']);
@@ -10863,7 +10991,7 @@ class ai_code_generator {
           }
 
         if ($index == 0 && $option_code == '') continue;
-        $data ['options'] []= array ('code' => $option_code, 'name' => $option_name, 'share' => $option_share, 'time' => $option_time, 'index' => $option_index, 'scheduling' => $option_scheduling, 'groups' => $rotation_groups);
+        $data ['options'] []= array ('code' => $option_code, 'name' => $option_name, 'share' => $option_share, 'time' => $option_time, 'index' => $option_index, 'scheduling' => $option_scheduling, 'groups' => $rotation_groups, 'prepend-append' => $option_append_prepend);
       }
     }
 

@@ -2,8 +2,8 @@
 /*
 Plugin Name: Favethemes Insights
 Plugin URI:  http://themeforest.net/user/favethemes
-Description: Add insights for favethemes themes
-Version:     1.2.9
+Description: Add insights for houzez theme
+Version:     1.3.1
 Author:      Favethemes
 Author URI:  http://themeforest.net/user/favethemes
 */
@@ -53,6 +53,8 @@ if ( ! class_exists( 'Favethemes_Insights' ) ) :
             $this->initialize_admin_menu();
 
             $this->include_files();
+
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
             do_action( 'fave_insights_loaded' );  // Favethemes Insights plugin loaded action hook
         }
@@ -163,6 +165,31 @@ if ( ! class_exists( 'Favethemes_Insights' ) ) :
                         )
                 );
             }
+        }
+
+        /**
+         * Enqueue Scripts
+         */
+        public function enqueue_scripts() {
+
+            if(self::houzez_is_insights_page()) {
+
+                wp_enqueue_script( 'houzez-insights', FAVE_INSIGHTS_URL . 'js/script.js', array('jquery', 'chart'), $this->version, true );
+
+                $locals = array(
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                );
+                wp_localize_script( 'houzez-insights', 'Houzez_insights_vars', $locals ); 
+            }
+        }
+
+        public static function houzez_is_insights_page() {
+            if ( is_page_template( array(
+                'template/user_dashboard_insight.php'
+            ) ) ) {
+                return true;
+            }
+            return false;
         }
 
         /**

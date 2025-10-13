@@ -3,6 +3,13 @@ $search_builder = houzez_option('dock_search_builder');
 $layout = $search_builder['enabled'];
 unset($layout['placebo']);
 
+if(wp_is_mobile()) { 
+	$advanced_fields = array_slice($layout, 1);
+} else {
+	$num_fields = houzez_option('dock_search_top_row_fields');
+	$advanced_fields = array_slice($layout, intval($num_fields) );
+}
+
 if(!taxonomy_exists('property_country')) {
     unset($layout['country']);
 }
@@ -28,18 +35,10 @@ if($enable_radius_search != 1) {
 if( houzez_option('dock_price_range') ) {
 	unset($layout['min-price'], $layout['max-price']);
 }
-
-if(wp_is_mobile()) { 
-	$advanced_fields = array_slice($layout, 1);
-} else {
-	$num_fields = houzez_option('dock_search_top_row_fields');
-	$advanced_fields = array_slice($layout, intval($num_fields) );
-}
-
 ?>
 
-<div class="advanced-search-filters search-v1-v2">
-	<div class="d-flex">
+<section class="advanced-search-filters search-v1-v2">
+	<div class="row row-cols-2 row-cols-lg-4 g-2">
 		<?php
 		if ($advanced_fields) {
 			foreach ($advanced_fields as $key=>$value) {
@@ -49,14 +48,14 @@ if(wp_is_mobile()) {
 						get_template_part('template-parts/search/fields/currency');
 						
 					}
-					echo '<div class="flex-search">';
+					echo '<div class="col">';
 						get_template_part('template-parts/search/fields/'.$key);
 					echo '</div>';
 					
 				} else {
 
-					echo '<div class="flex-search">';
-						houzez_get_custom_search_field($key);
+					echo '<div class="col">';
+						Houzez_Property_Search::get_custom_search_field($key);
 					echo '</div>';
 					
 				}
@@ -71,13 +70,13 @@ if(wp_is_mobile()) {
 	</div>
 
 	<?php if( houzez_option('dock_price_range') ) { ?>
-	<div class="d-flex">
-		<div class="flex-search-half">
-			<?php get_template_part('template-parts/search/fields/price-range'); ?>
+	<div class="row my-4">
+		<div class="col-12 col-lg-6">
+			<?php get_template_part('template-parts/search/fields/price', 'range', array('unique_id' => 'price_range_dock')); ?>
 		</div>
 	</div>
 	<?php } ?>
-</div>
+</section>
 
 <?php 
 if( houzez_option('dock_search_other_features') ) {

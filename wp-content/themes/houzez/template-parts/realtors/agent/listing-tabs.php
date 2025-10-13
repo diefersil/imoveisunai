@@ -39,19 +39,19 @@ if(houzez_option('agent_tabs', 1)) {
         $tab_all = "active";
     }
     ?>
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
             <a class="nav-link <?php echo esc_attr( $tab_all ); ?>" href="<?php echo esc_url($all_link); ?>"><?php esc_html_e('All', 'houzez');?></a>
         </li>
 
         <?php if(!empty($agent_detail_tab_1) && !empty($tab_1_name)) { ?>
-        <li class="nav-item">
+        <li class="nav-item" role="presentation">
             <a class="nav-link <?php echo esc_attr( $tab1_active ); ?>" href="<?php echo esc_url($tab1_link);?>"><?php echo esc_attr($tab_1_name);?></a>
         </li>
         <?php } ?>
 
         <?php if(!empty($agent_detail_tab_2) && !empty($tab_2_name)) { ?>
-        <li class="nav-item">
+        <li class="nav-item" role="presentation">
             <a class="nav-link <?php echo esc_attr( $tab2_active ); ?>" href="<?php echo esc_url($tab2_link);?>"><?php echo esc_attr($tab_2_name);?></a>
         </li>
         <?php } ?>

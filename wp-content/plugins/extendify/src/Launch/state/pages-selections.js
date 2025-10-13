@@ -1,3 +1,4 @@
+import { safeParseJson } from '@shared/lib/parsing';
 import { create } from 'zustand';
 import { devtools, persist, createJSONStorage } from 'zustand/middleware';
 
@@ -10,7 +11,7 @@ const key = `extendify-launch-pages-selection-${window.extSharedData.siteId}`;
 const state = (set, get) => ({
 	// initialize the state with default values
 	...initialState,
-	...(JSON.parse(localStorage.getItem(key) || '{}')?.state ?? {}), // For testing
+	...(safeParseJson(window.localStorage.getItem(key))?.state || {}),
 	has(type, item) {
 		if (!item?.id) return false;
 		return (get()?.[type] ?? [])?.some((t) => t.id === item.id);

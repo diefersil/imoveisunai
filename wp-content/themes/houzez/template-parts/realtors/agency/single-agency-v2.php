@@ -10,73 +10,33 @@ if( $sticky_sidebar['agency_sidebar'] != 0 ) {
 }
 
 $properties_ids_array = array();
-$listing_view = houzez_option('agency_listings_layout');
 $agency_phone = get_post_meta( get_the_ID(), 'fave_agency_phone', true );
 $agency_phone_call = str_replace(array('(',')',' ','-'),'', $agency_phone);
 
-$item_layout = $view_class = $cols_in_row = '';
-$card_deck = 'card-deck';
+// Set up the default view
+$default_view = houzez_option('agency_listings_layout', 'list-view-v1');
 
-if($listing_view == 'list-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'list-view';
+// Default arguments for agency listings
+$args = array(
+    'default_view' => $default_view,
+    'layout' => 'no-sidebar', // Agency listings always full width
+    'grid_columns' => houzez_option('agency_listings_grid_columns', '2'),
+    'show_switch' => true,
+);
 
-} elseif($listing_view == 'grid-view-v1') {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'list-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v2') {
-    $wrap_class = 'listing-v2';
-    $item_layout = 'v2';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v3') {
-    $wrap_class = 'listing-v3';
-    $item_layout = 'v3';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v4') {
-    $wrap_class = 'listing-v4';
-    $item_layout = 'v4';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'list-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'list-view';
-
-} elseif($listing_view == 'grid-view-v5') {
-    $wrap_class = 'listing-v5';
-    $item_layout = 'v5';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v6') {
-    $wrap_class = 'listing-v6';
-    $item_layout = 'v6';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'grid-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'v7';
-    $view_class = 'grid-view';
-
-} elseif($listing_view == 'list-view-v7') {
-    $wrap_class = 'listing-v7';
-    $item_layout = 'list-v7';
-    $view_class = 'list-view';
-    $card_deck = '';
-} else {
-    $wrap_class = 'listing-v1';
-    $item_layout = 'v1';
-    $view_class = 'grid-view';
+// Determine if we should show the view switcher based on version
+if (in_array($default_view, array('grid-view-v3', 'grid-view-v4', 'grid-view-v5', 'grid-view-v6', 'list-view-v7'))) {
+    $args['show_switch'] = false;
 }
+
+// Get view settings
+$view_settings = houzez_get_listing_view_settings($args['default_view']);
+$current_view = $view_settings['current_view'];
+$current_item_template = $view_settings['current_item_template'];
+$item_version = $view_settings['item_version'];
+
+// Get listing view class
+$listing_view_class = houzez_get_listing_view_class($current_view, $item_version, $args['layout'], $args['grid_columns']);
 
 $active_reviews_tab = $active_agents_tab = '';
 $active_reviews_content = $active_agents_content = '';
@@ -178,43 +138,36 @@ $agency_total_listing = $agency_qry->found_posts;
 
 
 $agents_query = Houzez_Query::loop_agency_agents(get_the_ID());
-
-$agent_wrap = 'agents-list-view';
-$agent_layout = 'list';
-$agents_template = houzez_option('agents-template-layout', 'v1');
-if( $agents_template == 'v2' ) { 
-    $agent_layout = 'agent-grid';
-    $agent_wrap = 'agents-grid-view agents-grid-view-3cols';
-} elseif( $agents_template == 'v3' ) {
-    $agent_wrap = 'agents-grid-view agents-grid-view-3cols';
-    $agent_layout = 'agent-grid-v2';
-}
 ?>
-<section class="content-wrap">
+<section class="content-wrap agent-detail-page-v2">
 
-    <div class="agent-profile-wrap">
+    <div class="agent-profile-wrap m-0">
         <div class="container">
-            <div class="agent-profile-top-wrap">
+            <div class="agent-profile-top-wrap d-flex align-items-start flex-column flex-sm-row gap-4">
                 <div class="agency-image">
                     <?php get_template_part('template-parts/realtors/agency/image'); ?>
                 </div><!-- agent-image -->
                 <div class="agent-profile-header">
-                    <h1><?php the_title(); ?> </h1>
+                    <h1 class="d-flex align-items-center gap-2 my-2" itemprop="name">
+                        <?php the_title(); ?> 
+                        <?php get_template_part('template-parts/realtors/agency/verified'); ?>
+                    </h1>
                     <?php 
                     if( houzez_option( 'agency_review', 0 ) != 0 ) {
-                        get_template_part('template-parts/realtors/rating'); 
+                        get_template_part('template-parts/realtors/rating', null, array('is_single_realtor' => true)); 
                     }?> 
+
                     <div class="agent-profile-address">
                         <?php get_template_part('template-parts/realtors/agency/address'); ?> 
                     </div><!-- agent-profile-address -->
-                    <div class="agent-profile-cta">
-                        <ul class="list-inline">
+                    <div class="agent-profile-cta mt-3">
+                        <ul class="list-inline m-0">
                             <?php if( houzez_option('agency_form_agency_page', 1) ) { ?>
-                            <li class="list-inline-item"><a href="#" data-toggle="modal" data-target="#realtor-form"><i class="houzez-icon icon-messages-bubble mr-1"></i> <?php echo houzez_option('agency_lb_ask_question', esc_html__('Ask a question', 'houzez')); ?></a></li>
+                            <li class="list-inline-item"><a href="#" data-bs-toggle="modal" data-bs-target="#realtor-form"><i class="houzez-icon icon-messages-bubble me-1"></i> <?php echo houzez_option('agency_lb_ask_question', esc_html__('Ask a question', 'houzez')); ?></a></li>
                             <?php } ?>
                             <?php if(!empty($agency_phone)) { ?>
                             <li class="list-inline-item">
-                                <a href="tel:<?php echo esc_attr($agency_phone_call); ?>"><i class="houzez-icon icon-phone mr-1"></i> <?php echo esc_attr($agency_phone); ?></a>
+                                <a href="tel:<?php echo esc_attr($agency_phone_call); ?>"><i class="houzez-icon icon-phone me-1"></i> <?php echo esc_attr($agency_phone); ?></a>
                             </li>
                             <?php } ?>
                         </ul>
@@ -230,19 +183,19 @@ if( $agents_template == 'v2' ) {
             <ul class="nav">
                 <?php if( houzez_option( 'agency_listings', 0 ) != 0 ) { ?>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo esc_attr($active_listings_tab); ?>" href="#tab-properties" data-toggle="pill" role="tab"><?php esc_html_e('Listings', 'houzez'); ?> (<?php echo esc_attr($agency_total_listing); ?>)</a>
+                    <a class="nav-link <?php echo esc_attr($active_listings_tab); ?>" href="#tab-properties" data-bs-toggle="pill" role="tab"><?php esc_html_e('Listings', 'houzez'); ?> (<?php echo esc_attr($agency_total_listing); ?>)</a>
                 </li>
                 <?php } ?>
 
                 <?php if( houzez_option( 'agency_agents', 0 ) != 0 ) { ?>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo esc_attr($active_agents_tab); ?>" href="#tab-agents" data-toggle="pill" role="tab"><?php esc_html_e('Agents', 'houzez'); ?> (<?php echo esc_attr($agents_query->found_posts); ?>)</a>
+                    <a class="nav-link <?php echo esc_attr($active_agents_tab); ?>" href="#tab-agents" data-bs-toggle="pill" role="tab"><?php esc_html_e('Agents', 'houzez'); ?> (<?php echo esc_attr($agents_query->found_posts); ?>)</a>
                 </li>
                 <?php } ?>
 
                 <?php if( houzez_option( 'agency_review', 0 ) != 0 ) { ?>
                 <li class="nav-item">
-                    <a class="nav-link hz-review-tab <?php echo esc_attr($active_reviews_tab); ?>" href="#tab-reviews" data-toggle="pill" role="tab"><?php esc_html_e('Reviews', 'houzez'); ?> (<?php echo houzez_reviews_count('review_agency_id'); ?>)</a>
+                    <a class="nav-link hz-review-tab <?php echo esc_attr($active_reviews_tab); ?>" href="#tab-reviews" data-bs-toggle="pill" role="tab"><?php esc_html_e('Reviews', 'houzez'); ?> (<?php echo houzez_reviews_count('review_agency_id'); ?>)</a>
                 </li>
                 <?php } ?>
             </ul>
@@ -257,7 +210,7 @@ if( $agents_template == 'v2' ) {
                 <div class="tab-content" id="tab-content">
                     
                     <?php if( houzez_option( 'agency_listings', 0 ) != 0 ) { ?>
-                    <div class="tab-pane fade <?php echo esc_attr($active_listings_content); ?>" id="tab-properties">
+                    <div class="tab-pane fade <?php echo esc_attr($active_listings_content); ?>" id="tab-properties" role="tabpanel">
                         <div class="listing-tools-wrap">
                             <div class="d-flex align-items-center">
                                 <div class="listing-tabs flex-grow-1">
@@ -266,13 +219,13 @@ if( $agents_template == 'v2' ) {
                                 <?php get_template_part('template-parts/realtors/agency/listing-sort-by'); ?>   
                             </div><!-- d-flex -->
                         </div><!-- listing-tools-wrap -->
-                        <div class="listing-view <?php echo esc_attr($view_class).' '.esc_attr($card_deck); ?>">
-                            
+
+                        <div class="<?php echo esc_attr($listing_view_class); ?>" role="list" data-view="<?php echo esc_attr($current_view); ?>">
                             <?php
                             if ( $agency_qry->have_posts() ) :
                                 while ( $agency_qry->have_posts() ) : $agency_qry->the_post();
 
-                                    get_template_part('template-parts/listing/item', $item_layout);
+                                    get_template_part('template-parts/listing/item', $current_item_template);
 
                                 endwhile;
                                 wp_reset_postdata();
@@ -280,7 +233,6 @@ if( $agents_template == 'v2' ) {
                                 get_template_part('template-parts/listing/item', 'none');
                             endif;
                             ?> 
-                            
                         </div><!-- listing-view -->
                         <?php houzez_pagination( $agency_qry->max_num_pages, $agency_total_listing, $post_per_page ); ?>
                     </div><!-- tab-pane -->
@@ -289,12 +241,12 @@ if( $agents_template == 'v2' ) {
                     <?php if( houzez_option( 'agency_agents', 0 ) != 0 ) { ?>
                     <div class="tab-pane fade <?php echo esc_attr($active_agents_content); ?>" id="tab-agents">
 
-                        <div class="<?php echo esc_attr($agent_wrap); ?>">
+                        <div class="agents-list-view" role="list">
                             <?php
                             if ( $agents_query->have_posts() ) :
                                 while ( $agents_query->have_posts() ) : $agents_query->the_post();
 
-                                    get_template_part('template-parts/realtors/agent/'.$agent_layout);
+                                    get_template_part('template-parts/realtors/agent/list');
 
                                 endwhile;
                                 wp_reset_postdata();
@@ -318,12 +270,37 @@ if( $agents_template == 'v2' ) {
                 <aside class="sidebar-wrap">
                     <div class="agent-bio-wrap">
                         <h2><?php echo esc_html__('About', 'houzez'); ?> <?php the_title(); ?></h2>
-                        <?php the_content(); ?>
+                        <?php 
+                        // Get the raw post content
+                        global $post;
+                        $content = $post->post_content;
+                        
+                        // Process content with auto excerpt if enabled
+                        $processed_content = houzez_auto_excerpt_content($content, 'agency');
+                        
+                        if( $processed_content['has_more'] ) {
+                            // Apply content filters to both parts
+                            $content_before_more = apply_filters( 'the_content', $processed_content['content_before'] );
+                            $content_after_more = apply_filters( 'the_content', $processed_content['content_after'] );
+                            
+                            // Get the read more text from settings or use default
+                            $more_link_text = houzez_option('read_more_text', __( 'Read More', 'houzez' ));
+                            $more_link = '<p><a href="#" class="houzez-read-more-link" onclick="this.style.display=\'none\'; this.parentNode.nextElementSibling.style.display=\'block\'; return false;">' . $more_link_text . '</a></p>';
+                            
+                            // Output the content with read more functionality
+                            echo $content_before_more;
+                            echo $more_link;
+                            echo '<div class="houzez-more-content" style="display: none;">' . $content_after_more . '</div>';
+                        } else {
+                            // No more tag needed, just display the content normally
+                            echo apply_filters( 'the_content', $processed_content['content'] );
+                        }
+                        ?>
 
                         <?php get_template_part('template-parts/realtors/agency/languages'); ?>
                     </div><!-- agent-bio-wrap --> 
                     <div class="agent-profile-content">
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled m-0">
                             <?php get_template_part('template-parts/realtors/agency/license'); ?>
                             <?php get_template_part('template-parts/realtors/agency/tax-number'); ?>
                             <?php get_template_part('template-parts/realtors/agency/service-area'); ?>

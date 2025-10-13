@@ -13,12 +13,12 @@ export default {
 		notCompleted: __('Register this domain', 'extendify-local'),
 	},
 	type: 'secondary-domain-task',
-	dependencies: { goals: [], plugins: [] },
+	dependencies: { plugins: [] },
 	show: ({ showSecondaryDomainTask }) => {
 		// They need either extendable or launch completed
 		if (themeSlug !== 'extendable' && !launchCompleted) return false;
 		return showSecondaryDomainTask;
 	},
 	backgroundImage:
-		'https://assets.extendify.com/assist-tasks/domains-recommendations.webp',
+		'https://images.extendify-cdn.com/assist-tasks/domains-recommendations.webp',
 };

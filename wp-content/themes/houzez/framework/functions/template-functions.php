@@ -6,6 +6,12 @@ if( ! function_exists( 'houzez_template_header' ) ) {
 	}
 }
 
+if( ! function_exists( 'houzez_template_header_mobile' ) ) {
+	function houzez_template_header_mobile() {
+		get_template_part('template-parts/header/nav-mobile');
+	}
+}
+
 if( ! function_exists( 'houzez_template_footer' ) ) {
 
 	function houzez_template_footer() {
@@ -13,22 +19,124 @@ if( ! function_exists( 'houzez_template_footer' ) ) {
 	}
 }
 
-if( ! function_exists( 'houzez_crm_files' ) ) {
+/**
+ * Core function to handle search form display logic
+ * 
+ * @param string $position The position where search should be displayed ('under_nav' or 'under_banner')
+ * @return void
+ */
+if( ! function_exists('houzez_render_search') ) {
+	function houzez_render_search($position) {
+		global $post;
+		if (!houzez_search_needed()) {
+			return;
+		}
 
-    function houzez_crm_files() {
-        if(houzez_is_dashboard()) { 
-            if( isset($_GET['hpage']) && $_GET['hpage'] == 'leads' ) {
-                get_template_part('template-parts/dashboard/board/leads/new-lead-panel');
+		// Get page level advanced search settings
+		$adv_settings = array(
+			'enable' => get_post_meta(houzez_postid(), 'fave_adv_search_enable', true),
+			'visibility' => get_post_meta(houzez_postid(), 'fave_adv_search', true),
+			'position' => get_post_meta(houzez_postid(), 'fave_adv_search_pos', true)
+		);
 
-            } elseif( isset($_GET['hpage']) && $_GET['hpage'] == 'deals' ) {
-                get_template_part('template-parts/dashboard/board/deals/new-deal-panel');
+		// Check page level settings first
+		if (!empty($adv_settings['enable']) && $adv_settings['enable'] === 'current_page') {
+			// Handle transparent logo case for page level
+			if (houzez_is_transparent_logo()) {
+				$adv_settings['position'] = 'under_banner';
+			}
 
-            } elseif( (isset($_GET['hpage']) && $_GET['hpage'] == 'enquiries') || (isset($_GET['hpage']) && ($_GET['hpage'] == 'lead-detail' && $_GET['tab']== 'enquires'))  ) {
-                get_template_part('template-parts/dashboard/board/enquires/add-new-enquiry');
-            }
-        }
-    }
+			// Show search based on page level visibility and position
+			if (in_array($adv_settings['visibility'], array('show', 'hide_show'))) {
+				// For page level, compare under_menu with under_nav position
+				$should_display = ($position === 'under_nav' && $adv_settings['position'] === 'under_menu') || 
+								($position === 'under_banner' && $adv_settings['position'] === 'under_banner');
+				
+				if ($should_display) {
+					houzez_get_search_templates();
+				}
+			}
+			return; // Return after handling page level settings
+		}
+
+		// If page level settings are not set or set to global, use theme options
+		if ($adv_settings['enable'] === 'global' || empty($adv_settings['enable'])) {
+			$settings = array(
+				'search_enable' => isset($_GET['search_pos']) ? 1 : houzez_option('main-search-enable'),
+				'search_position' => isset($_GET['search_pos']) ? sanitize_text_field($_GET['search_pos']) : houzez_option('search_position'),
+				'search_pages' => houzez_option('search_pages'),
+				'search_selected_pages' => houzez_option('header_search_selected_pages')
+			);
+
+			// Handle transparent logo case for theme options
+			if (houzez_is_transparent_logo()) {
+				$settings['search_position'] = 'under_banner';
+			}
+
+			// For theme options, use under_nav directly
+			if ($settings['search_enable'] == 0 || $settings['search_position'] != $position) {
+				return;
+			}
+
+			// Determine if search should be displayed based on page settings
+			$should_display = false;
+
+			switch ($settings['search_pages']) {
+				case 'only_home':
+					$should_display = is_front_page();
+					break;
+				case 'all_pages':
+					$should_display = true;
+					break;
+				case 'only_innerpages':
+					$should_display = !is_front_page();
+					break;
+				case 'specific_pages':
+					$should_display = is_page($settings['search_selected_pages']);
+					break;
+			}
+
+			if ($should_display) {
+				houzez_get_search_templates();
+			}
+		}
+	}
 }
+
+/**
+ * Renders the search form after header based on various conditions and settings
+ * 
+ * @since 1.0.0
+ * @return void
+ */
+if( ! function_exists('houzez_search_after_header') ) {
+	function houzez_search_after_header() {
+		houzez_render_search('under_nav');
+	}
+}
+
+/**
+ * Renders the search form after banner based on various conditions and settings
+ * 
+ * @since 1.0.0
+ * @return void
+ */
+if( ! function_exists('houzez_search_after_banner') ) {
+	function houzez_search_after_banner() {
+		houzez_render_search('under_banner');
+	}
+}
+
+/**
+ * Helper function to load search template parts
+ */
+if( ! function_exists('houzez_get_search_templates') ) {
+	function houzez_get_search_templates() {
+		get_template_part('template-parts/search/main');
+		get_template_part('template-parts/search/search-mobile-nav');
+	}
+}
+
 
 if( ! function_exists( 'houzez_realtor_contact_form' ) ) {
 
@@ -40,16 +148,6 @@ if( ! function_exists( 'houzez_realtor_contact_form' ) ) {
     }
 }
 
-if( ! function_exists( 'houzez_property_detail_files' ) ) {
-
-    function houzez_property_detail_files() {
-        
-        if(is_singular('property')) {
-            get_template_part( 'property-details/mobile-property-contact');
-            get_template_part( 'property-details/lightbox');
-        }
-    }
-}
 
 if( ! function_exists( 'houzez_listing_preview' ) ) {
 
@@ -70,25 +168,6 @@ if( ! function_exists( 'houzez_login_password_reset' ) ) {
     }
 }
 
-if( ! function_exists( 'houzez_mobile_search' ) ) {
-
-    function houzez_mobile_search() {
-        
-        if( wp_is_mobile() ) {
-			get_template_part('template-parts/search/mobile-search'); 
-		} 
-    }
-}
-
-if( ! function_exists( 'houzez_mobile_map_switch' ) ) {
-
-    function houzez_mobile_map_switch() {
-        
-        if( houzez_is_half_map() ) {
-			get_template_part('template-parts/listing/partials/mobile-map-switch');
-		}
-    }
-}
 
 if( ! function_exists( 'houzez_backtotop_compare' ) ) {
 
@@ -98,7 +177,10 @@ if( ! function_exists( 'houzez_backtotop_compare' ) ) {
         	if( houzez_option('backtotop') ) {
 				get_template_part('template-parts/footer/back-to-top'); 
 			}
-	        get_template_part('template-parts/listing/compare-properties'); 
+
+			if( houzez_option('disable_compare', 1) ) {
+		        get_template_part('template-parts/listing/compare-properties'); 
+		    }
         }
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -88,6 +87,35 @@ class Houzez_Elementor_Sort_By extends Widget_Base {
                 'type'      => Controls_Manager::TEXT,
                 'description'   => '',
                 'default' => esc_html__('Sort By:', 'houzez-theme-functionality'),
+            ]
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'style_section',
+            [
+                'label'     => esc_html__( 'Style', 'houzez-theme-functionality' ),
+                'tab'       => Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'title_typography',
+                'selector' => '{{WRAPPER}} .sort-by-title, {{WRAPPER}} .dropdown-toggle',
+            ]
+        );
+
+        $this->add_control(
+            'text_color',
+            [
+                'label' => esc_html__( 'Text Color', 'textdomain' ),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .sort-by-title, {{WRAPPER}} button:not(.bs-placeholder) .filter-option-inner-inner' => 'color: {{VALUE}}',
+                ],
             ]
         );
 

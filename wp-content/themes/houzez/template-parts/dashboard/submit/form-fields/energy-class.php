@@ -1,5 +1,5 @@
-<div class="form-group">
-        <label for="energy_class">
+<div class="form-group mb-3">
+        <label class="form-label" for="energy_class">
         	<?php echo houzez_option('cl_energy_cls', 'Energy Class' ).houzez_required_field('energy_class'); ?>
         </label>
 
@@ -9,6 +9,16 @@
         <?php
         $energy_array = houzez_option('energy_class_data', 'A+, A, B, C, D, E, F, G, H'); 
         $energy_array = explode(',', $energy_array);
+        
+        // Check energy mode and filter array accordingly
+        $energy_mode = houzez_option('energy_class_mode', 'standard');
+        if ($energy_mode === 'french_eu') {
+            // French/EU mode only uses A-G (no A+, no H)
+            $energy_array = array_filter($energy_array, function($class) {
+                $class = trim($class);
+                return $class !== 'A+' && $class !== 'H';
+            });
+        }
 
         if( ! empty( $energy_array ) ) {
 

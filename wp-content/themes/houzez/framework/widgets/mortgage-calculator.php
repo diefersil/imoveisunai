@@ -105,75 +105,64 @@ if( ! function_exists('houzez_mortgage_calculator_widget') ) {
         $currency_symbol = houzez_option('currency_symbol');
     ?>
 
-        <div class="widget-body">
-            <div class="form-group">
+        <div class="widget-body" role="form" aria-labelledby="calculator-title">
+            <div class="form-group mb-2">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text"><?php echo esc_attr($currency_symbol);?></div>
-                    </div><!-- input-group-prepend -->
+                    <span class="input-group-text" aria-hidden="true"><?php echo esc_attr($currency_symbol);?></span>
                     <input class="form-control" id="mc_total_amount" placeholder="<?php esc_html_e('Total Amount', 'houzez'); ?>" type="text">
-                </div><!-- input-group -->
-            </div><!-- form-group -->
-            <div class="form-group">
+                </div>
+            </div>
+            <div class="form-group mb-2">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text"><?php echo esc_attr($currency_symbol);?></div>
-                    </div><!-- input-group-prepend -->
+                    <span class="input-group-text" aria-hidden="true"><?php echo esc_attr($currency_symbol);?></span>
                     <input class="form-control" id="mc_down_payment" placeholder="<?php esc_html_e('Down Payment', 'houzez'); ?>" type="text">
-                </div><!-- input-group -->
-            </div><!-- form-group -->
-            <div class="form-group">
+                </div>
+            </div>
+            <div class="form-group mb-2">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text">%</div>
-                    </div><!-- input-group-prepend -->
+                    <span class="input-group-text" aria-hidden="true">%</span>
                     <input class="form-control" id="mc_interest_rate" placeholder="<?php esc_html_e('Interest Rate', 'houzez'); ?>" type="text">
-                </div><!-- input-group -->
-            </div><!-- form-group -->
-            <div class="form-group">
+                </div>
+            </div>
+            <div class="form-group mb-2">
                 <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text">
-                            <i class="houzez-icon icon-calendar-3"></i>
-                        </div>
-                    </div><!-- input-group-prepend -->
+                    <span class="input-group-text" aria-hidden="true">
+                        <i class="houzez-icon icon-calendar-3" aria-hidden="true"></i>
+                    </span>
                     <input class="form-control" id="mc_term_years" placeholder="<?php esc_html_e('Loan Term (Years)', 'houzez'); ?>" type="text">
-                </div><!-- input-group -->
-            </div><!-- form-group -->
-            <div class="form-group">
+                </div>
+            </div>
+            <div class="form-group mb-2">
                 <select class="selectpicker form-control bs-select-hidden" id="mc_payment_period" data-live-search="false" data-live-search-style="begins">
                     <option value="12"><?php esc_html_e('Monthly', 'houzez'); ?></option>
                     <option value="26"><?php esc_html_e('Bi-Weekly', 'houzez'); ?></option>
                     <option value="52"><?php esc_html_e('Weekly', 'houzez'); ?></option>
                 </select>
-            </div><!-- form-group -->
-            <button id="houzez_mortgage_calculate" type="submit" class="btn btn-search btn-secondary btn-full-width"><?php esc_html_e('Calculate', 'houzez'); ?></button>
-            <div class="mortgage-details detail-wrap">
-                <ul>
-                    <li>
+            </div>
+            <button id="houzez_mortgage_calculate" type="submit" class="btn btn-search btn-secondary w-100"><?php esc_html_e('Calculate', 'houzez'); ?></button>
+            <div class="mortgage-details detail-wrap py-2 px-3 mt-3" role="region" aria-label="Mortgage Calculation Results">
+                <ul role="list">
+                    <li class="p-0" role="listitem">
                         <strong><?php esc_html_e('Principal Amount:', 'houzez'); ?></strong> 
                         <span id="amount_financed" class="result-value"></span>
                     </li>
-                    <li>
+                    <li class="p-0" role="listitem">
                         <strong><?php esc_html_e('Years:', 'houzez'); ?></strong> 
                         <span id="cal_years" class="result-value"></span>
                     </li>
-                    <li id="mortgage_mwbi">
-                        
+                    <li class="p-0" role="listitem" id="mortgage_mwbi">
                     </li>
-                    <li>
+                    <li class="p-0" role="listitem">
                         <strong><?php esc_html_e('Balance Payable With Interest:', 'houzez'); ?></strong> 
                         <span id="balance_payable_with_interest" class="result-value"></span>
                     </li>
-                    <li>
+                    <li class="p-0" role="listitem">
                         <strong><?php esc_html_e('Total With Down Payment:', 'houzez'); ?></strong> 
                         <span id="total_with_down_payment" class="result-value"></span>
                     </li>
-
-
                 </ul>
-            </div><!-- mortgage-details -->
-        </div><!-- widget-body -->
+            </div>
+        </div>
 
         <?php
     }

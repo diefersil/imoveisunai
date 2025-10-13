@@ -14,47 +14,46 @@ $last2month = $leads_count['leads_count']['last2month'];
 $last2month = $last2month - $lastweek;
 
 ?>
-<div class="dashboard-content-block dashboard-statistic-block">
-	<h3><i class="houzez-icon icon-sign-badge-circle mr-2 primary-text"></i> <?php esc_html_e('Leads', 'houzez'); ?></h3>
+<div class="property-stats">
 	<div class="row">
-		<div class="col-md-4 col-sm-4 col-4">
-			<div class="views-data-wrap">
-				<div class="views-data">
-					<?php echo number_format_i18n($lastday); ?>
-				</div><!-- views-data -->
-				
-				<?php houzez_views_percentage($lasttwo, $lastday); ?>
-
-				<div class="views-text">
-					<?php esc_html_e('Last 24 Hours', 'houzez'); ?>
-				</div><!-- views-text -->
-			</div><!-- views-data-wrap -->
-		</div><!-- col-md-4 col-sm-12 -->
-		<div class="col-md-4 col-sm-4 col-4">
-			<div class="views-data-wrap">
-				<div class="views-data">
-					<?php echo number_format_i18n($leads_count['leads_count']['lastweek']); ?>
-				</div><!-- views-data -->
-				
-				<?php houzez_views_percentage($last2week, $lastweek); ?>
-
-				<div class="views-text">
-					<?php esc_html_e('Last 7 Days', 'houzez'); ?>
-				</div><!-- views-text -->
-			</div><!-- views-data-wrap -->
-		</div><!-- col-md-4 col-sm-12 -->
-		<div class="col-md-4 col-sm-4 col-4">
-			<div class="views-data-wrap">
-				<div class="views-data">
-					<?php echo number_format_i18n($leads_count['leads_count']['lastmonth']); ?>
-				</div><!-- views-data -->
-				
-				<?php houzez_views_percentage($last2month, $lastmonth); ?>
-
-				<div class="views-text">
-					<?php esc_html_e('Last 30 Days', 'houzez'); ?>
-				</div><!-- views-text -->
-			</div><!-- views-data-wrap -->
-		</div><!-- col-md-4 col-sm-12 -->
+		<div class="col-md-4 col-sm-6 col-12">
+			<div class="stats-box">
+				<div class="media">
+					<p>
+						<strong><?php esc_html_e('Last 24 Hours', 'houzez'); ?></strong>
+					</p>
+				</div>
+				<div class="d-flex align-items-baseline gap-2">
+					<h3><?php echo number_format_i18n($lastday); ?></h3>
+					<?php houzez_views_percentage($lasttwo, $lastday); ?>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-6 col-12">
+			<div class="stats-box">
+				<div class="media">
+					<p>
+						<strong><?php esc_html_e('Last 7 Days', 'houzez'); ?></strong>
+					</p>
+				</div>
+				<div class="d-flex align-items-baseline gap-2">
+					<h3><?php echo number_format_i18n($leads_count['leads_count']['lastweek']); ?></h3>
+					<?php houzez_views_percentage($last2week, $lastweek); ?>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-6 col-12">
+			<div class="stats-box">
+				<div class="media">
+					<p>
+						<strong><?php esc_html_e('Last 30 Days', 'houzez'); ?></strong>
+					</p>
+				</div>
+				<div class="d-flex align-items-baseline gap-2">
+					<h3><?php echo number_format_i18n($leads_count['leads_count']['lastmonth']); ?></h3>
+					<?php houzez_views_percentage($last2month, $lastmonth); ?>
+				</div>
+			</div>
+		</div>
 	</div>
-</div><!-- dashboard-statistic-block -->
+</div>

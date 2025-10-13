@@ -1,6 +1,7 @@
 <?php
 global $deal_data;
 $deals = Houzez_Deals::get_deals();
+$total_records = $deals['data']['total_records'];
 
 $active_deal = $won_deal = $lost_deal = '';
 $dashboard_crm = houzez_get_template_link_2('template/user_dashboard_crm.php');
@@ -39,26 +40,30 @@ if( isset($_GET['tab']) && $_GET['tab'] == 'active' ) {
     $active_deal = 'active';
 }
 ?>
-<header class="header-main-wrap dashboard-header-main-wrap">
-    <div class="dashboard-header-wrap">
-        <div class="d-flex align-items-center">
-            <div class="dashboard-header-left flex-grow-1">
-                <h1><?php echo houzez_option('dsh_deals', 'Deals'); ?></h1>         
-            </div><!-- dashboard-header-left -->
-            <div class="dashboard-header-right">
-                <a class="btn btn-primary open-close-deal-panel" href="#"><?php esc_html_e('Add New Deal', 'houzez'); ?></a>
-            </div><!-- dashboard-header-right -->
-        </div><!-- d-flex -->
-    </div><!-- dashboard-header-wrap -->
-</header><!-- .header-main-wrap -->
-<section class="dashboard-content-wrap deals-main-wrap">
-
-    <div class="dashboard-content-inner-wrap">
-        <?php get_template_part('template-parts/dashboard/statistics/statistic-deals'); ?>
+<div class="heading d-flex align-items-center justify-content-between">
+    <div class="heading-text">
+        <h2><?php echo houzez_option('dsh_deals', 'Deals'); ?></h2> 
     </div>
-    
-    <div class="deals-table-wrap">
+    <div class="add-export-btn">
+        <ul class="d-flex align-items-center gap-2">
+        <li>
+            <a href="#" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDeal" aria-controls="offcanvasDeal">
+            <i class="houzez-icon icon-add-circle me-2"></i><?php esc_html_e('Add New Deal', 'houzez'); ?>
+            </a>
+        </li>
+        </ul>
+    </div>
+</div>
 
+<?php 
+if(!empty($deals['data']['results']) || isset( $_GET['tab'] ) ) {
+
+get_template_part('template-parts/dashboard/statistics/statistic-deals'); ?>
+
+
+<div class="houzez-data-content">  
+  
+    <div class="deals-table-wrap">
         <ul class="nav nav-pills deals-nav-tab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active-deals <?php echo esc_attr($active_deal); ?>" href="<?php echo esc_url($active_link); ?>">
@@ -70,61 +75,52 @@ if( isset($_GET['tab']) && $_GET['tab'] == 'active' ) {
                     <?php esc_html_e('Won Deals', 'houzez'); ?> (<?php echo Houzez_Deals::get_total_deals_by_group('won'); ?>)
                 </a>
             </li>
-            <li class="nav-item lost-deals">
-                <a class="nav-link <?php echo esc_attr($lost_deal); ?>" href="<?php echo esc_url($lost_link); ?>">
+            <li class="nav-item">
+                <a class="nav-link lost-deals <?php echo esc_attr($lost_deal); ?>" href="<?php echo esc_url($lost_link); ?>">
                     <?php esc_html_e('Lost Deals', 'houzez'); ?> (<?php echo Houzez_Deals::get_total_deals_by_group('lost'); ?>)
                 </a>
             </li>
         </ul>
+
         <div class="deal-content-wrap p-0">
-            <table class="dashboard-table table-lined deals-table responsive-table">
-                <thead>
-                    <tr>
-                        <th class="table-nowrap"><?php esc_html_e('Title', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Contact Name', 'houzez'); ?></th>
-                        <?php if( houzez_is_admin() ) { ?>
-                        <th class="table-nowrap"><?php esc_html_e('Agent', 'houzez'); ?></th>
-                        <?php } ?>
-                        <th class="table-nowrap"><?php esc_html_e('Status', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Next Action', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Action Due Date', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Deal Value', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Last Contact Date', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Phone', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Email', 'houzez'); ?></th>
-                        <th class="table-nowrap"><?php esc_html_e('Actions', 'houzez'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    foreach ($deals['data']['results'] as $deal_data) { 
-                        get_template_part( 'template-parts/dashboard/board/deals/deal-item' );
-                    }
-                    ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="5">
-                            <?php get_template_part('template-parts/dashboard/board/records-html'); ?>
-                        </td>
-                        
-                        <td colspan="2" class="text-right no-wrap">
-                            <div class="leads-pagination-wrap">
-                                <?php
-                                $total_pages = ceil($deals['data']['total_records'] / $deals['data']['items_per_page']);
-                                $current_page = $deals['data']['page'];
-                                houzez_crm_pagination($total_pages, $current_page);
-                                ?>
-                            </div> <!-- leads-pagination-wrap -->
-                        </td>
+            <table class="table table-hover align-middle m-0 m-0">
+            <thead>
+                <tr>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Title', 'houzez'); ?>"><?php esc_html_e('Title', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Contact Name', 'houzez'); ?>"><?php esc_html_e('Contact Name', 'houzez'); ?></th>
+                    <?php if( houzez_is_admin() ) { ?>
+                    <th class="table-nowrap" data-label="<?php esc_html_e('Agent', 'houzez'); ?>"><?php esc_html_e('Agent', 'houzez'); ?></th>
+                    <?php } ?>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Status', 'houzez'); ?>"><?php esc_html_e('Status', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Next Action', 'houzez'); ?>"><?php esc_html_e('Next Action', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Action Due Date', 'houzez'); ?>"><?php esc_html_e('Action Due Date', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Deal Value', 'houzez'); ?>"><?php esc_html_e('Deal Value', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Last Contact Date', 'houzez'); ?>"><?php esc_html_e('Last Contact Date', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Phone', 'houzez'); ?>"><?php esc_html_e('Phone', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Email', 'houzez'); ?>"><?php esc_html_e('Email', 'houzez'); ?></th>
+                    <th class="text-nowrap" data-label="<?php esc_html_e('Actions', 'houzez'); ?>"><?php esc_html_e('Actions', 'houzez'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                foreach ($deals['data']['results'] as $deal_data) { 
+                    get_template_part( 'template-parts/dashboard/board/deals/deal-item' );
+                }
+                ?>
+            </tbody>
+            </table> 
+            <?php get_template_part('template-parts/dashboard/board/pagination', null, array('total_records' => $total_records)); ?>
+        </div>
+    </div>
 
-                    </tr>
-                </tfoot>
-            </table><!-- dashboard-table -->
-        </div><!-- dashboard-content-block -->
+</div> 
 
-    </div><!-- deals-table-wrap -->
-</section><!-- dashboard-content-wrap -->
-<section class="dashboard-side-wrap">
-    <?php get_template_part('template-parts/dashboard/side-wrap'); ?>
-</section>
+<?php 
+} else { ?>
+    <div class="stats-box">
+    <?php esc_html_e("Don't have any deal at this moment.", 'houzez'); ?> <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDeal" aria-controls="offcanvasDeal"><strong><?php esc_html_e('Add New Deal', 'houzez'); ?></strong></a>
+    </div>
+<?php 
+} ?>
+
+<?php get_template_part('template-parts/dashboard/board/deals/new-deal-panel'); ?>

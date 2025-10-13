@@ -157,16 +157,16 @@ if( !function_exists('houzez_send_emails_with_reply') ):
             $socials .= '<p style="margin:0;margin-bottom: 10px; text-align: center; font-size: 14px; color:#777777;">'.esc_html__('Follow us on', 'houzez').'</p>';
 
             if( !empty($social_1_icon) ) {
-                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_2_icon) ) {
-                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_3_icon) ) {
-                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_4_icon) ) {
-                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="20" height="20" alt=""> </a>';
             }
 
             $socials .= '</div>';
@@ -189,7 +189,7 @@ if( !function_exists('houzez_send_emails_with_reply') ):
         if( $enable_email_footer != 0 ) {
             $email_content .= '<div style="padding-top: 30px; text-align:center; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; text-align: center; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -278,16 +278,16 @@ if( !function_exists('houzez_send_emails') ):
             $socials .= '<p style="margin:0;margin-bottom: 10px; text-align: center; font-size: 14px; color:#777777;">'.esc_html__('Follow us on', 'houzez').'</p>';
 
             if( !empty($social_1_icon) ) {
-                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_2_icon) ) {
-                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_3_icon) ) {
-                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_4_icon) ) {
-                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="20" height="20" alt=""> </a>';
             }
 
             $socials .= '</div>';
@@ -310,7 +310,7 @@ if( !function_exists('houzez_send_emails') ):
         if( $enable_email_footer != 0 ) {
             $email_content .= '<div style="padding-top: 30px; text-align:center; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; text-align: center; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -372,16 +372,16 @@ if( !function_exists('houzez_send_emails_match_submission') ):
 
             $socials .= '<div>';
             if( !empty($social_1_icon) ) {
-                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_2_icon) ) {
-                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_3_icon) ) {
-                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_4_icon) ) {
-                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="20" height="20" alt=""> </a>';
             }
 
             $socials .= '</div>';
@@ -425,6 +425,11 @@ if( !function_exists('houzez_send_emails_match_submission') ):
                     font-size: 16px;
                     line-height: 24px;
                     font-weight: 300;
+                }
+                @media screen and (min-width: 500px) {
+                    body {
+                        font-size: 16px;
+                    }
                 }
                 ul, li {
                     list-style: none;
@@ -545,7 +550,8 @@ if( !function_exists('houzez_send_emails_match_submission') ):
                     left: 25px;
                     z-index: 1;
                     font-weight: 500;
-                    letter-spacing: .5px
+                    letter-spacing: .5px;
+                    line-height: 20px;
                 }
                 .type-label {
                     font-size: 14px;
@@ -651,16 +657,16 @@ if( !function_exists('houzez_send_messages_emails') ):
             $socials .= '<p style="margin:0;margin-bottom: 10px; text-align: center; font-size: 14px; color:#777777;">'.esc_html__('Follow us on', 'houzez').'</p>';
 
             if( !empty($social_1_icon) ) {
-                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_1_link).'" style="margin-right: 5px"><img src="'.esc_url($social_1_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_2_icon) ) {
-                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_2_link).'" style="margin-right: 5px"><img src="'.esc_url($social_2_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_3_icon) ) {
-                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_3_link).'" style="margin-right: 5px"><img src="'.esc_url($social_3_icon).'" width="20" height="20" alt=""> </a>';
             }
             if( !empty($social_4_icon) ) {
-                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="" height="" alt=""> </a>';
+                $socials .= '<a href="'.esc_url($social_4_link).'" style="margin-right: 5px"><img src="'.esc_url($social_4_icon).'" width="20" height="20" alt=""> </a>';
             }
 
             $socials .= '</div>';
@@ -681,9 +687,9 @@ if( !function_exists('houzez_send_messages_emails') ):
                         </div>';
 
         if( $enable_email_footer != 0 ) {
-            $email_content .= '<div style="padding-top: text-align:center; 30px; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
+            $email_content .= '<div style="padding-top:30px; text-align:center; 30px; padding-bottom: 30px; font-family:\'Helvetica Neue\',\'Helvetica\',Helvetica,Arial,sans-serif;">
 
-                            <div style="max-width: 640px; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
+                            <div style="max-width: 640px; text-align: center; background-color: ' . $email_foot_bg_color . '; margin: 0 auto;">
                                 ' . $email_footer_content . '
                             </div>
                             ' . $socials . '
@@ -778,7 +784,7 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
             wp_die();
         }
 
-        $sender_email = sanitize_email($_POST['email']);
+        $sender_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
         $sender_email = is_email($sender_email);
         if (!$sender_email) {
             echo json_encode(array(
@@ -808,7 +814,7 @@ if( !function_exists( 'houzez_contact_realtor' ) ) {
             }
         }
 
-        do_action('houzez_realtor_contact_form_submission');
+        do_action('houzez_before_realtor_form_submission');
         
 
         houzez_google_recaptcha_callback();
@@ -929,7 +935,7 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
         }
 
         $sender_name = isset($_POST['name']) ? sanitize_text_field( $_POST['name'] ) : '';
-        $sender_email = sanitize_email($_POST['email']);
+        $sender_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
         $sender_msg = isset($_POST['message']) ? stripslashes( $_POST['message'] ) : '';
         $email_reply_to = is_email($sender_email);
 
@@ -1013,6 +1019,16 @@ if( !function_exists( 'houzez_ele_contact_form' ) ) {
         }
         
         do_action('houzez_before_contact_form_submission');
+
+        // Allow third-party spam validation
+        $validation_errors = apply_filters('houzez_ele_contact_form_validation', array(), $_POST);
+        if (!empty($validation_errors)) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => implode('<br>', $validation_errors)
+            ));
+            wp_die();
+        }
 
         $cc_header = '';
         if ( ! empty( $email_to_cc ) ) {
@@ -1138,7 +1154,7 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
         $first_name = isset($_POST['first_name']) ? sanitize_text_field( $_POST['first_name'] ) : '';
         $last_name = isset($_POST['last_name']) ? sanitize_text_field( $_POST['last_name'] ) : '';
 
-        $sender_email = sanitize_email($_POST['email']);
+        $sender_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
         $sender_msg = isset($_POST['message']) ? stripslashes( $_POST['message'] ) : '';
         $email_reply_to = is_email($sender_email);
 
@@ -1244,6 +1260,16 @@ if( !function_exists( 'houzez_ele_inquiry_form' ) ) {
         }
 
         do_action('houzez_before_inquiry_form_submission');
+        
+        // Allow third-party spam validation
+        $validation_errors = apply_filters('houzez_ele_inquiry_form_validation', array(), $_POST);
+        if (!empty($validation_errors)) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => implode('<br>', $validation_errors)
+            ));
+            wp_die();
+        }
 
         $cc_header = '';
         if ( ! empty( $email_to_cc ) ) {
@@ -1324,7 +1350,7 @@ if( !function_exists('houzez_property_agent_contact') ) {
             // Set up the temporary post data
             $temp_post = get_post($property_id);
             $GLOBALS['post'] = $temp_post;
-            $return_array = houzez20_property_contact_form();
+            $return_array = houzez20_get_property_agent();
             $GLOBALS['post'] = $original_post;
 
             $is_single_agent = $return_array['is_single_agent'];
@@ -1384,7 +1410,7 @@ if( !function_exists('houzez_property_agent_contact') ) {
             wp_die();
         }
 
-        $sender_email = sanitize_email($_POST['email']);
+        $sender_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
         $sender_email = is_email($sender_email);
         if (!$sender_email) {
             echo json_encode(array(
@@ -1419,6 +1445,16 @@ if( !function_exists('houzez_property_agent_contact') ) {
         do_action('houzez_before_property_agent_form_submission');
     
         houzez_google_recaptcha_callback();
+        
+        // Allow third-party spam validation
+        $validation_errors = apply_filters('houzez_property_agent_contact_validation', array(), $_POST);
+        if (!empty($validation_errors)) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => implode('<br>', $validation_errors)
+            ));
+            wp_die();
+        }
 
         $cc_email = '';
         $bcc_email = '';
@@ -1493,7 +1529,7 @@ if( !function_exists('houzez_schedule_send_message') ) {
             // Set up the temporary post data
             $temp_post = get_post($property_id);
             $GLOBALS['post'] = $temp_post;
-            $return_array = houzez20_property_contact_form();
+            $return_array = houzez20_get_property_agent();
             $GLOBALS['post'] = $original_post;
 
             $is_single_agent = $return_array['is_single_agent'];
@@ -1551,7 +1587,7 @@ if( !function_exists('houzez_schedule_send_message') ) {
             wp_die();
         }*/
 
-        $sender_email = sanitize_email($_POST['email']);
+        $sender_email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
         $sender_email = is_email($sender_email);
         if (!$sender_email) {
             echo json_encode(array(
@@ -1608,6 +1644,16 @@ if( !function_exists('houzez_schedule_send_message') ) {
         }
 
         do_action('houzez_before_schedule_tour_form_submission');
+        
+        // Allow third-party spam validation
+        $validation_errors = apply_filters('houzez_schedule_tour_validation', array(), $_POST);
+        if (!empty($validation_errors)) {
+            echo json_encode(array(
+                'success' => false,
+                'msg' => implode('<br>', $validation_errors)
+            ));
+            wp_die();
+        }
 
         $args = array(
             'sender_name' => $sender_name, 
@@ -1690,8 +1736,8 @@ if (!function_exists( 'houzez_generator_recaptcha_callback')) {
             ?>
             <script type="text/javascript">
                 var reCaptchaIDs = [];
-                var siteKey = '<?php echo $reCAPTCHA_site_key; ?>';
-                var reCaptchaType = '<?php echo $recaptha_type; ?>';
+                var siteKey = '<?php echo esc_js($reCAPTCHA_site_key); ?>';
+                var reCaptchaType = '<?php echo esc_js($recaptha_type); ?>';
 
                 var houzezReCaptchaLoad = function() {
                     jQuery( '.houzez_google_reCaptcha' ).each( function( index, el ) {
@@ -1765,7 +1811,9 @@ if(!function_exists('houzez_google_recaptcha_callback')) {
         //  $recaptcha = new \ReCaptcha\ReCaptcha($secret, new \ReCaptcha\RequestMethod\SocketPost());
 
         // Make the call to verify the response and also pass the user's IP address
-        $resp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER['REMOTE_ADDR']);
+        $recaptcha_response = isset($_POST["g-recaptcha-response"]) ? sanitize_text_field($_POST["g-recaptcha-response"]) : '';
+        $user_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '';
+        $resp = $recaptcha->verify($recaptcha_response, $user_ip);
 
 
         if ($resp->isSuccess()):
@@ -1781,6 +1829,13 @@ if(!function_exists('houzez_google_recaptcha_callback')) {
                 'missing-input-response' => esc_html__('The response parameter is missing.', 'houzez'),
                 'invalid-input-response' => esc_html__('The response parameter is invalid or malformed.', 'houzez'),
                 'bad-request' => esc_html__('The request is invalid or malformed.', 'houzez'),
+                'timeout-or-duplicate' => esc_html__('The response is no longer valid: either is too old or has been used previously.', 'houzez'),
+                'invalid-hostname' => esc_html__('The hostname of the request is invalid.', 'houzez'),
+                'invalid-domain' => esc_html__('The domain of the request is invalid.', 'houzez'),
+                'invalid-key' => esc_html__('The key parameter is invalid or malformed.', 'houzez'),
+                'invalid-sitekey' => esc_html__('The sitekey parameter is invalid or malformed.', 'houzez'),
+                'invalid-referer' => esc_html__('The referer of the request is invalid.', 'houzez'),
+                'invalid-referer-domain' => esc_html__('The referer domain of the request is invalid.', 'houzez'),
             );
             $error_message = $captach_errors[ $error_codes[ 0 ]];
             echo json_encode( array(

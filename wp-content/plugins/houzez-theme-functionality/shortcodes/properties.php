@@ -60,7 +60,7 @@ if( !function_exists('houzez_properties') ) {
 		}
 
 		//do the query
-		$the_query = houzez_data_source::get_wp_query($atts, $paged); //by ref  do the query
+		$the_query = Houzez_Data_Source::get_wp_query($atts, $paged); //by ref  do the query
 		?>
 		
 		<div id="properties_module_section" class="property-cards-module <?php echo esc_attr($css_classes).' '.esc_attr($cols_class); ?>">
@@ -90,11 +90,11 @@ if( !function_exists('houzez_properties') ) {
 				houzez_pagination( $the_query->max_num_pages, $range = 2 );
 
 			} elseif( $pagination_type == 'loadmore' ) { ?>
-				<div id="fave-pagination-loadmore" class="load-more-wrap fave-load-more">
+				<<div id="fave-pagination-loadmore" class="load-more-wrap fave-load-more">
                     <a class="btn btn-primary-outlined btn-load-more"  
                     data-paged="2" 
                     data-prop-limit="<?php esc_attr_e($posts_limit); ?>" 
-                    data-card="<?php echo esc_attr($item_version); ?>" 
+                    data-card="item-v1" 
                     data-type="<?php esc_attr_e($property_type); ?>" 
                     data-status="<?php esc_attr_e($property_status); ?>" 
                     data-state="<?php esc_attr_e($property_state); ?>" 
@@ -106,6 +106,12 @@ if( !function_exists('houzez_properties') ) {
                     data-featured-prop="<?php esc_attr_e($featured_prop); ?>" 
                     data-offset="<?php esc_attr_e($offset); ?>"
                     data-sortby="<?php esc_attr_e($sort_by); ?>"
+                    data-property_ids="<?php esc_attr_e($property_ids); ?>"
+                    data-min_price="<?php esc_attr_e($min_price); ?>"
+                    data-max_price="<?php esc_attr_e($max_price); ?>"
+                    data-agents="<?php esc_attr_e($properties_by_agents); ?>"
+                    data-agencies="<?php esc_attr_e($properties_by_agencies); ?>"
+                    data-post_status="<?php esc_attr_e($post_status); ?>"
                     href="#">
                     	<?php get_template_part('template-parts/loader'); ?>
                     	<?php esc_html_e('Load More', 'houzez'); ?>		

@@ -1,5 +1,4 @@
 <?php
-
 namespace Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -92,17 +91,21 @@ class Houzez_Elementor_Space extends Widget_Base {
                         'max' => 200,
                     ],
                 ],
-                'devices' => [ 'desktop', 'tablet', 'mobile' ],
-                'desktop_default' => [
+                'default' => [
                     'size' => '50',
                     'unit' => 'px',
                 ],
+                'devices' => [ 'desktop', 'tablet', 'mobile' ],
+                'desktop_default' => [
+                    'size' => '30',
+                    'unit' => 'px',
+                ],
                 'tablet_default' => [
-                    'size' => '',
+                    'size' => '30',
                     'unit' => 'px',
                 ],
                 'mobile_default' => [
-                    'size' => '',
+                    'size' => '30',
                     'unit' => 'px',
                 ],
                 'selectors' => [

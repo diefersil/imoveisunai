@@ -115,7 +115,8 @@ class JS_Webp extends Page_Parser {
 		if ( ! \apply_filters( 'eio_do_js_webp', true, $this->request_uri ) ) {
 			return;
 		}
-
+		// WebP parsing for external use and third-party plugins.
+		\add_filter( 'eio_image_url_to_webp', array( $this, 'filter_image_url' ) );
 		// Hook into the output buffer callback function.
 		\add_filter( 'ewww_image_optimizer_filter_page_output', array( $this, 'filter_page_output' ), 20 );
 		// Generic filter for use by other plugins/themes.
@@ -930,6 +931,7 @@ class JS_Webp extends Page_Parser {
 
 	/**
 	 * Parse an array of image URLs and replace them with their WebP counterparts.
+	 *
 	 * Mostly for our Lazy Loader at this point, since it uses JSON when multiple
 	 * background images are used on a single element.
 	 *
@@ -947,6 +949,22 @@ class JS_Webp extends Page_Parser {
 			}
 		}
 		return $image_urls;
+	}
+
+	/**
+	 * Parse an image URL and replace it with WebP.
+	 *
+	 * @param string $image_url An image URL.
+	 * @return string|bool  A WebP image URL or false.
+	 */
+	public function filter_image_url( $image_url ) {
+		$this->debug_message( '<b>' . __METHOD__ . '()</b>' );
+		$this->debug_message( "checking $image_url for a WebP variant" );
+		if ( ! empty( $image_url ) && $this->validate_image_url( $image_url ) ) {
+			$image_url = $this->generate_url( $image_url );
+			return $image_url;
+		}
+		return false;
 	}
 
 	/**
@@ -1073,6 +1091,9 @@ class JS_Webp extends Page_Parser {
 			return false;
 		}
 		if ( $this->get_option( 'ewww_image_optimizer_webp_force' ) && $this->is_iterable( $this->allowed_urls ) ) {
+			if ( $extension && 'png' === $extension && $this->get_option( 'ewww_image_optimizer_jpg_only_mode' ) ) {
+				return false;
+			}
 			// Check the image for configured CDN paths.
 			foreach ( $this->allowed_urls as $allowed_url ) {
 				if ( \strpos( $image, $allowed_url ) !== false ) {

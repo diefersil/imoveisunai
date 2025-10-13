@@ -50,15 +50,9 @@ if( $background_type == 'image' ) {
     $webm = houzez_option( 'splash_bg_webm', false, 'url' );
     $ogv = houzez_option( 'splash_bg_ogv', false, 'url' );
     $splash_video_image = houzez_option('splash_video_image', false, 'url');
-
-    $ogv = substr($ogv, 0, strrpos($ogv, "."));
-    $mp4 = substr($mp4, 0, strrpos($mp4, "."));
-    $webm = substr($webm, 0, strrpos($webm, "."));
-    $video_image = substr($splash_video_image, 0, strrpos($splash_video_image, "."));
-
 }
 ?>
-<section class="top-banner-wrap top-banner-wrap-fullscreen horizontal-search-wrap">
+<section class="top-banner-wrap horizontal-search-wrap">
     <div id="houzez-auto-complete-banner" class="auto-complete"></div>
     <?php 
     if ( $background_type == 'slider' ) {
@@ -68,7 +62,7 @@ if( $background_type == 'image' ) {
         if(!empty($image_ids)) {
             foreach ( $image_ids as $id ) {
                 $url = wp_get_attachment_image_src($id, array(2000, 1000));
-                echo '<div class="splash-slider-item" style="background-image: url('.esc_url($url[0]).');"></div>';
+                echo '<div class="splash-slider-item" style="background-image: url(\''.esc_url($url[0]).'\');"></div>';
                 
             } 
         }
@@ -76,13 +70,18 @@ if( $background_type == 'image' ) {
         echo '</div>';
     } else if($background_type == 'video') {
 
-        echo '<div id="video-background" class="video-background splash-video-background" data-vide-bg="mp4: '.esc_url($mp4).', webm: '.esc_url($webm).', ogv: '.esc_url($ogv).', poster: '.esc_url($splash_video_image).'" data-vide-options="position: 0% 50%">
+           echo '<div class="video-background splash-video-background">
+                <video autoplay muted loop playsinline poster="'.esc_url($splash_video_image).'">
+                    <source src="'.esc_url($mp4).'" type="video/mp4">
+                    <source src="'.esc_url($webm).'" type="video/webm">
+                    <source src="'.esc_url($ogv).'" type="video/ogg">
+                </video>
             </div>';
 
     } ?>
 
     <?php if( $background_type == 'image' ) { ?>
-    <div class="banner-inner parallax d-flex" data-parallax-bg-image="<?php echo esc_url($bg_img); ?>">
+    <div class="banner-inner d-flex" style="background-image: url('<?php echo esc_url($bg_img); ?>') ; background-size: cover; background-position: center;">
     <?php } else { ?>
     <div class="banner-inner d-flex">
     <?php } ?>
@@ -99,54 +98,54 @@ if( $background_type == 'image' ) {
 <footer class="splash-page-footer">
     <div class="d-flex justify-content-between">
         <div class="splash-page-footer-left">
-            <i class="houzez-icon icon-messaging-whatsapp"></i> <?php echo esc_attr( $splash_callus_text ); ?> <?php echo esc_attr( $splash_callus_phone ); ?>
+            <i class="houzez-icon icon-messaging-whatsapp me-2"></i> <?php echo esc_attr( $splash_callus_text ); ?> <?php echo esc_attr( $splash_callus_phone ); ?>
         </div><!-- splash-page-footer-left -->
 
         <?php if( houzez_option('social-splash')): ?>
         <div class="splash-page-footer-right">
             <div class="footer-social">
-                <span class="footer-social-title">
+                <span class="footer-social-title me-2">
                     <?php echo $houzez_local['follow_us']; ?>
                 </span>
 
                 <?php if( houzez_option('sp-facebook') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-facebook" href="<?php echo esc_url(houzez_option('sp-facebook')); ?>"><i class="houzez-icon icon-social-media-facebook mr-2"></i></a>
+                        <a target="_blank" class="btn-facebook" href="<?php echo esc_url(houzez_option('sp-facebook')); ?>"><i class="houzez-icon icon-social-media-facebook me-2"></i></a>
                     </span>
                 <?php } ?>
 
                 <?php if( houzez_option('sp-twitter') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-twitter" href="<?php echo esc_url(houzez_option('sp-twitter')); ?>"><i class="houzez-icon icon-x-logo-twitter-logo-2 mr-2"></i></a>
+                        <a target="_blank" class="btn-twitter" href="<?php echo esc_url(houzez_option('sp-twitter')); ?>"><i class="houzez-icon icon-x-logo-twitter-logo-2 me-2"></i></a>
                     </span>
                 <?php } ?>
 
                 <?php if( houzez_option('sp-linkedin') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-linkedin" href="<?php echo esc_url(houzez_option('sp-linkedin')); ?>"><i class="houzez-icon icon-professional-network-linkedin mr-2"></i></a>
+                        <a target="_blank" class="btn-linkedin" href="<?php echo esc_url(houzez_option('sp-linkedin')); ?>"><i class="houzez-icon icon-professional-network-linkedin me-2"></i></a>
                     </span>
                 <?php } ?>
 
                 <?php if( houzez_option('sp-googleplus') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-google-plus" href="<?php echo esc_url(houzez_option('sp-googleplus')); ?>"><i class="houzez-icon icon-social-media-google-plus-1 mr-2"></i></a>
+                        <a target="_blank" class="btn-google-plus" href="<?php echo esc_url(houzez_option('sp-googleplus')); ?>"><i class="houzez-icon icon-social-media-google-plus-1 me-2"></i></a>
                     </span>
                 <?php } ?>
 
                 <?php if( houzez_option('sp-instagram') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-instagram" href="<?php echo esc_url(houzez_option('sp-instagram')); ?>"><i class="houzez-icon icon-social-instagram mr-2"></i></a>
+                        <a target="_blank" class="btn-instagram" href="<?php echo esc_url(houzez_option('sp-instagram')); ?>"><i class="houzez-icon icon-social-instagram me-2"></i></a>
                     </span>
                 <?php } ?>
                 <?php if( houzez_option('sp-tiktok') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-tiktok" href="<?php echo esc_url(houzez_option('sp-tiktok')); ?>"><i class="houzez-icon icon-tiktok-1-logos-24 mr-2"></i></a>
+                        <a target="_blank" class="btn-tiktok" href="<?php echo esc_url(houzez_option('sp-tiktok')); ?>"><i class="houzez-icon icon-tiktok-1-logos-24 me-2"></i></a>
                     </span>
                 <?php } ?>
 
                 <?php if( houzez_option('sp-telegram') != '' ){ ?>
                     <span>
-                        <a target="_blank" class="btn-telegram" href="<?php echo esc_url(houzez_option('sp-telegram')); ?>"><i class="houzez-icon icon-telegram-logos-24 mr-2"></i></a>
+                        <a target="_blank" class="btn-telegram" href="<?php echo esc_url(houzez_option('sp-telegram')); ?>"><i class="houzez-icon icon-telegram-logos-24 me-2"></i></a>
                     </span>
                 <?php } ?>
 

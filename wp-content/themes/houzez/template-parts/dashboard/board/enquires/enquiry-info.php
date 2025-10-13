@@ -1,5 +1,5 @@
 <?php
-global $enquiry, $lead;
+global $enquiry, $lead, $dashboard_crm;
 $temp_array = array();
 $first_name = $last_name = $display_name = '';
 if( isset($_GET['enquiry']) ) {
@@ -31,141 +31,141 @@ if( isset($_GET['enquiry']) ) {
 
 if( !empty($enquiry) ) :
 ?>
-<div class="lead-detail-wrap">
-	<h2><?php esc_html_e('Inquiry Detail', 'houzez'); ?></h2>
-	<a class="edit_enquiry_js label primary-label edit-lead-detail open-close-slide-panel" href="#" data-id="<?php echo intval($enquiry->enquiry_id);?>">
-		<?php esc_html_e('Edit', 'houzez'); ?>
-	</a>
-	<ul class="list-unstyled mb-5">
-		<li>
-			<strong><?php esc_html_e('Contact', 'houzez'); ?></strong><br>
-			<a href="<?php echo esc_url($lead_link); ?>"><strong><?php echo esc_attr($display_name); ?></strong></a>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Inquiry Type', 'houzez'); ?></strong><br>
-			<?php 
-			if( !empty($enquiry->enquiry_type) ) {
-				echo esc_attr($enquiry->enquiry_type);
-			} else {
-				echo '-'; 
-			} ?>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Property Type', 'houzez'); ?></strong><br>
-			<?php 
-            if(isset($meta['property_type']['name'])) {
-                echo esc_attr($meta['property_type']['name']); 
-            }?>
-		</li>
+<div class="inquiry-detail">
+  <div class="inquiry-detail-inner">
+    <h5><?php esc_html_e('Inquiry Detail', 'houzez'); ?></h5>
+    <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasInquiry" data-bs-backdrop="true" aria-controls="offcanvasInquiry" class="edit_enquiry_js" data-id="<?php echo intval($enquiry->enquiry_id);?>">
+        <i class="houzez-icon icon-pencil-circle me-1"></i> <?php esc_html_e('Edit', 'houzez'); ?>
+    </a>
+  </div>
+  <ul class="list-unstyled d-flex flex-column gap-2 mb-4">
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Contact', 'houzez'); ?></strong><br>
+        <a href="<?php echo esc_url($lead_link); ?>"><strong><?php echo esc_attr($display_name); ?></strong></a>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Inquiry Type', 'houzez'); ?></strong><br>
+        <?php 
+        if( !empty($enquiry->enquiry_type) ) {
+            echo esc_attr($enquiry->enquiry_type);
+        } else {
+            echo '-'; 
+        } ?>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Property Type', 'houzez'); ?></strong><br>
+        <?php 
+        if(isset($meta['property_type']['name'])) {
+            echo esc_attr($meta['property_type']['name']); 
+        }?>
+    </li>
 
-		<?php if(isset($meta['property_status']['name'])) { ?>
-		<li>
-			<strong><?php esc_html_e('Property Status', 'houzez'); ?></strong><br>
-			<?php echo esc_attr($meta['property_status']['name']); ?>
-		</li>
-		<?php } ?>
+    <?php if(isset($meta['property_status']['name'])) { ?>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Property Status', 'houzez'); ?></strong><br>
+        <?php echo esc_attr($meta['property_status']['name']); ?>
+    </li>
+    <?php } ?>
 
-		<?php if(isset($meta['property_label']['name'])) { ?>
-		<li>
-			<strong><?php esc_html_e('Property Label', 'houzez'); ?></strong><br>
-			<?php echo esc_attr($meta['property_label']['name']); ?>
-		</li>
-		<?php } ?>
+    <?php if(isset($meta['property_label']['name'])) { ?>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Property Label', 'houzez'); ?></strong><br>
+        <?php echo esc_attr($meta['property_label']['name']); ?>
+    </li>
+    <?php } ?>
 
-		<li>
-			<strong><?php esc_html_e('Price', 'houzez'); ?></strong><br>
-			<?php 
-            if(isset($meta['min_price'])) {
-                echo esc_attr($meta['min_price']); 
-            }
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Price', 'houzez'); ?></strong><br>
+        <?php 
+        if(isset($meta['min_price'])) {
+            echo esc_attr($meta['min_price']); 
+        }
 
-            if(isset($meta['max_price'])) {
-                echo ' - '.esc_attr($meta['max_price']); 
-            }?>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Bedrooms', 'houzez'); ?></strong><br>
-			<?php 
-            if(isset($meta['min_beds'])) {
-                echo esc_attr($meta['min_beds']); 
-            }
+        if(isset($meta['max_price'])) {
+            echo ' - '.esc_attr($meta['max_price']); 
+        }?>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Bedrooms', 'houzez'); ?></strong><br>
+        <?php 
+        if(isset($meta['min_beds'])) {
+            echo esc_attr($meta['min_beds']); 
+        }
 
-            if(isset($meta['max_beds'])) {
-                echo ' - '.esc_attr($meta['max_beds']); 
-            }?>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Bathrooms', 'houzez'); ?></strong><br>
-			<?php 
-            if(isset($meta['min_baths'])) {
-                echo esc_attr($meta['min_baths']); 
-            }
+        if(isset($meta['max_beds'])) {
+            echo ' - '.esc_attr($meta['max_beds']); 
+        }?>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Bathrooms', 'houzez'); ?></strong><br>
+        <?php 
+        if(isset($meta['min_baths'])) {
+            echo esc_attr($meta['min_baths']); 
+        }
 
-            if(isset($meta['max_baths'])) {
-                echo ' - '.esc_attr($meta['max_baths']); 
-            }?>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Area Size', 'houzez'); ?></strong><br>
-			<?php 
-            if(isset($meta['min_area'])) {
-                echo esc_attr($meta['min_area']); 
-            }
+        if(isset($meta['max_baths'])) {
+            echo ' - '.esc_attr($meta['max_baths']); 
+        }?>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Area Size', 'houzez'); ?></strong><br>
+        <?php 
+        if(isset($meta['min_area'])) {
+            echo esc_attr($meta['min_area']); 
+        }
 
-            if(isset($meta['max_area'])) {
-                echo ' - '.esc_attr($meta['max_area']); 
-            }?>
-		</li>
-		<li>
-			<strong><?php esc_html_e('Location', 'houzez'); ?></strong><br>
-			<?php
-			if(isset($meta['country']['name'])) {
-                $temp_array[] = esc_attr($meta['country']['name']); 
-            }
+        if(isset($meta['max_area'])) {
+            echo ' - '.esc_attr($meta['max_area']); 
+        }?>
+    </li>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Location', 'houzez'); ?></strong><br>
+        <?php
+        if(isset($meta['country']['name'])) {
+            $temp_array[] = esc_attr($meta['country']['name']); 
+        }
 
-            if(isset($meta['state']['name'])) {
-                $temp_array[] = esc_attr($meta['state']['name']); 
-            }
+        if(isset($meta['state']['name'])) {
+            $temp_array[] = esc_attr($meta['state']['name']); 
+        }
 
-            if(isset($meta['city']['name'])) {
-                $temp_array[] = esc_attr($meta['city']['name']); 
-            }
+        if(isset($meta['city']['name'])) {
+            $temp_array[] = esc_attr($meta['city']['name']); 
+        }
 
-            if(isset($meta['area']['name'])) {
-                $temp_array[] = esc_attr($meta['area']['name']); 
-            }
+        if(isset($meta['area']['name'])) {
+            $temp_array[] = esc_attr($meta['area']['name']); 
+        }
 
-            if(isset($meta['zipcode'])) {
-               $temp_array[] = esc_attr($meta['zipcode']); 
-            }
+        if(isset($meta['zipcode'])) {
+           $temp_array[] = esc_attr($meta['zipcode']); 
+        }
 
-            $location = join( ", ", $temp_array );
-            echo esc_attr($location);
-			?>
-		</li>
+        $location = join( ", ", $temp_array );
+        echo esc_attr($location);
+        ?>
+    </li>
 
-		<?php if(isset($meta['streat_address'])) { ?>
-		<li>
-			<strong><?php esc_html_e('Streat Address', 'houzez'); ?></strong><br>
-			<?php echo esc_attr($meta['streat_address']);  ?>
-		</li>
-		<?php } ?>
+    <?php if(isset($meta['streat_address'])) { ?>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Street Address', 'houzez'); ?></strong><br>
+        <?php echo esc_attr($meta['streat_address']);  ?>
+    </li>
+    <?php } ?>
 
-		<?php if(!empty($message)) { ?>
-		<li>
-			<strong><?php esc_html_e('Message', 'houzez'); ?></strong><br>
-			<?php echo esc_attr($message); ?>
-		</li>
-		<?php } ?>
+    <?php if(!empty($message)) { ?>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Message', 'houzez'); ?></strong><br>
+        <?php echo esc_attr($message); ?>
+    </li>
+    <?php } ?>
 
-		<?php if(!empty($private_note)) { ?>
-		<li>
-			<strong><?php esc_html_e('Private Note', 'houzez'); ?></strong><br>
-			<?php echo esc_attr($private_note); ?>
-		</li>
-		<?php } ?>
-
-	</ul>
-	
-</div><!-- lead-detail-wrap -->
+    <?php if(!empty($private_note)) { ?>
+    <li class="border-bottom pb-2">
+        <strong><?php esc_html_e('Private Note', 'houzez'); ?></strong><br>
+        <?php echo esc_attr($private_note); ?>
+    </li>
+    <?php } ?>
+  </ul>
+</div>
 <?php endif; ?>

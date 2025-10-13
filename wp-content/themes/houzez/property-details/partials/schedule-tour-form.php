@@ -9,7 +9,7 @@ if(houzez_form_type()) {
 
 } else {
 
-$return_array = houzez20_property_contact_form();
+$return_array = houzez20_get_property_agent();
 if(empty($return_array)) {
     return;
 }
@@ -18,6 +18,7 @@ $prop_agent_display = get_post_meta( get_the_ID(), 'fave_agents', true );
 $schedule_time_slots = houzez_option('schedule_time_slots');
 $gdpr_checkbox = houzez_option('gdpr_hide_checkbox', 1);
 $is_single_agent = true;
+$schedule_num_days = houzez_option('schedule_num_days', 14);
 $terms_page_id = houzez_option('terms_condition');
 $terms_page_id = apply_filters( 'wpml_object_id', $terms_page_id, 'page', true );
 $property_id = houzez_get_listing_data('property_id');
@@ -58,7 +59,7 @@ if( $prop_agent_display != '-1' && $houzez_agent_display == 'agent_info' ) {
     $prop_agent_email = get_the_author_meta( 'email' );
 }
 
-$agent_email = is_email($prop_agent_email);
+$agent_email = !empty($prop_agent_email) ? is_email($prop_agent_email) : false;
 ?>
 <form method="post" action="#">
     <input type="hidden" name="schedule_contact_form_ajax"
@@ -74,13 +75,21 @@ $agent_email = is_email($prop_agent_email);
     <input type="hidden" name="is_listing_form" value="yes">
     <input type="hidden" name="is_schedule_form" value="yes">
     <input type="hidden" name="redirect_to" value="<?php echo esc_url(houzez_option('schedule_tour_redirect')); ?>">
-    <input type="hidden" name="agent_id" value="<?php echo intval($return_array['agent_id'])?>">
-    <input type="hidden" name="agent_type" value="<?php echo esc_attr($return_array['agent_type'])?>">
+    <input type="hidden" name="agent_id" value="<?php echo isset($return_array['agent_id']) ? intval($return_array['agent_id']) : ''; ?>">
+    <input type="hidden" name="agent_type" value="<?php echo isset($return_array['agent_type']) ? esc_attr($return_array['agent_type']) : ''; ?>">
+
+    <?php 
+    if( ! $return_array['is_single_agent'] ) { 
+
+        foreach( $return_array['agent_info'] as $rt ) {
+            echo '<input type="checkbox" class="houzez-hidden" checked="checked" class="multiple-agent-check" name="target_email[]" value="' . $rt['agent_email'] . '" >';
+        }
+    }?>
     
-    <div class="row">
+    <div class="row g-2">
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
-                <label><?php echo houzez_option('spl_con_tour_type', 'Tour Type'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_tour_type', 'Tour Type'); ?></label>
                 <select name="schedule_tour_type" class="selectpicker form-control bs-select-hidden" title="<?php echo houzez_option('spl_con_select', 'Select'); ?>" data-live-search="false">
                     <option value="<?php echo houzez_option('spl_con_in_person', 'In Person'); ?>"><?php echo houzez_option('spl_con_in_person', 'In Person'); ?></option>
                     <option value="<?php echo houzez_option('spl_con_video_chat', 'Video Chat'); ?>"><?php echo houzez_option('spl_con_video_chat', 'Video Chat'); ?></option>
@@ -89,13 +98,39 @@ $agent_email = is_email($prop_agent_email);
         </div><!-- col-md-4 col-sm-12 -->
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
-                <label><?php echo houzez_option('spl_con_date', 'Date'); ?></label>
-                <input name="schedule_date" class="form-control db_input_date" placeholder="<?php echo houzez_option('spl_con_date_plac', 'Select tour date'); ?>" type="text">
+                <label class="mb-2"><?php echo houzez_option('spl_con_date', 'Date'); ?></label>
+                <select name="schedule_date" class="selectpicker form-control bs-select-hidden">
+                <option value=""><?php echo houzez_option('spl_con_date_plac', 'Select tour date'); ?></option>
+                <?php
+                $m = date("m"); // Current month
+                $de = date("d"); // Current day
+                $y = date("Y"); // Current year
+
+                $schedule_num_days = intval($schedule_num_days);
+
+                if (!$schedule_num_days) {
+                    $schedule_num_days = 14; // Set default to 14 if not specified or invalid
+                }
+
+                // Adjust $i <= 20 for 21 days range (0 to 20 equals 21 days)
+                for($i = 0; $i <= $schedule_num_days; $i++) { 
+
+                    $day = date_i18n('D', mktime(0, 0, 0, $m, ($de + $i), $y)); 
+                    $day_number = date_i18n('d', mktime(0, 0, 0, $m, ($de + $i), $y));
+                    $month = date_i18n('F', mktime(0, 0, 0, $m, ($de + $i), $y));
+                ?>
+                
+                    <option value="<?php echo $day.' '.$day_number.' '.$month; ?>"><?php echo $day.' '.$day_number.' '.$month; ?></option>
+                
+                <?php
+                }
+                ?>
+                </select>
             </div>
         </div><!-- col-md-6 col-sm-12 -->
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
-                <label><?php echo houzez_option('spl_con_time', 'Time'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_time', 'Time'); ?></label>
                 <select name="schedule_time" class="selectpicker form-control bs-select-hidden">
                     <?php 
                     $time_slots = explode(',', $schedule_time_slots); 
@@ -111,22 +146,22 @@ $agent_email = is_email($prop_agent_email);
         <h3><?php echo houzez_option('sps_your_info', 'Your information'); ?></h3>
     </div><!-- block-title-wrap -->
     
-    <div class="row">
+    <div class="row g-2">
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
-                <label><?php echo houzez_option('spl_con_name', 'Name'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_name', 'Name'); ?></label>
                 <input class="form-control" name="name" placeholder="<?php echo houzez_option('spl_con_name_plac', 'Enter your name'); ?>" type="text">
             </div>
         </div><!-- col-md-4 col-sm-12 -->
         <div class="col-md-4 col-sm-12">
             <div class="form-group"> 
-                <label><?php echo houzez_option('spl_con_phone', 'Phone'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_phone', 'Phone'); ?></label>
                 <input class="form-control" name="phone" placeholder="<?php echo houzez_option('spl_con_phone_plac', 'Enter your phone'); ?>" type="text">
             </div>
         </div><!-- col-md-4 col-sm-12 -->
         <div class="col-md-4 col-sm-12">
             <div class="form-group">
-                <label><?php echo houzez_option('spl_con_email', 'Email'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_email', 'Email'); ?></label>
                 <input class="form-control" name="email" placeholder="<?php echo houzez_option('spl_con_email_plac', 'Enter your email address'); ?>" type="email">
             </div>
         </div><!-- col-md-4 col-sm-12 -->
@@ -135,15 +170,15 @@ $agent_email = is_email($prop_agent_email);
 
         <div class="col-sm-12 col-xs-12">
             <div class="form-group form-group-textarea">
-                <label><?php echo houzez_option('spl_con_message', 'Message'); ?></label>
+                <label class="mb-2"><?php echo houzez_option('spl_con_message', 'Message'); ?></label>
                 <textarea class="form-control" name="message" rows="5" placeholder="<?php echo houzez_option('spl_con_message_plac', 'Message'); ?>"></textarea>
             </div>
         </div><!-- col-sm-12 col-xs-12 -->
 
         <?php if( houzez_option('gdpr_and_terms_checkbox', 1) ) { ?>
         <div class="col-sm-12 col-xs-12">
-            <div class="form-group">
-                <label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'hz-no-gdpr-checkbox';}?>">
+            <div class="form-group my-1">
+                <label class="control control--checkbox m-0 hz-terms-of-use <?php if( $gdpr_checkbox ){ echo 'p-0 hz-no-gdpr-checkbox';}?>">
                     <?php if( ! $gdpr_checkbox ) { ?>
                     <input type="checkbox" name="privacy_policy">
                     <span class="control__indicator"></span>
@@ -152,9 +187,11 @@ $agent_email = is_email($prop_agent_email);
                         <?php echo houzez_option('spl_sub_agree', 'By submitting this form I agree to'); ?> <a target="_blank" href="<?php echo esc_url(get_permalink($terms_page_id)); ?>"><?php echo houzez_option('spl_term', 'Terms of Use'); ?></a>
                     </div>
                 </label>
-            </div><!-- form-group -->
+            </div>
         </div>
         <?php } ?>
+
+        <?php do_action('houzez_after_property_schedule_tour_form_fields'); ?>
         
         <div class="col-sm-12 col-xs-12">
             <button class="houzez-ele-button schedule_contact_form btn btn-secondary btn-sm-full-width">
