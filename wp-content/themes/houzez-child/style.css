@@ -122,7 +122,7 @@ footer .item-price{
 }
 
 
-/*------------------------------------Admin Area------------------------------------*/
+/*------------------------------------Admin Area------------------------------------------------------------*/
 a[href="https://imoveisunai.com.br/favorite-properties/"],
 a[href="https://imoveisunai.com.br/invoices/"],
 a[href="https://imoveisunai.com.br/insights/"],
@@ -141,6 +141,14 @@ a[href="https://imoveisunai.com.br/my-profile/?agents=list"],
 {
   display:none !important;
 }
+
+/**/
+
+.dashboard-sidebar h5{
+  display: none !important;
+}
+
+
 
 /*-----------------------------------G Forms---------------------------------------*/
 
