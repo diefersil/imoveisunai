@@ -74,9 +74,9 @@ function getMetaTagsFromUrl($url) {
 
 // 🔹 LISTA DE URLS
 $urls = [
-    "https://www.wimoveis.com.br/propriedades/fazenda-a-venda-em-unai-mg-664-ha-melhor-regiao-da-3020695945.html?n_src=Listado&n_pg=1&n_pos=1",
-    "https://www.zapimoveis.com.br/imovel/venda-terreno-lote-condominio-1-quarto-residencial-vitoria-unai-mg-241m2-id-2883562327/",
-    "https://imoveisunai.com.br/imoveis/aluga-se-casa-no-riviera-park-com-2-quartos/"
+    "https://www.vivareal.com.br/",
+    "https://www.zapimoveis.com.br/",
+    "https://g1.globo.com/"
 ];
 
 $resultados = [];
