@@ -32,23 +32,39 @@ function getMetaProperty($xpath, $property) {
     return trim($xpath->evaluate("string(//meta[@property='$property']/@content)"));
 }
 
+function cleanText($text) {
+    return trim(preg_replace('/\s+/', ' ', $text));
+}
+
 $html = getHtml($listUrl);
 
 libxml_use_internal_errors(true);
 
 $dom = new DOMDocument();
 @$dom->loadHTML($html);
+
 $xpath = new DOMXPath($dom);
 
 $baseUrl = "https://primeimoveisunai.com.br";
 
-$links = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' property-title ')]//a");
+$cards = $xpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' item-wrap ')]");
 
 $resultados = [];
 $urlsVisitadas = [];
 
-foreach ($links as $link) {
-    $href = trim($link->getAttribute("href"));
+foreach ($cards as $card) {
+
+    // LINK DO IMÓVEL
+    $linkNode = $xpath->query(
+        ".//*[contains(concat(' ', normalize-space(@class), ' '), ' property-title ')]//a",
+        $card
+    )->item(0);
+
+    if (!$linkNode) {
+        continue;
+    }
+
+    $href = trim($linkNode->getAttribute("href"));
 
     if (!$href) {
         continue;
@@ -62,13 +78,31 @@ foreach ($links as $link) {
 
     $urlsVisitadas[$imovelUrl] = true;
 
+    // PREÇO
+    $priceNode = $xpath->query(
+        ".//*[contains(concat(' ', normalize-space(@class), ' '), ' property-price ')]//span",
+        $card
+    )->item(0);
+
+    $precoTexto = $priceNode
+        ? cleanText($priceNode->textContent)
+        : null;
+
+    // SOMENTE NÚMEROS
+    $preco = $precoTexto
+        ? (int) preg_replace('/\D/', '', $precoTexto)
+        : null;
+
+    // HTML DETALHE
     $detailHtml = getHtml($imovelUrl);
 
     $detailDom = new DOMDocument();
     @$detailDom->loadHTML($detailHtml);
+
     $detailXpath = new DOMXPath($detailDom);
 
     $resultados[] = [
+        "price" => $preco,
         "og_title" => getMetaProperty($detailXpath, "og:title"),
         "og_url" => getMetaProperty($detailXpath, "og:url"),
         "og_description" => getMetaProperty($detailXpath, "og:description"),
@@ -78,4 +112,9 @@ foreach ($links as $link) {
 
 header("Content-Type: application/json; charset=utf-8");
 
-echo json_encode($resultados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+echo json_encode(
+    $resultados,
+    JSON_PRETTY_PRINT |
+    JSON_UNESCAPED_UNICODE |
+    JSON_UNESCAPED_SLASHES
+);
