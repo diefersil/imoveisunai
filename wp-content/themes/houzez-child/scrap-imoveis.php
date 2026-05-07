@@ -125,7 +125,7 @@ foreach ($sites as $site) {
         $resultados[] = [
             "url do anuncio" => $urlAnuncio,
             "url da imagem" => getMetaProperty($detailXpath, "og:image"),
-            "preço" => $preco,
+            "preco" => $preco,
             "descricao" => getMetaProperty($detailXpath, "og:description")
         ];
     }
