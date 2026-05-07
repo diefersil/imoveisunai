@@ -177,9 +177,9 @@ foreach ($sites as $site) {
 
 header("Content-Type: application/json; charset=utf-8");
 
-echo json_encode(
+/*echo json_encode(
     $resultados,
     JSON_PRETTY_PRINT |
     JSON_UNESCAPED_UNICODE |
     JSON_UNESCAPED_SLASHES
-);
+);*/
