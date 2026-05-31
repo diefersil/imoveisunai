@@ -21,7 +21,7 @@ $categoriaImovelRegras = [
         "strings" => "fazenda, fazendas, rural, chácara, chacara, sítio, sitio"
     ],
     [
-        "categoria" => "Lotes",
+        "categoria" => "Terrenos e Lotes",
         "strings" => "lote, lotes, terreno, terrenos"
     ],
     [
@@ -29,8 +29,12 @@ $categoriaImovelRegras = [
         "strings" => "apartamento, apartamentos, apto"
     ],
     [
-        "categoria" => "Imóvel Urbano",
-        "strings" => ""
+        "categoria" => "Chácaras",
+        "strings" => "chacara,chacaras"
+    ],
+    [
+        "categoria" => "Kitnet",
+        "strings" => "kitnet,kitnets,quitinete"
     ]
 ];
 
@@ -71,6 +75,8 @@ $sites = [
             "galeria" => "//img[contains(@class,'img-fluid')]"
         ]
     ],
+
+    
     [
         "nome_site" => "Alfa Nicolau - Locação",
         "usuario" => "imoveisunai",
@@ -101,7 +107,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'g5core__entry-thumbnail')]",
             "card_url" => ".//a",
-            "galeria" => "//img[contains(@class,'img-fluid')]"
+            "galeria" => "//img[contains(@class,'g5core__zoom-image')]"
         ]
     ]
 ];
