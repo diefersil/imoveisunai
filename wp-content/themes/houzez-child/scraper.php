@@ -104,9 +104,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__listing-wrap')]",
             "card_nome" => ".//h3",
-            "preco" => ".//span[contains(@class,'g5ere__lpp-price')]//span",
+            "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//img[contains(@class,'g5core__entry-thumbnail')]",
-            "card_url" => ".//h3[contains(@class,'property-price')]//a",
+            "card_url" => ".//a",
             "galeria" => "//img[contains(@class,'g5core__zoom-image')]"
         ]
     ]
