@@ -5,6 +5,35 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
+$arquivoCsv = "scraper-res.php";
+$limiteRegistrosCsv = 100;
+
+/**
+ * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
+ */
+$categoriaImovelRegras = [
+    [
+        "categoria" => "Casas",
+        "strings" => "casa, sobrado, meia agua, meia água, casas, mansao, mansão"
+    ],
+    [
+        "categoria" => "Fazendas",
+        "strings" => "fazenda, fazendas, rural, chácara, chacara, sítio, sitio"
+    ],
+    [
+        "categoria" => "Lotes",
+        "strings" => "lote, lotes, terreno, terrenos"
+    ],
+    [
+        "categoria" => "Apartamentos",
+        "strings" => "apartamento, apartamentos, apto"
+    ],
+    [
+        "categoria" => "Imóvel Urbano",
+        "strings" => ""
+    ]
+];
+
 /**
  * CONFIGURAÇÃO DOS SITES
  */
@@ -14,10 +43,7 @@ $sites = [
         "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
 
-        // Pode ter várias categorias separadas por vírgula
         "categoria" => "Imóveis, Casas, Venda",
-
-        // Pode ter várias tags separadas por vírgula
         "tags" => "casa, imóvel, venda, Unaí, oportunidade",
 
         "meta1" => "",
@@ -25,7 +51,6 @@ $sites = [
         "meta3" => "(38) 99970-6070",
         "meta4" => "Prime Imóveis",
 
-        // Período em dias
         "periodo" => 30,
 
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
@@ -35,26 +60,51 @@ $sites = [
             "tipo" => "sempre"
         ],
 
-        /*"verificar_cidade" => [
-            "tipo" => "sempre",
-            "nome_cidade" => ""
-        ],*/
+        "verificar_string" => "",
 
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3",
             "preco" => ".//div[contains(@class,'property-price')]//span",
-            "card_imagem_url" => ".//img[contains(@class,'img-fluid')",
+            "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
             "card_url" => ".//a",
-            // Seletor usado dentro da página interna do card_url
-            //"galeria" => ".//div[contains(@class,'gallery') or contains(@class,'galeria')]//img"
+            "galeria" => "//img[contains(@class,'img-fluid')]"
+        ]
+    ],
+    [
+        "nome_site" => "Alfa Nicolau - Locação",
+        "usuario" => "imoveisunai",
+        "cidade" => "Unaí MG",
+
+        "categoria" => "Imóveis, Casas, Venda",
+        "tags" => "casa, imóvel, venda, Unaí, oportunidade",
+
+        "meta1" => "",
+        "meta2" => "Aluguel",
+        "meta3" => "(38) 9 9935 9555",
+        "meta4" => "Sucesso Imóveis",
+
+        "periodo" => 30,
+
+        "url" => "https://sucessoimoveis.imb.br/imoveis",
+        "numero_registros" => 10,
+
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+
+        "verificar_string" => "",
+
+        "seletores" => [
+            "card" => "//div[contains(@class,'g5ere__listing-wrap')]",
+            "card_nome" => ".//h3",
+            "preco" => ".//div[contains(@class,'property-price')]//span",
+            "card_imagem_url" => ".//img[contains(@class,'g5core__entry-thumbnail')]",
+            "card_url" => ".//a",
             "galeria" => "//img[contains(@class,'img-fluid')]"
         ]
     ]
-
 ];
-
-$arquivoCsv = "scraper-res.csv";
 
 /**
  * VERIFICA SE O SITE DEVE RODAR AGORA
@@ -84,12 +134,10 @@ function deveRodarAgora($frequencia) {
         $horaInicio = strtotime($inicio);
         $horaFim = strtotime($fim);
 
-        // Exemplo: 08:00 até 18:00
         if ($horaInicio <= $horaFim) {
             return ($agora >= $horaInicio && $agora <= $horaFim);
         }
 
-        // Exemplo: 22:00 até 06:00
         return ($agora >= $horaInicio || $agora <= $horaFim);
     }
 
@@ -161,7 +209,6 @@ function normalizarListaVirgula($texto) {
     $limpos = [];
 
     foreach ($partes as $parte) {
-
         $valor = limpar($parte);
 
         if ($valor !== "" && !in_array($valor, $limpos)) {
@@ -174,12 +221,6 @@ function normalizarListaVirgula($texto) {
 
 /**
  * NORMALIZAR PREÇO
- *
- * Exemplos:
- * R$ 1.200,00   => 1200
- * R$ 850.000,00 => 850000
- * 1.500,50      => 1500
- * R$ 2.000      => 2000
  */
 function normalizarPrecoInteiro($preco) {
 
@@ -189,23 +230,18 @@ function normalizarPrecoInteiro($preco) {
         return "";
     }
 
-    // Remove símbolo, letras e espaços, mantendo apenas números, ponto e vírgula
     $preco = preg_replace('/[^\d,\.]/', '', $preco);
 
     if ($preco === "") {
         return "";
     }
 
-    // Se tiver vírgula, considera o que vem depois como centavos
     if (strpos($preco, ",") !== false) {
         $partes = explode(",", $preco);
         $preco = $partes[0];
     }
 
-    // Remove pontos de milhar
     $preco = str_replace(".", "", $preco);
-
-    // Garante apenas números
     $preco = preg_replace('/\D/', '', $preco);
 
     return $preco;
@@ -213,10 +249,6 @@ function normalizarPrecoInteiro($preco) {
 
 /**
  * GERAR DATA FUTURA EM FORMATO AMERICANO
- *
- * Exemplo:
- * periodo = 30
- * saída = YYYY-MM-DD
  */
 function gerarDataPeriodoEua($periodo) {
 
@@ -231,12 +263,6 @@ function gerarDataPeriodoEua($periodo) {
 
 /**
  * VERIFICAÇÃO OPCIONAL POR STRING
- *
- * Se verificar_string estiver vazia ou não existir:
- * salva todos.
- *
- * Se verificar_string tiver valores separados por vírgula:
- * salva somente se card_nome contém pelo menos uma string.
  */
 function deveSalvarPorString($cardNome, $verificarString) {
 
@@ -262,6 +288,83 @@ function deveSalvarPorString($cardNome, $verificarString) {
     }
 
     return false;
+}
+
+/**
+ * REMOVER ACENTOS PARA COMPARAÇÃO
+ */
+function normalizarBusca($texto) {
+
+    $texto = limpar($texto);
+    $texto = mb_strtolower($texto, "UTF-8");
+
+    $comAcento = [
+        "á", "à", "ã", "â", "ä",
+        "é", "è", "ê", "ë",
+        "í", "ì", "î", "ï",
+        "ó", "ò", "õ", "ô", "ö",
+        "ú", "ù", "û", "ü",
+        "ç"
+    ];
+
+    $semAcento = [
+        "a", "a", "a", "a", "a",
+        "e", "e", "e", "e",
+        "i", "i", "i", "i",
+        "o", "o", "o", "o", "o",
+        "u", "u", "u", "u",
+        "c"
+    ];
+
+    return str_replace($comAcento, $semAcento, $texto);
+}
+
+/**
+ * DEFINIR CATEGORIA DO IMÓVEL PELO CARD_NOME
+ */
+function definirCategoriaImovel($cardNome, $regrasCategoriaImovel) {
+
+    if (empty($regrasCategoriaImovel) || !is_array($regrasCategoriaImovel)) {
+        return "";
+    }
+
+    $cardNomeBusca = normalizarBusca($cardNome);
+    $categoriaPadrao = "";
+
+    foreach ($regrasCategoriaImovel as $regra) {
+
+        $categoria = limpar($regra["categoria"] ?? "");
+        $strings = limpar($regra["strings"] ?? "");
+
+        if ($categoria === "") {
+            continue;
+        }
+
+        if ($strings === "") {
+            if ($categoriaPadrao === "") {
+                $categoriaPadrao = $categoria;
+            }
+
+            continue;
+        }
+
+        $listaStrings = explode(",", $strings);
+
+        foreach ($listaStrings as $string) {
+
+            $stringBusca = normalizarBusca($string);
+
+            if ($stringBusca === "") {
+                continue;
+            }
+
+            if (mb_stripos($cardNomeBusca, $stringBusca, 0, "UTF-8") !== false) {
+                return $categoria;
+            }
+        }
+    }
+
+    return $categoriaPadrao;
 }
 
 /**
@@ -444,16 +547,12 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
 
     $xpath = criarXpath($resposta["html"]);
 
-    /**
-     * OG TITLE
-     */
     $dados["og_title"] = getMetaContent($xpath, [
         "//meta[@property='og:title']",
         "//meta[@name='twitter:title']"
     ]);
 
     if ($dados["og_title"] === "") {
-
         $titleNode = $xpath->query("//title");
 
         if ($titleNode && $titleNode->length > 0) {
@@ -461,9 +560,6 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
         }
     }
 
-    /**
-     * OG IMAGE
-     */
     $dados["og_image"] = getMetaContent($xpath, [
         "//meta[@property='og:image']",
         "//meta[@property='og:image:url']",
@@ -474,18 +570,12 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
     }
 
-    /**
-     * OG DESCRIPTION
-     */
     $dados["og_description"] = getMetaContent($xpath, [
         "//meta[@property='og:description']",
         "//meta[@name='description']",
         "//meta[@name='twitter:description']"
     ]);
 
-    /**
-     * GALERIA DE IMAGENS
-     */
     if (!empty($selectorGaleria)) {
 
         $imagens = [];
@@ -528,6 +618,94 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
 }
 
 /**
+ * GERAR CHAVE ÚNICA DO REGISTRO
+ */
+function gerarChaveRegistro($item) {
+
+    $cardUrl = trim($item["card_url"] ?? "");
+
+    if ($cardUrl !== "") {
+        return md5(mb_strtolower($cardUrl, "UTF-8"));
+    }
+
+    return md5(
+        mb_strtolower(
+            ($item["nome_site"] ?? "") . "|" .
+            ($item["card_nome"] ?? "") . "|" .
+            ($item["preco"] ?? ""),
+            "UTF-8"
+        )
+    );
+}
+
+/**
+ * LER CSV EXISTENTE
+ */
+function lerCsvExistente($arquivoCsv, $colunas) {
+
+    $registros = [];
+
+    if (!file_exists($arquivoCsv)) {
+        return $registros;
+    }
+
+    $fp = fopen($arquivoCsv, "r");
+
+    if (!$fp) {
+        return $registros;
+    }
+
+    $cabecalho = fgetcsv($fp, 0, ";");
+
+    if (!$cabecalho) {
+        fclose($fp);
+        return $registros;
+    }
+
+    if (isset($cabecalho[0])) {
+        $cabecalho[0] = preg_replace('/^\xEF\xBB\xBF/', '', $cabecalho[0]);
+    }
+
+    while (($linha = fgetcsv($fp, 0, ";")) !== false) {
+
+        $item = [];
+
+        foreach ($colunas as $index => $coluna) {
+            $item[$coluna] = $linha[$index] ?? "";
+        }
+
+        $registros[] = $item;
+    }
+
+    fclose($fp);
+
+    return $registros;
+}
+
+/**
+ * MESCLAR REGISTROS SEM DUPLICAR E LIMITAR TOTAL
+ */
+function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) {
+
+    $resultado = [];
+
+    foreach ($registrosNovos as $item) {
+        $chave = gerarChaveRegistro($item);
+        $resultado[$chave] = $item;
+    }
+
+    foreach ($registrosAntigos as $item) {
+        $chave = gerarChaveRegistro($item);
+
+        if (!isset($resultado[$chave])) {
+            $resultado[$chave] = $item;
+        }
+    }
+
+    return array_slice(array_values($resultado), 0, $limite);
+}
+
+/**
  * PROCESSAMENTO
  */
 $resultados = [];
@@ -560,9 +738,6 @@ foreach ($sites as $site) {
 
     $verificarString = $site["verificar_string"] ?? "";
 
-    /**
-     * VERIFICA FREQUÊNCIA DO SITE
-     */
     if (!deveRodarAgora($frequencia)) {
 
         $logs[] = [
@@ -658,13 +833,15 @@ foreach ($sites as $site) {
             break;
         }
 
-        /**
-         * DADOS DO CARD
-         */
         $cardNome = getTextoSeletor(
             $xpath,
             $card,
             $seletores["card_nome"] ?? ""
+        );
+
+        $categoriaImovel = definirCategoriaImovel(
+            $cardNome,
+            $categoriaImovelRegras
         );
 
         $precoOriginal = getTextoSeletor(
@@ -689,33 +866,26 @@ foreach ($sites as $site) {
             $url
         );
 
-        /**
-         * IGNORA CARD VAZIO
-         */
         if (empty($cardNome) && empty($cardUrl)) {
             continue;
         }
 
-        /**
-         * VERIFICAÇÃO OPCIONAL POR STRING
-         */
         if (!deveSalvarPorString($cardNome, $verificarString)) {
             $ignoradosPorString++;
             continue;
         }
 
-        /**
-         * DADOS INTERNOS:
-         * OG TITLE, OG IMAGE, OG DESCRIPTION E GALERIA
-         */
         $dadosInternos = getDadosInternos(
             $cardUrl,
             $seletores["galeria"] ?? ""
         );
 
-        /**
-         * EVITA DUPLICADOS
-         */
+        $galeria = $dadosInternos["galeria"];
+
+        if (empty($galeria)) {
+            $galeria = $cardImagemUrl;
+        }
+
         $hash = md5(
             mb_strtolower(
                 $nomeSite . "|" .
@@ -723,6 +893,7 @@ foreach ($sites as $site) {
                 $cidade . "|" .
                 $categoria . "|" .
                 $tags . "|" .
+                $categoriaImovel . "|" .
                 $meta1 . "|" .
                 $meta2 . "|" .
                 $meta3 . "|" .
@@ -745,6 +916,7 @@ foreach ($sites as $site) {
             "cidade" => $cidade,
             "categoria" => $categoria,
             "tags" => $tags,
+            "categoria_imovel" => $categoriaImovel,
 
             "meta1" => $meta1,
             "meta2" => $meta2,
@@ -764,7 +936,7 @@ foreach ($sites as $site) {
             "og_image" => $dadosInternos["og_image"],
             "og_description" => $dadosInternos["og_description"],
             "og_status" => $dadosInternos["og_status"],
-            "galeria" => $dadosInternos["galeria"],
+            "galeria" => $galeria,
 
             "data_scraper_brasil" => date("d/m/Y H:i:s"),
             "data_scraper_eua" => date("Y-m-d H:i:s")
@@ -798,6 +970,7 @@ $colunas = [
     "cidade",
     "categoria",
     "tags",
+    "categoria_imovel",
 
     "meta1",
     "meta2",
@@ -822,6 +995,14 @@ $colunas = [
     "data_scraper_eua"
 ];
 
+$registrosAntigos = lerCsvExistente($arquivoCsv, $colunas);
+
+$registrosFinais = mesclarRegistrosLimitados(
+    $registrosAntigos,
+    array_values($resultados),
+    $limiteRegistrosCsv
+);
+
 /**
  * SALVAR CSV
  */
@@ -839,12 +1020,11 @@ if (!$fp) {
     exit;
 }
 
-// BOM UTF-8 para Excel
 fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
 fputcsv($fp, $colunas, ";");
 
-foreach ($resultados as $item) {
+foreach ($registrosFinais as $item) {
 
     $linha = [];
 
@@ -868,7 +1048,9 @@ echo json_encode([
     "data_execucao" => date("d/m/Y H:i:s"),
     "horario_atual" => date("H:i"),
     "total_sites" => count($sites),
-    "total_resultados" => count($resultados),
+    "total_resultados_novos" => count($resultados),
+    "total_resultados_csv" => count($registrosFinais),
+    "limite_registros_csv" => $limiteRegistrosCsv,
     "logs" => $logs,
     "resultado" => array_values($resultados)
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
