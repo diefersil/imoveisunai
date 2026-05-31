@@ -43,8 +43,8 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3",
-            "preco" => ".//*[contains(@class,'preco') or contains(@class,'price')]",
-            "card_imagem_url" => ".//img",
+            "preco" => ".//div[contains(@class,'property-price')",
+            "card_imagem_url" => ".//dimg[contains(@class,'img-fluid')",
             "card_url" => ".//h3 a",
 
             // Seletor usado dentro da página interna do card_url
