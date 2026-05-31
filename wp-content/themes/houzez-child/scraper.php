@@ -29,7 +29,7 @@ $sites = [
         "periodo" => 30,
 
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-        "numero_registros" => 5,
+        "numero_registros" => 10,
 
         "frequencia" => [
             "tipo" => "sempre"
