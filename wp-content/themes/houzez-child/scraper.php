@@ -102,7 +102,7 @@ $sites = [
         "verificar_string" => "",
 
         "seletores" => [
-            "card" => "//div[contains(@class,'g5ere__listing-inner')]",
+            "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
