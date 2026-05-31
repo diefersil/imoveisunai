@@ -25,7 +25,11 @@ $categoriaImovelRegras = [
         "strings" => "chácara,chacaras,sitio,sitios"
     ],
     [
-        "categoria" => "Lotes",
+        "categoria" => "Chácaras",
+        "strings" => "chácara,chacaras"
+    ],
+    [
+        "categoria" => "Lotes e Terrenos",
         "strings" => "lote, lotes, terreno, terrenos"
     ],
     [
