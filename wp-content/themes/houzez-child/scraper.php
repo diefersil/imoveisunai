@@ -20,10 +20,10 @@ $sites = [
         // Pode ter várias tags separadas por vírgula
         "tags" => "casa, imóvel, venda, Unaí, oportunidade",
 
-        "meta1" => "Aluguel",
-        "meta2" => "Casa",
-        "meta3" => "",
-        "meta4" => "",
+        "meta1" => "",
+        "meta2" => "Aluguel",
+        "meta3" => "(38) 99970-6070",
+        "meta4" => "Prime Imóveis",
 
         // Período em dias
         "periodo" => 30,
