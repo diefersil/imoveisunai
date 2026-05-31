@@ -31,6 +31,10 @@ $categoriaImovelRegras = [
     [
         "categoria" => "Apartamentos",
         "strings" => "apartamento, apartamentos, apto"
+    ],
+    [
+        "categoria" => "Kitnet",
+        "strings" => "kitnet,kitinets,quitinete"
     ]
 ];
 
