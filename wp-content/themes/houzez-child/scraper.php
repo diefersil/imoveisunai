@@ -22,7 +22,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Sítios e Chácaras",
-        "strings" => "fchácara,chacaras,sitio,sitios"
+        "strings" => "chácara,chacaras,sitio,sitios"
     ],
     [
         "categoria" => "Lotes",
@@ -74,7 +74,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
             "card_url" => ".//a",
-            "galeria" => "//img[contains(@class,'img-fluid')]"
+            "galeria" => "//img[contains(@class,'img-fluid')]",
             "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]"
         ]
     ],
