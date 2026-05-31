@@ -31,7 +31,7 @@ $categoriaImovelRegras = [
     [
         "categoria" => "Apartamentos",
         "strings" => "apartamento, apartamentos, apto"
-    ],
+    ]
 ];
 
 /**
