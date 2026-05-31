@@ -43,17 +43,18 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3",
-            "preco" => ".//div[contains(@class,'property-price')",
+            "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')",
             "card_url" => ".//a",
             // Seletor usado dentro da página interna do card_url
             //"galeria" => ".//div[contains(@class,'gallery') or contains(@class,'galeria')]//img"
             "galeria" => "//img[contains(@class,'img-fluid')]"
         ]
-    ],
+    ]
+
 ];
 
-$arquivoCsv = "scraper-res.csv";
+$arquivoCsv = "resultado_scraper.csv";
 
 /**
  * VERIFICA SE O SITE DEVE RODAR AGORA
@@ -83,40 +84,13 @@ function deveRodarAgora($frequencia) {
         $horaInicio = strtotime($inicio);
         $horaFim = strtotime($fim);
 
+        // Exemplo: 08:00 até 18:00
         if ($horaInicio <= $horaFim) {
             return ($agora >= $horaInicio && $agora <= $horaFim);
         }
 
+        // Exemplo: 22:00 até 06:00
         return ($agora >= $horaInicio || $agora <= $horaFim);
-    }
-
-    return true;
-}
-
-/**
- * VERIFICAÇÃO OPCIONAL POR CIDADE
- */
-function deveSalvarPorCidade($cardNome, $verificarCidade) {
-
-    if (empty($verificarCidade) || empty($verificarCidade["tipo"])) {
-        return true;
-    }
-
-    $tipo = $verificarCidade["tipo"];
-
-    if ($tipo === "sempre") {
-        return true;
-    }
-
-    if ($tipo === "verificar") {
-
-        $nomeCidade = limpar($verificarCidade["nome_cidade"] ?? "");
-
-        if ($nomeCidade === "") {
-            return true;
-        }
-
-        return mb_stripos($cardNome, $nomeCidade, 0, "UTF-8") !== false;
     }
 
     return true;
@@ -196,6 +170,98 @@ function normalizarListaVirgula($texto) {
     }
 
     return implode(", ", $limpos);
+}
+
+/**
+ * NORMALIZAR PREÇO
+ *
+ * Exemplos:
+ * R$ 1.200,00   => 1200
+ * R$ 850.000,00 => 850000
+ * 1.500,50      => 1500
+ * R$ 2.000      => 2000
+ */
+function normalizarPrecoInteiro($preco) {
+
+    $preco = limpar($preco);
+
+    if ($preco === "") {
+        return "";
+    }
+
+    // Remove símbolo, letras e espaços, mantendo apenas números, ponto e vírgula
+    $preco = preg_replace('/[^\d,\.]/', '', $preco);
+
+    if ($preco === "") {
+        return "";
+    }
+
+    // Se tiver vírgula, considera o que vem depois como centavos
+    if (strpos($preco, ",") !== false) {
+        $partes = explode(",", $preco);
+        $preco = $partes[0];
+    }
+
+    // Remove pontos de milhar
+    $preco = str_replace(".", "", $preco);
+
+    // Garante apenas números
+    $preco = preg_replace('/\D/', '', $preco);
+
+    return $preco;
+}
+
+/**
+ * GERAR DATA FUTURA EM FORMATO AMERICANO
+ *
+ * Exemplo:
+ * periodo = 30
+ * saída = YYYY-MM-DD
+ */
+function gerarDataPeriodoEua($periodo) {
+
+    $periodo = (int)$periodo;
+
+    if ($periodo <= 0) {
+        return "";
+    }
+
+    return date("Y-m-d", strtotime("+" . $periodo . " days"));
+}
+
+/**
+ * VERIFICAÇÃO OPCIONAL POR STRING
+ *
+ * Se verificar_string estiver vazia ou não existir:
+ * salva todos.
+ *
+ * Se verificar_string tiver valores separados por vírgula:
+ * salva somente se card_nome contém pelo menos uma string.
+ */
+function deveSalvarPorString($cardNome, $verificarString) {
+
+    $verificarString = limpar($verificarString ?? "");
+
+    if ($verificarString === "") {
+        return true;
+    }
+
+    $listaStrings = explode(",", $verificarString);
+
+    foreach ($listaStrings as $string) {
+
+        $string = limpar($string);
+
+        if ($string === "") {
+            continue;
+        }
+
+        if (mb_stripos($cardNome, $string, 0, "UTF-8") !== false) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -378,6 +444,9 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
 
     $xpath = criarXpath($resposta["html"]);
 
+    /**
+     * OG TITLE
+     */
     $dados["og_title"] = getMetaContent($xpath, [
         "//meta[@property='og:title']",
         "//meta[@name='twitter:title']"
@@ -392,6 +461,9 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
         }
     }
 
+    /**
+     * OG IMAGE
+     */
     $dados["og_image"] = getMetaContent($xpath, [
         "//meta[@property='og:image']",
         "//meta[@property='og:image:url']",
@@ -402,6 +474,9 @@ function getDadosInternos($urlCard, $selectorGaleria = "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
     }
 
+    /**
+     * OG DESCRIPTION
+     */
     $dados["og_description"] = getMetaContent($xpath, [
         "//meta[@property='og:description']",
         "//meta[@name='description']",
@@ -473,6 +548,7 @@ foreach ($sites as $site) {
     $meta4 = $site["meta4"] ?? "";
 
     $periodo = (int)($site["periodo"] ?? 0);
+    $dataPeriodoEua = gerarDataPeriodoEua($periodo);
 
     $url = $site["url"] ?? "";
     $numeroRegistros = (int)($site["numero_registros"] ?? 0);
@@ -482,10 +558,7 @@ foreach ($sites as $site) {
         "tipo" => "sempre"
     ];
 
-    $verificarCidade = $site["verificar_cidade"] ?? [
-        "tipo" => "sempre",
-        "nome_cidade" => ""
-    ];
+    $verificarString = $site["verificar_string"] ?? "";
 
     /**
      * VERIFICA FREQUÊNCIA DO SITE
@@ -577,7 +650,7 @@ foreach ($sites as $site) {
     }
 
     $contador = 0;
-    $ignoradosPorCidade = 0;
+    $ignoradosPorString = 0;
 
     foreach ($cards as $card) {
 
@@ -594,11 +667,13 @@ foreach ($sites as $site) {
             $seletores["card_nome"] ?? ""
         );
 
-        $preco = getTextoSeletor(
+        $precoOriginal = getTextoSeletor(
             $xpath,
             $card,
             $seletores["preco"] ?? ""
         );
+
+        $preco = normalizarPrecoInteiro($precoOriginal);
 
         $cardImagemUrl = getUrlSeletor(
             $xpath,
@@ -614,12 +689,18 @@ foreach ($sites as $site) {
             $url
         );
 
+        /**
+         * IGNORA CARD VAZIO
+         */
         if (empty($cardNome) && empty($cardUrl)) {
             continue;
         }
 
-        if (!deveSalvarPorCidade($cardNome, $verificarCidade)) {
-            $ignoradosPorCidade++;
+        /**
+         * VERIFICAÇÃO OPCIONAL POR STRING
+         */
+        if (!deveSalvarPorString($cardNome, $verificarString)) {
+            $ignoradosPorString++;
             continue;
         }
 
@@ -670,7 +751,7 @@ foreach ($sites as $site) {
             "meta3" => $meta3,
             "meta4" => $meta4,
 
-            "periodo" => $periodo,
+            "data_periodo_eua" => $dataPeriodoEua,
 
             "url" => $url,
 
@@ -704,7 +785,7 @@ foreach ($sites as $site) {
         "status" => "ok",
         "cards_encontrados" => $cards->length,
         "registros_salvos" => $contador,
-        "ignorados_por_cidade" => $ignoradosPorCidade
+        "ignorados_por_string" => $ignoradosPorString
     ];
 }
 
@@ -722,7 +803,7 @@ $colunas = [
     "meta2",
     "meta3",
     "meta4",
-    "periodo",
+    "data_periodo_eua",
 
     "url",
 
