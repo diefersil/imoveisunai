@@ -217,6 +217,10 @@ $houzez_addon->add_options( false, 'Floor Plan Details', array(
 // Additional Features
 $houzez_ad_help = "If there are multiple additional features then separate each value with a '|'";
 $houzez_addon->add_options( false, 'Additional Details', array(
+    $houzez_addon->add_field( 'fave_additional_features_enable', 'Show additional details', 'radio', array(
+        'disable' => 'Disable',
+        'enable' => 'Enable'
+    ) ),
     $houzez_addon->add_field( 'fave_additional_feature_title', 'Titles', 'text', null, $houzez_ad_help ),
     $houzez_addon->add_field( 'fave_additional_feature_value', 'Values', 'text', null, $houzez_ad_help )
 ) );
@@ -278,11 +282,11 @@ $houzez_addon->set_import_function( 'houzez_addon_import' );
 $houzez_addon->admin_notice();
 /* Check dependent plugins */
 $houzez_addon->admin_notice( 'Houzez Add-on requires WP All Import <a href="http://www.wpallimport.com/order-now/?utm_source=free-plugin&utm_medium=dot-org&utm_campaign=houzez" target="_blank">Pro</a> or <a href="http://wordpress.org/plugins/wp-all-import" target="_blank">Free</a>, and the <a href="https://themeforest.net/item/houzez-real-estate-wordpress-theme-/15752549">Houzez</a> theme.',
-    array('themes' => array("Houzez", 'Houzez Child'))
+    array('themes' => array("Houzez"))
 );
 
 $houzez_addon->run( array(
-    "themes"     => array("Houzez", 'Houzez Child'),
+    "themes"     => array("Houzez"),
     "post_types" => array("property")
 ) );
 
@@ -318,6 +322,9 @@ function houzez_addon_import( $post_id, $data, $import_options, $article ) {
         'fave_agent_display_option',
         'fave_prop_homeslider',
         'fave_video_url',
+        'fave_floor_plans_enable',
+        'fave_additional_features_enable',
+        'fave_multiunit_plans_enable',
         'fave_energy_class',
         'fave_energy_global_index',
         'fave_energy_performance',
@@ -363,10 +370,6 @@ function houzez_addon_import( $post_id, $data, $import_options, $article ) {
 
     $fields = array_merge( $fields, $image_fields, $floorplan_fields, $multi_units_fields, $additional_features_fields );
 
-    $floorplan_meta = '';
-    $multi_units_meta = '';
-    $additional_features_meta = '';
-
     // update everything in fields arrays
     foreach ( $fields as $field ) {
 
@@ -409,12 +412,7 @@ function houzez_addon_import( $post_id, $data, $import_options, $article ) {
             }
             else {
 
-                // Check if the key exists and is not null before using its value.
-                // If it doesn't exist or is null, default to an empty string.
-                $field_value = isset($data[$field]) ? $data[$field] : '';
-
-                // Now you can safely check the length.
-                if (strlen($field_value) == 0) {
+                if ( strlen( $data[$field] ) == 0 ) {
                     delete_post_meta( $post_id, $field );
                 } else {
                     update_post_meta( $post_id, $field, $data[$field] );
@@ -603,9 +601,7 @@ function houzez_addon_import( $post_id, $data, $import_options, $article ) {
     // update location fields
     $fields = array(
         'fave_property_map_address'  => $address,
-        'fave_property_location' => $lat . ',' . $long,
-        'houzez_geolocation_lat' => $lat,
-        'houzez_geolocation_long' => $long,
+        'fave_property_location' => $lat . ',' . $long
     );
 
     $houzez_addon->log( '- Updating location data' );
