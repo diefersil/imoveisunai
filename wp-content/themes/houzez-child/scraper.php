@@ -1,0 +1,796 @@
+<?php
+
+ini_set('max_execution_time', 2000);
+set_time_limit(2000);
+
+date_default_timezone_set("America/Sao_Paulo");
+
+/**
+ * CONFIGURAÇÃO DOS SITES
+ */
+$sites = [
+    [
+        "nome_site" => "Prime Imóveis - Locação",
+        "usuario" => "Diego",
+        "cidade" => "Unaí MG",
+
+        // Pode ter várias categorias separadas por vírgula
+        "categoria" => "Imóveis, Casas, Venda",
+
+        // Pode ter várias tags separadas por vírgula
+        "tags" => "casa, imóvel, venda, Unaí, oportunidade",
+
+        "meta1" => "Aluguel",
+        "meta2" => "Casa",
+        "meta3" => "",
+        "meta4" => "",
+
+        // Período em dias
+        "periodo" => 30,
+
+        "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
+        "numero_registros" => 5,
+
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+
+        /*"verificar_cidade" => [
+            "tipo" => "sempre",
+            "nome_cidade" => ""
+        ],*/
+
+        "seletores" => [
+            "card" => "//div[contains(@class,'property-main')]",
+            "card_nome" => ".//h3",
+            "preco" => ".//*[contains(@class,'preco') or contains(@class,'price')]",
+            "card_imagem_url" => ".//img",
+            "card_url" => ".//h3 a",
+
+            // Seletor usado dentro da página interna do card_url
+            //"galeria" => ".//div[contains(@class,'gallery') or contains(@class,'galeria')]//img"
+            "galeria" => "//IMG[contains(@class,'img-fluid')]"
+        ]
+    ],
+];
+
+$arquivoCsv = "scraper-res.csv";
+
+/**
+ * VERIFICA SE O SITE DEVE RODAR AGORA
+ */
+function deveRodarAgora($frequencia) {
+
+    if (empty($frequencia) || empty($frequencia["tipo"])) {
+        return true;
+    }
+
+    $tipo = $frequencia["tipo"];
+
+    if ($tipo === "sempre") {
+        return true;
+    }
+
+    if ($tipo === "horario") {
+
+        $inicio = $frequencia["horario_inicio"] ?? "";
+        $fim = $frequencia["horario_fim"] ?? "";
+
+        if (empty($inicio) || empty($fim)) {
+            return false;
+        }
+
+        $agora = strtotime(date("H:i"));
+        $horaInicio = strtotime($inicio);
+        $horaFim = strtotime($fim);
+
+        if ($horaInicio <= $horaFim) {
+            return ($agora >= $horaInicio && $agora <= $horaFim);
+        }
+
+        return ($agora >= $horaInicio || $agora <= $horaFim);
+    }
+
+    return true;
+}
+
+/**
+ * VERIFICAÇÃO OPCIONAL POR CIDADE
+ */
+function deveSalvarPorCidade($cardNome, $verificarCidade) {
+
+    if (empty($verificarCidade) || empty($verificarCidade["tipo"])) {
+        return true;
+    }
+
+    $tipo = $verificarCidade["tipo"];
+
+    if ($tipo === "sempre") {
+        return true;
+    }
+
+    if ($tipo === "verificar") {
+
+        $nomeCidade = limpar($verificarCidade["nome_cidade"] ?? "");
+
+        if ($nomeCidade === "") {
+            return true;
+        }
+
+        return mb_stripos($cardNome, $nomeCidade, 0, "UTF-8") !== false;
+    }
+
+    return true;
+}
+
+/**
+ * CURL
+ */
+function getHtml($url) {
+
+    $ch = curl_init($url);
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        CURLOPT_TIMEOUT => 40,
+        CURLOPT_CONNECTTIMEOUT => 20,
+        CURLOPT_ENCODING => "",
+        CURLOPT_REFERER => "https://www.google.com/",
+        CURLOPT_HTTPHEADER => [
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language: pt-BR,pt;q=0.9,en;q=0.8",
+            "Cache-Control: no-cache",
+        ],
+    ]);
+
+    $html = curl_exec($ch);
+
+    $erro = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $urlFinal = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+
+    curl_close($ch);
+
+    return [
+        "html" => $html,
+        "erro" => $erro,
+        "http_code" => $httpCode,
+        "url_final" => $urlFinal,
+        "ok" => ($html && $httpCode >= 200 && $httpCode < 400)
+    ];
+}
+
+/**
+ * LIMPAR TEXTO
+ */
+function limpar($texto) {
+    return trim(
+        preg_replace('/\s+/', ' ', strip_tags((string)$texto))
+    );
+}
+
+/**
+ * NORMALIZA LISTAS SEPARADAS POR VÍRGULA
+ */
+function normalizarListaVirgula($texto) {
+
+    $texto = limpar($texto);
+
+    if ($texto === "") {
+        return "";
+    }
+
+    $partes = explode(",", $texto);
+    $limpos = [];
+
+    foreach ($partes as $parte) {
+
+        $valor = limpar($parte);
+
+        if ($valor !== "" && !in_array($valor, $limpos)) {
+            $limpos[] = $valor;
+        }
+    }
+
+    return implode(", ", $limpos);
+}
+
+/**
+ * CRIAR DOM XPATH
+ */
+function criarXpath($html) {
+
+    libxml_use_internal_errors(true);
+
+    $dom = new DOMDocument();
+
+    $dom->loadHTML('<?xml encoding="UTF-8">' . $html);
+
+    libxml_clear_errors();
+
+    return new DOMXPath($dom);
+}
+
+/**
+ * TRANSFORMAR URL RELATIVA EM ABSOLUTA
+ */
+function urlAbsoluta($url, $base) {
+
+    $url = trim((string)$url);
+
+    if ($url === "") {
+        return "";
+    }
+
+    if (preg_match('/^https?:\/\//i', $url)) {
+        return $url;
+    }
+
+    $partes = parse_url($base);
+
+    if (empty($partes["scheme"]) || empty($partes["host"])) {
+        return $url;
+    }
+
+    if (strpos($url, "//") === 0) {
+        return $partes["scheme"] . ":" . $url;
+    }
+
+    $dominio = $partes["scheme"] . "://" . $partes["host"];
+
+    if (strpos($url, "/") === 0) {
+        return $dominio . $url;
+    }
+
+    $path = isset($partes["path"]) ? dirname($partes["path"]) : "";
+
+    return rtrim($dominio . "/" . trim($path, "/"), "/") . "/" . ltrim($url, "/");
+}
+
+/**
+ * PEGAR ATRIBUTO COM FALLBACK
+ */
+function getAtributoFallback($node, $atributos) {
+
+    if (!$node) {
+        return "";
+    }
+
+    foreach ($atributos as $attr) {
+
+        $valor = trim($node->getAttribute($attr));
+
+        if ($valor !== "") {
+
+            if ($attr === "srcset" || $attr === "data-srcset") {
+                $partes = explode(",", $valor);
+                $valor = trim(explode(" ", trim($partes[0]))[0]);
+            }
+
+            return $valor;
+        }
+    }
+
+    return "";
+}
+
+/**
+ * PEGAR TEXTO PELO SELETOR
+ */
+function getTextoSeletor($xpath, $contexto, $seletor) {
+
+    if (empty($seletor)) {
+        return "";
+    }
+
+    $node = $xpath->query($seletor, $contexto);
+
+    if ($node && $node->length > 0) {
+        return limpar($node->item(0)->textContent);
+    }
+
+    return "";
+}
+
+/**
+ * PEGAR URL PELO SELETOR
+ */
+function getUrlSeletor($xpath, $contexto, $seletor, $baseUrl) {
+
+    if (empty($seletor)) {
+        return "";
+    }
+
+    $node = $xpath->query($seletor, $contexto);
+
+    if (!$node || $node->length === 0) {
+        return "";
+    }
+
+    $url = getAtributoFallback($node->item(0), [
+        "href",
+        "src",
+        "data-src",
+        "data-lazy-src",
+        "data-original",
+        "srcset",
+        "data-srcset"
+    ]);
+
+    return urlAbsoluta($url, $baseUrl);
+}
+
+/**
+ * PEGAR META CONTENT
+ */
+function getMetaContent($xpath, $queries) {
+
+    foreach ($queries as $query) {
+
+        $node = $xpath->query($query);
+
+        if ($node && $node->length > 0) {
+
+            $content = limpar($node->item(0)->getAttribute("content"));
+
+            if ($content !== "") {
+                return $content;
+            }
+        }
+    }
+
+    return "";
+}
+
+/**
+ * PEGAR OG E GALERIA DA URL DO CARD
+ */
+function getDadosInternos($urlCard, $selectorGaleria = "") {
+
+    $dados = [
+        "og_title" => "",
+        "og_image" => "",
+        "og_description" => "",
+        "og_status" => "",
+        "galeria" => ""
+    ];
+
+    if (empty($urlCard)) {
+        $dados["og_status"] = "sem_card_url";
+        return $dados;
+    }
+
+    $resposta = getHtml($urlCard);
+
+    if (!$resposta["ok"]) {
+
+        $dados["og_status"] = "erro_http_" . $resposta["http_code"];
+
+        if (!empty($resposta["erro"])) {
+            $dados["og_status"] .= " - " . $resposta["erro"];
+        }
+
+        return $dados;
+    }
+
+    $xpath = criarXpath($resposta["html"]);
+
+    $dados["og_title"] = getMetaContent($xpath, [
+        "//meta[@property='og:title']",
+        "//meta[@name='twitter:title']"
+    ]);
+
+    if ($dados["og_title"] === "") {
+
+        $titleNode = $xpath->query("//title");
+
+        if ($titleNode && $titleNode->length > 0) {
+            $dados["og_title"] = limpar($titleNode->item(0)->textContent);
+        }
+    }
+
+    $dados["og_image"] = getMetaContent($xpath, [
+        "//meta[@property='og:image']",
+        "//meta[@property='og:image:url']",
+        "//meta[@name='twitter:image']"
+    ]);
+
+    if ($dados["og_image"] !== "") {
+        $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
+    }
+
+    $dados["og_description"] = getMetaContent($xpath, [
+        "//meta[@property='og:description']",
+        "//meta[@name='description']",
+        "//meta[@name='twitter:description']"
+    ]);
+
+    /**
+     * GALERIA DE IMAGENS
+     */
+    if (!empty($selectorGaleria)) {
+
+        $imagens = [];
+
+        $nodesGaleria = $xpath->query($selectorGaleria);
+
+        if ($nodesGaleria && $nodesGaleria->length > 0) {
+
+            foreach ($nodesGaleria as $imgNode) {
+
+                $imgUrl = getAtributoFallback($imgNode, [
+                    "src",
+                    "data-src",
+                    "data-lazy-src",
+                    "data-original",
+                    "data-full",
+                    "data-image",
+                    "data-large",
+                    "href",
+                    "srcset",
+                    "data-srcset"
+                ]);
+
+                $imgUrl = urlAbsoluta($imgUrl, $urlCard);
+
+                if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
+                    $imagens[] = $imgUrl;
+                }
+            }
+        }
+
+        if (!empty($imagens)) {
+            $dados["galeria"] = implode(",", $imagens);
+        }
+    }
+
+    $dados["og_status"] = "ok";
+
+    return $dados;
+}
+
+/**
+ * PROCESSAMENTO
+ */
+$resultados = [];
+$logs = [];
+
+foreach ($sites as $site) {
+
+    $nomeSite = $site["nome_site"] ?? "";
+    $usuario = $site["usuario"] ?? "";
+    $cidade = $site["cidade"] ?? "";
+
+    $categoria = normalizarListaVirgula($site["categoria"] ?? "");
+    $tags = normalizarListaVirgula($site["tags"] ?? "");
+
+    $meta1 = $site["meta1"] ?? "";
+    $meta2 = $site["meta2"] ?? "";
+    $meta3 = $site["meta3"] ?? "";
+    $meta4 = $site["meta4"] ?? "";
+
+    $periodo = (int)($site["periodo"] ?? 0);
+
+    $url = $site["url"] ?? "";
+    $numeroRegistros = (int)($site["numero_registros"] ?? 0);
+    $seletores = $site["seletores"] ?? [];
+
+    $frequencia = $site["frequencia"] ?? [
+        "tipo" => "sempre"
+    ];
+
+    $verificarCidade = $site["verificar_cidade"] ?? [
+        "tipo" => "sempre",
+        "nome_cidade" => ""
+    ];
+
+    /**
+     * VERIFICA FREQUÊNCIA DO SITE
+     */
+    if (!deveRodarAgora($frequencia)) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "ignorado_por_frequencia",
+            "horario_atual" => date("H:i")
+        ];
+
+        continue;
+    }
+
+    if (empty($url)) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "url_vazia"
+        ];
+
+        continue;
+    }
+
+    $resposta = getHtml($url);
+
+    if (!$resposta["ok"]) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "erro_http",
+            "http_code" => $resposta["http_code"],
+            "erro" => $resposta["erro"]
+        ];
+
+        continue;
+    }
+
+    $xpath = criarXpath($resposta["html"]);
+
+    $selectorCard = $seletores["card"] ?? "";
+
+    if (empty($selectorCard)) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "selector_card_vazio"
+        ];
+
+        continue;
+    }
+
+    $cards = $xpath->query($selectorCard);
+
+    if (!$cards || $cards->length === 0) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "sem_cards"
+        ];
+
+        continue;
+    }
+
+    $contador = 0;
+    $ignoradosPorCidade = 0;
+
+    foreach ($cards as $card) {
+
+        if ($numeroRegistros > 0 && $contador >= $numeroRegistros) {
+            break;
+        }
+
+        /**
+         * DADOS DO CARD
+         */
+        $cardNome = getTextoSeletor(
+            $xpath,
+            $card,
+            $seletores["card_nome"] ?? ""
+        );
+
+        $preco = getTextoSeletor(
+            $xpath,
+            $card,
+            $seletores["preco"] ?? ""
+        );
+
+        $cardImagemUrl = getUrlSeletor(
+            $xpath,
+            $card,
+            $seletores["card_imagem_url"] ?? "",
+            $url
+        );
+
+        $cardUrl = getUrlSeletor(
+            $xpath,
+            $card,
+            $seletores["card_url"] ?? "",
+            $url
+        );
+
+        if (empty($cardNome) && empty($cardUrl)) {
+            continue;
+        }
+
+        if (!deveSalvarPorCidade($cardNome, $verificarCidade)) {
+            $ignoradosPorCidade++;
+            continue;
+        }
+
+        /**
+         * DADOS INTERNOS:
+         * OG TITLE, OG IMAGE, OG DESCRIPTION E GALERIA
+         */
+        $dadosInternos = getDadosInternos(
+            $cardUrl,
+            $seletores["galeria"] ?? ""
+        );
+
+        /**
+         * EVITA DUPLICADOS
+         */
+        $hash = md5(
+            mb_strtolower(
+                $nomeSite . "|" .
+                $usuario . "|" .
+                $cidade . "|" .
+                $categoria . "|" .
+                $tags . "|" .
+                $meta1 . "|" .
+                $meta2 . "|" .
+                $meta3 . "|" .
+                $meta4 . "|" .
+                $periodo . "|" .
+                $cardNome . "|" .
+                $preco . "|" .
+                $cardUrl,
+                "UTF-8"
+            )
+        );
+
+        if (isset($resultados[$hash])) {
+            continue;
+        }
+
+        $resultados[$hash] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+
+            "meta1" => $meta1,
+            "meta2" => $meta2,
+            "meta3" => $meta3,
+            "meta4" => $meta4,
+
+            "periodo" => $periodo,
+
+            "url" => $url,
+
+            "card_nome" => $cardNome,
+            "preco" => $preco,
+            "card_imagem_url" => $cardImagemUrl,
+            "card_url" => $cardUrl,
+
+            "og_title" => $dadosInternos["og_title"],
+            "og_image" => $dadosInternos["og_image"],
+            "og_description" => $dadosInternos["og_description"],
+            "og_status" => $dadosInternos["og_status"],
+            "galeria" => $dadosInternos["galeria"],
+
+            "data_scraper_brasil" => date("d/m/Y H:i:s"),
+            "data_scraper_eua" => date("Y-m-d H:i:s")
+        ];
+
+        $contador++;
+
+        usleep(rand(400000, 1200000));
+    }
+
+    $logs[] = [
+        "nome_site" => $nomeSite,
+        "usuario" => $usuario,
+        "cidade" => $cidade,
+        "categoria" => $categoria,
+        "tags" => $tags,
+        "url" => $url,
+        "status" => "ok",
+        "cards_encontrados" => $cards->length,
+        "registros_salvos" => $contador,
+        "ignorados_por_cidade" => $ignoradosPorCidade
+    ];
+}
+
+/**
+ * COLUNAS DO CSV
+ */
+$colunas = [
+    "nome_site",
+    "usuario",
+    "cidade",
+    "categoria",
+    "tags",
+
+    "meta1",
+    "meta2",
+    "meta3",
+    "meta4",
+    "periodo",
+
+    "url",
+
+    "card_nome",
+    "preco",
+    "card_imagem_url",
+    "card_url",
+
+    "og_title",
+    "og_image",
+    "og_description",
+    "og_status",
+    "galeria",
+
+    "data_scraper_brasil",
+    "data_scraper_eua"
+];
+
+/**
+ * SALVAR CSV
+ */
+$fp = fopen($arquivoCsv, "w");
+
+if (!$fp) {
+    header("Content-Type: application/json; charset=utf-8");
+
+    echo json_encode([
+        "status" => "error",
+        "mensagem" => "Não foi possível criar o arquivo CSV.",
+        "arquivo_csv" => $arquivoCsv
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    exit;
+}
+
+// BOM UTF-8 para Excel
+fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+fputcsv($fp, $colunas, ";");
+
+foreach ($resultados as $item) {
+
+    $linha = [];
+
+    foreach ($colunas as $coluna) {
+        $linha[] = $item[$coluna] ?? "";
+    }
+
+    fputcsv($fp, $linha, ";");
+}
+
+fclose($fp);
+
+/**
+ * RETORNO JSON
+ */
+header("Content-Type: application/json; charset=utf-8");
+
+echo json_encode([
+    "status" => "success",
+    "arquivo_csv" => $arquivoCsv,
+    "data_execucao" => date("d/m/Y H:i:s"),
+    "horario_atual" => date("H:i"),
+    "total_sites" => count($sites),
+    "total_resultados" => count($resultados),
+    "logs" => $logs,
+    "resultado" => array_values($resultados)
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+exit;
