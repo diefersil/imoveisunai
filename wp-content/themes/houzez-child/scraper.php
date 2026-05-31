@@ -58,23 +58,16 @@ $sites = [
         "nome_site" => "Prime Imóveis - Locação",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
-
-        "categoria" => "Imóveis, Casas, Venda",
-        "tags" => "casa, imóvel, venda, Unaí, oportunidade",
-
+        "categoria" => "",
+        "tags" => "",
         "contato" => "(38) 99970-6070",
-
         "periodo" => 30,
-
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
         "numero_registros" => 10,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3",
@@ -85,31 +78,20 @@ $sites = [
             "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]",
         ]
     ],
-
-
     [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
-
-        "categoria" => "Imóveis, Casas, Venda",
-        "tags" => "casa, imóvel, venda, Unaí, oportunidade",
-
-
+        "categoria" => "",
+        "tags" => "",
         "contato" => "(38) 9 9935 9555",
-    
-
         "periodo" => 30,
-
         "url" => "https://sucessoimoveis.imb.br/imoveis",
         "numero_registros" => 10,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
