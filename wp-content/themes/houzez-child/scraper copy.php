@@ -5,8 +5,8 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-$arquivoCsv = "scraper-res.php";
-$limiteRegistrosCsv = 100;
+$arquivoCsv = "scraper-res.csv";
+$limiteRegistrosCsv = 200;
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
@@ -18,35 +18,23 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Fazendas",
-        "strings" => "fazenda,fazendas,rural,chácara,chacara,sítio,sitio"
+        "strings" => "fazenda, fazendas, rural, chácara, chacara, sítio, sitio"
     ],
     [
-        "categoria" => "Sítios e Chácaras",
-        "strings" => "fchácara,chacaras,sitio,sitios"
-    ],
-    [
-        "categoria" => "Lotes",
+        "categoria" => "Terrenos e Lotes",
         "strings" => "lote, lotes, terreno, terrenos"
     ],
     [
         "categoria" => "Apartamentos",
         "strings" => "apartamento, apartamentos, apto"
     ],
-];
-
-/**
- * REGRA GLOBAL DE STATUS DO IMÓVEL
- *
- * Verifica card_nome + descricao interna.
- */
-$StatusImovelRegras = [
     [
-        "status" => "Aluguel",
-        "strings" => "aluguel,aluga,aluga-se,locação,locações,locacao, locacoes"
+        "categoria" => "Chácaras",
+        "strings" => "chacara,chacaras"
     ],
     [
-        "status" => "Venda",
-        "strings" => "venda,vende,vende-se,à venda,a venda"
+        "categoria" => "Kitnet",
+        "strings" => "kitnet,kitnets,quitinete"
     ]
 ];
 
@@ -62,7 +50,10 @@ $sites = [
         "categoria" => "Imóveis, Casas, Venda",
         "tags" => "casa, imóvel, venda, Unaí, oportunidade",
 
-        "contato" => "(38) 99970-6070",
+        "meta1" => "",
+        "meta2" => "Aluguel",
+        "meta3" => "(38) 99970-6070",
+        "meta4" => "Prime Imóveis",
 
         "periodo" => 30,
 
@@ -82,7 +73,6 @@ $sites = [
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
             "card_url" => ".//a",
             "galeria" => "//img[contains(@class,'img-fluid')]"
-            "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]",
         ]
     ],
 
@@ -95,9 +85,10 @@ $sites = [
         "categoria" => "Imóveis, Casas, Venda",
         "tags" => "casa, imóvel, venda, Unaí, oportunidade",
 
-
-        "contato" => "(38) 9 9935 9555",
-    
+        "meta1" => "",
+        "meta2" => "",
+        "meta3" => "(38) 9 9935 9555",
+        "meta4" => "Sucesso Imóveis",
 
         "periodo" => 30,
 
@@ -116,7 +107,6 @@ $sites = [
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
-            "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]",
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img"
         ]
     ]
@@ -384,56 +374,6 @@ function definirCategoriaImovel($cardNome, $regrasCategoriaImovel) {
 }
 
 /**
- * DEFINIR STATUS DO IMÓVEL
- *
- * Verifica card_nome + descricao.
- */
-function definirStatusImovel($cardNome, $descricao, $regrasStatusImovel) {
-
-    if (empty($regrasStatusImovel) || !is_array($regrasStatusImovel)) {
-        return "";
-    }
-
-    $textoBusca = normalizarBusca($cardNome . " " . $descricao);
-    $statusPadrao = "";
-
-    foreach ($regrasStatusImovel as $regra) {
-
-        $status = limpar($regra["status"] ?? "");
-        $strings = limpar($regra["strings"] ?? "");
-
-        if ($status === "") {
-            continue;
-        }
-
-        if ($strings === "") {
-            if ($statusPadrao === "") {
-                $statusPadrao = $status;
-            }
-
-            continue;
-        }
-
-        $listaStrings = explode(",", $strings);
-
-        foreach ($listaStrings as $string) {
-
-            $stringBusca = normalizarBusca($string);
-
-            if ($stringBusca === "") {
-                continue;
-            }
-
-            if (mb_stripos($textoBusca, $stringBusca, 0, "UTF-8") !== false) {
-                return $status;
-            }
-        }
-    }
-
-    return $statusPadrao;
-}
-
-/**
  * CRIAR DOM XPATH
  */
 function criarXpath($html) {
@@ -581,17 +521,16 @@ function getMetaContent($xpath, $queries) {
 }
 
 /**
- * PEGAR OG, DESCRIÇÃO E GALERIA DA URL DO CARD
+ * PEGAR OG E GALERIA DA URL DO CARD
  */
-function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = "") {
+function getDadosInternos($urlCard, $selectorGaleria = "") {
 
     $dados = [
         "og_title" => "",
         "og_image" => "",
         "og_description" => "",
         "og_status" => "",
-        "galeria" => "",
-        "descricao" => ""
+        "galeria" => ""
     ];
 
     if (empty($urlCard)) {
@@ -643,21 +582,6 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         "//meta[@name='twitter:description']"
     ]);
 
-    /**
-     * DESCRIÇÃO INTERNA DO IMÓVEL
-     */
-    if (!empty($selectorDescricao)) {
-
-        $descricaoNode = $xpath->query($selectorDescricao);
-
-        if ($descricaoNode && $descricaoNode->length > 0) {
-            $dados["descricao"] = limpar($descricaoNode->item(0)->textContent);
-        }
-    }
-
-    /**
-     * GALERIA DE IMAGENS
-     */
     if (!empty($selectorGaleria)) {
 
         $imagens = [];
@@ -802,7 +726,10 @@ foreach ($sites as $site) {
     $categoria = normalizarListaVirgula($site["categoria"] ?? "");
     $tags = normalizarListaVirgula($site["tags"] ?? "");
 
-    $contato = $site["contato"] ?? "";
+    $meta1 = $site["meta1"] ?? "";
+    $meta2 = $site["meta2"] ?? "";
+    $meta3 = $site["meta3"] ?? "";
+    $meta4 = $site["meta4"] ?? "";
 
     $periodo = (int)($site["periodo"] ?? 0);
     $dataPeriodoEua = gerarDataPeriodoEua($periodo);
@@ -956,8 +883,7 @@ foreach ($sites as $site) {
 
         $dadosInternos = getDadosInternos(
             $cardUrl,
-            $seletores["galeria"] ?? "",
-            $seletores["descricao"] ?? ""
+            $seletores["galeria"] ?? ""
         );
 
         $galeria = $dadosInternos["galeria"];
@@ -965,14 +891,6 @@ foreach ($sites as $site) {
         if (empty($galeria)) {
             $galeria = $cardImagemUrl;
         }
-
-        $descricao = $dadosInternos["descricao"] ?? "";
-
-        $statusImovel = definirStatusImovel(
-            $cardNome,
-            $descricao,
-            $StatusImovelRegras
-        );
 
         $hash = md5(
             mb_strtolower(
@@ -982,8 +900,10 @@ foreach ($sites as $site) {
                 $categoria . "|" .
                 $tags . "|" .
                 $categoriaImovel . "|" .
-                $statusImovel . "|" .
-                $contato . "|" .
+                $meta1 . "|" .
+                $meta2 . "|" .
+                $meta3 . "|" .
+                $meta4 . "|" .
                 $periodo . "|" .
                 $cardNome . "|" .
                 $preco . "|" .
@@ -1003,16 +923,17 @@ foreach ($sites as $site) {
             "categoria" => $categoria,
             "tags" => $tags,
             "categoria_imovel" => $categoriaImovel,
-            "status_imovel" => $statusImovel,
 
-            "contato" => $contato,
+            "meta1" => $meta1,
+            "meta2" => $meta2,
+            "meta3" => $meta3,
+            "meta4" => $meta4,
 
             "data_periodo_eua" => $dataPeriodoEua,
 
             "url" => $url,
 
             "card_nome" => $cardNome,
-            "descricao" => $descricao,
             "preco" => $preco,
             "card_imagem_url" => $cardImagemUrl,
             "card_url" => $cardUrl,
@@ -1056,15 +977,16 @@ $colunas = [
     "categoria",
     "tags",
     "categoria_imovel",
-    "status_imovel",
 
-    "contato",
+    "meta1",
+    "meta2",
+    "meta3",
+    "meta4",
     "data_periodo_eua",
 
     "url",
 
     "card_nome",
-    "descricao",
     "preco",
     "card_imagem_url",
     "card_url",
