@@ -49,7 +49,7 @@ $sites = [
 
             // Seletor usado dentro da página interna do card_url
             //"galeria" => ".//div[contains(@class,'gallery') or contains(@class,'galeria')]//img"
-            "galeria" => "//IMG[contains(@class,'img-fluid')]"
+            "galeria" => "//img[contains(@class,'img-fluid')]"
         ]
     ],
 ];
