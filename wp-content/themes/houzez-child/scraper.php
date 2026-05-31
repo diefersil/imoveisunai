@@ -98,8 +98,8 @@ $sites = [
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
-            "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]",
-            "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img"
+            "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
+             "descricao" => "//div[contains(@class,'property-description') or contains(@class,'description') or contains(@class,'descricao')]"
         ]
     ]
 ];
