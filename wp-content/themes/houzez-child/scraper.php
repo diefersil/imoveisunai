@@ -5,7 +5,7 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-$arquivoCsv = "scraper-res.php";
+$arquivoCsv = "scraper-res.csv";
 $limiteRegistrosCsv = 100;
 
 /**
