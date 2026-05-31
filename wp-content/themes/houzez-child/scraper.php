@@ -106,7 +106,7 @@ $sites = [
             "card_nome" => ".//h3",
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//img[contains(@class,'g5core__entry-thumbnail')]",
-            "card_url" => ".//a",
+            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
             "galeria" => "//img[contains(@class,'g5core__zoom-image')]"
         ]
     ]
