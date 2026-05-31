@@ -86,7 +86,7 @@ $sites = [
         "tags" => "casa, imóvel, venda, Unaí, oportunidade",
 
         "meta1" => "",
-        "meta2" => "Aluguel",
+        "meta2" => "",
         "meta3" => "(38) 9 9935 9555",
         "meta4" => "Sucesso Imóveis",
 
