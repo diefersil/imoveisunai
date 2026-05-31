@@ -11,7 +11,7 @@ date_default_timezone_set("America/Sao_Paulo");
 $sites = [
     [
         "nome_site" => "Prime Imóveis - Locação",
-        "usuario" => "Diego",
+        "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
 
         // Pode ter várias categorias separadas por vírgula
