@@ -54,7 +54,7 @@ $sites = [
 
 ];
 
-$arquivoCsv = "resultado_scraper.csv";
+$arquivoCsv = "scraper-res.csv";
 
 /**
  * VERIFICA SE O SITE DEVE RODAR AGORA
