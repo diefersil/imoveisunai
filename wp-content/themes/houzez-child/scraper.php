@@ -76,9 +76,9 @@ $sites = [
         ]
     ],
 
-    
+
     [
-        "nome_site" => "Alfa Nicolau - Locação",
+        "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
 
@@ -104,9 +104,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__listing-wrap')]",
             "card_nome" => ".//h3",
-            "preco" => ".//div[contains(@class,'property-price')]//span",
+            "preco" => ".//span[contains(@class,'g5ere__lpp-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'g5core__entry-thumbnail')]",
-            "card_url" => ".//a",
+            "card_url" => ".//h3[contains(@class,'property-price')]//a",
             "galeria" => "//img[contains(@class,'g5core__zoom-image')]"
         ]
     ]
