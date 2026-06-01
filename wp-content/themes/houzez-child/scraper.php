@@ -119,16 +119,13 @@ $sites = [
         "contato" => "(38) 99935-9555",
         "periodo" => 30,
 
-        "url" => "https://sucessoimoveis.imb.br/imoveis",
-
-        /*
-        Exemplo com paginação:
+        //"url" => "https://sucessoimoveis.imb.br/imoveis",
+  
         "url" => [
             "https://sucessoimoveis.imb.br/imoveis",
             "https://sucessoimoveis.imb.br/imoveis/page/2",
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
-        */
 
         "numero_registros" => 10,
 
