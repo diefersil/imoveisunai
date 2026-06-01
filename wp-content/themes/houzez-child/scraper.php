@@ -79,7 +79,7 @@ $sites = [
         "categoria" => "",
         "tags" => "",
         "contato" => "(38) 99970-6070",
-        "periodo" => 50,
+        "periodo" => 30,
 
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
 
@@ -127,7 +127,7 @@ $sites = [
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
 
-        "numero_registros" => 50,
+        "numero_registros" => 20,
 
         "frequencia" => [
             "tipo" => "sempre"
