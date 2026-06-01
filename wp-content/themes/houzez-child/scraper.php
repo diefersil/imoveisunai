@@ -50,11 +50,11 @@ $categoriaImovelRegras = [
 $StatusImovelRegras = [
     [
         "status" => "Aluguel",
-        "strings" => "aluguel,aluga,aluga-se,locação,locações,locacao, locacoes"
+        "strings" => "aluguel,aluga,aluga-se,locação,locações,locacao, locacoes,alugar"
     ],
     [
         "status" => "Venda",
-        "strings" => "venda,vende,vende-se,à venda,a venda"
+        "strings" => "venda,vende,vende-se,à venda,a venda,compra,comprar,vender"
     ]
 ];
 
