@@ -5,7 +5,7 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-$arquivoCsv = "scraper-res.php";
+$arquivoCsv = "scraper-res.csv";
 $limiteRegistrosCsv = 100;
 
 /**
@@ -60,16 +60,6 @@ $StatusImovelRegras = [
 
 /**
  * CONFIGURAÇÃO DOS SITES
- *
- * A chave "url" pode ser uma string única:
- * "url" => "https://site.com/pagina"
- *
- * Ou várias URLs para paginação:
- * "url" => [
- *     "https://site.com/pagina",
- *     "https://site.com/pagina/page/2",
- *     "https://site.com/pagina/page/3"
- * ]
  */
 $sites = [
     [
@@ -80,29 +70,15 @@ $sites = [
         "tags" => "",
         "contato" => "(38) 99970-6070",
         "periodo" => 30,
-
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-
-        /*
-        Exemplo com paginação:
-        "url" => [
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao/page/2",
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao/page/3"
-        ],
-        */
-
         "numero_registros" => 10,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
-            "card_nome" => ".//h3[contains(@class,'property-title')]",
+            "card_nome" => "//h3[contains(@class,'property-title')]",
             "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
             "card_url" => ".//a",
@@ -118,26 +94,12 @@ $sites = [
         "tags" => "",
         "contato" => "(38) 99935-9555",
         "periodo" => 30,
-
         "url" => "https://sucessoimoveis.imb.br/imoveis",
-
-        /*
-        Exemplo com paginação:
-        "url" => [
-            "https://sucessoimoveis.imb.br/imoveis",
-            "https://sucessoimoveis.imb.br/imoveis/page/2",
-            "https://sucessoimoveis.imb.br/imoveis/page/3"
-        ],
-        */
-
         "numero_registros" => 10,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
@@ -146,43 +108,10 @@ $sites = [
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
             "descricao" => "//div[contains(@class,'card-body')]//p"
+            //"descricao" => "//div[contains(@class,'card-body') or contains(@class,'description') or contains(@class,'descricao')]"
         ]
     ]
 ];
-
-/**
- * NORMALIZAR URLS DO SITE
- */
-function normalizarUrlsSite($url) {
-
-    if (empty($url)) {
-        return [];
-    }
-
-    if (is_array($url)) {
-
-        $urls = [];
-
-        foreach ($url as $itemUrl) {
-
-            $itemUrl = trim((string)$itemUrl);
-
-            if ($itemUrl !== "" && !in_array($itemUrl, $urls)) {
-                $urls[] = $itemUrl;
-            }
-        }
-
-        return $urls;
-    }
-
-    $url = trim((string)$url);
-
-    if ($url === "") {
-        return [];
-    }
-
-    return [$url];
-}
 
 /**
  * VERIFICA SE O SITE DEVE RODAR AGORA
@@ -273,24 +202,6 @@ function limpar($texto) {
 }
 
 /**
- * PEGAR HTML INTERNO DE UM NODE
- */
-function getInnerHtml($node) {
-
-    if (!$node) {
-        return "";
-    }
-
-    $html = "";
-
-    foreach ($node->childNodes as $child) {
-        $html .= $node->ownerDocument->saveHTML($child);
-    }
-
-    return trim($html);
-}
-
-/**
  * NORMALIZA LISTAS SEPARADAS POR VÍRGULA
  */
 function normalizarListaVirgula($texto) {
@@ -305,7 +216,6 @@ function normalizarListaVirgula($texto) {
     $limpos = [];
 
     foreach ($partes as $parte) {
-
         $valor = limpar($parte);
 
         if ($valor !== "" && !in_array($valor, $limpos)) {
@@ -317,84 +227,17 @@ function normalizarListaVirgula($texto) {
 }
 
 /**
- * REMOVER ACENTOS PARA COMPARAÇÃO
- */
-function normalizarBusca($texto) {
-
-    $texto = limpar($texto);
-    $texto = mb_strtolower($texto, "UTF-8");
-
-    $comAcento = [
-        "á", "à", "ã", "â", "ä",
-        "é", "è", "ê", "ë",
-        "í", "ì", "î", "ï",
-        "ó", "ò", "õ", "ô", "ö",
-        "ú", "ù", "û", "ü",
-        "ç"
-    ];
-
-    $semAcento = [
-        "a", "a", "a", "a", "a",
-        "e", "e", "e", "e",
-        "i", "i", "i", "i",
-        "o", "o", "o", "o", "o",
-        "u", "u", "u", "u",
-        "c"
-    ];
-
-    return str_replace($comAcento, $semAcento, $texto);
-}
-
-/**
  * NORMALIZAR PREÇO
- *
- * Exemplos:
- * R$ 1.200,00      => 1200
- * R$ 850.000,00    => 850000
- * 1.500,50         => 1500
- * R$ 2.000         => 2000
- * 180 mil          => 180000
- * R$ 180 mil       => 180000
- * 1,2 milhão       => 1200000
- * 1.2 milhão       => 1200000
  */
 function normalizarPrecoInteiro($preco) {
 
-    $precoOriginal = limpar($preco);
+    $preco = limpar($preco);
 
-    if ($precoOriginal === "") {
+    if ($preco === "") {
         return "";
     }
 
-    $precoBusca = normalizarBusca($precoOriginal);
-
-    /**
-     * CASO: "180 mil", "R$ 180 mil", "850 mil"
-     */
-    if (preg_match('/(\d+(?:[.,]\d+)?)\s*mil\b/i', $precoBusca, $match)) {
-
-        $numero = str_replace(",", ".", $match[1]);
-        $valor = (float)$numero * 1000;
-
-        return (string)(int)round($valor);
-    }
-
-    /**
-     * CASO: "1,2 milhão", "1.2 milhao", "2 milhões"
-     */
-    if (preg_match('/(\d+(?:[.,]\d+)?)\s*(milhao|milhoes)\b/i', $precoBusca, $match)) {
-
-        $numero = str_replace(",", ".", $match[1]);
-        $valor = (float)$numero * 1000000;
-
-        return (string)(int)round($valor);
-    }
-
-    /**
-     * CASO PADRÃO:
-     * R$ 1.200,00 => 1200
-     */
-    $preco = preg_replace('/[^\d,\.]/', '', $precoOriginal);
+    $preco = preg_replace('/[^\d,\.]/', '', $preco);
 
     if ($preco === "") {
         return "";
@@ -452,6 +295,35 @@ function deveSalvarPorString($cardNome, $verificarString) {
     }
 
     return false;
+}
+
+/**
+ * REMOVER ACENTOS PARA COMPARAÇÃO
+ */
+function normalizarBusca($texto) {
+
+    $texto = limpar($texto);
+    $texto = mb_strtolower($texto, "UTF-8");
+
+    $comAcento = [
+        "á", "à", "ã", "â", "ä",
+        "é", "è", "ê", "ë",
+        "í", "ì", "î", "ï",
+        "ó", "ò", "õ", "ô", "ö",
+        "ú", "ù", "û", "ü",
+        "ç"
+    ];
+
+    $semAcento = [
+        "a", "a", "a", "a", "a",
+        "e", "e", "e", "e",
+        "i", "i", "i", "i",
+        "o", "o", "o", "o", "o",
+        "u", "u", "u", "u",
+        "c"
+    ];
+
+    return str_replace($comAcento, $semAcento, $texto);
 }
 
 /**
@@ -605,27 +477,6 @@ function urlAbsoluta($url, $base) {
 }
 
 /**
- * PEGAR URL DO ATRIBUTO STYLE
- *
- * Exemplo:
- * style="background-image: url(https://site.com/imagem.jpg)"
- */
-function getUrlFromStyle($style) {
-
-    $style = trim((string)$style);
-
-    if ($style === "") {
-        return "";
-    }
-
-    if (preg_match('/url\((["\']?)(.*?)\1\)/i', $style, $match)) {
-        return trim($match[2]);
-    }
-
-    return "";
-}
-
-/**
  * PEGAR ATRIBUTO COM FALLBACK
  */
 function getAtributoFallback($node, $atributos) {
@@ -635,18 +486,6 @@ function getAtributoFallback($node, $atributos) {
     }
 
     foreach ($atributos as $attr) {
-
-        if ($attr === "style") {
-
-            $style = trim($node->getAttribute("style"));
-            $urlStyle = getUrlFromStyle($style);
-
-            if ($urlStyle !== "") {
-                return $urlStyle;
-            }
-
-            continue;
-        }
 
         $valor = trim($node->getAttribute($attr));
 
@@ -703,12 +542,8 @@ function getUrlSeletor($xpath, $contexto, $seletor, $baseUrl) {
         "data-src",
         "data-lazy-src",
         "data-original",
-        "data-full",
-        "data-image",
-        "data-large",
         "srcset",
-        "data-srcset",
-        "style"
+        "data-srcset"
     ]);
 
     return urlAbsoluta($url, $baseUrl);
@@ -776,7 +611,6 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
     ]);
 
     if ($dados["og_title"] === "") {
-
         $titleNode = $xpath->query("//title");
 
         if ($titleNode && $titleNode->length > 0) {
@@ -801,14 +635,14 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
     ]);
 
     /**
-     * DESCRIÇÃO INTERNA DO IMÓVEL COM HTML INTERNO
+     * DESCRIÇÃO INTERNA DO IMÓVEL
      */
     if (!empty($selectorDescricao)) {
 
         $descricaoNode = $xpath->query($selectorDescricao);
 
         if ($descricaoNode && $descricaoNode->length > 0) {
-            $dados["descricao"] = getInnerHtml($descricaoNode->item(0));
+            $dados["descricao"] = limpar($descricaoNode->item(0)->textContent);
         }
     }
 
@@ -835,8 +669,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                     "data-large",
                     "href",
                     "srcset",
-                    "data-srcset",
-                    "style"
+                    "data-srcset"
                 ]);
 
                 $imgUrl = urlAbsoluta($imgUrl, $urlCard);
@@ -965,9 +798,7 @@ foreach ($sites as $site) {
     $periodo = (int)($site["periodo"] ?? 0);
     $dataPeriodoEua = gerarDataPeriodoEua($periodo);
 
-    $urlsSite = normalizarUrlsSite($site["url"] ?? "");
-    $urlPrincipal = $urlsSite[0] ?? "";
-
+    $url = $site["url"] ?? "";
     $numeroRegistros = (int)($site["numero_registros"] ?? 0);
     $seletores = $site["seletores"] ?? [];
 
@@ -985,7 +816,7 @@ foreach ($sites as $site) {
             "cidade" => $cidade,
             "categoria" => $categoria,
             "tags" => $tags,
-            "url" => $urlPrincipal,
+            "url" => $url,
             "status" => "ignorado_por_frequencia",
             "horario_atual" => date("H:i")
         ];
@@ -993,7 +824,7 @@ foreach ($sites as $site) {
         continue;
     }
 
-    if (empty($urlsSite)) {
+    if (empty($url)) {
 
         $logs[] = [
             "nome_site" => $nomeSite,
@@ -1001,8 +832,63 @@ foreach ($sites as $site) {
             "cidade" => $cidade,
             "categoria" => $categoria,
             "tags" => $tags,
-            "url" => "",
+            "url" => $url,
             "status" => "url_vazia"
+        ];
+
+        continue;
+    }
+
+    $resposta = getHtml($url);
+
+    if (!$resposta["ok"]) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "erro_http",
+            "http_code" => $resposta["http_code"],
+            "erro" => $resposta["erro"]
+        ];
+
+        continue;
+    }
+
+    $xpath = criarXpath($resposta["html"]);
+
+    $selectorCard = $seletores["card"] ?? "";
+
+    if (empty($selectorCard)) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "selector_card_vazio"
+        ];
+
+        continue;
+    }
+
+    $cards = $xpath->query($selectorCard);
+
+    if (!$cards || $cards->length === 0) {
+
+        $logs[] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "url" => $url,
+            "status" => "sem_cards"
         ];
 
         continue;
@@ -1010,192 +896,131 @@ foreach ($sites as $site) {
 
     $contador = 0;
     $ignoradosPorString = 0;
-    $cardsEncontradosTotal = 0;
 
-    foreach ($urlsSite as $url) {
+    foreach ($cards as $card) {
 
-        $resposta = getHtml($url);
+        if ($numeroRegistros > 0 && $contador >= $numeroRegistros) {
+            break;
+        }
 
-        if (!$resposta["ok"]) {
+        $cardNome = getTextoSeletor(
+            $xpath,
+            $card,
+            $seletores["card_nome"] ?? ""
+        );
 
-            $logs[] = [
-                "nome_site" => $nomeSite,
-                "usuario" => $usuario,
-                "cidade" => $cidade,
-                "categoria" => $categoria,
-                "tags" => $tags,
-                "url" => $url,
-                "status" => "erro_http",
-                "http_code" => $resposta["http_code"],
-                "erro" => $resposta["erro"]
-            ];
+        $categoriaImovel = definirCategoriaImovel(
+            $cardNome,
+            $categoriaImovelRegras
+        );
 
+        $precoOriginal = getTextoSeletor(
+            $xpath,
+            $card,
+            $seletores["preco"] ?? ""
+        );
+
+        $preco = normalizarPrecoInteiro($precoOriginal);
+
+        $cardImagemUrl = getUrlSeletor(
+            $xpath,
+            $card,
+            $seletores["card_imagem_url"] ?? "",
+            $url
+        );
+
+        $cardUrl = getUrlSeletor(
+            $xpath,
+            $card,
+            $seletores["card_url"] ?? "",
+            $url
+        );
+
+        if (empty($cardNome) && empty($cardUrl)) {
             continue;
         }
 
-        $xpath = criarXpath($resposta["html"]);
-
-        $selectorCard = $seletores["card"] ?? "";
-
-        if (empty($selectorCard)) {
-
-            $logs[] = [
-                "nome_site" => $nomeSite,
-                "usuario" => $usuario,
-                "cidade" => $cidade,
-                "categoria" => $categoria,
-                "tags" => $tags,
-                "url" => $url,
-                "status" => "selector_card_vazio"
-            ];
-
+        if (!deveSalvarPorString($cardNome, $verificarString)) {
+            $ignoradosPorString++;
             continue;
         }
 
-        $cards = $xpath->query($selectorCard);
+        $dadosInternos = getDadosInternos(
+            $cardUrl,
+            $seletores["galeria"] ?? "",
+            $seletores["descricao"] ?? ""
+        );
 
-        if (!$cards || $cards->length === 0) {
+        $galeria = $dadosInternos["galeria"];
 
-            $logs[] = [
-                "nome_site" => $nomeSite,
-                "usuario" => $usuario,
-                "cidade" => $cidade,
-                "categoria" => $categoria,
-                "tags" => $tags,
-                "url" => $url,
-                "status" => "sem_cards"
-            ];
-
-            continue;
+        if (empty($galeria)) {
+            $galeria = $cardImagemUrl;
         }
 
-        $cardsEncontradosTotal += $cards->length;
+        $descricao = $dadosInternos["descricao"] ?? "";
 
-        foreach ($cards as $card) {
+        $statusImovel = definirStatusImovel(
+            $cardNome,
+            $descricao,
+            $StatusImovelRegras
+        );
 
-            if ($numeroRegistros > 0 && $contador >= $numeroRegistros) {
-                break 2;
-            }
-
-            $cardNome = getTextoSeletor(
-                $xpath,
-                $card,
-                $seletores["card_nome"] ?? ""
-            );
-
-            $categoriaImovel = definirCategoriaImovel(
-                $cardNome,
-                $categoriaImovelRegras
-            );
-
-            $precoOriginal = getTextoSeletor(
-                $xpath,
-                $card,
-                $seletores["preco"] ?? ""
-            );
-
-            $preco = normalizarPrecoInteiro($precoOriginal);
-
-            $cardImagemUrl = getUrlSeletor(
-                $xpath,
-                $card,
-                $seletores["card_imagem_url"] ?? "",
-                $url
-            );
-
-            $cardUrl = getUrlSeletor(
-                $xpath,
-                $card,
-                $seletores["card_url"] ?? "",
-                $url
-            );
-
-            if (empty($cardNome) && empty($cardUrl)) {
-                continue;
-            }
-
-            if (!deveSalvarPorString($cardNome, $verificarString)) {
-                $ignoradosPorString++;
-                continue;
-            }
-
-            $dadosInternos = getDadosInternos(
+        $hash = md5(
+            mb_strtolower(
+                $nomeSite . "|" .
+                $usuario . "|" .
+                $cidade . "|" .
+                $categoria . "|" .
+                $tags . "|" .
+                $categoriaImovel . "|" .
+                $statusImovel . "|" .
+                $contato . "|" .
+                $periodo . "|" .
+                $cardNome . "|" .
+                $preco . "|" .
                 $cardUrl,
-                $seletores["galeria"] ?? "",
-                $seletores["descricao"] ?? ""
-            );
+                "UTF-8"
+            )
+        );
 
-            $galeria = $dadosInternos["galeria"];
-
-            if (empty($galeria)) {
-                $galeria = $cardImagemUrl;
-            }
-
-            $descricao = $dadosInternos["descricao"] ?? "";
-
-            $statusImovel = definirStatusImovel(
-                $cardNome,
-                $descricao,
-                $StatusImovelRegras
-            );
-
-            $hash = md5(
-                mb_strtolower(
-                    $nomeSite . "|" .
-                    $usuario . "|" .
-                    $cidade . "|" .
-                    $categoria . "|" .
-                    $tags . "|" .
-                    $categoriaImovel . "|" .
-                    $statusImovel . "|" .
-                    $contato . "|" .
-                    $periodo . "|" .
-                    $cardNome . "|" .
-                    $preco . "|" .
-                    $cardUrl,
-                    "UTF-8"
-                )
-            );
-
-            if (isset($resultados[$hash])) {
-                continue;
-            }
-
-            $resultados[$hash] = [
-                "nome_site" => $nomeSite,
-                "usuario" => $usuario,
-                "cidade" => $cidade,
-                "categoria" => $categoria,
-                "tags" => $tags,
-                "categoria_imovel" => $categoriaImovel,
-                "status_imovel" => $statusImovel,
-
-                "contato" => $contato,
-
-                "data_periodo_eua" => $dataPeriodoEua,
-
-                "url" => $url,
-
-                "card_nome" => $cardNome,
-                "descricao" => $descricao,
-                "preco" => $preco,
-                "card_imagem_url" => $cardImagemUrl,
-                "card_url" => $cardUrl,
-
-                "og_title" => $dadosInternos["og_title"],
-                "og_image" => $dadosInternos["og_image"],
-                "og_description" => $dadosInternos["og_description"],
-                "og_status" => $dadosInternos["og_status"],
-                "galeria" => $galeria,
-
-                "data_scraper_brasil" => date("d/m/Y H:i:s"),
-                "data_scraper_eua" => date("Y-m-d H:i:s")
-            ];
-
-            $contador++;
-
-            usleep(rand(400000, 1200000));
+        if (isset($resultados[$hash])) {
+            continue;
         }
+
+        $resultados[$hash] = [
+            "nome_site" => $nomeSite,
+            "usuario" => $usuario,
+            "cidade" => $cidade,
+            "categoria" => $categoria,
+            "tags" => $tags,
+            "categoria_imovel" => $categoriaImovel,
+            "status_imovel" => $statusImovel,
+
+            "contato" => $contato,
+
+            "data_periodo_eua" => $dataPeriodoEua,
+
+            "url" => $url,
+
+            "card_nome" => $cardNome,
+            "descricao" => $descricao,
+            "preco" => $preco,
+            "card_imagem_url" => $cardImagemUrl,
+            "card_url" => $cardUrl,
+
+            "og_title" => $dadosInternos["og_title"],
+            "og_image" => $dadosInternos["og_image"],
+            "og_description" => $dadosInternos["og_description"],
+            "og_status" => $dadosInternos["og_status"],
+            "galeria" => $galeria,
+
+            "data_scraper_brasil" => date("d/m/Y H:i:s"),
+            "data_scraper_eua" => date("Y-m-d H:i:s")
+        ];
+
+        $contador++;
+
+        usleep(rand(400000, 1200000));
     }
 
     $logs[] = [
@@ -1204,9 +1029,9 @@ foreach ($sites as $site) {
         "cidade" => $cidade,
         "categoria" => $categoria,
         "tags" => $tags,
-        "url" => $urlPrincipal,
+        "url" => $url,
         "status" => "ok",
-        "cards_encontrados" => $cardsEncontradosTotal,
+        "cards_encontrados" => $cards->length,
         "registros_salvos" => $contador,
         "ignorados_por_string" => $ignoradosPorString
     ];
