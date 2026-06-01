@@ -92,7 +92,7 @@ $sites = [
         ],
         */
 
-        "numero_registros" => 10,
+        "numero_registros" => 50,
 
         "frequencia" => [
             "tipo" => "sempre"
@@ -127,7 +127,7 @@ $sites = [
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
 
-        "numero_registros" => 10,
+        "numero_registros" => 50,
 
         "frequencia" => [
             "tipo" => "sempre"
