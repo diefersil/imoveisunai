@@ -124,7 +124,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
             "descricao" => "//div[contains(@class,'g5ere__property-block-description')]"
         ]
-    ],,
+    ],
     [
         "nome_site" => "W Imóveis",
         "usuario" => "imoveisunai",
