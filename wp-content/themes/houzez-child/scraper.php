@@ -183,7 +183,36 @@ $sites = [
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'box-description')]"
         ]
-    ]
+    ]/*,
+    [
+        "nome_site" => "Novo Lar",
+        "usuario" => "imoveisunai",
+        "cidade" => "",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://novolarimobiliariaunai.com.br/imoveis/"
+        ],
+        "numero_registros" => 30,
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//li[contains(@class,'cards_digital_carousel-item')]",
+            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_localizacao" => "",
+            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
+            "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
+            "card_url" => ".//a[contains(@class,'card-with-buttons')]",
+            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
+            "descricao" => "//div[contains(@class,'box-description')]"
+        ]
+    ]*/
 ];
 
 /**
