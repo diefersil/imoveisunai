@@ -6,7 +6,7 @@ set_time_limit(2000);
 date_default_timezone_set("America/Sao_Paulo");
 
 $arquivoCsv = "scraper-res.csv";
-$limiteRegistrosCsv = 300;
+$limiteRegistrosCsv = 500;
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
@@ -72,6 +72,7 @@ $sites = [
         "nome_site" => "Prime Imóveis - Locação",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí",
+        "uf" => "MG",
         "categoria" => "",
         "tags" => "",
         "contato" => "(38) 99970-6070",
@@ -85,8 +86,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3[contains(@class,'property-title')]",
-            "card_cidade" => "Unaí",
-            "card_uf" => "MG",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
             "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
@@ -98,7 +100,8 @@ $sites = [
     [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
-        "cidade" => "Unaí MG",
+        "cidade" => "Unaí",
+        "uf" => "MG",
         "categoria" => "",
         "tags" => "",
         "contato" => "(38) 99935-9555",
@@ -116,8 +119,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
-            "card_cidade" => "Unaí",
-            "card_uf" => "MG",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
             "card_localizacao" => "",
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
@@ -130,6 +134,7 @@ $sites = [
         "nome_site" => "W Imóveis",
         "usuario" => "imoveisunai",
         "cidade" => "",
+        "uf" => "",
         "categoria" => "",
         "tags" => "",
         "contato" => "",
@@ -147,6 +152,7 @@ $sites = [
             "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
             "card_cidade" => "",
             "card_uf" => "",
+            "card_contato" => "",
             "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
@@ -159,6 +165,7 @@ $sites = [
         "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
         "cidade" => "",
+        "uf" => "",
         "categoria" => "",
         "tags" => "",
         "contato" => "",
@@ -172,39 +179,11 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
-            "card_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
-            "descricao" => "//div[contains(@class,'box-description')]"
-        ]
-    ]/*,
-    [
-        "nome_site" => "Novo Lar",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://novolarimobiliariaunai.com.br/imoveis/"
-        ],
-        "numero_registros" => 30,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
             "card" => "//li[contains(@class,'cards_digital_carousel-item')]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
             "card_cidade" => "",
             "card_uf" => "",
+            "card_contato" => "",
             "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
@@ -212,7 +191,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'box-description')]"
         ]
-    ]*/
+    ]
 ];
 
 /**
@@ -990,6 +969,7 @@ foreach ($sites as $site) {
     $nomeSite = $site["nome_site"] ?? "";
     $usuario = $site["usuario"] ?? "";
     $cidade = $site["cidade"] ?? "";
+    $uf = $site["uf"] ?? "";
 
     $categoria = normalizarListaVirgula($site["categoria"] ?? "");
     $tags = normalizarListaVirgula($site["tags"] ?? "");
@@ -1017,6 +997,7 @@ foreach ($sites as $site) {
             "nome_site" => $nomeSite,
             "usuario" => $usuario,
             "cidade" => $cidade,
+            "uf" => $uf,
             "categoria" => $categoria,
             "tags" => $tags,
             "url" => $urlPrincipal,
@@ -1033,6 +1014,7 @@ foreach ($sites as $site) {
             "nome_site" => $nomeSite,
             "usuario" => $usuario,
             "cidade" => $cidade,
+            "uf" => $uf,
             "categoria" => $categoria,
             "tags" => $tags,
             "url" => "",
@@ -1056,6 +1038,7 @@ foreach ($sites as $site) {
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
                 "cidade" => $cidade,
+                "uf" => $uf,
                 "categoria" => $categoria,
                 "tags" => $tags,
                 "url" => $url,
@@ -1077,6 +1060,7 @@ foreach ($sites as $site) {
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
                 "cidade" => $cidade,
+                "uf" => $uf,
                 "categoria" => $categoria,
                 "tags" => $tags,
                 "url" => $url,
@@ -1094,6 +1078,7 @@ foreach ($sites as $site) {
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
                 "cidade" => $cidade,
+                "uf" => $uf,
                 "categoria" => $categoria,
                 "tags" => $tags,
                 "url" => $url,
@@ -1117,17 +1102,41 @@ foreach ($sites as $site) {
                 $seletores["card_nome"] ?? ""
             );
 
-            $cardCidade = getTextoSeletor(
-                $xpath,
-                $card,
-                $seletores["card_cidade"] ?? ""
-            );
+            $cardCidade = "";
 
-            $cardUf = getTextoSeletor(
-                $xpath,
-                $card,
-                $seletores["card_uf"] ?? ""
-            );
+            if (empty($cidade)) {
+                $cardCidade = getTextoSeletor(
+                    $xpath,
+                    $card,
+                    $seletores["card_cidade"] ?? ""
+                );
+            }
+
+            $cidadeFinal = !empty($cidade) ? $cidade : $cardCidade;
+
+            $cardUf = "";
+
+            if (empty($uf)) {
+                $cardUf = getTextoSeletor(
+                    $xpath,
+                    $card,
+                    $seletores["card_uf"] ?? ""
+                );
+            }
+
+            $ufFinal = !empty($uf) ? $uf : $cardUf;
+
+            $cardContato = "";
+
+            if (empty($contato)) {
+                $cardContato = getTextoSeletor(
+                    $xpath,
+                    $card,
+                    $seletores["card_contato"] ?? ""
+                );
+            }
+
+            $contatoFinal = !empty($contato) ? $contato : $cardContato;
 
             $cardLocalizacao = getTextoSeletor(
                 $xpath,
@@ -1195,16 +1204,15 @@ foreach ($sites as $site) {
                 mb_strtolower(
                     $nomeSite . "|" .
                     $usuario . "|" .
-                    $cidade . "|" .
+                    $cidadeFinal . "|" .
+                    $ufFinal . "|" .
                     $categoria . "|" .
                     $tags . "|" .
                     $categoriaImovel . "|" .
                     $statusImovel . "|" .
-                    $contato . "|" .
+                    $contatoFinal . "|" .
                     $periodo . "|" .
                     $cardNome . "|" .
-                    $cardCidade . "|" .
-                    $cardUf . "|" .
                     $cardLocalizacao . "|" .
                     $preco . "|" .
                     $cardUrl,
@@ -1219,21 +1227,20 @@ foreach ($sites as $site) {
             $resultados[$hash] = [
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
-                "cidade" => $cidade,
+                "cidade" => $cidadeFinal,
+                "uf" => $ufFinal,
                 "categoria" => $categoria,
                 "tags" => $tags,
                 "categoria_imovel" => $categoriaImovel,
                 "status_imovel" => $statusImovel,
 
-                "contato" => $contato,
+                "contato" => $contatoFinal,
 
                 "data_periodo_eua" => $dataPeriodoEua,
 
                 "url" => $url,
 
                 "card_nome" => $cardNome,
-                "card_cidade" => $cardCidade,
-                "card_uf" => $cardUf,
                 "card_localizacao" => $cardLocalizacao,
                 "descricao" => $descricao,
                 "preco" => $preco,
@@ -1260,6 +1267,7 @@ foreach ($sites as $site) {
         "nome_site" => $nomeSite,
         "usuario" => $usuario,
         "cidade" => $cidade,
+        "uf" => $uf,
         "categoria" => $categoria,
         "tags" => $tags,
         "url" => $urlPrincipal,
@@ -1277,6 +1285,7 @@ $colunas = [
     "nome_site",
     "usuario",
     "cidade",
+    "uf",
     "categoria",
     "tags",
     "categoria_imovel",
@@ -1288,8 +1297,6 @@ $colunas = [
     "url",
 
     "card_nome",
-    "card_cidade",
-    "card_uf",
     "card_localizacao",
     "descricao",
     "preco",
