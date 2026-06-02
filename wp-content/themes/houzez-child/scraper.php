@@ -29,7 +29,7 @@ $categoriaImovelRegras = [
         "strings" => "chácara,chacaras"
     ],
     [
-        "categoria" => "Lotes e Terrenos",
+        "categoria" => "Terrenos e Lotes",
         "strings" => "lote, lotes, terreno, terrenos"
     ],
     [
@@ -38,7 +38,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Kitnet",
-        "strings" => "kitnet,kitinets,quitinete"
+        "strings" => "kitnet,kitinets,quitinete,kitnete"
     ]
 ];
 
