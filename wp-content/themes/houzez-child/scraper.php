@@ -52,8 +52,6 @@ $categoriaImovelRegras = [
 
 /**
  * REGRA GLOBAL DE STATUS DO IMÓVEL
- *
- * Verifica card_nome + descricao interna.
  */
 $StatusImovelRegras = [
     [
@@ -68,22 +66,12 @@ $StatusImovelRegras = [
 
 /**
  * CONFIGURAÇÃO DOS SITES
- *
- * A chave "url" pode ser uma string única:
- * "url" => "https://site.com/pagina"
- *
- * Ou várias URLs para paginação:
- * "url" => [
- *     "https://site.com/pagina",
- *     "https://site.com/pagina/page/2",
- *     "https://site.com/pagina/page/3"
- * ]
  */
 $sites = [
     [
         "nome_site" => "Prime Imóveis - Locação",
         "usuario" => "imoveisunai",
-        "cidade" => "Unaí MG",
+        "cidade" => "Unaí",
         "categoria" => "",
         "tags" => "",
         "contato" => "(38) 99970-6070",
@@ -97,6 +85,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3[contains(@class,'property-title')]",
+            "card_cidade" => "Unaí",
+            "card_uf" => "MG",
+            "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'property-price')]//span",
             "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
             "card_url" => ".//a",
@@ -118,7 +109,6 @@ $sites = [
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
         "numero_registros" => 20,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
@@ -126,6 +116,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
+            "card_cidade" => "Unaí",
+            "card_uf" => "MG",
+            "card_localizacao" => "",
             "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
@@ -136,7 +129,7 @@ $sites = [
     [
         "nome_site" => "W Imóveis",
         "usuario" => "imoveisunai",
-        "cidade" => "Unaí MG",
+        "cidade" => "",
         "categoria" => "",
         "tags" => "",
         "contato" => "",
@@ -145,7 +138,6 @@ $sites = [
             "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"
         ],
         "numero_registros" => 5,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
@@ -153,6 +145,9 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'postingCardLayout-module__posting-card-layout')]",
             "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
             "card_url" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
@@ -163,7 +158,7 @@ $sites = [
     [
         "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
-        "cidade" => "Unaí MG",
+        "cidade" => "",
         "categoria" => "",
         "tags" => "",
         "contato" => "",
@@ -172,7 +167,6 @@ $sites = [
             "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"
         ],
         "numero_registros" => 5,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
@@ -180,6 +174,9 @@ $sites = [
         "seletores" => [
             "card" => "//li[contains(@class,'cards_digital_carousel-item')]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
             "card_url" => ".//a[contains(@class,'card-with-buttons')]",
@@ -386,16 +383,6 @@ function normalizarBusca($texto) {
 
 /**
  * NORMALIZAR PREÇO
- *
- * Exemplos:
- * R$ 1.200,00      => 1200
- * R$ 850.000,00    => 850000
- * 1.500,50         => 1500
- * R$ 2.000         => 2000
- * 180 mil          => 180000
- * R$ 180 mil       => 180000
- * 1,2 milhão       => 1200000
- * 1.2 milhão       => 1200000
  */
 function normalizarPrecoInteiro($preco) {
 
@@ -407,9 +394,6 @@ function normalizarPrecoInteiro($preco) {
 
     $precoBusca = normalizarBusca($precoOriginal);
 
-    /**
-     * CASO: "180 mil", "R$ 180 mil", "850 mil"
-     */
     if (preg_match('/(\d+(?:[.,]\d+)?)\s*mil\b/i', $precoBusca, $match)) {
 
         $numero = str_replace(",", ".", $match[1]);
@@ -418,9 +402,6 @@ function normalizarPrecoInteiro($preco) {
         return (string)(int)round($valor);
     }
 
-    /**
-     * CASO: "1,2 milhão", "1.2 milhao", "2 milhões"
-     */
     if (preg_match('/(\d+(?:[.,]\d+)?)\s*(milhao|milhoes)\b/i', $precoBusca, $match)) {
 
         $numero = str_replace(",", ".", $match[1]);
@@ -429,10 +410,6 @@ function normalizarPrecoInteiro($preco) {
         return (string)(int)round($valor);
     }
 
-    /**
-     * CASO PADRÃO:
-     * R$ 1.200,00 => 1200
-     */
     $preco = preg_replace('/[^\d,\.]/', '', $precoOriginal);
 
     if ($preco === "") {
@@ -543,8 +520,6 @@ function definirCategoriaImovel($cardNome, $regrasCategoriaImovel) {
 
 /**
  * DEFINIR STATUS DO IMÓVEL
- *
- * Verifica card_nome + descricao.
  */
 function definirStatusImovel($cardNome, $descricao, $regrasStatusImovel) {
 
@@ -645,9 +620,6 @@ function urlAbsoluta($url, $base) {
 
 /**
  * PEGAR URL DO ATRIBUTO STYLE
- *
- * Exemplo:
- * style="background-image: url(https://site.com/imagem.jpg)"
  */
 function getUrlFromStyle($style) {
 
@@ -839,9 +811,6 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         "//meta[@name='twitter:description']"
     ]);
 
-    /**
-     * DESCRIÇÃO INTERNA DO IMÓVEL COM HTML INTERNO
-     */
     if (!empty($selectorDescricao)) {
 
         $descricaoNode = $xpath->query($selectorDescricao);
@@ -851,9 +820,6 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         }
     }
 
-    /**
-     * GALERIA DE IMAGENS
-     */
     if (!empty($selectorGaleria)) {
 
         $imagens = [];
@@ -1122,6 +1088,24 @@ foreach ($sites as $site) {
                 $seletores["card_nome"] ?? ""
             );
 
+            $cardCidade = getTextoSeletor(
+                $xpath,
+                $card,
+                $seletores["card_cidade"] ?? ""
+            );
+
+            $cardUf = getTextoSeletor(
+                $xpath,
+                $card,
+                $seletores["card_uf"] ?? ""
+            );
+
+            $cardLocalizacao = getTextoSeletor(
+                $xpath,
+                $card,
+                $seletores["card_localizacao"] ?? ""
+            );
+
             $categoriaImovel = definirCategoriaImovel(
                 $cardNome,
                 $categoriaImovelRegras
@@ -1190,6 +1174,9 @@ foreach ($sites as $site) {
                     $contato . "|" .
                     $periodo . "|" .
                     $cardNome . "|" .
+                    $cardCidade . "|" .
+                    $cardUf . "|" .
+                    $cardLocalizacao . "|" .
                     $preco . "|" .
                     $cardUrl,
                     "UTF-8"
@@ -1216,6 +1203,9 @@ foreach ($sites as $site) {
                 "url" => $url,
 
                 "card_nome" => $cardNome,
+                "card_cidade" => $cardCidade,
+                "card_uf" => $cardUf,
+                "card_localizacao" => $cardLocalizacao,
                 "descricao" => $descricao,
                 "preco" => $preco,
                 "card_imagem_url" => $cardImagemUrl,
@@ -1269,6 +1259,9 @@ $colunas = [
     "url",
 
     "card_nome",
+    "card_cidade",
+    "card_uf",
+    "card_localizacao",
     "descricao",
     "preco",
     "card_imagem_url",
