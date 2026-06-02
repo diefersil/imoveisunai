@@ -92,11 +92,11 @@ $sites = [
             "card_uf" => "",
             "card_contato" => "",
             "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
+            "preco" => ".//span[contains(@class,'pd-praca-valor')]//label",
             "card_imagem_url" => ".//div[contains(@class,'pc-img-wrap')]",
             "card_url" => ".//div[contains(@class,'pc-img-wrap')]//a",
-            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
-            "descricao" => "//div[contains(@class,'box-description')]"
+            "galeria" => "//div[contains(@class,'pd-gallery')]//img",
+            "descricao" => "//div[contains(@class,'product_info_content')]"
         ]
     ],
     [
@@ -131,7 +131,6 @@ $sites = [
         ]
     ]
 ];
-
 
 /**
  * NORMALIZAR URLS DO SITE
