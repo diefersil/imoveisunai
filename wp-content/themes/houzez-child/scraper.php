@@ -153,7 +153,7 @@ $sites = [
         ]
     ],
     [
-        "nome_site" => "W Imóveis",
+        "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí MG",
         "categoria" => "",
@@ -161,7 +161,7 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/
+            "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"/
         ],
         "numero_registros" => 5,
 
@@ -170,13 +170,13 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
-            "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
+            "card" => "//li[contains(@class,'cards_digital_carousel-item')]",
+            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
-            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
-            "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
-            "descricao" => "//div[contains(@id,'longDescription')]"
+            "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
+            "card_url" => ".//a[contains(@class,'card-with-buttons')]",
+            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
+            "descricao" => "//div[contains(@class,'box-description')]"
         ]
     ]
 ];
