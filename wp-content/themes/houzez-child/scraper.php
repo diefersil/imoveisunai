@@ -134,7 +134,7 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/
+            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"
         ],
         "numero_registros" => 5,
 
@@ -161,7 +161,7 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"/
+            "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"
         ],
         "numero_registros" => 5,
 
