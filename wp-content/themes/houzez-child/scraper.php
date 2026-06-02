@@ -122,7 +122,7 @@ $sites = [
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
-            "descricao" => "//div[contains(@class,'g5ere__single-block')]"
+            "descricao" => "//div[contains(@class,'g5ere__property-block-description')]"
         ]
     ],,
     [
