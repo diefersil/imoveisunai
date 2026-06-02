@@ -172,7 +172,7 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//li[contains(@class,'cards_digital_carousel-item')]",
+            "card" => "//a[contains(@class,'card-with-buttons')]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
             "card_cidade" => "",
             "card_uf" => "",
