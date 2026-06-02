@@ -6,7 +6,7 @@ set_time_limit(2000);
 date_default_timezone_set("America/Sao_Paulo");
 
 $arquivoCsv = "scraper-teste.csv";
-$limiteRegistrosCsv = 300;
+$limiteRegistrosCsv = 10;
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
