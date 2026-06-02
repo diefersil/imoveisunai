@@ -98,7 +98,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'pd-gallery')]//img",
             "descricao" => "//div[contains(@class,'product_info_content')]"
         ]
-    ],
+    ]/*,
     [
         "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
@@ -129,7 +129,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'box-description')]"
         ]
-    ]
+    ]*/
 ];
 
 /**
