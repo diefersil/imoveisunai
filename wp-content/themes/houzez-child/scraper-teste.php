@@ -5,7 +5,7 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-$arquivoCsv = "scraper-res.csv";
+$arquivoCsv = "scraper-teste.csv";
 $limiteRegistrosCsv = 300;
 
 /**
@@ -69,99 +69,6 @@ $StatusImovelRegras = [
  */
 $sites = [
     [
-        "nome_site" => "Prime Imóveis - Locação",
-        "usuario" => "imoveisunai",
-        "cidade" => "Unaí",
-        "uf" => "MG",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "(38) 99970-6070",
-        "periodo" => 30,
-        "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-        "numero_registros" => 20,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//div[contains(@class,'property-main')]",
-            "card_nome" => ".//h3[contains(@class,'property-title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'property-price')]//span",
-            "card_imagem_url" => ".//img[contains(@class,'img-fluid')]",
-            "card_url" => ".//a",
-            "galeria" => "//img[contains(@class,'img-fluid')]",
-            "descricao" => "//div[contains(@class,'inner-box property-dsc')]"
-        ]
-    ],
-    [
-        "nome_site" => "Sucesso Imóveis - Geral",
-        "usuario" => "imoveisunai",
-        "cidade" => "Unaí",
-        "uf" => "MG",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "(38) 99935-9555",
-        "periodo" => 30,
-        "url" => [
-            "https://sucessoimoveis.imb.br/imoveis",
-            "https://sucessoimoveis.imb.br/imoveis/page/2",
-            "https://sucessoimoveis.imb.br/imoveis/page/3"
-        ],
-        "numero_registros" => 20,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
-            "card_nome" => ".//h3[contains(@class,'g5ere__loop-property-title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//span[contains(@class,'g5ere__lpp-price')]",
-            "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
-            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
-            "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
-            "descricao" => "//div[contains(@class,'g5ere__property-block-description')]"
-        ]
-    ]/*,
-    [
-        "nome_site" => "W Imóveis",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//div[contains(@class,'postingCardLayout-module__posting-card-layout')]",
-            "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
-            "card_url" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
-            "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
-            "descricao" => "//div[contains(@id,'longDescription')]"
-        ]
-    ],
-    [
         "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
         "cidade" => "",
@@ -191,7 +98,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'box-description')]"
         ]
-    ]*/
+    ]
 ];
 
 /**
