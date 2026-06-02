@@ -134,9 +134,34 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/*,
-            "https://sucessoimoveis.imb.br/imoveis/page/2",
-            "https://sucessoimoveis.imb.br/imoveis/page/3"*/
+            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/
+        ],
+        "numero_registros" => 5,
+
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
+            "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
+            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
+            "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
+            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
+            "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
+            "descricao" => "//div[contains(@id,'longDescription')]"
+        ]
+    ],
+    [
+        "nome_site" => "W Imóveis",
+        "usuario" => "imoveisunai",
+        "cidade" => "Unaí MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/
         ],
         "numero_registros" => 5,
 
