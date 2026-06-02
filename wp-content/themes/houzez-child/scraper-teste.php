@@ -69,6 +69,37 @@ $StatusImovelRegras = [
  */
 $sites = [
     [
+        "nome_site" => "Nucle Leiloes",
+        "usuario" => "imoveisunai",
+        "cidade" => "",
+        "uf" => "",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://nucleoleiloes.com.br/imoveis/cidade/2172/unai-mg"
+        ],
+        "numero_registros" => 5,
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => ".//article[contains(@class,'c-card')]",
+            "card_nome" => ".//h3[contains(@class,'pc-desc')]//a",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => "",
+            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
+            "card_imagem_url" => ".//div[contains(@class,'pc-img-wrap')]",
+            "card_url" => ".//div[contains(@class,'pc-img-wrap')]//a",
+            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
+            "descricao" => "//div[contains(@class,'box-description')]"
+        ]
+    ],
+    [
         "nome_site" => "Kenlo",
         "usuario" => "imoveisunai",
         "cidade" => "",
