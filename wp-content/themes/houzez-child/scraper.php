@@ -80,26 +80,12 @@ $sites = [
         "tags" => "",
         "contato" => "(38) 99970-6070",
         "periodo" => 30,
-
         "url" => "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-
-        /*
-        Exemplo com paginação:
-        "url" => [
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao",
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao/page/2",
-            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao/page/3"
-        ],
-        */
-
         "numero_registros" => 20,
-
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3[contains(@class,'property-title')]",
@@ -118,23 +104,17 @@ $sites = [
         "tags" => "",
         "contato" => "(38) 99935-9555",
         "periodo" => 30,
-
-        //"url" => "https://sucessoimoveis.imb.br/imoveis",
-  
         "url" => [
             "https://sucessoimoveis.imb.br/imoveis",
             "https://sucessoimoveis.imb.br/imoveis/page/2",
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
-
         "numero_registros" => 20,
 
         "frequencia" => [
             "tipo" => "sempre"
         ],
-
         "verificar_string" => "",
-
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3",
@@ -142,7 +122,36 @@ $sites = [
             "card_imagem_url" => ".//div[contains(@class,'g5ere__property-featured')]//a[contains(@style,'background-image')]",
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
-            "descricao" => "//div[contains(@class,'g5ere__single-block')]//p"
+            "descricao" => "//div[contains(@class,'g5ere__single-block')]"
+        ]
+    ],,
+    [
+        "nome_site" => "W Imóveis",
+        "usuario" => "imoveisunai",
+        "cidade" => "Unaí MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"/*,
+            "https://sucessoimoveis.imb.br/imoveis/page/2",
+            "https://sucessoimoveis.imb.br/imoveis/page/3"*/
+        ],
+        "numero_registros" => 5,
+
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
+            "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
+            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
+            "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
+            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
+            "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
+            "descricao" => "//div[contains(@id,'longDescription')]"
         ]
     ]
 ];
