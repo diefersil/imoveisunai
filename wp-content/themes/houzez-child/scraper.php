@@ -143,11 +143,11 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
+            "card" => "//div[contains(@class,'postingCardLayout-module__posting-card-layout')]",
             "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
-            "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
+            "card_url" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
             "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
             "descricao" => "//div[contains(@id,'longDescription')]"
         ]
