@@ -179,7 +179,7 @@ $sites = [
             "card_localizacao" => "",
             "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
             "card_imagem_url" => ".//img[contains(@class,'cards_digital_carousel-image')]",
-            "card_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",,
+            "card_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'box-description')]"
         ]
