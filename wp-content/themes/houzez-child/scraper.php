@@ -41,8 +41,12 @@ $categoriaImovelRegras = [
         "strings" => "kitnet,kitinets,quitinete,kitnete"
     ],
     [
-        "categoria" => "Barracoes e Galpoes",
+        "categoria" => "Barracoes e Galpões",
         "strings" => "barracao,barracoes,galpao,galpoes"
+    ],
+    [
+        "categoria" => "Salas Comerciais",
+        "strings" => "sala,salas"
     ]
 ];
 
