@@ -46,7 +46,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Salas Comerciais",
-        "strings" => "sala,salas"
+        "strings" => "sala comercial,salas comerciais"
     ]
 ];
 
