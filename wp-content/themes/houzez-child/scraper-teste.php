@@ -69,6 +69,37 @@ $StatusImovelRegras = [
  */
 $sites = [
     [
+        "nome_site" => "Zap Imóveis",
+        "usuario" => "imoveisunai",
+        "cidade" => "",
+        "uf" => "",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://www.zapimoveis.com.br/venda/fazendas-sitios-chacaras/mg+unai/  "
+        ],
+        "numero_registros" => 5,
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => ".//div[contains(@class,'olx-core-surface')]",
+            "card_nome" => ".//h2[contains(@class,'text-ellipsis')]//a",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => "",
+            "preco" => ".//span[contains(@class,'pd-praca-valor')]",
+            "card_imagem_url" => ".//div[contains(@class,'pc-img-wrap')]//img",
+            "card_url" => ".//div[contains(@class,'pc-img-wrap')]//a",
+            "galeria" => "//div[contains(@class,'pd-gallery')]//img",
+            "descricao" => "//div[contains(@class,'product_info_content')]"
+        ]
+    ]
+    /*[
         "nome_site" => "Nucle Leiloes",
         "usuario" => "imoveisunai",
         "cidade" => "",
