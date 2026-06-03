@@ -18,7 +18,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Fazendas",
-        "strings" => "fazenda,fazendas,rural,chácara,chacara,sítio,sitio"
+        "strings" => "fazenda,fazendas"
     ],
     [
         "categoria" => "Sítios e Chácaras",
