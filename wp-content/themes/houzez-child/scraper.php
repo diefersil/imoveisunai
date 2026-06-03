@@ -96,7 +96,7 @@ $sites = [
             "galeria" => "//img[contains(@class,'img-fluid')]",
             "descricao" => "//div[contains(@class,'inner-box property-dsc')]"
         ]
-    ],
+    ]/*,
     [
         "nome_site" => "Terra Fértil",
         "usuario" => "imoveisunai",
@@ -143,7 +143,7 @@ $sites = [
             "descricao" => "//div[contains(@class,'listing-details')]",
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
-    ],
+    ]*/,
     [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
