@@ -78,7 +78,7 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://www.chavesnamao.com.br/fazendas/mg-unai/"
+            "https://www.terrafertilimobiliaria.com.br/imoveis"
         ],
         "numero_registros" => 5,
         "frequencia" => [
@@ -86,7 +86,7 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => ".//div[contains(@class,'olx-core-surface')]",
+            "card" => ".//div[contains(@class,'card-with-buttons')]",
             "card_nome" => ".//h2[contains(@class,'text-ellipsis')]//a",
             "card_cidade" => "",
             "card_uf" => "",
