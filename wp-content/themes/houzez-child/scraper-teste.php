@@ -78,7 +78,7 @@ $sites = [
         "contato" => "",
         "periodo" => 30,
         "url" => [
-            "https://www.zapimoveis.com.br/venda/fazendas-sitios-chacaras/mg+unai/  "
+            "https://www.zapimoveis.com.br/venda/fazendas-sitios-chacaras/mg+unai"
         ],
         "numero_registros" => 5,
         "frequencia" => [
