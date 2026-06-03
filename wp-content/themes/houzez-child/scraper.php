@@ -98,6 +98,53 @@ $sites = [
         ]
     ],
     [
+        "nome_site" => "Terra Fértil",
+        "usuario" => "imoveisunai",
+        "cidade" => "Unaí",
+        "uf" => "MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "(38) 99958-5454",
+        "periodo" => 30,
+        "url" => [
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/apartamento",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/novos/apartamento",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento-duplex",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/hotel",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/casa",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/casa",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/terreno",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/ponto",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/ponto",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/sala",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/sala",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/novos/sala",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/barracao",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/barracao"
+        ],
+        "numero_registros" => 150,
+        "frequencia" => [
+            "tipo" => "sempre"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
+            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => ".//h2[contains(@class,'card-with-buttons__heading')]",
+            "preco" => ".//*[contains(@class,'card-with-buttons__value')]",
+            "card_imagem_url" => ".//li[contains(@class,'cards_digital_carousel-item-0')]//img",
+            "card_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
+            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
+            "descricao" => "//div[contains(@class,'listing-details')]",
+            //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
+        ]
+    ],
+    [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
         "cidade" => "Unaí",
