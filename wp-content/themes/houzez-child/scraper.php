@@ -133,7 +133,11 @@ $sites = [
         "verificar_string" => "",
         "seletores" => [
             //"card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card" => "//a[contains(@class,'borderHover')]",
+            "card" => "card" => "//a[
+                contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ')
+                and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')
+                and contains(@href, '/imovel/')
+            ]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]",
             "card_cidade" => "",
             "card_uf" => "",
@@ -141,7 +145,7 @@ $sites = [
             "card_localizacao" => ".//h2[contains(@class,'card-with-buttons__heading')]",
             "preco" => ".//*[contains(@class,'card-with-buttons__value')]",
             "card_imagem_url" => ".//li[contains(@class,'cards_digital_carousel-item-0')]//img",           
-            "card_url" => "//a[contains(@class,'borderHover')]",
+            "card_url" => "./@href",
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'listing-details')]",
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
