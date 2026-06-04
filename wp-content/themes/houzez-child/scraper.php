@@ -78,7 +78,7 @@ $StatusImovelRegras = [
  *
  * O array $sites foi separado para facilitar manutenção.
  */
-require_once __DIR__ . "/sites-config.php";
+require_once __DIR__ . "/scraper-sites-config.php";
 
 /**
  * NORMALIZAR URLS DO SITE
