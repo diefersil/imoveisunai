@@ -9,6 +9,14 @@ $arquivoCsv = "scraper-res.csv";
 $limiteRegistrosCsv = 300;
 
 /**
+ * GRAVAR CSV
+ *
+ * Use "sim" para gravar/atualizar o CSV.
+ * Use "nao" para testar sem alterar o arquivo CSV.
+ */
+$gravar_csv = "nao";
+
+/**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
  */
 $categoriaImovelRegras = [
@@ -80,7 +88,9 @@ $sites = [
         "url" => ["https://primeimoveisunai.com.br/imoveis","https://primeimoveisunai.com.br/imoveis/pagina/2"],
         "numero_registros" => 20,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "horario",
+            "horario_inicio" => "12:00",
+            "horario_fim" => "15:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -96,7 +106,7 @@ $sites = [
             "galeria" => "//img[contains(@class,'img-fluid')]",
             "descricao" => "//div[contains(@class,'inner-box property-dsc')]"
         ]
-    ]/*,
+    ],
     [
         "nome_site" => "Terra Fértil",
         "usuario" => "imoveisunai",
@@ -111,22 +121,13 @@ $sites = [
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento",
             "https://www.terrafertilimobiliaria.com.br/imoveis/novos/apartamento",
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento-duplex",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/hotel",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/casa",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/casa",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/terreno",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/ponto",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/ponto",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/sala",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/sala",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/novos/sala",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/barracao",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/barracao"
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda"
         ],
-        "numero_registros" => 150,
+        "numero_registros" => 15,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "sempre",
+            "horario_inicio" => "12:00",
+            "horario_fim" => "15:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -143,7 +144,7 @@ $sites = [
             "descricao" => "//div[contains(@class,'listing-details')]",
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
-    ]*/,
+    ],
     [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
@@ -160,7 +161,9 @@ $sites = [
         ],
         "numero_registros" => 20,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "horario",
+            "horario_inicio" => "12:00",
+            "horario_fim" => "15:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -176,69 +179,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
             "descricao" => "//div[contains(@class,'g5ere__property-block-description')]"
         ]
-    ]/*,
-    [
-        "nome_site" => "W Imóveis",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://www.wimoveis.com.br/venda/rurais/fazenda/mg/unai"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//div[contains(@class,'postingCardLayout-module__posting-card-layout')]",
-            "card_nome" => ".//h2[contains(@class,'postingLocations-module__location-block')]//span",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => ".//img[contains(@class,'is-selected')]",
-            "card_url" => "//div[contains(@class,'.//a[contains(@href, '/propriedades/') and contains(@href, '.html')]/@href')]",
-            "galeria" => "//div[contains(@id,'new-gallery-portal')]//img",
-            "descricao" => "//div[contains(@id,'longDescription')]"
-        ]
-    ],
-    [
-        "nome_site" => "Kenlo",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card_url" => ".//a[contains(@class,'card-with-buttons')]",
-            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
-            "descricao" => "//div[contains(@class,'box-description')]"
-        ]
-    ]*/
+    ]
 ];
 
 /**
@@ -380,6 +321,69 @@ function getInnerHtml($node) {
 
     return trim($html);
 }
+
+/**
+ * LIMPAR DESCRIÇÃO HTML
+ *
+ * Mantém somente:
+ * h1, h2, h3, h4, h5, h6, ul, li, b, i
+ *
+ * Remove atributos das tags.
+ * Remove scripts, styles e demais tags.
+ * Mantém quebras de linha.
+ */
+function limparDescricaoHtmlPermitida($html) {
+
+    $html = (string)$html;
+
+    if ($html === "") {
+        return "";
+    }
+
+    // Remove scripts e styles completamente
+    $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
+    $html = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $html);
+
+    // Transforma alguns blocos em quebras de linha antes de remover as tags
+    $html = preg_replace('/<\s*br\s*\/?>/i', "\n", $html);
+    $html = preg_replace('/<\s*\/\s*(p|div|section|article|tr|table)\s*>/i', "\n", $html);
+
+    // Normaliza tags permitidas removendo atributos
+    $html = preg_replace('/<\s*(h[1-6]|ul|li|b|i)\s+[^>]*>/i', '<$1>', $html);
+    $html = preg_replace('/<\s*\/\s*(h[1-6]|ul|li|b|i)\s*>/i', '</$1>', $html);
+
+    // Mantém somente as tags permitidas
+    $html = strip_tags($html, '<h1><h2><h3><h4><h5><h6><ul><li><b><i>');
+
+    // Quebras antes/depois de títulos
+    $html = preg_replace('/<(h[1-6])>/i', "\n<$1>", $html);
+    $html = preg_replace('/<\/(h[1-6])>/i', "</$1>\n", $html);
+
+    // Quebras em listas
+    $html = preg_replace('/<ul>/i', "\n<ul>\n", $html);
+    $html = preg_replace('/<\/ul>/i', "\n</ul>\n", $html);
+    $html = preg_replace('/<li>/i', "\n<li>", $html);
+    $html = preg_replace('/<\/li>/i', "</li>", $html);
+
+    // Decodifica entidades HTML
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    // Remove espaços excessivos linha a linha
+    $linhas = preg_split('/\r\n|\r|\n/', $html);
+    $linhasLimpas = [];
+
+    foreach ($linhas as $linha) {
+
+        $linha = trim($linha);
+
+        if ($linha !== "") {
+            $linhasLimpas[] = $linha;
+        }
+    }
+
+    return implode("\n", $linhasLimpas);
+}
+
 
 /**
  * NORMALIZA LISTAS SEPARADAS POR VÍRGULA
@@ -871,7 +875,10 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         $descricaoNode = $xpath->query($selectorDescricao);
 
         if ($descricaoNode && $descricaoNode->length > 0) {
-            $dados["descricao"] = getInnerHtml($descricaoNode->item(0));
+
+            $descricaoHtml = getInnerHtml($descricaoNode->item(0));
+
+            $dados["descricao"] = limparDescricaoHtmlPermitida($descricaoHtml);
         }
     }
 
@@ -1191,6 +1198,23 @@ foreach ($sites as $site) {
                 $seletores["card_localizacao"] ?? ""
             );
 
+            /**
+             * FALLBACK DA LOCALIZAÇÃO
+             *
+             * Se card_localizacao não for encontrado ou vier vazio,
+             * monta com cidade e UF finais.
+             */
+            if (empty($cardLocalizacao)) {
+
+                if (!empty($cidadeFinal) && !empty($ufFinal)) {
+                    $cardLocalizacao = $cidadeFinal . ", " . $ufFinal;
+                } elseif (!empty($cidadeFinal)) {
+                    $cardLocalizacao = $cidadeFinal;
+                } elseif (!empty($ufFinal)) {
+                    $cardLocalizacao = $ufFinal;
+                }
+            }
+
             $categoriaImovel = definirCategoriaImovel(
                 $cardNome,
                 $categoriaImovelRegras
@@ -1360,47 +1384,69 @@ $colunas = [
     "data_scraper_eua"
 ];
 
-$registrosAntigos = lerCsvExistente($arquivoCsv, $colunas);
-
-$registrosFinais = mesclarRegistrosLimitados(
-    $registrosAntigos,
-    array_values($resultados),
-    $limiteRegistrosCsv
-);
-
 /**
- * SALVAR CSV
+ * GRAVAR OU APENAS TESTAR SEM ALTERAR CSV
  */
-$fp = fopen($arquivoCsv, "w");
+$gravarCsvNormalizado = normalizarBusca($gravar_csv);
 
-if (!$fp) {
-    header("Content-Type: application/json; charset=utf-8");
+if ($gravarCsvNormalizado === "sim") {
 
-    echo json_encode([
-        "status" => "error",
-        "mensagem" => "Não foi possível criar o arquivo CSV.",
-        "arquivo_csv" => $arquivoCsv
-    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $registrosAntigos = lerCsvExistente($arquivoCsv, $colunas);
 
-    exit;
-}
+    $registrosFinais = mesclarRegistrosLimitados(
+        $registrosAntigos,
+        array_values($resultados),
+        $limiteRegistrosCsv
+    );
 
-fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    /**
+     * SALVAR CSV
+     */
+    $fp = fopen($arquivoCsv, "w");
 
-fputcsv($fp, $colunas, ";");
+    if (!$fp) {
+        header("Content-Type: application/json; charset=utf-8");
 
-foreach ($registrosFinais as $item) {
+        echo json_encode([
+            "status" => "error",
+            "mensagem" => "Não foi possível criar o arquivo CSV.",
+            "arquivo_csv" => $arquivoCsv,
+            "gravar_csv" => $gravar_csv
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    $linha = [];
-
-    foreach ($colunas as $coluna) {
-        $linha[] = $item[$coluna] ?? "";
+        exit;
     }
 
-    fputcsv($fp, $linha, ";");
-}
+    fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-fclose($fp);
+    fputcsv($fp, $colunas, ";");
+
+    foreach ($registrosFinais as $item) {
+
+        $linha = [];
+
+        foreach ($colunas as $coluna) {
+            $linha[] = $item[$coluna] ?? "";
+        }
+
+        fputcsv($fp, $linha, ";");
+    }
+
+    fclose($fp);
+
+    $csvStatus = "gravado";
+
+} else {
+
+    /**
+     * MODO TESTE
+     *
+     * Não lê nem grava o CSV.
+     * Retorna apenas os resultados novos da execução atual.
+     */
+    $registrosFinais = array_values($resultados);
+    $csvStatus = "nao_gravado_modo_teste";
+}
 
 /**
  * RETORNO JSON
@@ -1410,6 +1456,8 @@ header("Content-Type: application/json; charset=utf-8");
 echo json_encode([
     "status" => "success",
     "arquivo_csv" => $arquivoCsv,
+    "gravar_csv" => $gravar_csv,
+    "csv_status" => $csvStatus,
     "data_execucao" => date("d/m/Y H:i:s"),
     "horario_atual" => date("H:i"),
     "total_sites" => count($sites),
