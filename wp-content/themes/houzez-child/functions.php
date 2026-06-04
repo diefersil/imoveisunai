@@ -81,3 +81,34 @@ function disable_emojis_tinymce( $plugins ) {
     return array();
   }
 }
+
+
+
+// Adiciona a coluna "Contato" na listagem de imóveis do Houzez
+add_filter('manage_property_posts_columns', function ($columns) {
+
+    $new_columns = [];
+
+    foreach ($columns as $key => $label) {
+        $new_columns[$key] = $label;
+
+        // Adiciona depois do título
+        if ($key === 'title') {
+            $new_columns['fave_contato'] = 'Contato';
+        }
+    }
+
+    return $new_columns;
+});
+
+
+// Mostra o valor do campo fave_contato na coluna
+add_action('manage_property_posts_custom_column', function ($column, $post_id) {
+
+    if ($column === 'fave_contato') {
+        $contato = get_post_meta($post_id, 'fave_contato', true);
+
+        echo !empty($contato) ? esc_html($contato) : '—';
+    }
+
+}, 10, 2);
