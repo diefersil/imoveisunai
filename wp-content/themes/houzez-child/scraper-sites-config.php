@@ -18,7 +18,7 @@ $sites = [
         "url" => ["https://primeimoveisunai.com.br/imoveis","https://primeimoveisunai.com.br/imoveis/pagina/2"],
         "numero_registros" => 20,
         "frequencia" => [
-            "tipo" => "horario",
+            "tipo" => "nunca",
             "horario_inicio" => "23:00",
             "horario_fim" => "24:00"
         ],
@@ -96,7 +96,7 @@ $sites = [
         ],
         "numero_registros" => 20,
         "frequencia" => [
-            "tipo" => "horario",
+            "tipo" => "nunca",
             "horario_inicio" => "23:00",
             "horario_fim" => "24:00"
         ],
