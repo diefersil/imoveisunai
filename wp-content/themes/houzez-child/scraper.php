@@ -123,7 +123,7 @@ $sites = [
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento-duplex",
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda"
         ],
-        "numero_registros" => 15,
+        "numero_registros" => 5,
         "frequencia" => [
             "tipo" => "sempre",
             "horario_inicio" => "12:00",
