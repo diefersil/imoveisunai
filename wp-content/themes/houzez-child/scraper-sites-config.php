@@ -57,14 +57,14 @@ $sites = [
         ],
         "numero_registros" => 5,
         "frequencia" => [
-            "tipo" => "horario",
-            "horario_inicio" => "23:00",
-            "horario_fim" => "24:00"
+            "tipo" => "nunca",
+            "horario_inicio" => "16:00",
+            "horario_fim" => "18:00"
         ],
         "verificar_string" => "",
         "seletores" => [
             //"card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card" => "//a[contains(@class,'card-with-buttons') and contains(@class,'borderHover') and contains(@href,'/imovel/')]",
+            "card" => "//a[contains(@class,'card-with-buttons') and contains(@class,'borderHover')]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]",
             "card_cidade" => "",
             "card_uf" => "",
@@ -72,7 +72,7 @@ $sites = [
             "card_localizacao" => ".//h2[contains(@class,'card-with-buttons__heading')]",
             "preco" => ".//*[contains(@class,'card-with-buttons__value')]",
             "card_imagem_url" => ".//li[contains(@class,'cards_digital_carousel-item-0')]//img",           
-            "card_url" => ".//a",
+            "card_url" => ".",
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             "descricao" => "//div[contains(@class,'listing-details')]",
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
@@ -145,11 +145,10 @@ $sites = [
             "card_contato" => "",
             "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
             "preco" => ".//h5[contains(@class,'text-lg')]",
-            "card_imagem_url" => ".//img[contains(@class,'w-full')]//img",           
-            "card_url" => ".//a",
-            "galeria" => "//img[contains(@class,'item_imagem_galeria')]",
-            "descricao" => "//p[contains(@class,'descricao')]",
-            //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
+            "card_imagem_url" => ".//img[contains(@class,'w-full')]",           
+            "card_url" => ".",
+            "galeria" => "//img[contains(@class,'transition-all')]",
+            "descricao" => "//p[contains(@class,'my-5')]//span"
         ]
     ]
 ];
