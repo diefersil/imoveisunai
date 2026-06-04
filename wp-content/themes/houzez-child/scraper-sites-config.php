@@ -37,6 +37,8 @@ $sites = [
             "descricao" => "//div[contains(@class,'inner-box property-dsc')]"
         ]
     ],
+
+
     [
         "nome_site" => "Terra Fértil",
         "usuario" => "imoveisunai",
@@ -56,8 +58,8 @@ $sites = [
         "numero_registros" => 5,
         "frequencia" => [
             "tipo" => "sempre",
-            "horario_inicio" => "12:00",
-            "horario_fim" => "15:00"
+            "horario_inicio" => "23:00",
+            "horario_fim" => "24:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -76,6 +78,8 @@ $sites = [
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
     ],
+
+
     [
         "nome_site" => "Sucesso Imóveis - Geral",
         "usuario" => "imoveisunai",
@@ -109,6 +113,43 @@ $sites = [
             "card_url" => ".//a[contains(@class,'g5core__entry-thumbnail')]",
             "galeria" => "//div[contains(@class,'g5core__entry-thumbnail')]//img",
             "descricao" => "//div[contains(@class,'g5ere__property-block-description')]"
+        ]
+    ],
+
+
+    [
+        "nome_site" => "Área 38",
+        "usuario" => "imoveisunai",
+        "cidade" => "Paracatu",
+        "uf" => "MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "(38) 3671-0038",
+        "periodo" => 30,
+        "url" => [
+            "https://area38.com.br/busca?tipo=Fazenda",
+        ],
+        "numero_registros" => 5,
+        "frequencia" => [
+            "tipo" => "sempre",
+            "horario_inicio" => "15:00",
+            "horario_fim" => "18:00"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            
+            "card" => "//a[contains(@class,'mb-2')]",
+            "card_nome" => ".//h4[contains(@class,'text-lg')]",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
+            "preco" => ".//h5[contains(@class,'text-lg')]",
+            "card_imagem_url" => ".//img[contains(@class,'w-full')]//img",           
+            "card_url" => ".//a",
+            "galeria" => "//img[contains(@class,'item_imagem_galeria')]",
+            "descricao" => "//p[contains(@class,'descricao')]",
+            //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
     ]
 ];
