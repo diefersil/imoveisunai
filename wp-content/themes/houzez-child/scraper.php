@@ -1257,6 +1257,12 @@ foreach ($sites as $site) {
 
             $descricao = $dadosInternos["descricao"] ?? "";
 
+            /**
+             * Limpa a descrição antes de salvar no array de resultados.
+             * Assim o CSV e também o JSON de retorno ficam sem ponto e vírgula.
+             */
+            $descricao = limparDescricaoCsv($descricao);
+
             $statusImovel = definirStatusImovel(
                 $cardNome,
                 $descricao,
