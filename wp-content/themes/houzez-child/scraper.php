@@ -134,7 +134,6 @@ $sites = [
         "seletores" => [
             //"card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
             "card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ') and contains(@href, '/imovel/')]",
-            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]",
             "card_cidade" => "",
             "card_uf" => "",
             "card_contato" => "",
