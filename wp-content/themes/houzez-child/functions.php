@@ -58,29 +58,32 @@ function single_wa() {
                 return;
             }
 
-            const formWrap = document.querySelector(".property-form-wrap");
+            // Blocos onde os botões podem existir: desktop e mobile
+            const blocos = document.querySelectorAll(
+                ".property-form-wrap, .mobile-property-contact"
+            );
 
-            if (!formWrap) {
-                return;
-            }
+            blocos.forEach(function (bloco) {
 
-            // WhatsApp somente dentro de .property-form-wrap
-            formWrap.querySelectorAll(".hz-btn-whatsapp, a[href*='api.whatsapp.com/send']").forEach(function (botaoWhatsApp) {
+                // Botões WhatsApp dentro dos blocos
+                bloco.querySelectorAll(".hz-btn-whatsapp, a[href*='api.whatsapp.com/send']").forEach(function (botaoWhatsApp) {
 
-                if (!botaoWhatsApp.href) {
-                    return;
-                }
+                    if (!botaoWhatsApp.href) {
+                        return;
+                    }
 
-                botaoWhatsApp.href = botaoWhatsApp.href.replace(
-                    /phone=\d+/,
-                    `phone=${telefone}`
-                );
+                    botaoWhatsApp.href = botaoWhatsApp.href.replace(
+                        /phone=\d+/,
+                        `phone=${telefone}`
+                    );
 
-            });
+                });
 
-            // Telefone somente dentro de .property-form-wrap
-            formWrap.querySelectorAll(".btn-call, a[href^='tel:']").forEach(function (botaoTelefone) {
-                botaoTelefone.href = `tel:${telefone}`;
+                // Botões telefone dentro dos blocos
+                bloco.querySelectorAll(".btn-call, a[href^='tel:']").forEach(function (botaoTelefone) {
+                    botaoTelefone.href = `tel:${telefone}`;
+                });
+
             });
 
         });
