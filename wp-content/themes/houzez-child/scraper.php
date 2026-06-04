@@ -14,7 +14,7 @@ $limiteRegistrosCsv = 300;
  * Use "sim" para gravar/atualizar o CSV.
  * Use "nao" para testar sem alterar o arquivo CSV.
  */
-$gravar_csv = "nao";
+$gravar_csv = "sim";
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
