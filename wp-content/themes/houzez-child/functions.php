@@ -47,10 +47,9 @@ function single_wa() {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const botao = document.querySelector(".hz-btn-whatsapp");
             const contato = document.querySelector(".detail-wrap .contato span");
 
-            if (!botao || !contato) {
+            if (!contato) {
                 return;
             }
 
@@ -60,10 +59,24 @@ function single_wa() {
                 return;
             }
 
-            botao.href = botao.href.replace(
-                /phone=\d+/,
-                `phone=${telefone}`
+            // Botão WhatsApp
+            const botaoWhatsApp = document.querySelector(
+                ".property-schedule-tour-type-form .hz-btn-whatsapp"
             );
+
+            if (botaoWhatsApp) {
+                botaoWhatsApp.href = botaoWhatsApp.href.replace(
+                    /phone=\d+/,
+                    `phone=${telefone}`
+                );
+            }
+
+            // Botão telefone
+            const botaoTelefone = document.querySelector(".btn-call");
+
+            if (botaoTelefone) {
+                botaoTelefone.href = `tel:${telefone}`;
+            }
 
         });
     </script>
