@@ -1341,6 +1341,76 @@ foreach ($sites as $site) {
     ];
 }
 
+
+/**
+ * LIMPAR CAMPO CSV PADRÃO
+ *
+ * Usado em campos comuns para evitar quebra de linha real,
+ * ponto e vírgula interno e espaços duplicados no CSV.
+ */
+function limparCampoCsv($texto) {
+
+    $texto = html_entity_decode($texto ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // Remove quebras reais para manter 1 imóvel por linha no CSV
+    $texto = str_replace(["\r\n", "\r", "\n"], ' ', $texto);
+
+    // Evita conflito visual com separador CSV ;
+    $texto = str_replace(';', ',', $texto);
+
+    // Remove espaços duplicados
+    $texto = preg_replace('/\s+/', ' ', $texto);
+
+    return trim($texto);
+}
+
+/**
+ * LIMPAR DESCRIÇÃO PARA CSV / WP ALL IMPORT
+ *
+ * A descrição pode conter HTML permitido, então não deve usar
+ * a limpeza genérica. Mantém somente:
+ * ul, li, b e br.
+ */
+function limparDescricaoCsv($html) {
+
+    $html = html_entity_decode($html ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // Remove quebras reais para não quebrar linhas do CSV
+    $html = str_replace(["\r\n", "\r", "\n"], ' ', $html);
+
+    // Troca ponto e vírgula interno por vírgula
+    $html = str_replace(';', ',', $html);
+
+    // Normaliza variações de <br>
+    $html = preg_replace('/<\s*br\s*\/?>/i', '<br/>', $html);
+
+    // Remove atributos das tags permitidas
+    $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
+    $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
+    $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
+
+    // Normaliza fechamentos
+    $html = preg_replace('/<\s*\/\s*ul\s*>/i', '</ul>', $html);
+    $html = preg_replace('/<\s*\/\s*li\s*>/i', '</li>', $html);
+    $html = preg_replace('/<\s*\/\s*b\s*>/i', '</b>', $html);
+
+    // Mantém somente tags seguras para a descrição
+    $html = strip_tags($html, '<ul><li><b><br>');
+
+    // Remove espaços duplicados sem remover as tags
+    $html = preg_replace('/\s+/', ' ', $html);
+
+    // Evita vários <br/> seguidos
+    $html = preg_replace('/(<br\/>\s*){2,}/i', '<br/>', $html);
+
+    // Remove <br/> sobrando no início/fim
+    $html = preg_replace('/^(<br\/>\s*)+/i', '', $html);
+    $html = preg_replace('/(\s*<br\/>) +$/i', '', $html);
+    $html = preg_replace('/(\s*<br\/>)$/i', '', $html);
+
+    return trim($html);
+}
+
 /**
  * COLUNAS DO CSV
  */
@@ -1418,7 +1488,14 @@ if ($gravarCsvNormalizado === "sim") {
         $linha = [];
 
         foreach ($colunas as $coluna) {
-            $linha[] = $item[$coluna] ?? "";
+
+            $valor = $item[$coluna] ?? "";
+
+            if ($coluna === "descricao") {
+                $linha[] = limparDescricaoCsv($valor);
+            } else {
+                $linha[] = limparCampoCsv($valor);
+            }
         }
 
         fputcsv($fp, $linha, ";");
