@@ -133,7 +133,7 @@ $sites = [
         "verificar_string" => "",
         "seletores" => [
             //"card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card" => "card" => "//a[
+            "card" => "//a[
                 contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ')
                 and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')
                 and contains(@href, '/imovel/')
