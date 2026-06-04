@@ -6,7 +6,8 @@ set_time_limit(2000);
 date_default_timezone_set("America/Sao_Paulo");
 
 $arquivoCsv = "scraper-res.csv";
-$limiteRegistrosCsv = 300;
+$limiteRegistrosCsv = 500;
+$limiteImagensGaleria = 10;
 
 /**
  * GRAVAR CSV
@@ -346,7 +347,9 @@ function limparDescricaoHtmlPermitida($html) {
 
     // Transforma alguns blocos em quebras de linha antes de remover as tags
     $html = preg_replace('/<\s*br\s*\/?>/i', "\n", $html);
-    $html = preg_replace('/<\s*\/\s*(p|div|section|article|tr|table)\s*>/i', "\n", $html);
+    $html = preg_replace('/<\s*p\b[^>]*>/i', "\n", $html);
+    $html = preg_replace('/<\s*\/\s*p\s*>/i', "\n", $html);
+    $html = preg_replace('/<\s*\/\s*(div|section|article|tr|table)\s*>/i', "\n", $html);
 
     // Normaliza tags permitidas removendo atributos
     $html = preg_replace('/<\s*(h[1-6]|ul|li|b|i)\s+[^>]*>/i', '<$1>', $html);
@@ -855,6 +858,8 @@ function getMetaContent($xpath, $queries) {
  */
 function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = "") {
 
+    global $limiteImagensGaleria;
+
     $dados = [
         "og_title" => "",
         "og_image" => "",
@@ -956,6 +961,10 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
 
                 if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
                     $imagens[] = $imgUrl;
+
+                    if (!empty($limiteImagensGaleria) && count($imagens) >= (int)$limiteImagensGaleria) {
+                        break;
+                    }
                 }
             }
         }
