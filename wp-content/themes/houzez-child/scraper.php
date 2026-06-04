@@ -1373,40 +1373,59 @@ function limparCampoCsv($texto) {
  */
 function limparDescricaoCsv($html) {
 
-    $html = html_entity_decode($html ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $html = (string)($html ?? "");
 
-    // Remove quebras reais para não quebrar linhas do CSV
-    $html = str_replace(["\r\n", "\r", "\n"], ' ', $html);
+    if ($html === "") {
+        return "";
+    }
 
-    // Troca ponto e vírgula interno por vírgula
-    $html = str_replace(';', ',', $html);
+    // Decodifica entidades HTML
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    // Normaliza quebras reais para <br/>
+    $html = str_replace(["\r\n", "\r", "\n"], "<br/>", $html);
 
     // Normaliza variações de <br>
-    $html = preg_replace('/<\s*br\s*\/?>/i', '<br/>', $html);
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    /**
+     * IMPORTANTE:
+     * Remove ponto e vírgula da descrição para não quebrar CSV separado por ;
+     *
+     * Exemplo:
+     * Área total 1.401,6027 hectares;
+     * vira:
+     * Área total 1.401,6027 hectares<br/>
+     */
+    $html = str_replace([";", "；"], "<br/>", $html);
 
     // Remove atributos das tags permitidas
     $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
     $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
     $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
 
-    // Normaliza fechamentos
-    $html = preg_replace('/<\s*\/\s*ul\s*>/i', '</ul>', $html);
-    $html = preg_replace('/<\s*\/\s*li\s*>/i', '</li>', $html);
-    $html = preg_replace('/<\s*\/\s*b\s*>/i', '</b>', $html);
-
-    // Mantém somente tags seguras para a descrição
+    // Mantém somente estas tags
     $html = strip_tags($html, '<ul><li><b><br>');
 
-    // Remove espaços duplicados sem remover as tags
+    // Garante <br/> novamente depois do strip_tags
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    // Remove espaços duplicados
     $html = preg_replace('/\s+/', ' ', $html);
 
-    // Evita vários <br/> seguidos
+    // Remove <br/> repetidos
     $html = preg_replace('/(<br\/>\s*){2,}/i', '<br/>', $html);
 
+    // Limpa espaços perto das tags
+    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
+    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
+    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
+    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
+
     // Remove <br/> sobrando no início/fim
-    $html = preg_replace('/^(<br\/>\s*)+/i', '', $html);
-    $html = preg_replace('/(\s*<br\/>) +$/i', '', $html);
-    $html = preg_replace('/(\s*<br\/>)$/i', '', $html);
+    $html = preg_replace('/^(<br\/>)+/i', '', $html);
+    $html = preg_replace('/(<br\/>)+$/i', '', $html);
 
     return trim($html);
 }
