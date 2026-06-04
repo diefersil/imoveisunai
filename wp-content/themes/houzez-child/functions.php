@@ -35,8 +35,7 @@ function hide(){
     <?php }
 }
 
-
-add_action('wp_head', 'single_wa');
+add_action('wp_footer', 'single_wa');
 
 function single_wa() {
 
@@ -59,24 +58,30 @@ function single_wa() {
                 return;
             }
 
-            // Botão WhatsApp
-            const botaoWhatsApp = document.querySelector(
-                ".hz-btn-whatsapp"
-            );
+            const formWrap = document.querySelector(".property-form-wrap");
 
-            if (botaoWhatsApp) {
+            if (!formWrap) {
+                return;
+            }
+
+            // WhatsApp somente dentro de .property-form-wrap
+            formWrap.querySelectorAll(".hz-btn-whatsapp, a[href*='api.whatsapp.com/send']").forEach(function (botaoWhatsApp) {
+
+                if (!botaoWhatsApp.href) {
+                    return;
+                }
+
                 botaoWhatsApp.href = botaoWhatsApp.href.replace(
                     /phone=\d+/,
                     `phone=${telefone}`
                 );
-            }
 
-            // Botão telefone
-            const botaoTelefone = document.querySelector(".btn-call");
+            });
 
-            if (botaoTelefone) {
+            // Telefone somente dentro de .property-form-wrap
+            formWrap.querySelectorAll(".btn-call, a[href^='tel:']").forEach(function (botaoTelefone) {
                 botaoTelefone.href = `tel:${telefone}`;
-            }
+            });
 
         });
     </script>
