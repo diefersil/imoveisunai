@@ -677,6 +677,50 @@ function urlAbsoluta($url, $base) {
     return rtrim($dominio . "/" . trim($path, "/"), "/") . "/" . ltrim($url, "/");
 }
 
+
+/**
+ * NORMALIZAR URL DE IMAGEM PARA WP ALL IMPORT
+ *
+ * Alguns plugins/importadores podem interpretar "+" como espaço.
+ * Esta função codifica corretamente o path da URL:
+ *
+ * +       => %2B
+ * =       => %3D
+ * espaço  => %20
+ */
+function normalizarUrlImagemImport($url) {
+
+    $url = trim((string)$url);
+
+    if ($url === "") {
+        return "";
+    }
+
+    $url = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    $partes = parse_url($url);
+
+    if (empty($partes["scheme"]) || empty($partes["host"])) {
+        return $url;
+    }
+
+    $scheme = $partes["scheme"];
+    $host = $partes["host"];
+    $path = $partes["path"] ?? "";
+    $query = isset($partes["query"]) ? "?" . $partes["query"] : "";
+
+    $segmentos = explode("/", ltrim($path, "/"));
+    $segmentosCodificados = [];
+
+    foreach ($segmentos as $segmento) {
+        $segmentosCodificados[] = rawurlencode(rawurldecode($segmento));
+    }
+
+    $pathFinal = "/" . implode("/", $segmentosCodificados);
+
+    return $scheme . "://" . $host . $pathFinal . $query;
+}
+
 /**
  * PEGAR URL DO ATRIBUTO STYLE
  */
@@ -862,6 +906,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
 
     if ($dados["og_image"] !== "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
+        $dados["og_image"] = normalizarUrlImagemImport($dados["og_image"]);
     }
 
     $dados["og_description"] = getMetaContent($xpath, [
@@ -907,6 +952,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                 ]);
 
                 $imgUrl = urlAbsoluta($imgUrl, $urlCard);
+                $imgUrl = normalizarUrlImagemImport($imgUrl);
 
                 if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
                     $imagens[] = $imgUrl;
@@ -1234,6 +1280,8 @@ foreach ($sites as $site) {
                 $seletores["card_imagem_url"] ?? "",
                 $url
             );
+
+            $cardImagemUrl = normalizarUrlImagemImport($cardImagemUrl);
 
             $cardUrl = getUrlSeletor(
                 $xpath,
