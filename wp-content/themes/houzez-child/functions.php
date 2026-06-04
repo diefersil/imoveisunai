@@ -61,7 +61,7 @@ function single_wa() {
 
             // Botão WhatsApp
             const botaoWhatsApp = document.querySelector(
-                ".property-schedule-tour-type-form .hz-btn-whatsapp"
+                ".hz-btn-whatsapp"
             );
 
             if (botaoWhatsApp) {
