@@ -248,50 +248,78 @@ function limparDescricaoHtmlPermitida($html) {
         return "";
     }
 
+    // Decodifica entidades HTML antes do tratamento
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
     // Remove scripts e styles completamente
     $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
     $html = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $html);
 
-    // Transforma alguns blocos em quebras de linha antes de remover as tags
-    $html = preg_replace('/<\s*br\s*\/?>/i', "\n", $html);
-    $html = preg_replace('/<\s*p\b[^>]*>/i', "\n", $html);
-    $html = preg_replace('/<\s*\/\s*p\s*>/i', "\n", $html);
-    $html = preg_replace('/<\s*\/\s*(div|section|article|tr|table)\s*>/i', "\n", $html);
+    /**
+     * Títulos h1-h6 viram negrito + <br/>
+     * Exemplo:
+     * <h2>Descrição</h2> => <b>Descrição</b><br/>
+     */
+    $html = preg_replace_callback('/<h[1-6]\b[^>]*>(.*?)<\/h[1-6]>/is', function ($match) {
 
-    // Normaliza tags permitidas removendo atributos
-    $html = preg_replace('/<\s*(h[1-6]|ul|li|b|i)\s+[^>]*>/i', '<$1>', $html);
-    $html = preg_replace('/<\s*\/\s*(h[1-6]|ul|li|b|i)\s*>/i', '</$1>', $html);
+        $titulo = trim(
+            preg_replace('/\s+/', ' ', strip_tags($match[1]))
+        );
 
-    // Mantém somente as tags permitidas
-    $html = strip_tags($html, '<h1><h2><h3><h4><h5><h6><ul><li><b><i>');
-
-    // Quebras antes/depois de títulos
-    $html = preg_replace('/<(h[1-6])>/i', "\n<$1>", $html);
-    $html = preg_replace('/<\/(h[1-6])>/i', "</$1>\n", $html);
-
-    // Quebras em listas
-    $html = preg_replace('/<ul>/i', "\n<ul>\n", $html);
-    $html = preg_replace('/<\/ul>/i', "\n</ul>\n", $html);
-    $html = preg_replace('/<li>/i', "\n<li>", $html);
-    $html = preg_replace('/<\/li>/i', "</li>", $html);
-
-    // Decodifica entidades HTML
-    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
-
-    // Remove espaços excessivos linha a linha
-    $linhas = preg_split('/\r\n|\r|\n/', $html);
-    $linhasLimpas = [];
-
-    foreach ($linhas as $linha) {
-
-        $linha = trim($linha);
-
-        if ($linha !== "") {
-            $linhasLimpas[] = $linha;
+        if ($titulo === "") {
+            return "<br/>";
         }
-    }
 
-    return implode("\n", $linhasLimpas);
+        return "<b>" . $titulo . "</b><br/>";
+    }, $html);
+
+    /**
+     * Parágrafos, br e quebras reais viram <br/>
+     */
+    $html = preg_replace('/<\s*br\s*\/?>/i', '<br/>', $html);
+    $html = preg_replace('/<\s*p\b[^>]*>/i', '<br/>', $html);
+    $html = preg_replace('/<\s*\/\s*p\s*>/i', '<br/>', $html);
+    $html = preg_replace('/\r\n|\r|\n/', '<br/>', $html);
+
+    /**
+     * Divs e blocos viram quebra no fechamento.
+     * Exemplo:
+     * <div>Exemplo</div> => Exemplo<br/>
+     */
+    $html = preg_replace('/<\s*(div|section|article|tr|table)\b[^>]*>/i', '', $html);
+    $html = preg_replace('/<\s*\/\s*(div|section|article|tr|table)\s*>/i', '<br/>', $html);
+
+    /**
+     * Mantém somente ul e li, sem atributos.
+     * O <b> é mantido apenas para os títulos convertidos.
+     * O <br/> é mantido para preservar quebras no WP All Import.
+     */
+    $html = preg_replace('/<\s*ul\b[^>]*>/i', '<ul>', $html);
+    $html = preg_replace('/<\s*\/\s*ul\s*>/i', '</ul>', $html);
+    $html = preg_replace('/<\s*li\b[^>]*>/i', '<li>', $html);
+    $html = preg_replace('/<\s*\/\s*li\s*>/i', '</li>', $html);
+
+    // Remove todo HTML restante, deixando somente ul, li, b e br
+    $html = strip_tags($html, '<ul><li><b><br>');
+
+    // Normaliza qualquer variação de br para <br/>
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    // Remove espaços excessivos entre tags e texto
+    $html = preg_replace('/[ \t]+/', ' ', $html);
+    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
+    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
+    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
+    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
+
+    // Evita vários <br/> seguidos
+    $html = preg_replace('/(?:<br\/>){2,}/i', '<br/>', $html);
+
+    // Remove <br/> no começo, mas mantém no final quando veio de um bloco/div
+    $html = preg_replace('/^(<br\/>)+/i', '', $html);
+
+    return trim($html);
 }
 
 
