@@ -36,6 +36,41 @@ function hide(){
 }
 
 
+add_action('wp_head', 'single_wa');
+
+function single_wa() {
+
+    if ( ! is_single() ) {
+        return;
+    }
+    ?>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const botao = document.querySelector(".hz-btn-whatsapp");
+            const contato = document.querySelector(".detail-wrap .contato span");
+
+            if (!botao || !contato) {
+                return;
+            }
+
+            const telefone = contato.textContent.replace(/\D/g, "");
+
+            if (!telefone) {
+                return;
+            }
+
+            botao.href = botao.href.replace(
+                /phone=\d+/,
+                `phone=${telefone}`
+            );
+
+        });
+    </script>
+    <?php
+}
+
+
 add_action('wp_head', 'ga');
 function ga(){?>
     <!-- Google tag (gtag.js) -->
