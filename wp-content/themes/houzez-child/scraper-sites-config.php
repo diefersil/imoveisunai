@@ -57,7 +57,7 @@ $sites = [
         ],
         "numero_registros" => 5,
         "frequencia" => [
-            "tipo" => "sempre",
+            "tipo" => "horario",
             "horario_inicio" => "23:00",
             "horario_fim" => "24:00"
         ],
