@@ -5,8 +5,17 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-$arquivoCsv = "scraper-teste.csv";
-$limiteRegistrosCsv = 10;
+$arquivoCsv = "scraper-res.csv";
+$limiteRegistrosCsv = 500;
+$limiteImagensGaleria = 10;
+
+/**
+ * GRAVAR CSV
+ *
+ * Use "sim" para gravar/atualizar o CSV.
+ * Use "nao" para testar sem alterar o arquivo CSV.
+ */
+$gravar_csv = "sim";
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
@@ -18,7 +27,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Fazendas",
-        "strings" => "fazenda,fazendas,rural,chácara,chacara,sítio,sitio"
+        "strings" => "fazenda,fazendas"
     ],
     [
         "categoria" => "Sítios e Chácaras",
@@ -29,7 +38,7 @@ $categoriaImovelRegras = [
         "strings" => "chácara,chacaras"
     ],
     [
-        "categoria" => "Terrenos e Lotes",
+        "categoria" => "Lotes e Terrenos",
         "strings" => "lote, lotes, terreno, terrenos"
     ],
     [
@@ -46,7 +55,7 @@ $categoriaImovelRegras = [
     ],
     [
         "categoria" => "Salas Comerciais",
-        "strings" => "sala,salas"
+        "strings" => "sala comercial,salas comerciais"
     ]
 ];
 
@@ -66,103 +75,10 @@ $StatusImovelRegras = [
 
 /**
  * CONFIGURAÇÃO DOS SITES
+ *
+ * O array $sites foi separado para facilitar manutenção.
  */
-$sites = [
-    [
-        "nome_site" => "Zap Imóveis",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://www.terrafertilimobiliaria.com.br/imoveis"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => ".//div[contains(@class,'card-with-buttons')]",
-            "card_nome" => ".//h2[contains(@class,'text-ellipsis')]//a",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//span[contains(@class,'pd-praca-valor')]",
-            "card_imagem_url" => ".//div[contains(@class,'pc-img-wrap')]//img",
-            "card_url" => ".//div[contains(@class,'pc-img-wrap')]//a",
-            "galeria" => "//div[contains(@class,'pd-gallery')]//img",
-            "descricao" => "//div[contains(@class,'product_info_content')]"
-        ]
-    ]
-    /*[
-        "nome_site" => "Nucle Leiloes",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://nucleoleiloes.com.br/imoveis/cidade/2172/unai-mg"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => ".//article[contains(@class,'c-card')]",
-            "card_nome" => ".//h3[contains(@class,'pc-desc')]//a",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//span[contains(@class,'pd-praca-valor')]",
-            "card_imagem_url" => ".//div[contains(@class,'pc-img-wrap')]//img",
-            "card_url" => ".//div[contains(@class,'pc-img-wrap')]//a",
-            "galeria" => "//div[contains(@class,'pd-gallery')]//img",
-            "descricao" => "//div[contains(@class,'product_info_content')]"
-        ]
-    ]/*,
-    [
-        "nome_site" => "Kenlo",
-        "usuario" => "imoveisunai",
-        "cidade" => "",
-        "uf" => "",
-        "categoria" => "",
-        "tags" => "",
-        "contato" => "",
-        "periodo" => 30,
-        "url" => [
-            "https://portal.kenlo.com.br/imoveis/a-venda/fazenda/unai"
-        ],
-        "numero_registros" => 5,
-        "frequencia" => [
-            "tipo" => "sempre"
-        ],
-        "verificar_string" => "",
-        "seletores" => [
-            "card" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]//span",
-            "card_cidade" => "",
-            "card_uf" => "",
-            "card_contato" => "",
-            "card_localizacao" => "",
-            "preco" => ".//div[contains(@class,'postingPrices-module__price')]",
-            "card_imagem_url" => "//a[contains(concat(' ', normalize-space(@class), ' '), ' card-with-buttons ') and contains(concat(' ', normalize-space(@class), ' '), ' borderHover ')]",
-            "card_url" => ".//a[contains(@class,'card-with-buttons')]",
-            "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
-            "descricao" => "//div[contains(@class,'box-description')]"
-        ]
-    ]*/
-];
-
+require_once __DIR__ . "/scraper-sites-config.php";
 
 /**
  * NORMALIZAR URLS DO SITE
@@ -207,7 +123,11 @@ function deveRodarAgora($frequencia) {
         return true;
     }
 
-    $tipo = $frequencia["tipo"];
+    $tipo = mb_strtolower(trim((string)$frequencia["tipo"]), "UTF-8");
+
+    if ($tipo === "nunca") {
+        return false;
+    }
 
     if ($tipo === "sempre") {
         return true;
@@ -222,6 +142,11 @@ function deveRodarAgora($frequencia) {
             return false;
         }
 
+        // Evita problema com strtotime("24:00")
+        if ($fim === "24:00") {
+            $fim = "23:59";
+        }
+
         $agora = strtotime(date("H:i"));
         $horaInicio = strtotime($inicio);
         $horaFim = strtotime($fim);
@@ -230,6 +155,7 @@ function deveRodarAgora($frequencia) {
             return ($agora >= $horaInicio && $agora <= $horaFim);
         }
 
+        // Caso atravesse meia-noite, exemplo: 23:00 até 01:00
         return ($agora >= $horaInicio || $agora <= $horaFim);
     }
 
@@ -303,6 +229,99 @@ function getInnerHtml($node) {
 
     return trim($html);
 }
+
+/**
+ * LIMPAR DESCRIÇÃO HTML
+ *
+ * Mantém somente:
+ * h1, h2, h3, h4, h5, h6, ul, li, b, i
+ *
+ * Remove atributos das tags.
+ * Remove scripts, styles e demais tags.
+ * Mantém quebras de linha.
+ */
+function limparDescricaoHtmlPermitida($html) {
+
+    $html = (string)$html;
+
+    if ($html === "") {
+        return "";
+    }
+
+    // Decodifica entidades HTML antes do tratamento
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    // Remove scripts e styles completamente
+    $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
+    $html = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $html);
+
+    /**
+     * Títulos h1-h6 viram negrito + <br/>
+     * Exemplo:
+     * <h2>Descrição</h2> => <b>Descrição</b><br/>
+     */
+    $html = preg_replace_callback('/<h[1-6]\b[^>]*>(.*?)<\/h[1-6]>/is', function ($match) {
+
+        $titulo = trim(
+            preg_replace('/\s+/', ' ', strip_tags($match[1]))
+        );
+
+        if ($titulo === "") {
+            return "<br/>";
+        }
+
+        return "<b>" . $titulo . "</b><br/>";
+    }, $html);
+
+    /**
+     * Parágrafos, br e quebras reais viram <br/>
+     */
+    $html = preg_replace('/<\s*br\s*\/?>/i', '<br/>', $html);
+    $html = preg_replace('/<\s*p\b[^>]*>/i', '<br/>', $html);
+    $html = preg_replace('/<\s*\/\s*p\s*>/i', '<br/>', $html);
+    $html = preg_replace('/\r\n|\r|\n/', '<br/>', $html);
+
+    /**
+     * Divs e blocos viram quebra no fechamento.
+     * Exemplo:
+     * <div>Exemplo</div> => Exemplo<br/>
+     */
+    $html = preg_replace('/<\s*(div|section|article|tr|table)\b[^>]*>/i', '', $html);
+    $html = preg_replace('/<\s*\/\s*(div|section|article|tr|table)\s*>/i', '<br/>', $html);
+
+    /**
+     * Mantém somente ul e li, sem atributos.
+     * O <b> é mantido apenas para os títulos convertidos.
+     * O <br/> é mantido para preservar quebras no WP All Import.
+     */
+    $html = preg_replace('/<\s*ul\b[^>]*>/i', '<ul>', $html);
+    $html = preg_replace('/<\s*\/\s*ul\s*>/i', '</ul>', $html);
+    $html = preg_replace('/<\s*li\b[^>]*>/i', '<li>', $html);
+    $html = preg_replace('/<\s*\/\s*li\s*>/i', '</li>', $html);
+
+    // Remove todo HTML restante, deixando somente ul, li, b e br
+    $html = strip_tags($html, '<ul><li><b><br>');
+
+    // Normaliza qualquer variação de br para <br/>
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    // Remove espaços excessivos entre tags e texto
+    $html = preg_replace('/[ \t]+/', ' ', $html);
+    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
+    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
+    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
+    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
+
+    // Evita vários <br/> seguidos
+    $html = preg_replace('/(?:<br\/>){2,}/i', '<br/>', $html);
+
+    // Remove <br/> no começo, mas mantém no final quando veio de um bloco/div
+    $html = preg_replace('/^(<br\/>)+/i', '', $html);
+
+    return trim($html);
+}
+
 
 /**
  * NORMALIZA LISTAS SEPARADAS POR VÍRGULA
@@ -596,6 +615,50 @@ function urlAbsoluta($url, $base) {
     return rtrim($dominio . "/" . trim($path, "/"), "/") . "/" . ltrim($url, "/");
 }
 
+
+/**
+ * NORMALIZAR URL DE IMAGEM PARA WP ALL IMPORT
+ *
+ * Alguns plugins/importadores podem interpretar "+" como espaço.
+ * Esta função codifica corretamente o path da URL:
+ *
+ * +       => %2B
+ * =       => %3D
+ * espaço  => %20
+ */
+function normalizarUrlImagemImport($url) {
+
+    $url = trim((string)$url);
+
+    if ($url === "") {
+        return "";
+    }
+
+    $url = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    $partes = parse_url($url);
+
+    if (empty($partes["scheme"]) || empty($partes["host"])) {
+        return $url;
+    }
+
+    $scheme = $partes["scheme"];
+    $host = $partes["host"];
+    $path = $partes["path"] ?? "";
+    $query = isset($partes["query"]) ? "?" . $partes["query"] : "";
+
+    $segmentos = explode("/", ltrim($path, "/"));
+    $segmentosCodificados = [];
+
+    foreach ($segmentos as $segmento) {
+        $segmentosCodificados[] = rawurlencode(rawurldecode($segmento));
+    }
+
+    $pathFinal = "/" . implode("/", $segmentosCodificados);
+
+    return $scheme . "://" . $host . $pathFinal . $query;
+}
+
 /**
  * PEGAR URL DO ATRIBUTO STYLE
  */
@@ -730,6 +793,8 @@ function getMetaContent($xpath, $queries) {
  */
 function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = "") {
 
+    global $limiteImagensGaleria;
+
     $dados = [
         "og_title" => "",
         "og_image" => "",
@@ -781,6 +846,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
 
     if ($dados["og_image"] !== "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
+        $dados["og_image"] = normalizarUrlImagemImport($dados["og_image"]);
     }
 
     $dados["og_description"] = getMetaContent($xpath, [
@@ -794,7 +860,10 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         $descricaoNode = $xpath->query($selectorDescricao);
 
         if ($descricaoNode && $descricaoNode->length > 0) {
-            $dados["descricao"] = getInnerHtml($descricaoNode->item(0));
+
+            $descricaoHtml = getInnerHtml($descricaoNode->item(0));
+
+            $dados["descricao"] = limparDescricaoHtmlPermitida($descricaoHtml);
         }
     }
 
@@ -823,9 +892,14 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                 ]);
 
                 $imgUrl = urlAbsoluta($imgUrl, $urlCard);
+                $imgUrl = normalizarUrlImagemImport($imgUrl);
 
                 if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
                     $imagens[] = $imgUrl;
+
+                    if (!empty($limiteImagensGaleria) && count($imagens) >= (int)$limiteImagensGaleria) {
+                        break;
+                    }
                 }
             }
         }
@@ -1114,6 +1188,23 @@ foreach ($sites as $site) {
                 $seletores["card_localizacao"] ?? ""
             );
 
+            /**
+             * FALLBACK DA LOCALIZAÇÃO
+             *
+             * Se card_localizacao não for encontrado ou vier vazio,
+             * monta com cidade e UF finais.
+             */
+            if (empty($cardLocalizacao)) {
+
+                if (!empty($cidadeFinal) && !empty($ufFinal)) {
+                    $cardLocalizacao = $cidadeFinal . ", " . $ufFinal;
+                } elseif (!empty($cidadeFinal)) {
+                    $cardLocalizacao = $cidadeFinal;
+                } elseif (!empty($ufFinal)) {
+                    $cardLocalizacao = $ufFinal;
+                }
+            }
+
             $categoriaImovel = definirCategoriaImovel(
                 $cardNome,
                 $categoriaImovelRegras
@@ -1133,6 +1224,8 @@ foreach ($sites as $site) {
                 $seletores["card_imagem_url"] ?? "",
                 $url
             );
+
+            $cardImagemUrl = normalizarUrlImagemImport($cardImagemUrl);
 
             $cardUrl = getUrlSeletor(
                 $xpath,
@@ -1163,6 +1256,12 @@ foreach ($sites as $site) {
             }
 
             $descricao = $dadosInternos["descricao"] ?? "";
+
+            /**
+             * Limpa a descrição antes de salvar no array de resultados.
+             * Assim o CSV e também o JSON de retorno ficam sem ponto e vírgula.
+             */
+            $descricao = limparDescricaoCsv($descricao);
 
             $statusImovel = definirStatusImovel(
                 $cardNome,
@@ -1248,6 +1347,95 @@ foreach ($sites as $site) {
     ];
 }
 
+
+/**
+ * LIMPAR CAMPO CSV PADRÃO
+ *
+ * Usado em campos comuns para evitar quebra de linha real,
+ * ponto e vírgula interno e espaços duplicados no CSV.
+ */
+function limparCampoCsv($texto) {
+
+    $texto = html_entity_decode($texto ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // Remove quebras reais para manter 1 imóvel por linha no CSV
+    $texto = str_replace(["\r\n", "\r", "\n"], ' ', $texto);
+
+    // Evita conflito visual com separador CSV ;
+    $texto = str_replace(';', ',', $texto);
+
+    // Remove espaços duplicados
+    $texto = preg_replace('/\s+/', ' ', $texto);
+
+    return trim($texto);
+}
+
+/**
+ * LIMPAR DESCRIÇÃO PARA CSV / WP ALL IMPORT
+ *
+ * A descrição pode conter HTML permitido, então não deve usar
+ * a limpeza genérica. Mantém somente:
+ * ul, li, b e br.
+ */
+function limparDescricaoCsv($html) {
+
+    $html = (string)($html ?? "");
+
+    if ($html === "") {
+        return "";
+    }
+
+    // Decodifica entidades HTML
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    // Normaliza quebras reais para <br/>
+    $html = str_replace(["\r\n", "\r", "\n"], "<br/>", $html);
+
+    // Normaliza variações de <br>
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    /**
+     * IMPORTANTE:
+     * Remove ponto e vírgula da descrição para não quebrar CSV separado por ;
+     *
+     * Exemplo:
+     * Área total 1.401,6027 hectares;
+     * vira:
+     * Área total 1.401,6027 hectares<br/>
+     */
+    $html = str_replace([";", "；"], "<br/>", $html);
+
+    // Remove atributos das tags permitidas
+    $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
+    $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
+    $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
+
+    // Mantém somente estas tags
+    $html = strip_tags($html, '<ul><li><b><br>');
+
+    // Garante <br/> novamente depois do strip_tags
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    // Remove espaços duplicados
+    $html = preg_replace('/\s+/', ' ', $html);
+
+    // Remove <br/> repetidos
+    $html = preg_replace('/(<br\/>\s*){2,}/i', '<br/>', $html);
+
+    // Limpa espaços perto das tags
+    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
+    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
+    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
+    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
+
+    // Remove <br/> sobrando no início/fim
+    $html = preg_replace('/^(<br\/>)+/i', '', $html);
+    $html = preg_replace('/(<br\/>)+$/i', '', $html);
+
+    return trim($html);
+}
+
 /**
  * COLUNAS DO CSV
  */
@@ -1283,47 +1471,76 @@ $colunas = [
     "data_scraper_eua"
 ];
 
-$registrosAntigos = lerCsvExistente($arquivoCsv, $colunas);
-
-$registrosFinais = mesclarRegistrosLimitados(
-    $registrosAntigos,
-    array_values($resultados),
-    $limiteRegistrosCsv
-);
-
 /**
- * SALVAR CSV
+ * GRAVAR OU APENAS TESTAR SEM ALTERAR CSV
  */
-$fp = fopen($arquivoCsv, "w");
+$gravarCsvNormalizado = normalizarBusca($gravar_csv);
 
-if (!$fp) {
-    header("Content-Type: application/json; charset=utf-8");
+if ($gravarCsvNormalizado === "sim") {
 
-    echo json_encode([
-        "status" => "error",
-        "mensagem" => "Não foi possível criar o arquivo CSV.",
-        "arquivo_csv" => $arquivoCsv
-    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $registrosAntigos = lerCsvExistente($arquivoCsv, $colunas);
 
-    exit;
-}
+    $registrosFinais = mesclarRegistrosLimitados(
+        $registrosAntigos,
+        array_values($resultados),
+        $limiteRegistrosCsv
+    );
 
-fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    /**
+     * SALVAR CSV
+     */
+    $fp = fopen($arquivoCsv, "w");
 
-fputcsv($fp, $colunas, ";");
+    if (!$fp) {
+        header("Content-Type: application/json; charset=utf-8");
 
-foreach ($registrosFinais as $item) {
+        echo json_encode([
+            "status" => "error",
+            "mensagem" => "Não foi possível criar o arquivo CSV.",
+            "arquivo_csv" => $arquivoCsv,
+            "gravar_csv" => $gravar_csv
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    $linha = [];
-
-    foreach ($colunas as $coluna) {
-        $linha[] = $item[$coluna] ?? "";
+        exit;
     }
 
-    fputcsv($fp, $linha, ";");
-}
+    fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-fclose($fp);
+    fputcsv($fp, $colunas, ";");
+
+    foreach ($registrosFinais as $item) {
+
+        $linha = [];
+
+        foreach ($colunas as $coluna) {
+
+            $valor = $item[$coluna] ?? "";
+
+            if ($coluna === "descricao") {
+                $linha[] = limparDescricaoCsv($valor);
+            } else {
+                $linha[] = limparCampoCsv($valor);
+            }
+        }
+
+        fputcsv($fp, $linha, ";");
+    }
+
+    fclose($fp);
+
+    $csvStatus = "gravado";
+
+} else {
+
+    /**
+     * MODO TESTE
+     *
+     * Não lê nem grava o CSV.
+     * Retorna apenas os resultados novos da execução atual.
+     */
+    $registrosFinais = array_values($resultados);
+    $csvStatus = "nao_gravado_modo_teste";
+}
 
 /**
  * RETORNO JSON
@@ -1333,6 +1550,8 @@ header("Content-Type: application/json; charset=utf-8");
 echo json_encode([
     "status" => "success",
     "arquivo_csv" => $arquivoCsv,
+    "gravar_csv" => $gravar_csv,
+    "csv_status" => $csvStatus,
     "data_execucao" => date("d/m/Y H:i:s"),
     "horario_atual" => date("H:i"),
     "total_sites" => count($sites),

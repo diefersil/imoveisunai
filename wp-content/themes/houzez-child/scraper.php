@@ -10,6 +10,29 @@ $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
 
 /**
+ * BAIXAR IMAGENS PARA WP ALL IMPORT
+ *
+ * Use "sim" para baixar as imagens via cURL para a pasta local.
+ * Use "nao" para manter as URLs externas no CSV.
+ */
+$baixar_imagens = "sim";
+
+/**
+ * Pasta onde as imagens serão salvas.
+ *
+ * Se este scraper estiver na raiz do WordPress, este caminho salva em:
+ * wp-content/uploads/wpallimport/files
+ */
+$pastaImagensImport = __DIR__ . "/wp-content/uploads/wpallimport/files";
+
+/**
+ * Caminho gravado no CSV após baixar a imagem.
+ *
+ * O WP All Import poderá usar este caminho local/relativo.
+ */
+$caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
+
+/**
  * GRAVAR CSV
  *
  * Use "sim" para gravar/atualizar o CSV.
@@ -660,6 +683,144 @@ function normalizarUrlImagemImport($url) {
 }
 
 /**
+ * PEGAR EXTENSÃO DA IMAGEM PELA URL
+ */
+function getExtensaoImagemUrl($url) {
+
+    $path = parse_url($url, PHP_URL_PATH);
+    $ext = strtolower(pathinfo($path ?? "", PATHINFO_EXTENSION));
+
+    $permitidas = ["jpg", "jpeg", "png", "webp", "gif"];
+
+    if (in_array($ext, $permitidas)) {
+        return $ext;
+    }
+
+    return "jpg";
+}
+
+/**
+ * GERAR NOME LOCAL SEGURO PARA IMAGEM
+ */
+function gerarNomeImagemLocal($url) {
+
+    $ext = getExtensaoImagemUrl($url);
+
+    return "img_" . md5($url) . "." . $ext;
+}
+
+/**
+ * BAIXAR IMAGEM POR CURL PARA A PASTA DO WP ALL IMPORT
+ *
+ * Retorna o caminho local/relativo salvo no CSV.
+ * Se falhar, retorna a URL original normalizada para não perder a imagem.
+ */
+function baixarImagemParaWpAllImport($url) {
+
+    global $baixar_imagens;
+    global $pastaImagensImport;
+    global $caminhoRelativoImagensImport;
+
+    $url = normalizarUrlImagemImport($url);
+
+    if (empty($url)) {
+        return "";
+    }
+
+    // Se não for URL http/https, mantém como está
+    if (!preg_match('/^https?:\/\//i', $url)) {
+        return $url;
+    }
+
+    // Se estiver desativado, mantém a URL externa
+    if (normalizarBusca($baixar_imagens) !== "sim") {
+        return $url;
+    }
+
+    if (empty($pastaImagensImport)) {
+        return $url;
+    }
+
+    if (!is_dir($pastaImagensImport)) {
+        @mkdir($pastaImagensImport, 0755, true);
+    }
+
+    if (!is_dir($pastaImagensImport) || !is_writable($pastaImagensImport)) {
+        return $url;
+    }
+
+    $nomeArquivo = gerarNomeImagemLocal($url);
+    $caminhoArquivo = rtrim($pastaImagensImport, "/") . "/" . $nomeArquivo;
+    $caminhoRelativo = trim($caminhoRelativoImagensImport, "/") . "/" . $nomeArquivo;
+
+    // Se já existe, não baixa novamente
+    if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+        return $caminhoRelativo;
+    }
+
+    $arquivoTmp = $caminhoArquivo . ".tmp";
+
+    $fp = @fopen($arquivoTmp, "w");
+
+    if (!$fp) {
+        return $url;
+    }
+
+    $ch = curl_init($url);
+
+    curl_setopt_array($ch, [
+        CURLOPT_FILE => $fp,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_TIMEOUT => 60,
+        CURLOPT_CONNECTTIMEOUT => 20,
+        CURLOPT_ENCODING => "",
+        CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        CURLOPT_REFERER => "https://www.google.com/",
+        CURLOPT_HTTPHEADER => [
+            "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+            "Accept-Language: pt-BR,pt;q=0.9,en;q=0.8",
+            "Cache-Control: no-cache",
+        ],
+    ]);
+
+    curl_exec($ch);
+
+    $erro = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+
+    curl_close($ch);
+    fclose($fp);
+
+    if (
+        $erro ||
+        $httpCode < 200 ||
+        $httpCode >= 400 ||
+        !file_exists($arquivoTmp) ||
+        filesize($arquivoTmp) <= 0
+    ) {
+        @unlink($arquivoTmp);
+        return $url;
+    }
+
+    // Se o servidor informar content-type, confere se é imagem
+    if (!empty($contentType) && stripos($contentType, "image/") === false) {
+        @unlink($arquivoTmp);
+        return $url;
+    }
+
+    @rename($arquivoTmp, $caminhoArquivo);
+
+    if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+        return $caminhoRelativo;
+    }
+
+    return $url;
+}
+
+/**
  * PEGAR URL DO ATRIBUTO STYLE
  */
 function getUrlFromStyle($style) {
@@ -846,7 +1007,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
 
     if ($dados["og_image"] !== "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
-        $dados["og_image"] = normalizarUrlImagemImport($dados["og_image"]);
+        $dados["og_image"] = baixarImagemParaWpAllImport($dados["og_image"]);
     }
 
     $dados["og_description"] = getMetaContent($xpath, [
@@ -892,7 +1053,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                 ]);
 
                 $imgUrl = urlAbsoluta($imgUrl, $urlCard);
-                $imgUrl = normalizarUrlImagemImport($imgUrl);
+                $imgUrl = baixarImagemParaWpAllImport($imgUrl);
 
                 if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
                     $imagens[] = $imgUrl;
@@ -1225,7 +1386,7 @@ foreach ($sites as $site) {
                 $url
             );
 
-            $cardImagemUrl = normalizarUrlImagemImport($cardImagemUrl);
+            $cardImagemUrl = baixarImagemParaWpAllImport($cardImagemUrl);
 
             $cardUrl = getUrlSeletor(
                 $xpath,
