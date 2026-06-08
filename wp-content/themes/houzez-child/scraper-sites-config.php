@@ -131,9 +131,9 @@ $sites = [
         ],
         "numero_registros" => 5,
         "frequencia" => [
-            "tipo" => "nunca",
+            "tipo" => "sempre"/*,
             "horario_inicio" => "15:00",
-            "horario_fim" => "18:00"
+            "horario_fim" => "18:00"*/
         ],
         "verificar_string" => "",
         "seletores" => [
