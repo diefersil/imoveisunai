@@ -39,6 +39,10 @@ function detectarRaizWordPress() {
     return rtrim(__DIR__, "/\\");
 }
 
+/**
+ * REGRA GLOBAIS
+ */
+
 $arquivoCsv = "scraper-res.csv";
 $gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
