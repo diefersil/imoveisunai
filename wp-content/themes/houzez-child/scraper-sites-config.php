@@ -49,11 +49,8 @@ $sites = [
         "contato" => "(38) 99958-5454",
         "periodo" => 30,
         "url" => [
-            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar/apartamento",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/novos/apartamento",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento-duplex",
-            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda"
+            "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar",
         ],
         "numero_registros" => 20,
         "frequencia" => [
