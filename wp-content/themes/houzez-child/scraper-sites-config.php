@@ -72,7 +72,7 @@ $sites = [
             "card_url" => ".",
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
             //"descricao" => "//div[contains(@class,'listing-details')]",
-            "descricao" => "//div[contains(@class,'box-detail')]"
+            "descricao" => "//div[contains(@class,'box-description')]"
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
     ],
