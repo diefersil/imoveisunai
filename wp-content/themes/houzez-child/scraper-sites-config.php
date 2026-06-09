@@ -55,9 +55,9 @@ $sites = [
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/apartamento-duplex",
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda"
         ],
-        "numero_registros" => 5,
+        "numero_registros" => 20,
         "frequencia" => [
-            "tipo" => "nunca"/*,
+            "tipo" => "sempre"/*,
             "horario_inicio" => "16:00",
             "horario_fim" => "18:00"*/
         ],
@@ -131,7 +131,7 @@ $sites = [
         ],
         "numero_registros" => 5,
         "frequencia" => [
-            "tipo" => "sempre"/*,
+            "tipo" => "nunca"/*,
             "horario_inicio" => "15:00",
             "horario_fim" => "18:00"*/
         ],
