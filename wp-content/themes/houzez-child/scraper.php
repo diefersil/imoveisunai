@@ -54,6 +54,14 @@ $limiteImagensGaleria = 10;
 $baixar_imagens = "sim";
 
 /**
+ * EXIBIR LOG DE IMAGENS NO JSON FINAL
+ *
+ * Use "sim" para exibir a lista completa logs_imagens no retorno JSON.
+ * Use "nao" para ocultar a lista e exibir apenas os totais.
+ */
+$exibir_log_imagens = "sim";
+
+/**
  * Pasta onde as imagens serão salvas.
  *
  * IMPORTANTE:
@@ -1818,7 +1826,7 @@ $totalErrosImagens = count(array_filter($logsImagens, function ($item) {
     return ($item["status"] ?? "") === "erro";
 }));
 
-echo json_encode([
+$retornoJson = [
     "status" => "success",
     "arquivo_csv" => $arquivoCsv,
     "gravar_csv" => $gravar_csv,
@@ -1830,14 +1838,20 @@ echo json_encode([
     "total_resultados_csv" => count($registrosFinais),
     "limite_registros_csv" => $limiteRegistrosCsv,
     "baixar_imagens" => $baixar_imagens,
+    "exibir_log_imagens" => $exibir_log_imagens,
     "pasta_imagens_import" => $pastaImagensImport,
     "total_logs_imagens" => count($logsImagens),
     "total_imagens_baixadas" => $totalImagensBaixadas,
     "total_imagens_ja_existiam" => $totalImagensJaExistiam,
     "total_erros_imagens" => $totalErrosImagens,
-    "logs_imagens" => $logsImagens,
     "logs" => $logs,
     "resultado" => array_values($resultados)
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+];
+
+if (normalizarBusca($exibir_log_imagens) === "sim") {
+    $retornoJson["logs_imagens"] = $logsImagens;
+}
+
+echo json_encode($retornoJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 exit;
