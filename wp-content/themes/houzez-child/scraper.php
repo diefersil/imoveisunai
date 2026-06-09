@@ -71,6 +71,13 @@ $pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
 $caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
 
 /**
+ * LOG DE IMAGENS
+ *
+ * Registra imagens baixadas, imagens que já existiam e erros de download.
+ */
+$logsImagens = [];
+
+/**
  * GRAVAR CSV
  *
  * Use "sim" para gravar/atualizar o CSV.
@@ -748,6 +755,28 @@ function gerarNomeImagemLocal($url) {
 }
 
 /**
+ * ADICIONAR ITEM AO LOG DE IMAGENS
+ */
+function adicionarLogImagem($status, $urlOriginal, $caminhoRelativo = "", $mensagem = "", $extra = []) {
+
+    global $logsImagens;
+
+    $item = [
+        "data" => date("d/m/Y H:i:s"),
+        "status" => $status,
+        "url_original" => $urlOriginal,
+        "caminho_local" => $caminhoRelativo,
+        "mensagem" => $mensagem
+    ];
+
+    if (!empty($extra) && is_array($extra)) {
+        $item = array_merge($item, $extra);
+    }
+
+    $logsImagens[] = $item;
+}
+
+/**
  * BAIXAR IMAGEM POR CURL PARA A PASTA DO WP ALL IMPORT
  *
  * Retorna o caminho local/relativo salvo no CSV.
@@ -759,23 +788,28 @@ function baixarImagemParaWpAllImport($url) {
     global $pastaImagensImport;
     global $caminhoRelativoImagensImport;
 
+    $urlOriginal = trim((string)$url);
     $url = normalizarUrlImagemImport($url);
 
     if (empty($url)) {
+        adicionarLogImagem("ignorado", $urlOriginal, "", "URL vazia");
         return "";
     }
 
     // Se não for URL http/https, mantém como está
     if (!preg_match('/^https?:\/\//i', $url)) {
+        adicionarLogImagem("ignorado", $url, $url, "Não é URL externa http/https");
         return $url;
     }
 
     // Se estiver desativado, mantém a URL externa
     if (normalizarBusca($baixar_imagens) !== "sim") {
+        adicionarLogImagem("ignorado", $url, $url, "Download de imagens desativado");
         return $url;
     }
 
     if (empty($pastaImagensImport)) {
+        adicionarLogImagem("erro", $url, "", "Pasta de imagens não configurada");
         return $url;
     }
 
@@ -784,6 +818,9 @@ function baixarImagemParaWpAllImport($url) {
     }
 
     if (!is_dir($pastaImagensImport) || !is_writable($pastaImagensImport)) {
+        adicionarLogImagem("erro", $url, "", "Pasta não existe ou sem permissão de escrita", [
+            "pasta" => $pastaImagensImport
+        ]);
         return $url;
     }
 
@@ -793,6 +830,10 @@ function baixarImagemParaWpAllImport($url) {
 
     // Se já existe, não baixa novamente
     if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+        adicionarLogImagem("ja_existia", $url, $caminhoRelativo, "Imagem já existia, não baixou novamente", [
+            "arquivo" => $caminhoArquivo,
+            "tamanho_bytes" => filesize($caminhoArquivo)
+        ]);
         return $caminhoRelativo;
     }
 
@@ -801,6 +842,9 @@ function baixarImagemParaWpAllImport($url) {
     $fp = @fopen($arquivoTmp, "w");
 
     if (!$fp) {
+        adicionarLogImagem("erro", $url, "", "Não foi possível criar arquivo temporário", [
+            "arquivo_tmp" => $arquivoTmp
+        ]);
         return $url;
     }
 
@@ -840,21 +884,37 @@ function baixarImagemParaWpAllImport($url) {
         filesize($arquivoTmp) <= 0
     ) {
         @unlink($arquivoTmp);
+        adicionarLogImagem("erro", $url, "", "Falha no download da imagem", [
+            "http_code" => $httpCode,
+            "erro_curl" => $erro,
+            "content_type" => $contentType
+        ]);
         return $url;
     }
 
     // Se o servidor informar content-type, confere se é imagem
     if (!empty($contentType) && stripos($contentType, "image/") === false) {
         @unlink($arquivoTmp);
+        adicionarLogImagem("erro", $url, "", "Arquivo baixado não parece ser imagem", [
+            "http_code" => $httpCode,
+            "content_type" => $contentType
+        ]);
         return $url;
     }
 
     @rename($arquivoTmp, $caminhoArquivo);
 
     if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+        adicionarLogImagem("baixada", $url, $caminhoRelativo, "Imagem baixada com sucesso", [
+            "arquivo" => $caminhoArquivo,
+            "tamanho_bytes" => filesize($caminhoArquivo),
+            "http_code" => $httpCode,
+            "content_type" => $contentType
+        ]);
         return $caminhoRelativo;
     }
 
+    adicionarLogImagem("erro", $url, "", "Download feito, mas arquivo final não foi encontrado");
     return $url;
 }
 
@@ -1746,6 +1806,18 @@ if ($gravarCsvNormalizado === "sim") {
  */
 header("Content-Type: application/json; charset=utf-8");
 
+$totalImagensBaixadas = count(array_filter($logsImagens, function ($item) {
+    return ($item["status"] ?? "") === "baixada";
+}));
+
+$totalImagensJaExistiam = count(array_filter($logsImagens, function ($item) {
+    return ($item["status"] ?? "") === "ja_existia";
+}));
+
+$totalErrosImagens = count(array_filter($logsImagens, function ($item) {
+    return ($item["status"] ?? "") === "erro";
+}));
+
 echo json_encode([
     "status" => "success",
     "arquivo_csv" => $arquivoCsv,
@@ -1757,6 +1829,13 @@ echo json_encode([
     "total_resultados_novos" => count($resultados),
     "total_resultados_csv" => count($registrosFinais),
     "limite_registros_csv" => $limiteRegistrosCsv,
+    "baixar_imagens" => $baixar_imagens,
+    "pasta_imagens_import" => $pastaImagensImport,
+    "total_logs_imagens" => count($logsImagens),
+    "total_imagens_baixadas" => $totalImagensBaixadas,
+    "total_imagens_ja_existiam" => $totalImagensJaExistiam,
+    "total_erros_imagens" => $totalErrosImagens,
+    "logs_imagens" => $logsImagens,
     "logs" => $logs,
     "resultado" => array_values($resultados)
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
