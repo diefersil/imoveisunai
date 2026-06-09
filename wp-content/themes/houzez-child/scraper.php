@@ -51,7 +51,7 @@ $limiteImagensGaleria = 10;
  * Use "sim" para baixar as imagens via cURL para a pasta local.
  * Use "nao" para manter as URLs externas no CSV.
  */
-$baixar_imagens = "sim";
+$baixar_imagens = "nao";
 
 /**
  * EXIBIR LOG DE IMAGENS NO JSON FINAL
