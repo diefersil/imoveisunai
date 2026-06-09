@@ -52,7 +52,7 @@ $sites = [
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda",
             "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar",
         ],
-        "numero_registros" => 20,
+        "numero_registros" => 6,
         "frequencia" => [
             "tipo" => "sempre"/*,
             "horario_inicio" => "16:00",
