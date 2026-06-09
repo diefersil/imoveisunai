@@ -72,9 +72,9 @@ $exibir_log_imagens = "nao";
 $pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
 
 /**
- * Caminho gravado no CSV após baixar a imagem.
+ * Caminho da pasta onde a imagem será salva.
  *
- * O WP All Import poderá usar este caminho local/relativo.
+ * OBS: no CSV/JSON será gravado somente o nome final do arquivo.
  */
 $caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
 
@@ -883,7 +883,7 @@ function adicionarLogImagem($status, $urlOriginal, $caminhoRelativo = "", $mensa
 /**
  * BAIXAR IMAGEM POR CURL PARA A PASTA DO WP ALL IMPORT
  *
- * Retorna o caminho local/relativo salvo no CSV.
+ * Retorna somente o nome final do arquivo salvo no CSV/JSON.
  * Se falhar, retorna a URL original normalizada para não perder a imagem.
  */
 function baixarImagemParaWpAllImport($url, $refererOrigem = "") {
@@ -942,7 +942,7 @@ function baixarImagemParaWpAllImport($url, $refererOrigem = "") {
             "referer_usado" => $referersImagem[0] ?? "",
             "referers_tentados" => $referersImagem
         ]);
-        return $caminhoRelativo;
+        return $nomeArquivo;
     }
 
     $tentativas = [];
@@ -1038,7 +1038,7 @@ function baixarImagemParaWpAllImport($url, $refererOrigem = "") {
                 "referers_tentados" => $referersImagem,
                 "tentativas" => $tentativas
             ]);
-            return $caminhoRelativo;
+            return $nomeArquivo;
         }
 
         @unlink($arquivoTmp);
