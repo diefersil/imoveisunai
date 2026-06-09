@@ -763,32 +763,99 @@ function gerarNomeImagemLocal($url) {
 }
 
 /**
- * DEFINIR REFERER PARA DOWNLOAD DE IMAGEM
- *
- * Preferência:
- * 1) usar a URL da página de origem do imóvel/listagem;
- * 2) fallback específico para Área 38/VistaHost;
- * 3) fallback genérico.
+ * VERIFICA SE A IMAGEM É DO CDN VISTAHOST / ÁREA 38
  */
-function getRefererDownloadImagem($urlImagem, $refererOrigem = "") {
-
-    $refererOrigem = trim((string)$refererOrigem);
-
-    if ($refererOrigem !== "" && preg_match('/^https?:\/\//i', $refererOrigem)) {
-        return $refererOrigem;
-    }
+function imagemEhArea38VistaHost($urlImagem) {
 
     $urlBusca = mb_strtolower((string)$urlImagem, "UTF-8");
 
-    if (
+    return (
         strpos($urlBusca, "cdn.vistahost.com.br/area38lt/") !== false ||
         strpos($urlBusca, "vista.imobi/fotos/") !== false ||
         strpos($urlBusca, "area38") !== false
-    ) {
-        return "https://area38.com.br/";
+    );
+}
+
+/**
+ * PEGAR RAIZ DO REFERER
+ *
+ * Exemplo:
+ * https://area38.com.br/imovel/abc => https://area38.com.br/
+ */
+function getRaizReferer($url) {
+
+    $url = trim((string)$url);
+
+    if ($url === "" || !preg_match('/^https?:\/\//i', $url)) {
+        return "";
     }
 
-    return "https://www.google.com/";
+    $partes = parse_url($url);
+
+    if (empty($partes["scheme"]) || empty($partes["host"])) {
+        return "";
+    }
+
+    return $partes["scheme"] . "://" . $partes["host"] . "/";
+}
+
+/**
+ * DEFINIR LISTA DE REFERERS PARA DOWNLOAD DE IMAGEM
+ *
+ * Em alguns CDNs, principalmente o VistaHost/Área 38, a imagem só baixa
+ * quando o referer é a raiz do site, por exemplo: https://area38.com.br/
+ *
+ * Por isso, o download tenta mais de um referer em ordem.
+ */
+function getReferersDownloadImagem($urlImagem, $refererOrigem = "") {
+
+    $referers = [];
+    $refererOrigem = trim((string)$refererOrigem);
+    $raizRefererOrigem = getRaizReferer($refererOrigem);
+
+    /**
+     * Para imagens da Área 38/VistaHost, prioriza o referer que funcionou
+     * no seu teste manual com cURL.
+     */
+    if (imagemEhArea38VistaHost($urlImagem)) {
+        $referers[] = "https://area38.com.br/";
+    }
+
+    // Depois tenta a URL exata da página de origem
+    if ($refererOrigem !== "" && preg_match('/^https?:\/\//i', $refererOrigem)) {
+        $referers[] = $refererOrigem;
+    }
+
+    // Depois tenta somente a raiz do domínio da origem
+    if ($raizRefererOrigem !== "") {
+        $referers[] = $raizRefererOrigem;
+    }
+
+    // Fallback genérico
+    $referers[] = "https://www.google.com/";
+
+    // Remove duplicados preservando ordem
+    $referersUnicos = [];
+
+    foreach ($referers as $referer) {
+        $referer = trim($referer);
+
+        if ($referer !== "" && !in_array($referer, $referersUnicos)) {
+            $referersUnicos[] = $referer;
+        }
+    }
+
+    return $referersUnicos;
+}
+
+/**
+ * DEFINIR REFERER PRINCIPAL PARA LOG
+ */
+function getRefererDownloadImagem($urlImagem, $refererOrigem = "") {
+
+    $referers = getReferersDownloadImagem($urlImagem, $refererOrigem);
+
+    return $referers[0] ?? "https://www.google.com/";
 }
 
 /**
@@ -865,102 +932,124 @@ function baixarImagemParaWpAllImport($url, $refererOrigem = "") {
     $caminhoArquivo = rtrim($pastaImagensImport, "/") . "/" . $nomeArquivo;
     $caminhoRelativo = trim($caminhoRelativoImagensImport, "/") . "/" . $nomeArquivo;
 
+    $referersImagem = getReferersDownloadImagem($url, $refererOrigem);
+
     // Se já existe, não baixa novamente
     if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
-        $refererImagem = getRefererDownloadImagem($url, $refererOrigem);
-
         adicionarLogImagem("ja_existia", $url, $caminhoRelativo, "Imagem já existia, não baixou novamente", [
             "arquivo" => $caminhoArquivo,
             "tamanho_bytes" => filesize($caminhoArquivo),
-            "referer_usado" => $refererImagem
+            "referer_usado" => $referersImagem[0] ?? "",
+            "referers_tentados" => $referersImagem
         ]);
         return $caminhoRelativo;
     }
 
-    $arquivoTmp = $caminhoArquivo . ".tmp";
+    $tentativas = [];
 
-    $fp = @fopen($arquivoTmp, "w");
+    foreach ($referersImagem as $refererImagem) {
 
-    if (!$fp) {
-        adicionarLogImagem("erro", $url, "", "Não foi possível criar arquivo temporário", [
-            "arquivo_tmp" => $arquivoTmp
+        $arquivoTmp = $caminhoArquivo . ".tmp";
+
+        if (file_exists($arquivoTmp)) {
+            @unlink($arquivoTmp);
+        }
+
+        $fp = @fopen($arquivoTmp, "wb");
+
+        if (!$fp) {
+            adicionarLogImagem("erro", $url, "", "Não foi possível criar arquivo temporário", [
+                "arquivo_tmp" => $arquivoTmp
+            ]);
+            return $url;
+        }
+
+        $ch = curl_init($url);
+
+        curl_setopt_array($ch, [
+            CURLOPT_FILE => $fp,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 60,
+            CURLOPT_CONNECTTIMEOUT => 20,
+            CURLOPT_ENCODING => "",
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+            CURLOPT_REFERER => $refererImagem,
+            CURLOPT_HTTPHEADER => [
+                "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "Accept-Language: pt-BR,pt;q=0.9,en;q=0.8",
+                "Cache-Control: no-cache",
+                "Pragma: no-cache",
+                "Referer: " . $refererImagem,
+            ],
         ]);
-        return $url;
-    }
 
-    $refererImagem = getRefererDownloadImagem($url, $refererOrigem);
+        $success = curl_exec($ch);
 
-    $ch = curl_init($url);
+        $erro = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        $urlFinal = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
 
-    curl_setopt_array($ch, [
-        CURLOPT_FILE => $fp,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_TIMEOUT => 60,
-        CURLOPT_CONNECTTIMEOUT => 20,
-        CURLOPT_ENCODING => "",
-        CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-        CURLOPT_REFERER => $refererImagem,
-        CURLOPT_HTTPHEADER => [
-            "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-            "Accept-Language: pt-BR,pt;q=0.9,en;q=0.8",
-            "Cache-Control: no-cache",
-            "Referer: " . $refererImagem,
-        ],
-    ]);
+        curl_close($ch);
+        fclose($fp);
 
-    curl_exec($ch);
+        $tamanhoTmp = (file_exists($arquivoTmp)) ? filesize($arquivoTmp) : 0;
 
-    $erro = curl_error($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-
-    curl_close($ch);
-    fclose($fp);
-
-    if (
-        $erro ||
-        $httpCode < 200 ||
-        $httpCode >= 400 ||
-        !file_exists($arquivoTmp) ||
-        filesize($arquivoTmp) <= 0
-    ) {
-        @unlink($arquivoTmp);
-        adicionarLogImagem("erro", $url, "", "Falha no download da imagem", [
+        $tentativas[] = [
+            "referer" => $refererImagem,
+            "success" => $success ? "sim" : "nao",
             "http_code" => $httpCode,
             "erro_curl" => $erro,
             "content_type" => $contentType,
-            "referer_usado" => $refererImagem
-        ]);
-        return $url;
-    }
+            "url_final" => $urlFinal,
+            "tamanho_bytes_tmp" => $tamanhoTmp
+        ];
 
-    // Se o servidor informar content-type, confere se é imagem
-    if (!empty($contentType) && stripos($contentType, "image/") === false) {
+        $downloadOk = (
+            $success &&
+            !$erro &&
+            $httpCode >= 200 &&
+            $httpCode < 400 &&
+            file_exists($arquivoTmp) &&
+            filesize($arquivoTmp) > 0
+        );
+
+        if ($downloadOk && !empty($contentType) && stripos($contentType, "image/") === false) {
+            $downloadOk = false;
+        }
+
+        if (!$downloadOk) {
+            @unlink($arquivoTmp);
+            continue;
+        }
+
+        @rename($arquivoTmp, $caminhoArquivo);
+
+        if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+            adicionarLogImagem("baixada", $url, $caminhoRelativo, "Imagem baixada com sucesso", [
+                "arquivo" => $caminhoArquivo,
+                "tamanho_bytes" => filesize($caminhoArquivo),
+                "http_code" => $httpCode,
+                "content_type" => $contentType,
+                "referer_usado" => $refererImagem,
+                "referers_tentados" => $referersImagem,
+                "tentativas" => $tentativas
+            ]);
+            return $caminhoRelativo;
+        }
+
         @unlink($arquivoTmp);
-        adicionarLogImagem("erro", $url, "", "Arquivo baixado não parece ser imagem", [
-            "http_code" => $httpCode,
-            "content_type" => $contentType,
-            "referer_usado" => $refererImagem
-        ]);
-        return $url;
     }
 
-    @rename($arquivoTmp, $caminhoArquivo);
+    adicionarLogImagem("erro", $url, "", "Falha no download da imagem em todas as tentativas de referer", [
+        "referer_origem" => $refererOrigem,
+        "referers_tentados" => $referersImagem,
+        "tentativas" => $tentativas
+    ]);
 
-    if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
-        adicionarLogImagem("baixada", $url, $caminhoRelativo, "Imagem baixada com sucesso", [
-            "arquivo" => $caminhoArquivo,
-            "tamanho_bytes" => filesize($caminhoArquivo),
-            "http_code" => $httpCode,
-            "content_type" => $contentType,
-            "referer_usado" => $refererImagem
-        ]);
-        return $caminhoRelativo;
-    }
-
-    adicionarLogImagem("erro", $url, "", "Download feito, mas arquivo final não foi encontrado");
     return $url;
 }
 
