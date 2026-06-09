@@ -66,7 +66,7 @@ $sites = [
             "https://terrafertil.com.br/imoveis/para-alugar/barracao",
             "https://terrafertil.com.br/imoveis/a-venda/barracao",
         ],
-        "numero_registros" => 10,
+        "numero_registros" => 120,
         "frequencia" => [
             "tipo" => "sempre"/*,
             "horario_inicio" => "16:00",
