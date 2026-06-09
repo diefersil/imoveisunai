@@ -3,7 +3,7 @@
 
 $url = 'https://cdn.vistahost.com.br/area38lt/vista.imobi/fotos/966/in7q8n_96668681c288f0c1.jpg';
 
-$upload_dir = '.';
+$upload_dir = './';
 $filename = basename(parse_url($url, PHP_URL_PATH));
 $filepath = $upload_dir . $filename;
 
