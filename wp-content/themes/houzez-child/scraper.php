@@ -5,6 +5,42 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
+/**
+ * DESCOBRIR A RAIZ DO WORDPRESS
+ *
+ * Se o script estiver dentro de tema/plugin/subpasta, esta função sobe
+ * os diretórios até encontrar wp-load.php ou wp-config.php.
+ * Assim as imagens são salvas na raiz correta do WordPress.
+ */
+function detectarRaizWordPress() {
+
+    if (defined("ABSPATH") && ABSPATH !== "") {
+        return rtrim(ABSPATH, "/\\");
+    }
+
+    $dir = __DIR__;
+
+    for ($i = 0; $i < 8; $i++) {
+
+        if (file_exists($dir . "/wp-load.php") || file_exists($dir . "/wp-config.php")) {
+            return rtrim($dir, "/\\");
+        }
+
+        $dirPai = dirname($dir);
+
+        if ($dirPai === $dir) {
+            break;
+        }
+
+        $dir = $dirPai;
+    }
+
+    // Fallback: mantém o comportamento antigo caso não encontre a raiz
+    return rtrim(__DIR__, "/\\");
+}
+
+$raizWordPress = detectarRaizWordPress();
+
 $arquivoCsv = "scraper-res.csv";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
@@ -20,10 +56,12 @@ $baixar_imagens = "sim";
 /**
  * Pasta onde as imagens serão salvas.
  *
- * Se este scraper estiver na raiz do WordPress, este caminho salva em:
- * wp-content/uploads/wpallimport/files
+ * IMPORTANTE:
+ * Usa a RAIZ do WordPress, não a pasta do tema/plugin.
+ * Resultado final:
+ * /wp-content/uploads/wpallimport/files
  */
-$pastaImagensImport = __DIR__ . "/wp-content/uploads/wpallimport/files";
+$pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
 
 /**
  * Caminho gravado no CSV após baixar a imagem.
