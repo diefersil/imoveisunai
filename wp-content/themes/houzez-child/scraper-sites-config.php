@@ -71,8 +71,8 @@ $sites = [
             "card_imagem_url" => ".//li[contains(@class,'cards_digital_carousel-item-0')]//img",           
             "card_url" => ".",
             "galeria" => "//div[contains(@class,'overflow-image-gallery')]//img",
-            "descricao" => "//div[contains(@class,'box-description')] | //div[contains(@class,'box-detail')]"
-            //"descricao" => "//div[contains(@class,'listing-details')]",
+            //"descricao" => "//div[contains(@class,'box-description')] | //div[contains(@class,'box-detail')]"
+            "descricao" => "//div[contains(@class,'details')]"
             //"descricao" => "//div[contains(@class,'box-description')]"
             //"descricao" => "//div[contains(@class,'box-description') and contains(@class,'box-detail')]",listing-details
         ]
