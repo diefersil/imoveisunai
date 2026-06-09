@@ -59,7 +59,7 @@ $baixar_imagens = "sim";
  * Use "sim" para exibir a lista completa logs_imagens no retorno JSON.
  * Use "nao" para ocultar a lista e exibir apenas os totais.
  */
-$exibir_log_imagens = "sim";
+$exibir_log_imagens = "nao";
 
 /**
  * Pasta onde as imagens serão salvas.
