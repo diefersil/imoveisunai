@@ -64,7 +64,7 @@ $sites = [
             "https://terrafertil.com.br/imoveis/a-venda/sala",
             "https://terrafertil.com.br/imoveis/novos/sala",
             "https://terrafertil.com.br/imoveis/para-alugar/barracao",
-            "https://terrafertil.com.br/imoveis/a-venda/barracao",
+            "https://terrafertil.com.br/imoveis/a-venda/barracao"
         ],
         "numero_registros" => 120,
         "frequencia" => [
