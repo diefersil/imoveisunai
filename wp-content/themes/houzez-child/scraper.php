@@ -1382,6 +1382,17 @@ foreach ($sites as $site) {
     $urlPrincipal = $urlsSite[0] ?? "";
 
     $numeroRegistros = (int)($site["numero_registros"] ?? 0);
+
+    /**
+     * LIMITE MÁXIMO DE REGISTROS POR URL
+     *
+     * Se for maior que zero, limita quantos imóveis serão salvos por cada URL
+     * do mesmo site. Exemplo: 4 URLs x 10 por URL = até 40 registros.
+     *
+     * Se não existir ou for zero, não limita por URL.
+     */
+    $numeroMaximoPorUrl = (int)($site["numero_maximo_por_url"] ?? 0);
+
     $seletores = $site["seletores"] ?? [];
 
     $frequencia = $site["frequencia"] ?? [
@@ -1426,8 +1437,12 @@ foreach ($sites as $site) {
     $contador = 0;
     $ignoradosPorString = 0;
     $cardsEncontradosTotal = 0;
+    $registrosPorUrl = [];
 
     foreach ($urlsSite as $url) {
+
+        $contadorPorUrl = 0;
+        $registrosPorUrl[$url] = 0;
 
         $resposta = getHtml($url);
 
@@ -1493,6 +1508,10 @@ foreach ($sites as $site) {
 
             if ($numeroRegistros > 0 && $contador >= $numeroRegistros) {
                 break 2;
+            }
+
+            if ($numeroMaximoPorUrl > 0 && $contadorPorUrl >= $numeroMaximoPorUrl) {
+                break;
             }
 
             $cardNome = getTextoSeletor(
@@ -1682,6 +1701,8 @@ foreach ($sites as $site) {
             ];
 
             $contador++;
+            $contadorPorUrl++;
+            $registrosPorUrl[$url] = $contadorPorUrl;
 
             usleep(rand(400000, 1200000));
         }
@@ -1697,7 +1718,10 @@ foreach ($sites as $site) {
         "url" => $urlPrincipal,
         "status" => "ok",
         "cards_encontrados" => $cardsEncontradosTotal,
+        "numero_registros" => $numeroRegistros,
+        "numero_maximo_por_url" => $numeroMaximoPorUrl,
         "registros_salvos" => $contador,
+        "registros_por_url" => $registrosPorUrl,
         "ignorados_por_string" => $ignoradosPorString
     ];
 }
