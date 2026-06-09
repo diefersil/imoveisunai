@@ -49,10 +49,12 @@ $sites = [
         "contato" => "(38) 99958-5454",
         "periodo" => 30,
         "url" => [
+            "https://www.terrafertilimobiliaria.com.br/imoveis"
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda",
             "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar",
+            "https://www.terrafertilimobiliaria.com.br/imoveis/novos",
         ],
-        "numero_registros" => 10,
+        "numero_registros" => 40,
         "frequencia" => [
             "tipo" => "sempre"/*,
             "horario_inicio" => "16:00",
