@@ -763,6 +763,35 @@ function gerarNomeImagemLocal($url) {
 }
 
 /**
+ * DEFINIR REFERER PARA DOWNLOAD DE IMAGEM
+ *
+ * Preferência:
+ * 1) usar a URL da página de origem do imóvel/listagem;
+ * 2) fallback específico para Área 38/VistaHost;
+ * 3) fallback genérico.
+ */
+function getRefererDownloadImagem($urlImagem, $refererOrigem = "") {
+
+    $refererOrigem = trim((string)$refererOrigem);
+
+    if ($refererOrigem !== "" && preg_match('/^https?:\/\//i', $refererOrigem)) {
+        return $refererOrigem;
+    }
+
+    $urlBusca = mb_strtolower((string)$urlImagem, "UTF-8");
+
+    if (
+        strpos($urlBusca, "cdn.vistahost.com.br/area38lt/") !== false ||
+        strpos($urlBusca, "vista.imobi/fotos/") !== false ||
+        strpos($urlBusca, "area38") !== false
+    ) {
+        return "https://area38.com.br/";
+    }
+
+    return "https://www.google.com/";
+}
+
+/**
  * ADICIONAR ITEM AO LOG DE IMAGENS
  */
 function adicionarLogImagem($status, $urlOriginal, $caminhoRelativo = "", $mensagem = "", $extra = []) {
@@ -790,7 +819,7 @@ function adicionarLogImagem($status, $urlOriginal, $caminhoRelativo = "", $mensa
  * Retorna o caminho local/relativo salvo no CSV.
  * Se falhar, retorna a URL original normalizada para não perder a imagem.
  */
-function baixarImagemParaWpAllImport($url) {
+function baixarImagemParaWpAllImport($url, $refererOrigem = "") {
 
     global $baixar_imagens;
     global $pastaImagensImport;
@@ -838,9 +867,12 @@ function baixarImagemParaWpAllImport($url) {
 
     // Se já existe, não baixa novamente
     if (file_exists($caminhoArquivo) && filesize($caminhoArquivo) > 0) {
+        $refererImagem = getRefererDownloadImagem($url, $refererOrigem);
+
         adicionarLogImagem("ja_existia", $url, $caminhoRelativo, "Imagem já existia, não baixou novamente", [
             "arquivo" => $caminhoArquivo,
-            "tamanho_bytes" => filesize($caminhoArquivo)
+            "tamanho_bytes" => filesize($caminhoArquivo),
+            "referer_usado" => $refererImagem
         ]);
         return $caminhoRelativo;
     }
@@ -856,6 +888,8 @@ function baixarImagemParaWpAllImport($url) {
         return $url;
     }
 
+    $refererImagem = getRefererDownloadImagem($url, $refererOrigem);
+
     $ch = curl_init($url);
 
     curl_setopt_array($ch, [
@@ -867,11 +901,12 @@ function baixarImagemParaWpAllImport($url) {
         CURLOPT_CONNECTTIMEOUT => 20,
         CURLOPT_ENCODING => "",
         CURLOPT_USERAGENT => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-        CURLOPT_REFERER => "https://www.google.com/",
+        CURLOPT_REFERER => $refererImagem,
         CURLOPT_HTTPHEADER => [
             "Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
             "Accept-Language: pt-BR,pt;q=0.9,en;q=0.8",
             "Cache-Control: no-cache",
+            "Referer: " . $refererImagem,
         ],
     ]);
 
@@ -895,7 +930,8 @@ function baixarImagemParaWpAllImport($url) {
         adicionarLogImagem("erro", $url, "", "Falha no download da imagem", [
             "http_code" => $httpCode,
             "erro_curl" => $erro,
-            "content_type" => $contentType
+            "content_type" => $contentType,
+            "referer_usado" => $refererImagem
         ]);
         return $url;
     }
@@ -905,7 +941,8 @@ function baixarImagemParaWpAllImport($url) {
         @unlink($arquivoTmp);
         adicionarLogImagem("erro", $url, "", "Arquivo baixado não parece ser imagem", [
             "http_code" => $httpCode,
-            "content_type" => $contentType
+            "content_type" => $contentType,
+            "referer_usado" => $refererImagem
         ]);
         return $url;
     }
@@ -917,7 +954,8 @@ function baixarImagemParaWpAllImport($url) {
             "arquivo" => $caminhoArquivo,
             "tamanho_bytes" => filesize($caminhoArquivo),
             "http_code" => $httpCode,
-            "content_type" => $contentType
+            "content_type" => $contentType,
+            "referer_usado" => $refererImagem
         ]);
         return $caminhoRelativo;
     }
@@ -1113,7 +1151,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
 
     if ($dados["og_image"] !== "") {
         $dados["og_image"] = urlAbsoluta($dados["og_image"], $urlCard);
-        $dados["og_image"] = baixarImagemParaWpAllImport($dados["og_image"]);
+        $dados["og_image"] = baixarImagemParaWpAllImport($dados["og_image"], $urlCard);
     }
 
     $dados["og_description"] = getMetaContent($xpath, [
@@ -1159,7 +1197,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                 ]);
 
                 $imgUrl = urlAbsoluta($imgUrl, $urlCard);
-                $imgUrl = baixarImagemParaWpAllImport($imgUrl);
+                $imgUrl = baixarImagemParaWpAllImport($imgUrl, $urlCard);
 
                 if (!empty($imgUrl) && !in_array($imgUrl, $imagens)) {
                     $imagens[] = $imgUrl;
@@ -1492,7 +1530,7 @@ foreach ($sites as $site) {
                 $url
             );
 
-            $cardImagemUrl = baixarImagemParaWpAllImport($cardImagemUrl);
+            $cardImagemUrl = baixarImagemParaWpAllImport($cardImagemUrl, $url);
 
             $cardUrl = getUrlSeletor(
                 $xpath,
