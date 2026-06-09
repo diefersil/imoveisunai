@@ -39,59 +39,16 @@ function detectarRaizWordPress() {
     return rtrim(__DIR__, "/\\");
 }
 
-$raizWordPress = detectarRaizWordPress();
-
 $arquivoCsv = "scraper-res.csv";
+$gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
-
-/**
- * BAIXAR IMAGENS PARA WP ALL IMPORT
- *
- * Use "sim" para baixar as imagens via cURL para a pasta local.
- * Use "nao" para manter as URLs externas no CSV.
- */
-$baixar_imagens = "nao";
-
-/**
- * EXIBIR LOG DE IMAGENS NO JSON FINAL
- *
- * Use "sim" para exibir a lista completa logs_imagens no retorno JSON.
- * Use "nao" para ocultar a lista e exibir apenas os totais.
- */
+$raizWordPress = detectarRaizWordPress();
+$baixar_imagens = "sim";
 $exibir_log_imagens = "nao";
-
-/**
- * Pasta onde as imagens serão salvas.
- *
- * IMPORTANTE:
- * Usa a RAIZ do WordPress, não a pasta do tema/plugin.
- * Resultado final:
- * /wp-content/uploads/wpallimport/files
- */
 $pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
-
-/**
- * Caminho da pasta onde a imagem será salva.
- *
- * OBS: no CSV/JSON será gravado somente o nome final do arquivo.
- */
 $caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
-
-/**
- * LOG DE IMAGENS
- *
- * Registra imagens baixadas, imagens que já existiam e erros de download.
- */
 $logsImagens = [];
-
-/**
- * GRAVAR CSV
- *
- * Use "sim" para gravar/atualizar o CSV.
- * Use "nao" para testar sem alterar o arquivo CSV.
- */
-$gravar_csv = "nao";
 
 /**
  * REGRA GLOBAL DE CATEGORIA DO IMÓVEL
