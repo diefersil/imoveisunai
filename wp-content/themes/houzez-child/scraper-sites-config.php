@@ -146,5 +146,38 @@ $sites = [
             "galeria" => "//img[contains(@class,'transition-all')]",
             "descricao" => "//p[contains(@class,'my-5')]//span"
         ]
+    ],
+
+    [
+        "nome_site" => "Morado Imóveis",
+        "usuario" => "imoveisunai",
+        "cidade" => "Paracatu",
+        "uf" => "MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "(38) 99856-5306",
+        "periodo" => 30,
+        "url" => [
+            "https://moradoimoveis.com.br/busca",
+        ],
+        "numero_registros" => 5,
+        "numero_maximo_por_url" => 5,
+        "frequencia" => [
+            "tipo" => "nunca"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//div[contains(@class,'ImovelItem')]",
+            "card_nome" => ".//a[contains(@class,'Title')]",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
+            "preco" => ".//h5[contains(@class,'text-lg')]",
+            "card_imagem_url" => ".//img[contains(@class,'w-full')]",
+            "card_nome" => ".//a[contains(@class,'Title')]",
+            "galeria" => "//img[contains(@class,'transition-all')]",
+            "descricao" => "//p[contains(@class,'my-5')]//span"
+        ]
     ]
 ];
