@@ -1108,6 +1108,8 @@ function getUrlSeletor($xpath, $contexto, $seletor, $baseUrl) {
         "href",
         "src",
         "data-src",
+        "data-img",
+        "data-thumb",
         "data-lazy-src",
         "data-original",
         "data-full",
@@ -1235,6 +1237,8 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
                 $imgUrl = getAtributoFallback($imgNode, [
                     "src",
                     "data-src",
+                    "data-img",
+                    "data-thumb",
                     "data-lazy-src",
                     "data-original",
                     "data-full",
