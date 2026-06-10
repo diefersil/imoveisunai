@@ -173,11 +173,11 @@ $sites = [
             "card_uf" => "",
             "card_contato" => "",
             "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
-            "preco" => ".//h5[contains(@class,'text-lg')]",
-            "card_imagem_url" => ".//img[contains(@class,'w-full')]",
-            "card_nome" => ".//a[contains(@class,'Title')]",
+            "preco" => ".//span[contains(@class,'ValorMoeda')]",
+            "card_imagem_url" => ".//img[contains(@class,'BannerImage')]",
+            "card_url" => ".//a",
             "galeria" => "//img[contains(@class,'transition-all')]",
-            "descricao" => "//p[contains(@class,'my-5')]//span"
+            "descricao" => "//div[contains(@class,'central_left')]"
         ]
     ]
 ];
