@@ -60,7 +60,7 @@ $sites = [
         "numero_registros" => 40,
         "numero_maximo_por_url" => 10,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "nunca"
         ],
         "verificar_string" => "",
         "seletores" => [
