@@ -1697,7 +1697,8 @@ foreach ($sites as $site) {
                 "galeria" => $galeria,
 
                 "data_scraper_brasil" => date("d/m/Y H:i:s"),
-                "data_scraper_eua" => date("Y-m-d H:i:s")
+                "data_scraper_eua" => date("Y-m-d H:i:s"),
+                "data_scraper_eua_timestamp" => time()
             ];
 
             $contador++;
@@ -1847,7 +1848,8 @@ $colunas = [
     "galeria",
 
     "data_scraper_brasil",
-    "data_scraper_eua"
+    "data_scraper_eua",
+    "data_scraper_eua_timestamp"
 ];
 
 /**
