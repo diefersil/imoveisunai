@@ -224,7 +224,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'valor')]//h5",
             "card_imagem_url" => ".//div[contains(@class,'foto')]//img",
             "card_url" => ".",
-            "galeria" => "//div[contains(@class,'fotorama__stage__frame')]//img",
+            "galeria" => "//div[contains(@class,'fotorama')]//img",
             "descricao" => "//div[contains(@class,'descricao_imovel')]"
         ]
     ]
