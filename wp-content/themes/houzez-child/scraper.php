@@ -1345,17 +1345,41 @@ function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) 
 
     $resultado = [];
 
-    foreach ($registrosNovos as $item) {
+    /**
+     * Primeiro carrega os registros antigos.
+     * Assim conseguimos preservar a data da primeira captura.
+     */
+    foreach ($registrosAntigos as $item) {
         $chave = gerarChaveRegistro($item);
         $resultado[$chave] = $item;
     }
 
-    foreach ($registrosAntigos as $item) {
+    /**
+     * Depois aplica os registros novos.
+     * Se já existir, mantém data_primeiro_* antiga
+     * e atualiza apenas data_ultimo_*.
+     */
+    foreach ($registrosNovos as $item) {
+
         $chave = gerarChaveRegistro($item);
 
-        if (!isset($resultado[$chave])) {
-            $resultado[$chave] = $item;
+        if (isset($resultado[$chave])) {
+
+            $item["data_primeiro_scraper_brasil"] =
+                $resultado[$chave]["data_primeiro_scraper_brasil"] ?? ($resultado[$chave]["data_scraper_brasil"] ?? "");
+
+            $item["data_primeiro_scraper_eua"] =
+                $resultado[$chave]["data_primeiro_scraper_eua"] ?? ($resultado[$chave]["data_scraper_eua"] ?? "");
+
+            $item["data_primeiro_scraper_eua_timestamp"] =
+                $resultado[$chave]["data_primeiro_scraper_eua_timestamp"] ?? "";
         }
+
+        $item["data_ultimo_scraper_brasil"] = date("d/m/Y H:i:s");
+        $item["data_ultimo_scraper_eua"] = date("Y-m-d H:i:s");
+        $item["data_ultimo_scraper_eua_timestamp"] = time();
+
+        $resultado[$chave] = $item;
     }
 
     return array_slice(array_values($resultado), 0, $limite);
@@ -1700,9 +1724,15 @@ foreach ($sites as $site) {
                 "og_status" => $dadosInternos["og_status"],
                 "galeria" => $galeria,
 
-                "data_scraper_brasil" => date("d/m/Y H:i:s"),
-                "data_scraper_eua" => date("Y-m-d H:i:s"),
-                "data_scraper_eua_timestamp" => strtotime($dataPeriodoEua)
+                "data_primeiro_scraper_brasil" => date("d/m/Y H:i:s"),
+                "data_primeiro_scraper_eua" => date("Y-m-d H:i:s"),
+                "data_primeiro_scraper_eua_timestamp" => time(),
+
+                "data_ultimo_scraper_brasil" => date("d/m/Y H:i:s"),
+                "data_ultimo_scraper_eua" => date("Y-m-d H:i:s"),
+                "data_ultimo_scraper_eua_timestamp" => time(),
+
+                "data_periodo_eua_timestamp" => strtotime($dataPeriodoEua)
             ];
 
             $contador++;
@@ -1851,9 +1881,15 @@ $colunas = [
     "og_status",
     "galeria",
 
-    "data_scraper_brasil",
-    "data_scraper_eua",
-    "data_scraper_eua_timestamp"
+    "data_primeiro_scraper_brasil",
+    "data_primeiro_scraper_eua",
+    "data_primeiro_scraper_eua_timestamp",
+
+    "data_ultimo_scraper_brasil",
+    "data_ultimo_scraper_eua",
+    "data_ultimo_scraper_eua_timestamp",
+
+    "data_periodo_eua_timestamp"
 ];
 
 /**
