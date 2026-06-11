@@ -161,9 +161,12 @@ $sites = [
         "periodo" => 30,
         "url" => [
             "https://moradoimoveis.com.br/busca",
+            "https://moradoimoveis.com.br/imoveis/aluguel",
+            "https://moradoimoveis.com.br/imoveis/venda",
+            "https://moradoimoveis.com.br/imoveis/venda/fazenda"
         ],
-        "numero_registros" => 5,
-        "numero_maximo_por_url" => 5,
+        "numero_registros" => 48,
+        "numero_maximo_por_url" => 12,
         "frequencia" => [
             "tipo" => "horario",
             "horario_inicio" => "23:00",
