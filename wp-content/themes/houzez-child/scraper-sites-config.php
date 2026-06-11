@@ -188,5 +188,43 @@ $sites = [
             "galeria" => "//div[contains(@class,'ms-lightbox') and @data-img]",
             "descricao" => "//div[contains(@class,'central_left')]"
         ]
+    ],
+
+    [
+        "nome_site" => "Novo Lar",
+        "usuario" => "imoveisunai",
+        "cidade" => "Unaí",
+        "uf" => "MG",
+        "categoria" => "",
+        "tags" => "",
+        "contato" => "(38) 99856-5306",
+        "periodo" => 30,
+        "url" => [
+            "https://moradoimoveis.com.br/busca",
+            "https://moradoimoveis.com.br/imoveis/aluguel",
+            "https://moradoimoveis.com.br/imoveis/venda",
+            "https://moradoimoveis.com.br/imoveis/venda/fazenda"
+        ],
+        "numero_registros" => 48,
+        "numero_maximo_por_url" => 12,
+        "frequencia" => [
+            "tipo" => "horario",
+            "horario_inicio" => "23:00",
+            "horario_fim" => "01:00"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//div[contains(@class,'resultado_grade')]",
+            "card_nome" => ".//h3[contains(@class,'tipo')]",
+            "card_cidade" => "",
+            "card_uf" => "",
+            "card_contato" => "",
+            "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
+            "preco" => ".//div[contains(@class,'valor')]//h5",
+            "card_imagem_url" => ".//div[contains(@class,'foto')]//img",
+            "card_url" => ".//a",
+            "galeria" => "//img[contains(@class,'fotorama__img')]",
+            "descricao" => "//div[contains(@class,'descricao_imovel')]"
+        ]
     ]
 ];
