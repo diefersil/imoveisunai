@@ -57,8 +57,9 @@ $sites = [
             "https://www.terrafertilimobiliaria.com.br/imoveis/a-venda",
             "https://www.terrafertilimobiliaria.com.br/imoveis/para-alugar",
             "https://www.terrafertilimobiliaria.com.br/imoveis/novos",
+            "www.terrafertilimobiliaria.com.br/imoveis/a-venda/fazenda"
         ],
-        "numero_registros" => 40,
+        "numero_registros" => 50,
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
