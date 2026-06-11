@@ -1702,7 +1702,7 @@ foreach ($sites as $site) {
 
                 "data_scraper_brasil" => date("d/m/Y H:i:s"),
                 "data_scraper_eua" => date("Y-m-d H:i:s"),
-                "data_scraper_eua_timestamp" => time()
+                "data_scraper_eua_timestamp" => strtotime($dataPeriodoEua)
             ];
 
             $contador++;
