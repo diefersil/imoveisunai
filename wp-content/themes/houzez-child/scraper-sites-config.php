@@ -24,8 +24,8 @@ $sites = [
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
-            "horario_inicio" => "23:00",
-            "horario_fim" => "01:00"
+            "horario_inicio" => "00:00",
+            "horario_fim" => "02:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -63,8 +63,8 @@ $sites = [
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
-            "horario_inicio" => "23:00",
-            "horario_fim" => "01:00"
+            "horario_inicio" => "02:00",
+            "horario_fim" => "04:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -100,8 +100,8 @@ $sites = [
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
-            "horario_inicio" => "23:00",
-            "horario_fim" => "01:00"
+            "horario_inicio" => "04:00",
+            "horario_fim" => "06:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -172,7 +172,7 @@ $sites = [
         "frequencia" => [
             "tipo" => "horario",
             "horario_inicio" => "23:00",
-            "horario_fim" => "01:00"
+            "horario_fim" => "12:00"
         ],
         "verificar_string" => "",
         "seletores" => [
