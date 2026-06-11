@@ -17,7 +17,8 @@ $sites = [
         "periodo" => 30,
         "url" => [
             "https://primeimoveisunai.com.br/imoveis",
-            "https://primeimoveisunai.com.br/imoveis/pagina/2"
+            "https://primeimoveisunai.com.br/imoveis/pagina/2",
+            "https://primeimoveisunai.com.br/imoveis/negociacao/locacao"
         ],
         "numero_registros" => 20,
         "numero_maximo_por_url" => 10,
@@ -94,8 +95,8 @@ $sites = [
             "https://sucessoimoveis.imb.br/imoveis/page/2",
             "https://sucessoimoveis.imb.br/imoveis/page/3"
         ],
-        "numero_registros" => 20,
-        "numero_maximo_por_url" => 7,
+        "numero_registros" => 30,
+        "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
             "horario_inicio" => "23:00",
