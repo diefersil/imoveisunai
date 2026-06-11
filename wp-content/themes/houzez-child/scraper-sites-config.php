@@ -214,7 +214,7 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//div[contains(@class,'resultado_grade')]",
+            "card" => "//a[div[contains(@class,'resultado')]]",
             "card_nome" => ".//h3[contains(@class,'tipo')]",
             "card_cidade" => "",
             "card_uf" => "",
@@ -222,7 +222,7 @@ $sites = [
             "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
             "preco" => ".//div[contains(@class,'valor')]//h5",
             "card_imagem_url" => ".//div[contains(@class,'foto')]//img",
-            "card_url" => ".//a",
+            "card_url" => ".",
             "galeria" => "//img[contains(@class,'fotorama__img')]",
             "descricao" => "//div[contains(@class,'descricao_imovel')]"
         ]
