@@ -197,13 +197,13 @@ $sites = [
         "uf" => "MG",
         "categoria" => "",
         "tags" => "",
-        "contato" => "(38) 99856-5306",
+        "contato" => "(38) 99879-9441",
         "periodo" => 30,
         "url" => [
-            "https://moradoimoveis.com.br/busca",
-            "https://moradoimoveis.com.br/imoveis/aluguel",
-            "https://moradoimoveis.com.br/imoveis/venda",
-            "https://moradoimoveis.com.br/imoveis/venda/fazenda"
+            "https://novolarimobiliariaunai.com.br/imoveis/chacara",
+            "https://novolarimobiliariaunai.com.br/imoveis/fazenda",
+            "https://novolarimobiliariaunai.com.br/imoveis/",
+            "https://moradoimoveis.com.br/imoveis/venda/sitio"
         ],
         "numero_registros" => 48,
         "numero_maximo_por_url" => 12,
