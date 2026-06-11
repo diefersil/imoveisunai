@@ -200,12 +200,13 @@ $sites = [
         "contato" => "(38) 99879-9441",
         "periodo" => 30,
         "url" => [
+            "https://novolarimobiliariaunai.com.br/imoveis/"/*
             "https://novolarimobiliariaunai.com.br/imoveis/chacara",
             "https://novolarimobiliariaunai.com.br/imoveis/fazenda",
             "https://novolarimobiliariaunai.com.br/imoveis/",
-            "https://moradoimoveis.com.br/imoveis/venda/sitio"
+            "https://moradoimoveis.com.br/imoveis/venda/sitio"*/
         ],
-        "numero_registros" => 48,
+        "numero_registros" => 5,
         "numero_maximo_por_url" => 12,
         "frequencia" => [
             "tipo" => "sempre"/*,
