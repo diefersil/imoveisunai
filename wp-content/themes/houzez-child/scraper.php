@@ -44,12 +44,12 @@ function detectarRaizWordPress() {
  */
 
 $arquivoCsv = "scraper-res.csv";
-$gravar_csv = "nao";
+$gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
 $raizWordPress = detectarRaizWordPress();
-$baixar_imagens = "nao";
-$exibir_log_imagens = "nao";
+$baixar_imagens = "sim";
+$exibir_log_imagens = "sim";
 $pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
 $caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
 $logsImagens = [];
