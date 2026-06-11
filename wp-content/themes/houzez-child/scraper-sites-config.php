@@ -176,7 +176,7 @@ $sites = [
             "preco" => ".//span[contains(@class,'ValorMoeda')]",
             "card_imagem_url" => ".//img[contains(@class,'BannerImage')]",
             "card_url" => ".//a",
-            "galeria" => "//div[contains(@class,'ms-lightbox') and @data-img]"
+            "galeria" => "//div[contains(@class,'ms-lightbox') and @data-img]",
             "descricao" => "//div[contains(@class,'central_left')]"
         ]
     ]
