@@ -22,9 +22,9 @@ $sites = [
         "numero_registros" => 20,
         "numero_maximo_por_url" => 10,
         "frequencia" => [
-            "tipo" => "nunca",
+            "tipo" => "horario",
             "horario_inicio" => "23:00",
-            "horario_fim" => "24:00"
+            "horario_fim" => "01:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -60,7 +60,9 @@ $sites = [
         "numero_registros" => 40,
         "numero_maximo_por_url" => 10,
         "frequencia" => [
-            "tipo" => "nunca"
+            "tipo" => "horario",
+            "horario_inicio" => "23:00",
+            "horario_fim" => "01:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -95,9 +97,9 @@ $sites = [
         "numero_registros" => 20,
         "numero_maximo_por_url" => 7,
         "frequencia" => [
-            "tipo" => "nunca",
+            "tipo" => "horario",
             "horario_inicio" => "23:00",
-            "horario_fim" => "24:00"
+            "horario_fim" => "01:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -163,7 +165,9 @@ $sites = [
         "numero_registros" => 5,
         "numero_maximo_por_url" => 5,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "horario",
+            "horario_inicio" => "23:00",
+            "horario_fim" => "01:00"
         ],
         "verificar_string" => "",
         "seletores" => [
