@@ -44,12 +44,12 @@ function detectarRaizWordPress() {
  */
 
 $arquivoCsv = "scraper-res.csv";
-$gravar_csv = "sim";
+$gravar_csv = "nao";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
 $raizWordPress = detectarRaizWordPress();
-$baixar_imagens = "sim";
-$exibir_log_imagens = "sim";
+$baixar_imagens = "nao";
+$exibir_log_imagens = "nao";
 $pastaImagensImport = $raizWordPress . "/wp-content/uploads/wpallimport/files";
 $caminhoRelativoImagensImport = "wp-content/uploads/wpallimport/files";
 $logsImagens = [];
@@ -473,6 +473,30 @@ function gerarDataPeriodoEua($periodo) {
     }
 
     return date("Y-m-d", strtotime("+" . $periodo . " days"));
+}
+
+/**
+ * GERAR TIMESTAMP DO PERÍODO
+ *
+ * Calcula a expiração usando:
+ * data_primeiro_scraper_eua + período em dias.
+ */
+function gerarDataPeriodoTimestamp($dataPrimeiroScraperEua, $periodo) {
+
+    $dataPrimeiroScraperEua = trim((string)$dataPrimeiroScraperEua);
+    $periodo = (int)$periodo;
+
+    if ($dataPrimeiroScraperEua === "" || $periodo <= 0) {
+        return "";
+    }
+
+    $timestampBase = strtotime($dataPrimeiroScraperEua);
+
+    if (!$timestampBase) {
+        return "";
+    }
+
+    return strtotime(date("Y-m-d H:i:s", $timestampBase) . " +" . $periodo . " days");
 }
 
 /**
@@ -1362,22 +1386,22 @@ function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) 
     foreach ($registrosNovos as $item) {
 
         $chave = gerarChaveRegistro($item);
+        $periodoDias = (int)($item["_periodo_dias"] ?? 0);
 
         if (isset($resultado[$chave])) {
 
             $item["data_primeiro_scraper_brasil"] =
-                $resultado[$chave]["data_primeiro_scraper_brasil"] ?? ($resultado[$chave]["data_scraper_brasil"] ?? "");
+                $resultado[$chave]["data_primeiro_scraper_brasil"] ?? ($resultado[$chave]["data_scraper_brasil"] ?? $item["data_primeiro_scraper_brasil"] ?? "");
 
             $item["data_primeiro_scraper_eua"] =
-                $resultado[$chave]["data_primeiro_scraper_eua"] ?? ($resultado[$chave]["data_scraper_eua"] ?? "");
-
-            $item["data_primeiro_scraper_eua_timestamp"] =
-                $resultado[$chave]["data_primeiro_scraper_eua_timestamp"] ?? "";
+                $resultado[$chave]["data_primeiro_scraper_eua"] ?? ($resultado[$chave]["data_scraper_eua"] ?? $item["data_primeiro_scraper_eua"] ?? "");
         }
 
         $item["data_ultimo_scraper_brasil"] = date("d/m/Y H:i:s");
         $item["data_ultimo_scraper_eua"] = date("Y-m-d H:i:s");
-        $item["data_ultimo_scraper_eua_timestamp"] = time();
+        $item["data_periodo_timestamp"] = gerarDataPeriodoTimestamp($item["data_primeiro_scraper_eua"] ?? "", $periodoDias);
+
+        unset($item["_periodo_dias"]);
 
         $resultado[$chave] = $item;
     }
@@ -1726,13 +1750,12 @@ foreach ($sites as $site) {
 
                 "data_primeiro_scraper_brasil" => date("d/m/Y H:i:s"),
                 "data_primeiro_scraper_eua" => date("Y-m-d H:i:s"),
-                "data_primeiro_scraper_eua_timestamp" => time(),
 
                 "data_ultimo_scraper_brasil" => date("d/m/Y H:i:s"),
                 "data_ultimo_scraper_eua" => date("Y-m-d H:i:s"),
-                "data_ultimo_scraper_eua_timestamp" => time(),
 
-                "data_periodo_eua_timestamp" => strtotime($dataPeriodoEua)
+                "data_periodo_timestamp" => gerarDataPeriodoTimestamp(date("Y-m-d H:i:s"), $periodo),
+                "_periodo_dias" => $periodo
             ];
 
             $contador++;
@@ -1883,13 +1906,11 @@ $colunas = [
 
     "data_primeiro_scraper_brasil",
     "data_primeiro_scraper_eua",
-    "data_primeiro_scraper_eua_timestamp",
 
     "data_ultimo_scraper_brasil",
     "data_ultimo_scraper_eua",
-    "data_ultimo_scraper_eua_timestamp",
 
-    "data_periodo_eua_timestamp"
+    "data_periodo_timestamp"
 ];
 
 /**
