@@ -208,9 +208,9 @@ $sites = [
         "numero_registros" => 40,
         "numero_maximo_por_url" => 12,
         "frequencia" => [
-            "tipo" => "sempre"/*,
-            "horario_inicio" => "23:00",
-            "horario_fim" => "01:00"*/
+            "tipo" => "horario",
+            "horario_inicio" => "04:00",
+            "horario_fim" => "06:00"
         ],
         "verificar_string" => "",
         "seletores" => [
