@@ -193,7 +193,7 @@ $sites = [
      * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Morado Imóveis",
-        "contato_nome" => "",
+        "contato_nome" => "Morado Imóveis",
         "usuario" => "imoveisunai",
         "cidade" => "Paracatu",
         "uf" => "MG",
