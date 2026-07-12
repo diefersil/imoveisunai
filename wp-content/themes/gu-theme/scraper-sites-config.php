@@ -168,7 +168,7 @@ $sites = [
         "numero_registros" => 5,
         "numero_maximo_por_url" => 5,
         "frequencia" => [
-            "tipo" => "sempre"
+            "tipo" => "nunca"
         ],
         "verificar_string" => "",
         "seletores" => [
