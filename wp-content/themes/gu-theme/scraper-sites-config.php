@@ -205,9 +205,6 @@ $sites = [
         "contato_desc" => "",
         "periodo" => 30,
         "url" => [
-            "https://moradoimoveis.com.br/busca",
-            "https://moradoimoveis.com.br/imoveis/aluguel",
-            "https://moradoimoveis.com.br/imoveis/venda",
             "https://moradoimoveis.com.br/imoveis/venda/fazenda"
         ],
         "numero_registros" => 48,
