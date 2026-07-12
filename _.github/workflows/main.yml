@@ -33,6 +33,7 @@ jobs:
             **/.htaccess
             **/wp-content/uploads**
             **/wp-content/plugins**
+            **/wp-content/languages**
             **/wp-content/cache/**
             **/wp-content/ewww/**
             **/wp-content/wflogs/**
