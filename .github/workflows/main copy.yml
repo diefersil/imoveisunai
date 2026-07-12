@@ -28,8 +28,16 @@ jobs:
             **/node_modules/**
             **/.github/**
             **/_create/**
+            **/wp-content/updraft/**
             **/wp-config.php
             **/.htaccess
+            **/wp-content/uploads**
+            **/wp-content/plugins**
+            **/wp-content/languages**
+            **/wp-content/cache/**
+            **/wp-content/ewww/**
+            **/wp-content/wflogs/**
+            **/wp-content/wp-rocket-config/**
+  
 
-            **/wp-content/!(plugins|themes)
-            **/wp-content/!(plugins|themes)/**
+            
