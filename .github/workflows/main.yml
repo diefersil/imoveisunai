@@ -33,3 +33,4 @@ jobs:
 
             **/wp-content/!(plugins|themes)
             **/wp-content/!(plugins|themes)/**
+            
