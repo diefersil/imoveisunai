@@ -6,6 +6,9 @@
  * Edite este arquivo para adicionar/remover sites e ajustar seletores.
  */
 $sites = [
+    /*----------------------------------------------------------------------------*
+     * SITE: Prime Imóveis
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Prime Imóveis",
         "contato_nome" => "Prime Imóveis",
@@ -35,8 +38,6 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'property-main')]",
             "card_nome" => ".//h3[contains(@class,'property-title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -51,6 +52,9 @@ $sites = [
         ]
     ],
 
+    /*----------------------------------------------------------------------------*
+     * SITE: Terra Fértil
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Terra Fértil",
         "contato_nome" => "Terra Fértil",
@@ -82,8 +86,6 @@ $sites = [
         "seletores" => [
             "card" => "//a[contains(@class,'card-with-buttons') and contains(@class,'borderHover')]",
             "card_nome" => ".//p[contains(@class,'card-with-buttons__title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -98,6 +100,9 @@ $sites = [
         ]
     ],
 
+    /*----------------------------------------------------------------------------*
+     * SITE: Sucesso Imóveis
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Sucesso Imóveis",
         "contato_nome" => "Sucesso Imóveis",
@@ -127,8 +132,6 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'g5ere__property-item-inner')]",
             "card_nome" => ".//h3[contains(@class,'g5ere__loop-property-title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -143,6 +146,9 @@ $sites = [
         ]
     ],
 
+    /*----------------------------------------------------------------------------*
+     * SITE: Área 38
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Área 38",
         "contato_nome" => "",
@@ -168,8 +174,6 @@ $sites = [
         "seletores" => [
             "card" => "//a[contains(@class,'mb-2')]",
             "card_nome" => ".//h4[contains(@class,'text-lg')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -184,6 +188,9 @@ $sites = [
         ]
     ],
 
+    /*----------------------------------------------------------------------------*
+     * SITE: Morado Imóveis
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Morado Imóveis",
         "contato_nome" => "",
@@ -214,8 +221,6 @@ $sites = [
         "seletores" => [
             "card" => "//div[contains(@class,'ImovelItem')]",
             "card_nome" => ".//a[contains(@class,'Title')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -230,6 +235,9 @@ $sites = [
         ]
     ],
 
+    /*----------------------------------------------------------------------------*
+     * SITE: Novo Lar
+     * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Novo Lar",
         "contato_nome" => "",
@@ -260,8 +268,6 @@ $sites = [
         "seletores" => [
             "card" => "//a[div[contains(@class,'resultado')]]",
             "card_nome" => ".//h3[contains(@class,'tipo')]",
-            "card_cidade" => "",
-            "card_uf" => "",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",

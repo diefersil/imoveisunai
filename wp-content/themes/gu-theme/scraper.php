@@ -465,6 +465,203 @@ function normalizarBusca($texto) {
     return str_replace($comAcento, $semAcento, $texto);
 }
 
+
+/**
+ * PADRONIZAR NOME DA CIDADE ENCONTRADO NO TEXTO
+ */
+function normalizarNomeCidade(string $cidade): string {
+
+    $cidade = preg_replace('/\s+/u', ' ', $cidade);
+
+    $cidade = trim(
+        $cidade,
+        " \t\n\r\0\x0B-–—,.;:/"
+    );
+
+    if (function_exists('mb_convert_case')) {
+
+        $cidade = mb_convert_case(
+            mb_strtolower($cidade, 'UTF-8'),
+            MB_CASE_TITLE,
+            'UTF-8'
+        );
+
+        $cidade = preg_replace_callback(
+            '/\b(De|Da|Do|Das|Dos|E)\b/u',
+            static fn(array $item): string =>
+                mb_strtolower($item[1], 'UTF-8'),
+            $cidade
+        );
+    }
+
+    return $cidade;
+}
+
+/**
+ * PROCURA UMA CIDADE E UMA UF EM UM TEXTO DE ANÚNCIO IMOBILIÁRIO
+ */
+function encontrarCidadeUf(string $texto): array {
+
+    $ufs = implode('|', [
+        'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF',
+        'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+        'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS',
+        'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+    ]);
+
+    $textoLimpo = html_entity_decode(
+        strip_tags($texto),
+        ENT_QUOTES | ENT_HTML5,
+        'UTF-8'
+    );
+
+    $textoLimpo = preg_replace('/[ \t]+/u', ' ', $textoLimpo);
+    $textoLimpo = preg_replace('/ *\R+ */u', "\n", $textoLimpo);
+
+    $nomeCidade =
+        "[\\p{L}][\\p{L}\\p{M}'’.-]*" .
+        "(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,5}";
+
+    $regras = [
+        'cidade_ou_municipio_com_uf' =>
+            "/\\b(?:cidade|munic[ií]pio)\\s+de\\s+" .
+            "($nomeCidade)\\s*" .
+            "(?:[-–—\\/,]\\s*|\\s+)" .
+            "($ufs)\\b/iu",
+
+        'localizado_em_com_uf' =>
+            "/\\b(?:localizad[oa]s?|situad[oa]s?)\\s+" .
+            "(?:em|no|na)\\s+" .
+            "(?:cidade\\s+de\\s+|munic[ií]pio\\s+de\\s+)?" .
+            "($nomeCidade)\\s*" .
+            "(?:[-–—\\/,]\\s*|\\s+)" .
+            "($ufs)\\b/iu",
+
+        'tipo_imovel_em_com_uf' =>
+            "/\\b(?:fazenda|s[ií]tio|ch[áa]cara|lote|terreno|" .
+            "casa|apartamento|im[oó]vel)\\s+" .
+            "(?:à\\s+venda\\s+)?" .
+            "(?:em|no|na)\\s+" .
+            "($nomeCidade)\\s*" .
+            "(?:[-–—\\/,]\\s*|\\s+)" .
+            "($ufs)\\b/iu",
+
+        'cidade_uf_generico' =>
+            "/\\b($nomeCidade)\\s*" .
+            "[-–—\\/,]\\s*" .
+            "($ufs)\\b/iu",
+    ];
+
+    foreach ($regras as $nomeRegra => $regex) {
+
+        if (preg_match($regex, $textoLimpo, $resultado)) {
+            return [
+                'cidade' => normalizarNomeCidade($resultado[1]),
+                'uf' => strtoupper($resultado[2]),
+                'regra' => $nomeRegra,
+                'trecho' => trim($resultado[0])
+            ];
+        }
+    }
+
+    $regexSemUf =
+        "/\\b(?:cidade|munic[ií]pio)\\s+de\\s+" .
+        "($nomeCidade)" .
+        "(?=\\s+(?:com|onde|que|fica|possui|tem|e)\\b|" .
+        "[\\n,.;:()]|$)/iu";
+
+    if (preg_match($regexSemUf, $textoLimpo, $resultado)) {
+        return [
+            'cidade' => normalizarNomeCidade($resultado[1]),
+            'uf' => null,
+            'regra' => 'cidade_ou_municipio_sem_uf',
+            'trecho' => trim($resultado[0])
+        ];
+    }
+
+    return [
+        'cidade' => null,
+        'uf' => null,
+        'regra' => null,
+        'trecho' => null
+    ];
+}
+
+/**
+ * VERIFICA SE A CIDADE GLOBAL APARECE NO TEXTO DO IMÓVEL
+ */
+function cidadeGlobalEncontradaNoTexto($cidade, $texto): bool {
+
+    $cidadeBusca = normalizarBusca($cidade);
+    $textoBusca = normalizarBusca($texto);
+
+    if ($cidadeBusca === "" || $textoBusca === "") {
+        return false;
+    }
+
+    $regex = '/(?<!\\p{L})' . preg_quote($cidadeBusca, '/') . '(?!\\p{L})/u';
+
+    return preg_match($regex, $textoBusca) === 1;
+}
+
+/**
+ * SUGERIR CIDADE E UF DO IMÓVEL
+ *
+ * Usa o texto real do imóvel:
+ * card_localizacao + descricao + og_title.
+ *
+ * Regra:
+ * - Se a cidade global estiver vazia, vai direto para encontrarCidadeUf().
+ * - Se a cidade global estiver preenchida, primeiro tenta confirmar essa cidade no texto.
+ * - Se não confirmar a cidade global, tenta sugerir cidade/UF pelo texto.
+ */
+function sugerirCidadeUfImovel($cidadeGlobal, $ufGlobal, $cardLocalizacao, $descricao, $ogTitle): array {
+
+    $textoBuscaCidade = trim(
+        (string)$cardLocalizacao . " " .
+        (string)$descricao . " " .
+        (string)$ogTitle
+    );
+
+    if ($textoBuscaCidade === "") {
+        return [
+            "cidade" => "",
+            "uf" => "",
+            "regra" => null,
+            "trecho" => null
+        ];
+    }
+
+    $cidadeGlobal = trim((string)$cidadeGlobal);
+    $ufGlobal = trim((string)$ufGlobal);
+
+    /**
+     * Se a cidade global estiver preenchida, primeiro tenta confirmar
+     * se ela aparece no texto real do imóvel.
+     */
+    if ($cidadeGlobal !== "" && cidadeGlobalEncontradaNoTexto($cidadeGlobal, $textoBuscaCidade)) {
+        return [
+            "cidade" => normalizarNomeCidade($cidadeGlobal),
+            "uf" => strtoupper($ufGlobal),
+            "regra" => "cidade_global_encontrada",
+            "trecho" => $cidadeGlobal
+        ];
+    }
+
+    /**
+     * Se a cidade global estiver vazia, ou se não foi confirmada no texto,
+     * tenta localizar cidade e UF diretamente pelo conteúdo do imóvel.
+     */
+    $sugestao = encontrarCidadeUf($textoBuscaCidade);
+
+    return [
+        "cidade" => !empty($sugestao["cidade"]) ? $sugestao["cidade"] : "",
+        "uf" => !empty($sugestao["uf"]) ? $sugestao["uf"] : "",
+        "regra" => $sugestao["regra"] ?? null,
+        "trecho" => $sugestao["trecho"] ?? null
+    ];
+}
+
 /**
  * NORMALIZAR PREÇO
  */
@@ -1666,29 +1863,8 @@ foreach ($sites as $site) {
                 $seletores["card_nome"] ?? ""
             );
 
-            $cardCidade = "";
-
-            if (empty($cidade)) {
-                $cardCidade = getTextoSeletor(
-                    $xpath,
-                    $card,
-                    $seletores["card_cidade"] ?? ""
-                );
-            }
-
-            $cidadeFinal = !empty($cidade) ? $cidade : $cardCidade;
-
-            $cardUf = "";
-
-            if (empty($uf)) {
-                $cardUf = getTextoSeletor(
-                    $xpath,
-                    $card,
-                    $seletores["card_uf"] ?? ""
-                );
-            }
-
-            $ufFinal = !empty($uf) ? $uf : $cardUf;
+            $cidadeFinal = $cidade;
+            $ufFinal = $uf;
 
             $cardContatoNome = "";
 
@@ -1731,23 +1907,6 @@ foreach ($sites as $site) {
                 $card,
                 $seletores["card_localizacao"] ?? ""
             );
-
-            /**
-             * FALLBACK DA LOCALIZAÇÃO
-             *
-             * Se card_localizacao não for encontrado ou vier vazio,
-             * monta com cidade e UF finais.
-             */
-            if (empty($cardLocalizacao)) {
-
-                if (!empty($cidadeFinal) && !empty($ufFinal)) {
-                    $cardLocalizacao = $cidadeFinal . ", " . $ufFinal;
-                } elseif (!empty($cidadeFinal)) {
-                    $cardLocalizacao = $cidadeFinal;
-                } elseif (!empty($ufFinal)) {
-                    $cardLocalizacao = $ufFinal;
-                }
-            }
 
             $cardArea = getTextoSeletor(
                 $xpath,
@@ -1819,6 +1978,42 @@ foreach ($sites as $site) {
              */
             $descricao = limparDescricaoCsv($descricao);
 
+            $cidadeUfSugerida = sugerirCidadeUfImovel(
+                $cidade,
+                $uf,
+                $cardLocalizacao,
+                $descricao,
+                $dadosInternos["og_title"] ?? ""
+            );
+
+            $cidadeSugerida = $cidadeUfSugerida["cidade"] ?? "";
+            $ufSugerido = $cidadeUfSugerida["uf"] ?? "";
+
+            if (empty($cidadeFinal) && !empty($cidadeSugerida)) {
+                $cidadeFinal = $cidadeSugerida;
+            }
+
+            if (empty($ufFinal) && !empty($ufSugerido)) {
+                $ufFinal = $ufSugerido;
+            }
+
+            /**
+             * FALLBACK DA LOCALIZAÇÃO
+             *
+             * Se card_localizacao não for encontrado ou vier vazio,
+             * monta com cidade e UF finais.
+             */
+            if (empty($cardLocalizacao)) {
+
+                if (!empty($cidadeFinal) && !empty($ufFinal)) {
+                    $cardLocalizacao = $cidadeFinal . ", " . $ufFinal;
+                } elseif (!empty($cidadeFinal)) {
+                    $cardLocalizacao = $cidadeFinal;
+                } elseif (!empty($ufFinal)) {
+                    $cardLocalizacao = $ufFinal;
+                }
+            }
+
             $negociacao = definirStatusImovel(
                 $cardNome,
                 $descricao,
@@ -1865,7 +2060,11 @@ foreach ($sites as $site) {
                     "card_url" => $cardUrl,
                     "preco" => $preco,
                     "galeria" => $galeria,
-                    "categoria_imovel" => $categoriaImovel
+                    "categoria_imovel" => $categoriaImovel,
+                    "cidade_sugerida" => $cidadeSugerida,
+                    "uf_sugerido" => $ufSugerido,
+                    "cidade_sugerida_regra" => $cidadeUfSugerida["regra"] ?? null,
+                    "cidade_sugerida_trecho" => $cidadeUfSugerida["trecho"] ?? null
                 ];
 
                 continue;
@@ -1878,6 +2077,8 @@ foreach ($sites as $site) {
                     $usuario . "|" .
                     $cidadeFinal . "|" .
                     $ufFinal . "|" .
+                    $cidadeSugerida . "|" .
+                    $ufSugerido . "|" .
                     $categoria . "|" .
                     $tags . "|" .
                     $categoriaImovel . "|" .
@@ -1941,6 +2142,10 @@ foreach ($sites as $site) {
                 "data_ultimo_scraper_eua" => date("Y-m-d H:i:s"),
 
                 "data_expiracao" => gerarDataPeriodoTimestamp(date("Y-m-d H:i:s"), $periodo),
+
+                "cidade_sugerida" => $cidadeSugerida,
+                "uf_sugerido" => $ufSugerido,
+
                 "_periodo_dias" => $periodo
             ];
 
@@ -2101,7 +2306,10 @@ $colunas = [
     "data_ultimo_scraper_brasil",
     "data_ultimo_scraper_eua",
 
-    "data_expiracao"
+    "data_expiracao",
+
+    "cidade_sugerida",
+    "uf_sugerido"
 ];
 
 /**

@@ -603,43 +603,50 @@ add_action( 'admin_head', function () {
  * 23. JETENGINE - MACRO PERSONALIZADA POR CATEGORIA GET
  * ============================================================ */
 
-/*
-add_action( 'jet-engine/register-macros', function() {
+add_action('wp_footer', 'limpar_loop_etiquetas');
 
-	if ( ! class_exists( 'Jet_Engine_Base_Macros' ) ) {
-		return;
-	}
+function limpar_loop_etiquetas() {
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-	class Tipo_Por_Categoria_GET_Macro extends Jet_Engine_Base_Macros {
+        document.querySelectorAll('.loop-etiquetas').forEach(function (el) {
 
-		public function macros_tag() {
-			return 'tipo_por_categoria_get';
-		}
+            var walker = document.createTreeWalker(
+                el,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
 
-		public function macros_name() {
-			return 'Tipo por Categoria GET';
-		}
+            var node;
 
-		public function macros_callback( $args = array() ) {
+            while (node = walker.nextNode()) {
 
-			$categoria = isset( $_GET['categoria'] ) ? absint( $_GET['categoria'] ) : 0;
+                var texto = node.nodeValue;
 
-			$mapa = array(
-				1218 => 'carros',
-				1220 => 'motos',
-				1221 => 'caminhoes',
-				1222 => 'maquinas',
-			);
+                // Ignora nós vazios, quebras de linha ou espaços soltos
+                if (!texto.trim()) {
+                    continue;
+                }
 
-			return isset( $mapa[ $categoria ] ) ? $mapa[ $categoria ] : '';
-		}
-	}
+                // Remove do início: "| | ", "| " ou espaço
+                node.nodeValue = texto.replace(/^\s*(?:\|\s*\|\s*|\|\s*)?/, '');
 
-	new Tipo_Por_Categoria_GET_Macro();
+                // Para depois de limpar o primeiro texto real
+                break;
+            }
 
-} );
-*/
+        });
 
+    });
+    </script>
+    <?php
+}
+
+/* ============================================================
+ * 23. JETENGINE - MACRO PERSONALIZADA POR CATEGORIA GET
+ * ============================================================ */
 
 // Shortcode genérico para mostrar termo de qualquer taxonomia no loop
 // Uso: [taxonomia_loop tax="cidade"]
