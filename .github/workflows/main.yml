@@ -31,3 +31,4 @@ jobs:
             **/wp-config.php
             **/.htaccess
             **/wp-content/**
+            
