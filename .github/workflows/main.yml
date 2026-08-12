@@ -30,7 +30,4 @@ jobs:
             **/_create/**
             **/wp-config.php
             **/.htaccess
-
-            **/wp-content/!(plugins|themes)
-            **/wp-content/!(plugins|themes)/**
-            
+            **/wp-content/**

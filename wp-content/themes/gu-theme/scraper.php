@@ -344,9 +344,9 @@ function limparDescricaoHtmlPermitida($html) {
     $html = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $html);
 
     /**
-     * Títulos h1-h6 viram negrito + <br/>
+     * Títulos h1-h6 viram <h4 class='desc-title'>.
      * Exemplo:
-     * <h2>Descrição</h2> => <b>Descrição</b><br/>
+     * <h2>Descrição</h2> => <h4 class='desc-title'>Descrição</h4>
      */
     $html = preg_replace_callback('/<h[1-6]\b[^>]*>(.*?)<\/h[1-6]>/is', function ($match) {
 
@@ -355,10 +355,10 @@ function limparDescricaoHtmlPermitida($html) {
         );
 
         if ($titulo === "") {
-            return "<br/>";
+            return "";
         }
 
-        return "<b>" . $titulo . "</b><br/>";
+        return "<h4 class='desc-title'>" . $titulo . "</h4>";
     }, $html);
 
     /**
@@ -378,17 +378,19 @@ function limparDescricaoHtmlPermitida($html) {
     $html = preg_replace('/<\s*\/\s*(div|section|article|tr|table)\s*>/i', '<br/>', $html);
 
     /**
-     * Mantém somente ul e li, sem atributos.
-     * O <b> é mantido apenas para os títulos convertidos.
+     * Mantém somente h4.desc-title, ul, li, b e br, sem atributos extras.
+     * O <h4 class='desc-title'> é usado para títulos da descrição.
      * O <br/> é mantido para preservar quebras no WP All Import.
      */
+    $html = preg_replace('/<\s*h4\b[^>]*>/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/<\s*\/\s*h4\s*>/i', '</h4>', $html);
     $html = preg_replace('/<\s*ul\b[^>]*>/i', '<ul>', $html);
     $html = preg_replace('/<\s*\/\s*ul\s*>/i', '</ul>', $html);
     $html = preg_replace('/<\s*li\b[^>]*>/i', '<li>', $html);
     $html = preg_replace('/<\s*\/\s*li\s*>/i', '</li>', $html);
 
-    // Remove todo HTML restante, deixando somente ul, li, b e br
-    $html = strip_tags($html, '<ul><li><b><br>');
+    // Remove todo HTML restante, deixando somente h4, ul, li, b e br
+    $html = strip_tags($html, '<h4><ul><li><b><br>');
 
     // Normaliza qualquer variação de br para <br/>
     $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
@@ -396,6 +398,8 @@ function limparDescricaoHtmlPermitida($html) {
     // Remove espaços excessivos entre tags e texto
     $html = preg_replace('/[ \t]+/', ' ', $html);
     $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<h4\s+class=[\'\"]desc-title[\'\"]>\s*/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/\s*<\/h4>\s*/i', '</h4>', $html);
     $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
     $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
     $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
@@ -499,16 +503,19 @@ function normalizarNomeCidade(string $cidade): string {
 }
 
 /**
- * PREPARAR A DESCRIÇÃO PARA BUSCA DE CIDADE/UF
+ * PREPARAR O TEXTO PARA BUSCA DE CIDADE/UF
  *
  * IMPORTANTE:
- * A fonte de cidade_sugerida é EXCLUSIVAMENTE o campo descricao.
+ * A fonte de cidade_sugerida usa o texto real do imóvel:
+ * card_localizacao_original + descricao + og_title.
+ *
+ * O card_localizacao_original é o valor capturado do site antes do fallback.
  * As quebras de linha são preservadas porque ajudam a identificar títulos
- * e trechos como "FAZENDA EM BURITIS MG" no início da descrição.
+ * e trechos como "FAZENDA EM BURITIS MG" no início do texto.
  */
-function prepararDescricaoParaBuscaCidade($descricao): string {
+function prepararTextoParaBuscaCidade($texto): string {
 
-    $texto = (string)($descricao ?? "");
+    $texto = (string)($texto ?? "");
 
     if (trim($texto) === "") {
         return "";
@@ -625,18 +632,18 @@ function adicionarCandidatoCidadeUf(array &$candidatos, $cidade, $uf, $pontos, $
 }
 
 /**
- * PROCURA CIDADE E UF EXCLUSIVAMENTE NA DESCRIÇÃO DO IMÓVEL
+ * PROCURA CIDADE E UF NO TEXTO REAL DO IMÓVEL
  *
  * Estratégia:
  * - encontra vários candidatos;
  * - atribui maior pontuação para padrões imobiliários mais explícitos;
- * - prioriza ocorrências no início da descrição;
+ * - prioriza ocorrências no início do texto;
  * - penaliza cidades usadas apenas como referência de distância/acesso;
  * - retorna somente o candidato mais confiável.
  */
-function encontrarCidadeUf(string $descricao): array {
+function encontrarCidadeUf(string $texto): array {
 
-    $textoLimpo = prepararDescricaoParaBuscaCidade($descricao);
+    $textoLimpo = prepararTextoParaBuscaCidade($texto);
 
     if ($textoLimpo === "") {
         return [
@@ -920,21 +927,23 @@ function encontrarCidadeUf(string $descricao): array {
  * SUGERIR CIDADE E UF DO IMÓVEL
  *
  * REGRA DEFINITIVA:
- * cidade_sugerida e uf_sugerido têm como fonte SOMENTE o campo descricao.
+ * cidade_sugerida e uf_sugerido usam o texto real do imóvel:
+ * card_localizacao_original + descricao + og_title.
  *
- * NÃO utiliza:
- * - cidade/UF configuradas no scraper-sites-config.php;
- * - card_localizacao;
- * - card_nome;
- * - og_title;
- * - og_description;
- * - URL do imóvel.
+ * IMPORTANTE:
+ * - card_localizacao_original é capturado antes do fallback;
+ * - o fallback de card_localizacao não entra na busca de cidade_sugerida;
+ * - isso evita falso positivo quando a localização é montada com a cidade global.
  */
-function sugerirCidadeUfImovel($descricao): array {
+function sugerirCidadeUfImovel($descricao, $ogTitle = "", $cardLocalizacaoOriginal = ""): array {
 
-    $descricao = trim((string)$descricao);
+    $textoBuscaCidade = trim(
+        (string)$cardLocalizacaoOriginal . "\n" .
+        (string)$descricao . "\n" .
+        (string)$ogTitle
+    );
 
-    if ($descricao === "") {
+    if ($textoBuscaCidade === "") {
         return [
             "cidade" => "",
             "uf" => "",
@@ -944,7 +953,7 @@ function sugerirCidadeUfImovel($descricao): array {
         ];
     }
 
-    $sugestao = encontrarCidadeUf($descricao);
+    $sugestao = encontrarCidadeUf($textoBuscaCidade);
 
     return [
         "cidade" => !empty($sugestao["cidade"]) ? $sugestao["cidade"] : "",
@@ -2240,11 +2249,18 @@ foreach ($sites as $site) {
 
             $contatoFoneFinal = !empty($contatoFone) ? $contatoFone : $cardContato;
 
-            $cardLocalizacao = getTextoSeletor(
+            $cardLocalizacaoOriginal = getTextoSeletor(
                 $xpath,
                 $card,
                 $seletores["card_localizacao"] ?? ""
             );
+
+            /**
+             * IMPORTANTE:
+             * card_localizacao fica somente com o valor encontrado pelo seletor.
+             * Se o seletor não encontrar nada, permanece vazio.
+             */
+            $cardLocalizacao = $cardLocalizacaoOriginal;
 
             $cardArea = getTextoSeletor(
                 $xpath,
@@ -2317,13 +2333,22 @@ foreach ($sites as $site) {
             $descricao = limparDescricaoCsv($descricao);
 
             /**
-             * cidade_sugerida e uf_sugerido são calculados EXCLUSIVAMENTE
-             * a partir do campo descricao.
+             * cidade_sugerida e uf_sugerido são calculados usando:
+             * card_localizacao_original + descricao + og_title.
+             *
+             * Não usa o fallback de card_localizacao para evitar falso positivo.
              */
-            $cidadeUfSugerida = sugerirCidadeUfImovel($descricao);
+            $ogTitle = $dadosInternos["og_title"] ?? "";
+
+            $cidadeUfSugerida = sugerirCidadeUfImovel(
+                $descricao,
+                $ogTitle,
+                $cardLocalizacaoOriginal
+            );
 
             $cidadeSugerida = $cidadeUfSugerida["cidade"] ?? "";
             $ufSugerido = $cidadeUfSugerida["uf"] ?? "";
+            $cidadeConfianca = (int)($cidadeUfSugerida["confianca"] ?? 0);
 
             if (empty($cidadeFinal) && !empty($cidadeSugerida)) {
                 $cidadeFinal = $cidadeSugerida;
@@ -2334,21 +2359,9 @@ foreach ($sites as $site) {
             }
 
             /**
-             * FALLBACK DA LOCALIZAÇÃO
-             *
-             * Se card_localizacao não for encontrado ou vier vazio,
-             * monta com cidade e UF finais.
+             * Sem fallback para card_localizacao.
+             * O campo mantém somente o que foi encontrado no site.
              */
-            if (empty($cardLocalizacao)) {
-
-                if (!empty($cidadeFinal) && !empty($ufFinal)) {
-                    $cardLocalizacao = $cidadeFinal . ", " . $ufFinal;
-                } elseif (!empty($cidadeFinal)) {
-                    $cardLocalizacao = $cidadeFinal;
-                } elseif (!empty($ufFinal)) {
-                    $cardLocalizacao = $ufFinal;
-                }
-            }
 
             $negociacao = definirStatusImovel(
                 $cardNome,
@@ -2402,7 +2415,7 @@ foreach ($sites as $site) {
                     "uf_sugerido" => $ufSugerido,
                     "cidade_sugerida_regra" => $cidadeUfSugerida["regra"] ?? null,
                     "cidade_sugerida_trecho" => $cidadeUfSugerida["trecho"] ?? null,
-                    "cidade_sugerida_confianca" => $cidadeUfSugerida["confianca"] ?? 0
+                    "cidade_confianca" => $cidadeConfianca
                 ];
 
                 continue;
@@ -2483,6 +2496,7 @@ foreach ($sites as $site) {
 
                 "cidade_sugerida" => $cidadeSugerida,
                 "uf_sugerido" => $ufSugerido,
+                "cidade_confianca" => $cidadeConfianca,
                 "usuario_email" => $usuarioEmail,
 
                 "_periodo_dias" => $periodo
@@ -2544,7 +2558,7 @@ function limparCampoCsv($texto) {
  *
  * A descrição pode conter HTML permitido, então não deve usar
  * a limpeza genérica. Mantém somente:
- * ul, li, b e br.
+ * h4.desc-title, ul, li, b e br.
  */
 function limparDescricaoCsv($html) {
 
@@ -2574,13 +2588,15 @@ function limparDescricaoCsv($html) {
      */
     $html = str_replace([";", "；"], "<br/>", $html);
 
-    // Remove atributos das tags permitidas
+    // Remove atributos extras das tags permitidas
+    $html = preg_replace('/<\s*h4\b[^>]*>/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/<\s*\/\s*h4\s*>/i', '</h4>', $html);
     $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
     $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
     $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
 
     // Mantém somente estas tags
-    $html = strip_tags($html, '<ul><li><b><br>');
+    $html = strip_tags($html, '<h4><ul><li><b><br>');
 
     // Garante <br/> novamente depois do strip_tags
     $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
@@ -2593,6 +2609,8 @@ function limparDescricaoCsv($html) {
 
     // Limpa espaços perto das tags
     $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<h4\s+class=[\'\"]desc-title[\'\"]>\s*/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/\s*<\/h4>\s*/i', '</h4>', $html);
     $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
     $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
     $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
@@ -2741,6 +2759,7 @@ $colunas = [
 
     "cidade_sugerida",
     "uf_sugerido",
+    "cidade_confianca",
     "usuario_email"
 ];
 
