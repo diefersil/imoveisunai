@@ -12,7 +12,8 @@ $sites = [
     [
         "nome_site" => "Prime Imóveis",
         "contato_nome" => "Prime Imóveis",
-        "usuario" => "imoveisunai",
+        "usuario" => "primeimoveis",
+        "usuario_email" => "prime@imoveisunai.com.br",
         "cidade" => "Unaí",
         "uf" => "MG",
         "categoria" => "",
@@ -58,7 +59,8 @@ $sites = [
     [
         "nome_site" => "Terra Fértil",
         "contato_nome" => "Terra Fértil",
-        "usuario" => "imoveisunai",
+        "usuario" => "terrafertil",
+        "usuario_email" => "fertil@imoveisunai.com.br",
         "cidade" => "Unaí",
         "uf" => "MG",
         "categoria" => "",
@@ -106,7 +108,8 @@ $sites = [
     [
         "nome_site" => "Sucesso Imóveis",
         "contato_nome" => "Sucesso Imóveis",
-        "usuario" => "imoveisunai",
+        "usuario" => "sucessoimoveis",
+        "usuario_email" => "sucesso@imoveisunai.com.br",
         "cidade" => "Unaí",
         "uf" => "MG",
         "categoria" => "",
@@ -151,8 +154,9 @@ $sites = [
      * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Área 38",
-        "contato_nome" => "",
-        "usuario" => "imoveisunai",
+        "contato_nome" => "Área 38",
+        "usuario" => "area38",
+        "usuario_email" => "area38@imoveisunai.com.br",
         "cidade" => "Paracatu",
         "uf" => "MG",
         "categoria" => "",
@@ -194,7 +198,8 @@ $sites = [
     [
         "nome_site" => "Morado Imóveis",
         "contato_nome" => "Morado Imóveis",
-        "usuario" => "imoveisunai",
+        "usuario" => "moradoimoveis",
+        "usuario_email" => "morado@imoveisunai.com.br",
         "cidade" => "Paracatu",
         "uf" => "MG",
         "categoria" => "",
@@ -237,8 +242,9 @@ $sites = [
      * ---------------------------------------------------------------------------- */
     [
         "nome_site" => "Novo Lar",
-        "contato_nome" => "",
-        "usuario" => "imoveisunai",
+        "contato_nome" => "Novo Lar",
+        "usuario" => "novolar",
+        "usuario_email" => "novolar@imoveisunai.com.br",
         "cidade" => "Unaí",
         "uf" => "MG",
         "categoria" => "",

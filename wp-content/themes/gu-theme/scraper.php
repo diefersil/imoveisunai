@@ -44,6 +44,7 @@ function detectarRaizWordPress() {
  */
 
 $arquivoCsv = "scraper-res.csv";
+$arquivoCsvUsuarios = "scraper-users.csv";
 $gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
@@ -498,9 +499,154 @@ function normalizarNomeCidade(string $cidade): string {
 }
 
 /**
- * PROCURA UMA CIDADE E UMA UF EM UM TEXTO DE ANÚNCIO IMOBILIÁRIO
+ * PREPARAR A DESCRIÇÃO PARA BUSCA DE CIDADE/UF
+ *
+ * IMPORTANTE:
+ * A fonte de cidade_sugerida é EXCLUSIVAMENTE o campo descricao.
+ * As quebras de linha são preservadas porque ajudam a identificar títulos
+ * e trechos como "FAZENDA EM BURITIS MG" no início da descrição.
  */
-function encontrarCidadeUf(string $texto): array {
+function prepararDescricaoParaBuscaCidade($descricao): string {
+
+    $texto = (string)($descricao ?? "");
+
+    if (trim($texto) === "") {
+        return "";
+    }
+
+    $texto = html_entity_decode(
+        $texto,
+        ENT_QUOTES | ENT_HTML5,
+        'UTF-8'
+    );
+
+    // Preserva separação visual antes de remover o HTML.
+    $texto = preg_replace('/<\s*br\s*\/?>/i', "\n", $texto);
+    $texto = preg_replace('/<\s*\/\s*(?:p|div|li|ul|ol|h[1-6]|section|article)\s*>/i', "\n", $texto);
+    $texto = preg_replace('/<\s*(?:p|div|li|ul|ol|h[1-6]|section|article)\b[^>]*>/i', '', $texto);
+
+    $texto = strip_tags($texto);
+
+    // Espaços internos são normalizados sem eliminar quebras de linha.
+    $texto = preg_replace('/[ \t]+/u', ' ', $texto);
+    $texto = preg_replace('/ *\R+ */u', "\n", $texto);
+    $texto = preg_replace('/\n{2,}/u', "\n", $texto);
+
+    return trim($texto);
+}
+
+/**
+ * ADICIONAR CANDIDATO DE CIDADE/UF
+ *
+ * Se a mesma cidade/UF for encontrada por mais de uma regra,
+ * mantém a ocorrência com maior pontuação.
+ */
+function adicionarCandidatoCidadeUf(array &$candidatos, $cidade, $uf, $pontos, $regra, $trecho, $posicao): void {
+
+    $cidade = normalizarNomeCidade((string)$cidade);
+    $uf = strtoupper(trim((string)$uf));
+    $trecho = trim((string)$trecho);
+    $posicao = max(0, (int)$posicao);
+
+    if ($cidade === "") {
+        return;
+    }
+
+    // Evita candidatos obviamente inválidos.
+    if (preg_match('/\d/u', $cidade)) {
+        return;
+    }
+
+    $cidadeBusca = normalizarBusca($cidade);
+
+    $invalidosExatos = [
+        'cidade', 'municipio', 'imovel', 'propriedade',
+        'casa', 'apartamento', 'terreno', 'lote',
+        'fazenda', 'sitio', 'chacara', 'galpao',
+        'barracao', 'loja', 'sala comercial', 'ponto comercial'
+    ];
+
+    if (in_array($cidadeBusca, $invalidosExatos, true)) {
+        return;
+    }
+
+    /**
+     * Evita que o padrão genérico transforme trechos de referência em cidade.
+     * Exemplos que devem ser descartados:
+     * - km de Unaí-MG
+     * - próximo de Brasília-DF
+     * - Fazenda em Buritis-MG (quando capturado inteiro pelo fallback genérico)
+     */
+    if (preg_match(
+        '/^(?:km\s+de|quil[oô]metros?\s+de|pr[oó]xim[oa]\s+de|distante\s+de|sentido|acesso\s+por|via)\b/iu',
+        $cidadeBusca
+    )) {
+        return;
+    }
+
+    if (preg_match(
+        '/^(?:em|no|na|de|do|da)\s+/iu',
+        $cidadeBusca
+    )) {
+        return;
+    }
+
+    if (preg_match(
+        '/^(?:fazenda|s[ií]tio|ch[áa]cara|casa|apartamento|apto|sobrado|terreno|lote|kitnet|quitinete|galp[aã]o|barrac[aã]o|loja|im[oó]vel|propriedade)\s+(?:em|no|na)\s+/iu',
+        $cidadeBusca
+    )) {
+        return;
+    }
+
+    $chave = $cidadeBusca . '|' . $uf;
+
+    $novo = [
+        'cidade' => $cidade,
+        'uf' => $uf,
+        'pontos' => (int)$pontos,
+        'regra' => (string)$regra,
+        'trecho' => $trecho,
+        'posicao' => $posicao
+    ];
+
+    if (!isset($candidatos[$chave])) {
+        $candidatos[$chave] = $novo;
+        return;
+    }
+
+    $atual = $candidatos[$chave];
+
+    if (
+        $novo['pontos'] > $atual['pontos'] ||
+        ($novo['pontos'] === $atual['pontos'] && $novo['posicao'] < $atual['posicao'])
+    ) {
+        $candidatos[$chave] = $novo;
+    }
+}
+
+/**
+ * PROCURA CIDADE E UF EXCLUSIVAMENTE NA DESCRIÇÃO DO IMÓVEL
+ *
+ * Estratégia:
+ * - encontra vários candidatos;
+ * - atribui maior pontuação para padrões imobiliários mais explícitos;
+ * - prioriza ocorrências no início da descrição;
+ * - penaliza cidades usadas apenas como referência de distância/acesso;
+ * - retorna somente o candidato mais confiável.
+ */
+function encontrarCidadeUf(string $descricao): array {
+
+    $textoLimpo = prepararDescricaoParaBuscaCidade($descricao);
+
+    if ($textoLimpo === "") {
+        return [
+            'cidade' => null,
+            'uf' => null,
+            'regra' => null,
+            'trecho' => null,
+            'confianca' => 0
+        ];
+    }
 
     $ufs = implode('|', [
         'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF',
@@ -509,156 +655,303 @@ function encontrarCidadeUf(string $texto): array {
         'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
     ]);
 
-    $textoLimpo = html_entity_decode(
-        strip_tags($texto),
-        ENT_QUOTES | ENT_HTML5,
-        'UTF-8'
-    );
-
-    $textoLimpo = preg_replace('/[ \t]+/u', ' ', $textoLimpo);
-    $textoLimpo = preg_replace('/ *\R+ */u', "\n", $textoLimpo);
-
+    /**
+     * Até 6 palavras no nome da cidade.
+     * Exemplos:
+     * Buritis
+     * Rio Verde
+     * Santa Helena de Goiás
+     * São João da Ponte
+     */
     $nomeCidade =
         "[\\p{L}][\\p{L}\\p{M}'’.-]*" .
         "(?:\\s+[\\p{L}][\\p{L}\\p{M}'’.-]*){0,5}";
 
+    /**
+     * Tipos de imóveis rurais e urbanos.
+     */
+    $tiposImovel =
+        "fazenda|fazendas|" .
+        "s[ií]tio|s[ií]tios|" .
+        "ch[áa]cara|ch[áa]caras|" .
+        "casa|casas|sobrado|sobrados|mans[aã]o|mans[oõ]es|" .
+        "apartamento|apartamentos|apto|aptos|" .
+        "terreno|terrenos|lote|lotes|" .
+        "kitnet|kitnets|quitinete|quitinetes|" .
+        "flat|flats|loft|lofts|duplex|cobertura|coberturas|" .
+        "galp[aã]o|galp[oõ]es|barrac[aã]o|barrac[oõ]es|" .
+        "loja|lojas|sala\\s+comercial|salas\\s+comerciais|" .
+        "ponto\\s+comercial|pontos\\s+comerciais|" .
+        "pr[eé]dio|pr[eé]dios|" .
+        "im[oó]vel|im[oó]veis|propriedade|propriedades|" .
+        "[aá]rea\\s+rural|[aá]rea\\s+urbana|[aá]rea";
+
+    $candidatos = [];
+
+    /**
+     * Ordem não define o vencedor sozinha: cada regra tem uma pontuação.
+     */
     $regras = [
-        'cidade_ou_municipio_com_uf' =>
-            "/\\b(?:cidade|munic[ií]pio)\\s+de\\s+" .
-            "($nomeCidade)\\s*" .
-            "(?:[-–—\\/,]\\s*|\\s+)" .
-            "($ufs)\\b/iu",
-
-        'localizado_em_com_uf' =>
-            "/\\b(?:localizad[oa]s?|situad[oa]s?)\\s+" .
-            "(?:em|no|na)\\s+" .
-            "(?:cidade\\s+de\\s+|munic[ií]pio\\s+de\\s+)?" .
-            "($nomeCidade)\\s*" .
-            "(?:[-–—\\/,]\\s*|\\s+)" .
-            "($ufs)\\b/iu",
-
-        'tipo_imovel_em_com_uf' =>
-            "/\\b(?:fazenda|s[ií]tio|ch[áa]cara|lote|terreno|" .
-            "casa|apartamento|im[oó]vel)\\s+" .
-            "(?:à\\s+venda\\s+)?" .
-            "(?:em|no|na)\\s+" .
-            "($nomeCidade)\\s*" .
-            "(?:[-–—\\/,]\\s*|\\s+)" .
-            "($ufs)\\b/iu",
-
-        'cidade_uf_generico' =>
-            "/\\b($nomeCidade)\\s*" .
-            "[-–—\\/,]\\s*" .
-            "($ufs)\\b/iu",
+        [
+            'nome' => 'cidade_ou_municipio_com_uf',
+            'pontos' => 100,
+            'regex' =>
+                "/\\b(?:cidade|munic[ií]pio)\\s+de\\s+" .
+                "($nomeCidade)\\s*" .
+                "(?:[-–—\\/,]\\s*|\\s+)" .
+                "($ufs)\\b/iu"
+        ],
+        [
+            'nome' => 'tipo_imovel_em_com_uf',
+            'pontos' => 98,
+            'regex' =>
+                "/\\b(?:$tiposImovel)\\b" .
+                "(?:\\s+(?:rural|urbano|urbana))?" .
+                "(?:\\s+(?:à\\s+venda|a\\s+venda|para\\s+venda))?" .
+                "(?:\\s+(?:localizad[oa]|situad[oa]))?" .
+                "\\s+(?:em|no|na)\\s+" .
+                "($nomeCidade)\\s*" .
+                "(?:[-–—\\/,]\\s*|\\s+)" .
+                "($ufs)\\b/iu"
+        ],
+        [
+            'nome' => 'localizado_em_com_uf',
+            'pontos' => 95,
+            'regex' =>
+                "/\\b(?:localizad[oa]s?|situad[oa]s?|localiza-se|situa-se)\\s+" .
+                "(?:em|no|na)\\s+" .
+                "(?:cidade\\s+de\\s+|munic[ií]pio\\s+de\\s+)?" .
+                "($nomeCidade)\\s*" .
+                "(?:[-–—\\/,]\\s*|\\s+)" .
+                "($ufs)\\b/iu"
+        ],
+        [
+            'nome' => 'venda_em_com_uf',
+            'pontos' => 90,
+            'regex' =>
+                "/\\b(?:à\\s+venda|a\\s+venda|vende-se|venda)\\s+" .
+                "(?:em|no|na)\\s+" .
+                "($nomeCidade)\\s*" .
+                "(?:[-–—\\/,]\\s*|\\s+)" .
+                "($ufs)\\b/iu"
+        ],
+        [
+            'nome' => 'rotulo_localizacao_com_uf',
+            'pontos' => 88,
+            'regex' =>
+                "/\\b(?:localiza[cç][aã]o|cidade|munic[ií]pio|endere[cç]o)\\s*[:=-]\\s*" .
+                "($nomeCidade)\\s*" .
+                "(?:[-–—\\/,]\\s*|\\s+)" .
+                "($ufs)\\b/iu"
+        ],
+        [
+            'nome' => 'cidade_uf_com_separador',
+            'pontos' => 72,
+            'regex' =>
+                "/\\b($nomeCidade)\\s*[-–—\\/]\\s*($ufs)\\b/iu"
+        ]
     ];
 
-    foreach ($regras as $nomeRegra => $regex) {
+    foreach ($regras as $regra) {
 
-        if (preg_match($regex, $textoLimpo, $resultado)) {
-            return [
-                'cidade' => normalizarNomeCidade($resultado[1]),
-                'uf' => strtoupper($resultado[2]),
-                'regra' => $nomeRegra,
-                'trecho' => trim($resultado[0])
-            ];
+        if (!preg_match_all(
+            $regra['regex'],
+            $textoLimpo,
+            $matches,
+            PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+        )) {
+            continue;
+        }
+
+        foreach ($matches as $match) {
+
+            $trecho = $match[0][0] ?? '';
+            $posicao = $match[0][1] ?? 0;
+            $cidade = $match[1][0] ?? '';
+            $uf = $match[2][0] ?? '';
+
+            $pontos = (int)$regra['pontos'];
+
+            // Títulos e primeiras linhas tendem a descrever o imóvel.
+            if ($posicao <= 120) {
+                $pontos += 15;
+            } elseif ($posicao <= 350) {
+                $pontos += 8;
+            }
+
+            adicionarCandidatoCidadeUf(
+                $candidatos,
+                $cidade,
+                $uf,
+                $pontos,
+                $regra['nome'],
+                $trecho,
+                $posicao
+            );
         }
     }
 
+    /**
+     * Sem UF: aceita apenas formas explícitas "cidade de" / "município de".
+     * Isso reduz falsos positivos como "casa em condomínio fechado".
+     */
     $regexSemUf =
         "/\\b(?:cidade|munic[ií]pio)\\s+de\\s+" .
         "($nomeCidade)" .
         "(?=\\s+(?:com|onde|que|fica|possui|tem|e)\\b|" .
         "[\\n,.;:()]|$)/iu";
 
-    if (preg_match($regexSemUf, $textoLimpo, $resultado)) {
+    if (preg_match_all(
+        $regexSemUf,
+        $textoLimpo,
+        $matchesSemUf,
+        PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+    )) {
+
+        foreach ($matchesSemUf as $match) {
+
+            $trecho = $match[0][0] ?? '';
+            $posicao = $match[0][1] ?? 0;
+            $cidade = $match[1][0] ?? '';
+            $pontos = 68;
+
+            if ($posicao <= 120) {
+                $pontos += 12;
+            } elseif ($posicao <= 350) {
+                $pontos += 6;
+            }
+
+            adicionarCandidatoCidadeUf(
+                $candidatos,
+                $cidade,
+                '',
+                $pontos,
+                'cidade_ou_municipio_sem_uf',
+                $trecho,
+                $posicao
+            );
+        }
+    }
+
+    if (empty($candidatos)) {
         return [
-            'cidade' => normalizarNomeCidade($resultado[1]),
+            'cidade' => null,
             'uf' => null,
-            'regra' => 'cidade_ou_municipio_sem_uf',
-            'trecho' => trim($resultado[0])
+            'regra' => null,
+            'trecho' => null,
+            'confianca' => 0
+        ];
+    }
+
+    /**
+     * Penaliza cidades citadas apenas como referência.
+     * Exemplos:
+     * - 230 km de Brasília
+     * - distante 50 km de Unaí
+     * - próximo de Paracatu
+     * - sentido Rio Verde
+     */
+    foreach ($candidatos as $chave => $candidato) {
+
+        $cidadeRegex = preg_quote($candidato['cidade'], '/');
+        $penalidade = 0;
+
+        if (preg_match(
+            '/\\b\\d+(?:[.,]\\d+)?\\s*km\\s+(?:de|da|do|at[eé]|para)\\s+(?:a\\s+)?' . $cidadeRegex . '\\b/iu',
+            $textoLimpo
+        )) {
+            $penalidade = max($penalidade, 85);
+        }
+
+        if (preg_match(
+            '/\\b(?:distante|dist[aâ]ncia)\\s+(?:de\\s+)?\\d+(?:[.,]\\d+)?\\s*km\\s+(?:de|da|do)?\\s*' . $cidadeRegex . '\\b/iu',
+            $textoLimpo
+        )) {
+            $penalidade = max($penalidade, 85);
+        }
+
+        if (preg_match(
+            '/\\b(?:pr[oó]ximo|pr[oó]xima|proximidades|sentido|acesso\\s+por|via)\\s+(?:a|de|da|do|para)?\\s*' . $cidadeRegex . '\\b/iu',
+            $textoLimpo
+        )) {
+            $penalidade = max($penalidade, 40);
+        }
+
+        $candidatos[$chave]['pontos'] -= $penalidade;
+    }
+
+    $candidatos = array_values($candidatos);
+
+    usort($candidatos, static function ($a, $b) {
+
+        if ($a['pontos'] === $b['pontos']) {
+            return $a['posicao'] <=> $b['posicao'];
+        }
+
+        return $b['pontos'] <=> $a['pontos'];
+    });
+
+    $melhor = $candidatos[0];
+    $confianca = max(0, min(100, (int)$melhor['pontos']));
+
+    /**
+     * Abaixo de 50 pontos, prefere não sugerir uma cidade.
+     */
+    if ($confianca < 50) {
+        return [
+            'cidade' => null,
+            'uf' => null,
+            'regra' => null,
+            'trecho' => null,
+            'confianca' => $confianca
         ];
     }
 
     return [
-        'cidade' => null,
-        'uf' => null,
-        'regra' => null,
-        'trecho' => null
+        'cidade' => $melhor['cidade'],
+        'uf' => $melhor['uf'],
+        'regra' => $melhor['regra'],
+        'trecho' => $melhor['trecho'],
+        'confianca' => $confianca
     ];
-}
-
-/**
- * VERIFICA SE A CIDADE GLOBAL APARECE NO TEXTO DO IMÓVEL
- */
-function cidadeGlobalEncontradaNoTexto($cidade, $texto): bool {
-
-    $cidadeBusca = normalizarBusca($cidade);
-    $textoBusca = normalizarBusca($texto);
-
-    if ($cidadeBusca === "" || $textoBusca === "") {
-        return false;
-    }
-
-    $regex = '/(?<!\\p{L})' . preg_quote($cidadeBusca, '/') . '(?!\\p{L})/u';
-
-    return preg_match($regex, $textoBusca) === 1;
 }
 
 /**
  * SUGERIR CIDADE E UF DO IMÓVEL
  *
- * Usa o texto real do imóvel:
- * card_localizacao + descricao + og_title.
+ * REGRA DEFINITIVA:
+ * cidade_sugerida e uf_sugerido têm como fonte SOMENTE o campo descricao.
  *
- * Regra:
- * - Se a cidade global estiver vazia, vai direto para encontrarCidadeUf().
- * - Se a cidade global estiver preenchida, primeiro tenta confirmar essa cidade no texto.
- * - Se não confirmar a cidade global, tenta sugerir cidade/UF pelo texto.
+ * NÃO utiliza:
+ * - cidade/UF configuradas no scraper-sites-config.php;
+ * - card_localizacao;
+ * - card_nome;
+ * - og_title;
+ * - og_description;
+ * - URL do imóvel.
  */
-function sugerirCidadeUfImovel($cidadeGlobal, $ufGlobal, $cardLocalizacao, $descricao, $ogTitle): array {
+function sugerirCidadeUfImovel($descricao): array {
 
-    $textoBuscaCidade = trim(
-        (string)$cardLocalizacao . " " .
-        (string)$descricao . " " .
-        (string)$ogTitle
-    );
+    $descricao = trim((string)$descricao);
 
-    if ($textoBuscaCidade === "") {
+    if ($descricao === "") {
         return [
             "cidade" => "",
             "uf" => "",
             "regra" => null,
-            "trecho" => null
+            "trecho" => null,
+            "confianca" => 0
         ];
     }
 
-    $cidadeGlobal = trim((string)$cidadeGlobal);
-    $ufGlobal = trim((string)$ufGlobal);
-
-    /**
-     * Se a cidade global estiver preenchida, primeiro tenta confirmar
-     * se ela aparece no texto real do imóvel.
-     */
-    if ($cidadeGlobal !== "" && cidadeGlobalEncontradaNoTexto($cidadeGlobal, $textoBuscaCidade)) {
-        return [
-            "cidade" => normalizarNomeCidade($cidadeGlobal),
-            "uf" => strtoupper($ufGlobal),
-            "regra" => "cidade_global_encontrada",
-            "trecho" => $cidadeGlobal
-        ];
-    }
-
-    /**
-     * Se a cidade global estiver vazia, ou se não foi confirmada no texto,
-     * tenta localizar cidade e UF diretamente pelo conteúdo do imóvel.
-     */
-    $sugestao = encontrarCidadeUf($textoBuscaCidade);
+    $sugestao = encontrarCidadeUf($descricao);
 
     return [
         "cidade" => !empty($sugestao["cidade"]) ? $sugestao["cidade"] : "",
         "uf" => !empty($sugestao["uf"]) ? $sugestao["uf"] : "",
         "regra" => $sugestao["regra"] ?? null,
-        "trecho" => $sugestao["trecho"] ?? null
+        "trecho" => $sugestao["trecho"] ?? null,
+        "confianca" => (int)($sugestao["confianca"] ?? 0)
     ];
 }
 
@@ -723,10 +1016,13 @@ function gerarDataPeriodoEua($periodo) {
 }
 
 /**
- * GERAR TIMESTAMP DO PERÍODO
+ * GERAR DATA DE EXPIRAÇÃO
  *
  * Calcula a expiração usando:
  * data_primeiro_scraper_eua + período em dias.
+ *
+ * Formato final:
+ * 2026-08-10 17:07:32
  */
 function gerarDataPeriodoTimestamp($dataPrimeiroScraperEua, $periodo) {
 
@@ -743,7 +1039,39 @@ function gerarDataPeriodoTimestamp($dataPrimeiroScraperEua, $periodo) {
         return "";
     }
 
-    return strtotime(date("Y-m-d H:i:s", $timestampBase) . " +" . $periodo . " days");
+    $timestampExpiracao = strtotime(date("Y-m-d H:i:s", $timestampBase) . " +" . $periodo . " days");
+
+    if (!$timestampExpiracao) {
+        return "";
+    }
+
+    return date("Y-m-d H:i:s", $timestampExpiracao);
+}
+
+/**
+ * NORMALIZAR DATA DE EXPIRAÇÃO PARA O CSV
+ *
+ * Garante compatibilidade com CSV antigo que tinha timestamp numérico.
+ */
+function normalizarDataExpiracaoCsv($dataExpiracao) {
+
+    $dataExpiracao = trim((string)$dataExpiracao);
+
+    if ($dataExpiracao === "") {
+        return "";
+    }
+
+    if (ctype_digit($dataExpiracao)) {
+        return date("Y-m-d H:i:s", (int)$dataExpiracao);
+    }
+
+    $timestamp = strtotime($dataExpiracao);
+
+    if (!$timestamp) {
+        return $dataExpiracao;
+    }
+
+    return date("Y-m-d H:i:s", $timestamp);
 }
 
 /**
@@ -1630,6 +1958,10 @@ function lerCsvExistente($arquivoCsv, $colunas) {
             $item["data_expiracao"] = $item["data_periodo_timestamp"];
         }
 
+        if (isset($item["data_expiracao"])) {
+            $item["data_expiracao"] = normalizarDataExpiracaoCsv($item["data_expiracao"]);
+        }
+
         if (!isset($item["contato_nome"])) {
             $item["contato_nome"] = "";
         }
@@ -1706,6 +2038,7 @@ foreach ($sites as $site) {
     $nomeSite = $site["nome_site"] ?? "";
     $contatoNome = $site["contato_nome"] ?? "";
     $usuario = $site["usuario"] ?? "";
+    $usuarioEmail = $site["usuario_email"] ?? "";
     $cidade = $site["cidade"] ?? "";
     $uf = $site["uf"] ?? "";
 
@@ -1748,6 +2081,7 @@ foreach ($sites as $site) {
         $logs[] = [
             "nome_site" => $nomeSite,
             "usuario" => $usuario,
+            "usuario_email" => $usuarioEmail,
             "cidade" => $cidade,
             "uf" => $uf,
             "categoria" => $categoria,
@@ -1765,6 +2099,7 @@ foreach ($sites as $site) {
         $logs[] = [
             "nome_site" => $nomeSite,
             "usuario" => $usuario,
+            "usuario_email" => $usuarioEmail,
             "cidade" => $cidade,
             "uf" => $uf,
             "categoria" => $categoria,
@@ -1794,6 +2129,7 @@ foreach ($sites as $site) {
             $logs[] = [
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
+                "usuario_email" => $usuarioEmail,
                 "cidade" => $cidade,
                 "uf" => $uf,
                 "categoria" => $categoria,
@@ -1816,6 +2152,7 @@ foreach ($sites as $site) {
             $logs[] = [
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
+                "usuario_email" => $usuarioEmail,
                 "cidade" => $cidade,
                 "uf" => $uf,
                 "categoria" => $categoria,
@@ -1834,6 +2171,7 @@ foreach ($sites as $site) {
             $logs[] = [
                 "nome_site" => $nomeSite,
                 "usuario" => $usuario,
+                "usuario_email" => $usuarioEmail,
                 "cidade" => $cidade,
                 "uf" => $uf,
                 "categoria" => $categoria,
@@ -1978,13 +2316,11 @@ foreach ($sites as $site) {
              */
             $descricao = limparDescricaoCsv($descricao);
 
-            $cidadeUfSugerida = sugerirCidadeUfImovel(
-                $cidade,
-                $uf,
-                $cardLocalizacao,
-                $descricao,
-                $dadosInternos["og_title"] ?? ""
-            );
+            /**
+             * cidade_sugerida e uf_sugerido são calculados EXCLUSIVAMENTE
+             * a partir do campo descricao.
+             */
+            $cidadeUfSugerida = sugerirCidadeUfImovel($descricao);
 
             $cidadeSugerida = $cidadeUfSugerida["cidade"] ?? "";
             $ufSugerido = $cidadeUfSugerida["uf"] ?? "";
@@ -2051,6 +2387,7 @@ foreach ($sites as $site) {
                 $logs[] = [
                     "nome_site" => $nomeSite,
                     "usuario" => $usuario,
+                    "usuario_email" => $usuarioEmail,
                     "cidade" => $cidadeFinal,
                     "uf" => $ufFinal,
                     "url" => $url,
@@ -2064,7 +2401,8 @@ foreach ($sites as $site) {
                     "cidade_sugerida" => $cidadeSugerida,
                     "uf_sugerido" => $ufSugerido,
                     "cidade_sugerida_regra" => $cidadeUfSugerida["regra"] ?? null,
-                    "cidade_sugerida_trecho" => $cidadeUfSugerida["trecho"] ?? null
+                    "cidade_sugerida_trecho" => $cidadeUfSugerida["trecho"] ?? null,
+                    "cidade_sugerida_confianca" => $cidadeUfSugerida["confianca"] ?? 0
                 ];
 
                 continue;
@@ -2145,6 +2483,7 @@ foreach ($sites as $site) {
 
                 "cidade_sugerida" => $cidadeSugerida,
                 "uf_sugerido" => $ufSugerido,
+                "usuario_email" => $usuarioEmail,
 
                 "_periodo_dias" => $periodo
             ];
@@ -2160,6 +2499,7 @@ foreach ($sites as $site) {
     $logs[] = [
         "nome_site" => $nomeSite,
         "usuario" => $usuario,
+        "usuario_email" => $usuarioEmail,
         "cidade" => $cidade,
         "uf" => $uf,
         "categoria" => $categoria,
@@ -2265,6 +2605,97 @@ function limparDescricaoCsv($html) {
     return trim($html);
 }
 
+
+/**
+ * GERAR REGISTROS DO CSV DE USUÁRIOS
+ *
+ * Gera o arquivo scraper-users.csv com dados exclusivos do responsável/contato
+ * configurado em cada site.
+ */
+function gerarRegistrosUsuariosSites($sites) {
+
+    $registros = [];
+
+    if (empty($sites) || !is_array($sites)) {
+        return $registros;
+    }
+
+    foreach ($sites as $site) {
+
+        $urlsSite = normalizarUrlsSite($site["url"] ?? "");
+        $urlPrincipal = $urlsSite[0] ?? "";
+        $contatoSite = getUrlPrincipalSemBarra($urlPrincipal);
+
+        $contatoNome = $site["contato_nome"] ?? ($site["nome_site"] ?? "");
+        $usuario = $site["usuario"] ?? "";
+        $usuarioEmail = $site["usuario_email"] ?? "";
+        $contatoFone = $site["contato_fone"] ?? ($site["contato"] ?? "");
+        $contatoWhatsapp = $site["contato_whatsapp"] ?? "";
+        $contatoInstagram = $site["contato_instagram"] ?? "";
+        $contatoDesc = $site["contato_desc"] ?? "";
+
+        $item = [
+            "contato_nome" => $contatoNome,
+            "usuario" => $usuario,
+            "usuario_email" => $usuarioEmail,
+            "contato_fone" => $contatoFone,
+            "contato_whatsapp" => $contatoWhatsapp,
+            "contato_instagram" => $contatoInstagram,
+            "contato_desc" => $contatoDesc,
+            "contato_site" => $contatoSite
+        ];
+
+        /**
+         * Evita registros duplicados no scraper-users.csv.
+         */
+        $chave = md5(
+            mb_strtolower(
+                ($item["contato_nome"] ?? "") . "|" .
+                ($item["usuario"] ?? "") . "|" .
+                ($item["usuario_email"] ?? "") . "|" .
+                ($item["contato_fone"] ?? "") . "|" .
+                ($item["contato_whatsapp"] ?? "") . "|" .
+                ($item["contato_site"] ?? ""),
+                "UTF-8"
+            )
+        );
+
+        $registros[$chave] = $item;
+    }
+
+    return array_values($registros);
+}
+
+/**
+ * GRAVAR CSV SIMPLES
+ */
+function gravarCsvSimples($arquivoCsv, $colunas, $registros) {
+
+    $fp = fopen($arquivoCsv, "w");
+
+    if (!$fp) {
+        return false;
+    }
+
+    fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    fputcsv($fp, $colunas, ";");
+
+    foreach ($registros as $item) {
+
+        $linha = [];
+
+        foreach ($colunas as $coluna) {
+            $linha[] = limparCampoCsv($item[$coluna] ?? "");
+        }
+
+        fputcsv($fp, $linha, ";");
+    }
+
+    fclose($fp);
+
+    return true;
+}
+
 /**
  * COLUNAS DO CSV
  */
@@ -2309,8 +2740,26 @@ $colunas = [
     "data_expiracao",
 
     "cidade_sugerida",
-    "uf_sugerido"
+    "uf_sugerido",
+    "usuario_email"
 ];
+
+
+/**
+ * COLUNAS DO CSV DE USUÁRIOS
+ */
+$colunasUsuarios = [
+    "contato_nome",
+    "usuario",
+    "usuario_email",
+    "contato_fone",
+    "contato_whatsapp",
+    "contato_instagram",
+    "contato_desc",
+    "contato_site"
+];
+
+$registrosUsuarios = gerarRegistrosUsuariosSites($sites);
 
 /**
  * GRAVAR OU APENAS TESTAR SEM ALTERAR CSV
@@ -2359,6 +2808,8 @@ if ($gravarCsvNormalizado === "sim") {
 
             if ($coluna === "descricao") {
                 $linha[] = limparDescricaoCsv($valor);
+            } elseif ($coluna === "data_expiracao") {
+                $linha[] = limparCampoCsv(normalizarDataExpiracaoCsv($valor));
             } else {
                 $linha[] = limparCampoCsv($valor);
             }
@@ -2371,6 +2822,9 @@ if ($gravarCsvNormalizado === "sim") {
 
     $csvStatus = "gravado";
 
+    $csvUsuariosGravado = gravarCsvSimples($arquivoCsvUsuarios, $colunasUsuarios, $registrosUsuarios);
+    $csvUsuariosStatus = $csvUsuariosGravado ? "gravado" : "erro_gravacao";
+
 } else {
 
     /**
@@ -2381,6 +2835,7 @@ if ($gravarCsvNormalizado === "sim") {
      */
     $registrosFinais = array_values($resultados);
     $csvStatus = "nao_gravado_modo_teste";
+    $csvUsuariosStatus = "nao_gravado_modo_teste";
 }
 
 /**
@@ -2403,13 +2858,16 @@ $totalErrosImagens = count(array_filter($logsImagens, function ($item) {
 $retornoJson = [
     "status" => "success",
     "arquivo_csv" => $arquivoCsv,
+    "arquivo_csv_usuarios" => $arquivoCsvUsuarios,
     "gravar_csv" => $gravar_csv,
     "csv_status" => $csvStatus,
+    "csv_usuarios_status" => $csvUsuariosStatus,
     "data_execucao" => date("d/m/Y H:i:s"),
     "horario_atual" => date("H:i"),
     "total_sites" => count($sites),
     "total_resultados_novos" => count($resultados),
     "total_resultados_csv" => count($registrosFinais),
+    "total_usuarios_csv" => count($registrosUsuarios),
     "limite_registros_csv" => $limiteRegistrosCsv,
     "baixar_imagens" => $baixar_imagens,
     "exibir_log_imagens" => $exibir_log_imagens,
@@ -2419,7 +2877,8 @@ $retornoJson = [
     "total_imagens_ja_existiam" => $totalImagensJaExistiam,
     "total_erros_imagens" => $totalErrosImagens,
     "logs" => $logs,
-    "resultado" => array_values($resultados)
+    "resultado" => array_values($resultados),
+    "resultado_usuarios" => $registrosUsuarios
 ];
 
 if (normalizarBusca($exibir_log_imagens) === "sim") {
