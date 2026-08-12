@@ -51,4 +51,5 @@ jobs:
             **/_create/**
             **/wp-config.php
             **/.htaccess
-            **/wp-content/**
+            **/wp-content/!(plugins|languages|themes)
+            **/wp-content/!(plugins|languages|themes)/**
