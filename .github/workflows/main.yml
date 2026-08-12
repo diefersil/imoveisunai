@@ -12,15 +12,36 @@ jobs:
 
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      # DEBUG: mostrar o que realmente existe no GitHub Actions
+      - name: 🔎 Verificar arquivos
+        run: |
+          echo "PASTA ATUAL:"
+          pwd
+
+          echo ""
+          echo "ARQUIVOS ENCONTRADOS:"
+          find . -maxdepth 3 -type f | sort | head -300
+
+          echo ""
+          echo "ULTIMO COMMIT:"
+          git log -1 --oneline
 
       - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.1
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
           password: ${{ secrets.ftp_password }}
+
+          local-dir: ./
           server-dir: /imoveisunai.com.br/imu/
+
+          # TEMPORÁRIO: força a action a criar um novo estado
+          state-name: .ftp-deploy-sync-state-v2.json
+
+          log-level: verbose
 
           exclude: |
             **/.git*
