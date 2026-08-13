@@ -10,7 +10,6 @@ jobs:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
 
-    # Limite máximo para o job inteiro
     timeout-minutes: 30
 
     steps:
@@ -30,34 +29,21 @@ jobs:
           rm -rf deploy-root
           mkdir -p deploy-root
 
-          echo "Preparando arquivos da raiz..."
-
-          # ------------------------------------------------
-          # Arquivos wp-*.php
-          # EXCETO wp-config.php
-          # ------------------------------------------------
           for file in wp-*.php; do
             if [ -f "$file" ] && [ "$file" != "wp-config.php" ]; then
               cp "$file" deploy-root/
             fi
           done
 
-          # ------------------------------------------------
-          # index.php da raiz
-          # ------------------------------------------------
           if [ -f "index.php" ]; then
             cp index.php deploy-root/
           fi
 
-          # ------------------------------------------------
-          # wp-content/index.php
-          # ------------------------------------------------
           if [ -f "wp-content/index.php" ]; then
             mkdir -p deploy-root/wp-content
             cp wp-content/index.php deploy-root/wp-content/
           fi
 
-          echo ""
           echo "======================================"
           echo "ROOT PREPARADO"
           echo "======================================"
@@ -66,7 +52,7 @@ jobs:
 
 
       # ==================================================
-      # 3. DEPLOY ARQUIVOS DA RAIZ
+      # 3. DEPLOY ROOT
       # ==================================================
       - name: 📄 Deploy Root
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -79,7 +65,6 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/
 
           state-name: .ftp-deploy-root.json
-
           timeout: 190000
 
 
@@ -97,49 +82,11 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-admin/
 
           state-name: .ftp-deploy-wp-admin.json
-
           timeout: 190000
 
 
       # ==================================================
-      # 5. DEPLOY WP-INCLUDES
-      # ==================================================
-      - name: ⚙️ Deploy WP Includes
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.ftp_host }}
-          username: ${{ secrets.ftp_user }}
-          password: ${{ secrets.ftp_password }}
-
-          local-dir: ./wp-includes/
-          server-dir: /imoveisunai.com.br/imu/wp-includes/
-
-          state-name: .ftp-deploy-wp-includes.json
-
-          timeout: 190000
-
-
-      # ==================================================
-      # 6. DEPLOY PLUGINS
-      # ==================================================
-      - name: 🔌 Deploy Plugins
-        if: ${{ hashFiles('wp-content/plugins/**') != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.ftp_host }}
-          username: ${{ secrets.ftp_user }}
-          password: ${{ secrets.ftp_password }}
-
-          local-dir: ./wp-content/plugins/
-          server-dir: /imoveisunai.com.br/imu/wp-content/plugins/
-
-          state-name: .ftp-deploy-plugins.json
-
-          timeout: 190000
-
-
-      # ==================================================
-      # 7. DEPLOY THEMES
+      # 5. DEPLOY THEMES
       # ==================================================
       - name: 🎨 Deploy Themes
         if: ${{ hashFiles('wp-content/themes/**') != '' }}
@@ -153,12 +100,11 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-content/themes/
 
           state-name: .ftp-deploy-themes.json
-
           timeout: 190000
 
 
       # ==================================================
-      # 8. DEPLOY LANGUAGES
+      # 6. DEPLOY LANGUAGES
       # ==================================================
       - name: 🌎 Deploy Languages
         if: ${{ hashFiles('wp-content/languages/**') != '' }}
@@ -172,12 +118,11 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-content/languages/
 
           state-name: .ftp-deploy-languages.json
-
           timeout: 190000
 
 
       # ==================================================
-      # 9. DEPLOY MU-PLUGINS
+      # 7. DEPLOY MU-PLUGINS
       # ==================================================
       - name: ⚙️ Deploy MU Plugins
         if: ${{ hashFiles('wp-content/mu-plugins/**') != '' }}
@@ -191,5 +136,39 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-content/mu-plugins/
 
           state-name: .ftp-deploy-mu-plugins.json
+          timeout: 190000
 
+
+      # ==================================================
+      # 8. DEPLOY WP-INCLUDES - PENÚLTIMO
+      # ==================================================
+      - name: ⚙️ Deploy WP Includes
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.ftp_host }}
+          username: ${{ secrets.ftp_user }}
+          password: ${{ secrets.ftp_password }}
+
+          local-dir: ./wp-includes/
+          server-dir: /imoveisunai.com.br/imu/wp-includes/
+
+          state-name: .ftp-deploy-wp-includes.json
+          timeout: 190000
+
+
+      # ==================================================
+      # 9. DEPLOY PLUGINS - ÚLTIMO
+      # ==================================================
+      - name: 🔌 Deploy Plugins
+        if: ${{ hashFiles('wp-content/plugins/**') != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.ftp_host }}
+          username: ${{ secrets.ftp_user }}
+          password: ${{ secrets.ftp_password }}
+
+          local-dir: ./wp-content/plugins/
+          server-dir: /imoveisunai.com.br/imu/wp-content/plugins/
+
+          state-name: .ftp-deploy-plugins.json
           timeout: 190000
