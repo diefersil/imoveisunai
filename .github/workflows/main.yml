@@ -12,7 +12,7 @@ jobs:
 
     steps:
       # ==========================================
-      # 1. BAIXAR O REPOSITÓRIO
+      # 1. BAIXAR REPOSITÓRIO
       # ==========================================
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
@@ -26,7 +26,12 @@ jobs:
           rm -rf deploy-core
           mkdir -p deploy-core
 
-          # Pastas principais do WordPress
+          echo "Preparando Core WordPress..."
+
+          # --------------------------------------
+          # PASTAS ORIGINAIS DO WORDPRESS
+          # --------------------------------------
+
           if [ -d "wp-admin" ]; then
             cp -a wp-admin deploy-core/
           fi
@@ -35,29 +40,47 @@ jobs:
             cp -a wp-includes deploy-core/
           fi
 
-          # Arquivos wp-*.php
+
+          # --------------------------------------
+          # ARQUIVOS wp-*.php DA RAIZ
+          # --------------------------------------
           # wp-config.php NÃO será enviado
+          # --------------------------------------
+
           for file in wp-*.php; do
             if [ -f "$file" ] && [ "$file" != "wp-config.php" ]; then
               cp "$file" deploy-core/
             fi
           done
 
-          # index.php da raiz
+
+          # --------------------------------------
+          # INDEX.PHP DA RAIZ
+          # --------------------------------------
+
           if [ -f "index.php" ]; then
             cp index.php deploy-core/
           fi
 
-          # wp-content/index.php
+
+          # --------------------------------------
+          # WP-CONTENT/INDEX.PHP
+          # --------------------------------------
+
           if [ -f "wp-content/index.php" ]; then
             mkdir -p deploy-core/wp-content
             cp wp-content/index.php deploy-core/wp-content/
           fi
 
+
+          echo ""
           echo "======================================"
-          echo "CORE PREPARADO"
+          echo "CORE PREPARADO PARA DEPLOY"
           echo "======================================"
+
           du -sh deploy-core
+
+          echo ""
           find deploy-core -maxdepth 2 -type d | sort
 
 
@@ -65,7 +88,7 @@ jobs:
       # 3. DEPLOY CORE
       # ==========================================
       - name: 🚀 Deploy Core
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
@@ -82,7 +105,7 @@ jobs:
       # ==========================================
       - name: 🔌 Deploy Plugins
         if: ${{ hashFiles('wp-content/plugins/**') != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
@@ -99,7 +122,7 @@ jobs:
       # ==========================================
       - name: 🎨 Deploy Themes
         if: ${{ hashFiles('wp-content/themes/**') != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
@@ -116,7 +139,7 @@ jobs:
       # ==========================================
       - name: 🌎 Deploy Languages
         if: ${{ hashFiles('wp-content/languages/**') != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
@@ -133,7 +156,7 @@ jobs:
       # ==========================================
       - name: ⚙️ Deploy MU Plugins
         if: ${{ hashFiles('wp-content/mu-plugins/**') != '' }}
-        uses: SamKirkland/FTP-Deploy-Action@4.4.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
