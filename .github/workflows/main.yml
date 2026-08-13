@@ -10,99 +10,118 @@ jobs:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
 
+    # Limite máximo para o job inteiro
+    timeout-minutes: 30
+
     steps:
-      # ==========================================
+
+      # ==================================================
       # 1. BAIXAR REPOSITÓRIO
-      # ==========================================
+      # ==================================================
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
 
-      # ==========================================
-      # 2. PREPARAR CORE WORDPRESS
-      # ==========================================
-      - name: 📦 Preparar Core
+      # ==================================================
+      # 2. PREPARAR ARQUIVOS DA RAIZ
+      # ==================================================
+      - name: 📦 Preparar Root
         run: |
-          rm -rf deploy-core
-          mkdir -p deploy-core
+          rm -rf deploy-root
+          mkdir -p deploy-root
 
-          echo "Preparando Core WordPress..."
+          echo "Preparando arquivos da raiz..."
 
-          # --------------------------------------
-          # PASTAS ORIGINAIS DO WORDPRESS
-          # --------------------------------------
-
-          if [ -d "wp-admin" ]; then
-            cp -a wp-admin deploy-core/
-          fi
-
-          if [ -d "wp-includes" ]; then
-            cp -a wp-includes deploy-core/
-          fi
-
-
-          # --------------------------------------
-          # ARQUIVOS wp-*.php DA RAIZ
-          # --------------------------------------
-          # wp-config.php NÃO será enviado
-          # --------------------------------------
-
+          # ------------------------------------------------
+          # Arquivos wp-*.php
+          # EXCETO wp-config.php
+          # ------------------------------------------------
           for file in wp-*.php; do
             if [ -f "$file" ] && [ "$file" != "wp-config.php" ]; then
-              cp "$file" deploy-core/
+              cp "$file" deploy-root/
             fi
           done
 
-
-          # --------------------------------------
-          # INDEX.PHP DA RAIZ
-          # --------------------------------------
-
+          # ------------------------------------------------
+          # index.php da raiz
+          # ------------------------------------------------
           if [ -f "index.php" ]; then
-            cp index.php deploy-core/
+            cp index.php deploy-root/
           fi
 
-
-          # --------------------------------------
-          # WP-CONTENT/INDEX.PHP
-          # --------------------------------------
-
+          # ------------------------------------------------
+          # wp-content/index.php
+          # ------------------------------------------------
           if [ -f "wp-content/index.php" ]; then
-            mkdir -p deploy-core/wp-content
-            cp wp-content/index.php deploy-core/wp-content/
+            mkdir -p deploy-root/wp-content
+            cp wp-content/index.php deploy-root/wp-content/
           fi
 
-
           echo ""
           echo "======================================"
-          echo "CORE PREPARADO PARA DEPLOY"
+          echo "ROOT PREPARADO"
           echo "======================================"
 
-          du -sh deploy-core
-
-          echo ""
-          find deploy-core -maxdepth 2 -type d | sort
+          find deploy-root -type f | sort
 
 
-      # ==========================================
-      # 3. DEPLOY CORE
-      # ==========================================
-      - name: 🚀 Deploy Core
+      # ==================================================
+      # 3. DEPLOY ARQUIVOS DA RAIZ
+      # ==================================================
+      - name: 📄 Deploy Root
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.ftp_host }}
           username: ${{ secrets.ftp_user }}
           password: ${{ secrets.ftp_password }}
 
-          local-dir: ./deploy-core/
+          local-dir: ./deploy-root/
           server-dir: /imoveisunai.com.br/imu/
 
-          state-name: .ftp-deploy-core.json
+          state-name: .ftp-deploy-root.json
+
+          timeout: 190000
 
 
-      # ==========================================
-      # 4. DEPLOY PLUGINS
-      # ==========================================
+      # ==================================================
+      # 4. DEPLOY WP-ADMIN
+      # ==================================================
+      - name: 🛠️ Deploy WP Admin
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.ftp_host }}
+          username: ${{ secrets.ftp_user }}
+          password: ${{ secrets.ftp_password }}
+
+          local-dir: ./wp-admin/
+          server-dir: /imoveisunai.com.br/imu/wp-admin/
+
+          state-name: .ftp-deploy-wp-admin.json
+
+          timeout: 190000
+
+
+      # ==================================================
+      # 5. DEPLOY WP-INCLUDES
+      # ==================================================
+      - name: ⚙️ Deploy WP Includes
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.ftp_host }}
+          username: ${{ secrets.ftp_user }}
+          password: ${{ secrets.ftp_password }}
+
+          local-dir: ./wp-includes/
+          server-dir: /imoveisunai.com.br/imu/wp-includes/
+
+          state-name: .ftp-deploy-wp-includes.json
+
+          timeout: 190000
+
+
+      # ==================================================
+      # 6. DEPLOY PLUGINS
+      # ==================================================
       - name: 🔌 Deploy Plugins
         if: ${{ hashFiles('wp-content/plugins/**') != '' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -116,10 +135,12 @@ jobs:
 
           state-name: .ftp-deploy-plugins.json
 
+          timeout: 190000
 
-      # ==========================================
-      # 5. DEPLOY THEMES
-      # ==========================================
+
+      # ==================================================
+      # 7. DEPLOY THEMES
+      # ==================================================
       - name: 🎨 Deploy Themes
         if: ${{ hashFiles('wp-content/themes/**') != '' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -133,10 +154,12 @@ jobs:
 
           state-name: .ftp-deploy-themes.json
 
+          timeout: 190000
 
-      # ==========================================
-      # 6. DEPLOY LANGUAGES
-      # ==========================================
+
+      # ==================================================
+      # 8. DEPLOY LANGUAGES
+      # ==================================================
       - name: 🌎 Deploy Languages
         if: ${{ hashFiles('wp-content/languages/**') != '' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -150,10 +173,12 @@ jobs:
 
           state-name: .ftp-deploy-languages.json
 
+          timeout: 190000
 
-      # ==========================================
-      # 7. DEPLOY MU-PLUGINS
-      # ==========================================
+
+      # ==================================================
+      # 9. DEPLOY MU-PLUGINS
+      # ==================================================
       - name: ⚙️ Deploy MU Plugins
         if: ${{ hashFiles('wp-content/mu-plugins/**') != '' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -166,3 +191,5 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-content/mu-plugins/
 
           state-name: .ftp-deploy-mu-plugins.json
+
+          timeout: 190000
