@@ -19,7 +19,6 @@ jobs:
 
       REMOTE_ROOT: /home4/guiaun34/imoveisunai.com.br/imu
 
-      # Senha armazenada no GitHub Secrets
       SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
@@ -57,60 +56,13 @@ jobs:
 
 
       # ==================================================
-      # 4. TESTAR CONEXÃO SSH
-      # ==================================================
-      - name: 🔎 Testar conexão SSH
-        run: |
-          sshpass -e \
-          ssh \
-            -p "$SSH_PORT" \
-            -o PubkeyAuthentication=no \
-            -o PreferredAuthentications=keyboard-interactive,password \
-            -o KbdInteractiveAuthentication=yes \
-            -o PasswordAuthentication=yes \
-            -o NumberOfPasswordPrompts=1 \
-            -o ConnectTimeout=30 \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=10 \
-            "$SSH_USER@$SSH_HOST" \
-            "echo 'SSH conectado com sucesso'"
-
-
-      # ==================================================
-      # 5. CRIAR DIRETÓRIOS REMOTOS
-      # ==================================================
-      - name: 📁 Preparar diretórios remotos
-        run: |
-          sshpass -e \
-          ssh \
-            -p "$SSH_PORT" \
-            -o PubkeyAuthentication=no \
-            -o PreferredAuthentications=keyboard-interactive,password \
-            -o KbdInteractiveAuthentication=yes \
-            -o PasswordAuthentication=yes \
-            "$SSH_USER@$SSH_HOST" \
-            "mkdir -p \
-              '$REMOTE_ROOT' \
-              '$REMOTE_ROOT/wp-admin' \
-              '$REMOTE_ROOT/wp-includes' \
-              '$REMOTE_ROOT/wp-content' \
-              '$REMOTE_ROOT/wp-content/themes' \
-              '$REMOTE_ROOT/wp-content/languages' \
-              '$REMOTE_ROOT/wp-content/mu-plugins' \
-              '$REMOTE_ROOT/wp-content/plugins'"
-
-
-      # ==================================================
-      # 6. PREPARAR ARQUIVOS DA RAIZ
+      # 4. PREPARAR ROOT
       # ==================================================
       - name: 📦 Preparar Root
         run: |
           rm -rf deploy-root
-
           mkdir -p deploy-root
 
-          # Enviar arquivos wp-*.php
-          # EXCETO wp-config.php
           for file in wp-*.php; do
 
             if [ -f "$file" ] && [ "$file" != "wp-config.php" ]; then
@@ -119,12 +71,10 @@ jobs:
 
           done
 
-          # index.php da raiz
           if [ -f "index.php" ]; then
             cp index.php deploy-root/
           fi
 
-          # wp-content/index.php
           if [ -f "wp-content/index.php" ]; then
 
             mkdir -p deploy-root/wp-content
@@ -143,189 +93,243 @@ jobs:
 
 
       # ==================================================
-      # 7. DEPLOY ROOT
+      # 5. DEPLOY COMPLETO
+      #    UMA ÚNICA CONEXÃO SSH
       # ==================================================
-      - name: 📄 Deploy Root
+      - name: 🚀 Deploy WordPress
         run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./deploy-root/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/"
+
+          CONTROL_SOCKET="$HOME/.ssh/hostgator-control"
+
+          rm -f "$CONTROL_SOCKET"
 
 
-      # ==================================================
-      # 8. DEPLOY WP-ADMIN
-      # ==================================================
-      - name: 🛠️ Deploy WP Admin
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-admin/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-admin/"
+          # ==================================================
+          # FUNÇÃO PARA ENCERRAR SSH
+          # ==================================================
+          cleanup() {
+
+            echo ""
+            echo "Encerrando conexão SSH..."
+
+            ssh \
+              -S "$CONTROL_SOCKET" \
+              -O exit \
+              -p "$SSH_PORT" \
+              "$SSH_USER@$SSH_HOST" \
+              2>/dev/null || true
+
+          }
+
+          trap cleanup EXIT
 
 
-      # ==================================================
-      # 9. DEPLOY THEMES
-      # ==================================================
-      - name: 🎨 Deploy Themes
-        if: ${{ hashFiles('wp-content/themes/**') != '' }}
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-content/themes/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-content/themes/"
+          # ==================================================
+          # ABRIR CONEXÃO SSH PERSISTENTE
+          # COM TENTATIVAS AUTOMÁTICAS
+          # ==================================================
+          echo "======================================"
+          echo "ABRINDO CONEXÃO SSH"
+          echo "======================================"
+
+          conectado=0
+
+          for tentativa in 1 2 3 4 5; do
+
+            echo ""
+            echo "Tentativa SSH: $tentativa de 5"
+
+            if sshpass -e \
+              ssh \
+                -M \
+                -S "$CONTROL_SOCKET" \
+                -fN \
+                -p "$SSH_PORT" \
+                -o PubkeyAuthentication=no \
+                -o PreferredAuthentications=keyboard-interactive,password \
+                -o KbdInteractiveAuthentication=yes \
+                -o PasswordAuthentication=yes \
+                -o NumberOfPasswordPrompts=1 \
+                -o ConnectTimeout=30 \
+                -o ServerAliveInterval=30 \
+                -o ServerAliveCountMax=10 \
+                "$SSH_USER@$SSH_HOST"
+            then
+
+              conectado=1
+              break
+
+            fi
 
 
-      # ==================================================
-      # 10. DEPLOY LANGUAGES
-      # ==================================================
-      - name: 🌎 Deploy Languages
-        if: ${{ hashFiles('wp-content/languages/**') != '' }}
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-content/languages/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-content/languages/"
+            echo "Falha ao conectar."
+
+            espera=$((tentativa * 15))
+
+            echo "Nova tentativa em ${espera}s..."
+
+            sleep "$espera"
+
+          done
 
 
-      # ==================================================
-      # 11. DEPLOY MU-PLUGINS
-      # ==================================================
-      - name: ⚙️ Deploy MU Plugins
-        if: ${{ hashFiles('wp-content/mu-plugins/**') != '' }}
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-content/mu-plugins/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-content/mu-plugins/"
+          if [ "$conectado" -ne 1 ]; then
+
+            echo "======================================"
+            echo "ERRO: NÃO FOI POSSÍVEL CONECTAR"
+            echo "======================================"
+
+            exit 1
+
+          fi
 
 
-      # ==================================================
-      # 12. DEPLOY WP-INCLUDES - PENÚLTIMO
-      # ==================================================
-      - name: ⚙️ Deploy WP Includes
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-includes/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-includes/"
+          echo ""
+          echo "SSH conectado com sucesso."
 
 
-      # ==================================================
-      # 13. DEPLOY PLUGINS - ÚLTIMO
-      # ==================================================
-      - name: 🔌 Deploy Plugins
-        if: ${{ hashFiles('wp-content/plugins/**') != '' }}
-        run: |
-          sshpass -e \
-          rsync \
-            -az \
-            --partial \
-            --timeout=300 \
-            --info=progress2 \
-            --stats \
-            -e "ssh \
-              -p $SSH_PORT \
-              -o PubkeyAuthentication=no \
-              -o PreferredAuthentications=keyboard-interactive,password \
-              -o KbdInteractiveAuthentication=yes \
-              -o PasswordAuthentication=yes \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10" \
-            ./wp-content/plugins/ \
-            "$SSH_USER@$SSH_HOST:$REMOTE_ROOT/wp-content/plugins/"
+          # ==================================================
+          # TESTAR CONEXÃO
+          # ==================================================
+          ssh \
+            -S "$CONTROL_SOCKET" \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "echo 'Servidor SSH OK'"
 
 
-      # ==================================================
-      # 14. FINALIZAÇÃO
-      # ==================================================
-      - name: ✅ Deploy concluído
-        run: |
+          # ==================================================
+          # CRIAR DIRETÓRIOS REMOTOS
+          # ==================================================
+          ssh \
+            -S "$CONTROL_SOCKET" \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "mkdir -p \
+              '$REMOTE_ROOT' \
+              '$REMOTE_ROOT/wp-admin' \
+              '$REMOTE_ROOT/wp-includes' \
+              '$REMOTE_ROOT/wp-content' \
+              '$REMOTE_ROOT/wp-content/themes' \
+              '$REMOTE_ROOT/wp-content/languages' \
+              '$REMOTE_ROOT/wp-content/mu-plugins' \
+              '$REMOTE_ROOT/wp-content/plugins'"
+
+
+          # ==================================================
+          # FUNÇÃO RSYNC
+          # ==================================================
+          deploy() {
+
+            ORIGEM="$1"
+            DESTINO="$2"
+            NOME="$3"
+
+            echo ""
+            echo "======================================"
+            echo "DEPLOY: $NOME"
+            echo "======================================"
+
+            rsync \
+              -az \
+              --partial \
+              --timeout=600 \
+              --info=progress2 \
+              --stats \
+              -e "ssh \
+                -S $CONTROL_SOCKET \
+                -p $SSH_PORT \
+                -o ServerAliveInterval=30 \
+                -o ServerAliveCountMax=10" \
+              "$ORIGEM" \
+              "$SSH_USER@$SSH_HOST:$DESTINO"
+
+            echo ""
+            echo "$NOME concluído."
+
+          }
+
+
+          # ==================================================
+          # 1. ROOT
+          # ==================================================
+          deploy \
+            "./deploy-root/" \
+            "$REMOTE_ROOT/" \
+            "ROOT"
+
+
+          # ==================================================
+          # 2. WP-ADMIN
+          # ==================================================
+          deploy \
+            "./wp-admin/" \
+            "$REMOTE_ROOT/wp-admin/" \
+            "WP-ADMIN"
+
+
+          # ==================================================
+          # 3. THEMES
+          # ==================================================
+          if [ -d "wp-content/themes" ]; then
+
+            deploy \
+              "./wp-content/themes/" \
+              "$REMOTE_ROOT/wp-content/themes/" \
+              "THEMES"
+
+          fi
+
+
+          # ==================================================
+          # 4. LANGUAGES
+          # ==================================================
+          if [ -d "wp-content/languages" ]; then
+
+            deploy \
+              "./wp-content/languages/" \
+              "$REMOTE_ROOT/wp-content/languages/" \
+              "LANGUAGES"
+
+          fi
+
+
+          # ==================================================
+          # 5. MU-PLUGINS
+          # ==================================================
+          if [ -d "wp-content/mu-plugins" ]; then
+
+            deploy \
+              "./wp-content/mu-plugins/" \
+              "$REMOTE_ROOT/wp-content/mu-plugins/" \
+              "MU-PLUGINS"
+
+          fi
+
+
+          # ==================================================
+          # 6. WP-INCLUDES - PENÚLTIMO
+          # ==================================================
+          deploy \
+            "./wp-includes/" \
+            "$REMOTE_ROOT/wp-includes/" \
+            "WP-INCLUDES"
+
+
+          # ==================================================
+          # 7. PLUGINS - ÚLTIMO
+          # ==================================================
+          if [ -d "wp-content/plugins" ]; then
+
+            deploy \
+              "./wp-content/plugins/" \
+              "$REMOTE_ROOT/wp-content/plugins/" \
+              "PLUGINS"
+
+          fi
+
+
+          echo ""
           echo "======================================"
           echo "DEPLOY WORDPRESS CONCLUÍDO"
           echo "======================================"
