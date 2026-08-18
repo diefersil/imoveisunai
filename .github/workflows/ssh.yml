@@ -3,7 +3,7 @@ on:
     branches:
       - main
 
-name: 🚀 Deploy Plugins via SSH
+name: 🚀 Deploy Plugins SSH
 
 jobs:
   deploy-plugins:
@@ -17,6 +17,7 @@ jobs:
       SSH_USER: guiaun34
       SSH_PORT: 2222
       REMOTE_DIR: /home4/guiaun34/imoveisunai.com.br/imu/wp-content/plugins
+      SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
 
     steps:
 
@@ -28,26 +29,21 @@ jobs:
 
 
       # ==================================================
-      # 2. INSTALAR RSYNC
+      # 2. INSTALAR RSYNC + SSHPASS
       # ==================================================
-      - name: 📦 Instalar Rsync
+      - name: 📦 Instalar dependências
         run: |
           sudo apt-get update
-          sudo apt-get install -y rsync openssh-client
+          sudo apt-get install -y rsync sshpass
 
 
       # ==================================================
-      # 3. CONFIGURAR SSH
+      # 3. ADICIONAR SERVIDOR AOS KNOWN HOSTS
       # ==================================================
       - name: 🔐 Configurar SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
 
           ssh-keyscan \
             -p "$SSH_PORT" \
@@ -58,15 +54,16 @@ jobs:
 
 
       # ==================================================
-      # 4. TESTAR SSH
+      # 4. TESTAR CONEXÃO POR SENHA
       # ==================================================
-      - name: 🔎 Testar conexão SSH
+      - name: 🔎 Testar SSH
         run: |
+          sshpass -p "$SSH_PASSWORD" \
           ssh \
             -p "$SSH_PORT" \
+            -o PreferredAuthentications=password \
+            -o PubkeyAuthentication=no \
             -o ConnectTimeout=30 \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=10 \
             "$SSH_USER@$SSH_HOST" \
             "echo 'SSH conectado com sucesso'"
 
@@ -76,8 +73,11 @@ jobs:
       # ==================================================
       - name: 📁 Preparar diretório remoto
         run: |
+          sshpass -p "$SSH_PASSWORD" \
           ssh \
             -p "$SSH_PORT" \
+            -o PreferredAuthentications=password \
+            -o PubkeyAuthentication=no \
             "$SSH_USER@$SSH_HOST" \
             "mkdir -p '$REMOTE_DIR'"
 
@@ -88,6 +88,7 @@ jobs:
       - name: 🔌 Deploy Plugins
         if: ${{ hashFiles('wp-content/plugins/**') != '' }}
         run: |
+          sshpass -p "$SSH_PASSWORD" \
           rsync \
             -az \
             --partial \
@@ -96,6 +97,8 @@ jobs:
             --stats \
             -e "ssh \
               -p $SSH_PORT \
+              -o PreferredAuthentications=password \
+              -o PubkeyAuthentication=no \
               -o ConnectTimeout=30 \
               -o ServerAliveInterval=30 \
               -o ServerAliveCountMax=10" \
@@ -104,7 +107,7 @@ jobs:
 
 
       # ==================================================
-      # 7. FINALIZAÇÃO
+      # 7. FINAL
       # ==================================================
       - name: ✅ Deploy concluído
         run: |
