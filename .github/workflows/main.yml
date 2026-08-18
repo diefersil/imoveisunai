@@ -171,4 +171,4 @@ jobs:
           server-dir: /imoveisunai.com.br/imu/wp-content/plugins/
 
           state-name: .ftp-deploy-plugins.json
-          timeout: 190000
+          timeout: 190000000
