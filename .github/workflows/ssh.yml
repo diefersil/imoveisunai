@@ -1,41 +1,113 @@
 on:
   push:
     branches:
-      - develop
+      - main
 
-name: 🚀 Deploy website via SSH
+name: 🚀 Deploy Plugins via SSH
 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy SSH
+  deploy-plugins:
+    name: 🔌 Deploy Plugins
     runs-on: ubuntu-latest
 
+    timeout-minutes: 120
+
+    env:
+      SSH_HOST: imoveisunai.com.br
+      SSH_USER: guiaun34
+      SSH_PORT: 2222
+      REMOTE_DIR: /home4/guiaun34/imoveisunai.com.br/imu/wp-content/plugins
+
     steps:
+
+      # ==================================================
+      # 1. BAIXAR REPOSITÓRIO
+      # ==================================================
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      - name: 📂 Sync files via SSH
-        uses: easingthemes/ssh-deploy@main
-        with:
+
+      # ==================================================
+      # 2. INSTALAR RSYNC
+      # ==================================================
+      - name: 📦 Instalar Rsync
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync openssh-client
+
+
+      # ==================================================
+      # 3. CONFIGURAR SSH
+      # ==================================================
+      - name: 🔐 Configurar SSH
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USER }}
-          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-          SOURCE: "./"
-          TARGET: "/home4/guiaun34/imoveisunai.com.br/imu/"
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
 
-          ARGS: "-rlgoDzvc -i"
+          ssh-keyscan \
+            -p "$SSH_PORT" \
+            -H "$SSH_HOST" \
+            >> ~/.ssh/known_hosts
 
-          SSH_CMD_ARGS: "-o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o IdentityAgent=none"
+          chmod 600 ~/.ssh/known_hosts
 
-          EXCLUDE: "
-            .git*,
-            .git*/**,
-            node_modules/**,
-            .github/**,
-            _create/**,
-            wp-content/**,
-            wp-config.php,
-            .htaccess
-          "
+
+      # ==================================================
+      # 4. TESTAR SSH
+      # ==================================================
+      - name: 🔎 Testar conexão SSH
+        run: |
+          ssh \
+            -p "$SSH_PORT" \
+            -o ConnectTimeout=30 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$SSH_USER@$SSH_HOST" \
+            "echo 'SSH conectado com sucesso'"
+
+
+      # ==================================================
+      # 5. GARANTIR DIRETÓRIO DE PLUGINS
+      # ==================================================
+      - name: 📁 Preparar diretório remoto
+        run: |
+          ssh \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "mkdir -p '$REMOTE_DIR'"
+
+
+      # ==================================================
+      # 6. DEPLOY SOMENTE PLUGINS
+      # ==================================================
+      - name: 🔌 Deploy Plugins
+        if: ${{ hashFiles('wp-content/plugins/**') != '' }}
+        run: |
+          rsync \
+            -az \
+            --partial \
+            --timeout=300 \
+            --info=progress2 \
+            --stats \
+            -e "ssh \
+              -p $SSH_PORT \
+              -o ConnectTimeout=30 \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=10" \
+            ./wp-content/plugins/ \
+            "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
+
+
+      # ==================================================
+      # 7. FINALIZAÇÃO
+      # ==================================================
+      - name: ✅ Deploy concluído
+        run: |
+          echo "======================================"
+          echo "DEPLOY DE PLUGINS CONCLUÍDO"
+          echo "======================================"
