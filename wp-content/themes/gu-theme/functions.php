@@ -42,7 +42,7 @@ add_theme_support( 'post-thumbnails', array( 'post', 'imoveis' ) );
  * 05. GOOGLE ANALYTICS - TAG G-D9DED3C7TD
  * ============================================================ */
 
-add_action( 'wp_head', 'ga' );
+//add_action( 'wp_head', 'ga' );
 
 function ga() {
 	?>
