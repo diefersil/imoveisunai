@@ -352,7 +352,7 @@ function replace_text() {
  * 13. BOTÃO ENTER NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'set_apply_button' );
+//add_action( 'wp_footer', 'set_apply_button' );
 
 function set_apply_button() {
 	?>
