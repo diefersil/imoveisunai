@@ -81,7 +81,7 @@ function google_font() {
  * 07. GOOGLE ADSENSE
  * ============================================================ */
 
-add_action( 'wp_head', 'adsense' );
+//add_action( 'wp_head', 'adsense' );
 
 function adsense() {
 	?>
