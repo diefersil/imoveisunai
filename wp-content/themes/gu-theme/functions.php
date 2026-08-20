@@ -428,7 +428,7 @@ add_action( 'wp_footer', 'ac' );
  * 17. GOOGLE ANALYTICS / TAG MANAGER - TAG G-XX83SR8MC6
  * ============================================================ */
 
-add_action( 'wp_head', 'tag_manager' );
+//add_action( 'wp_head', 'tag_manager' );
 
 function tag_manager() {
 	?>
