@@ -95,7 +95,7 @@ function adsense() {
  * 08. JET SEARCH - DEFINE ID NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'set_id_input_search', 999 );
+add_action( 'wp_footer', 'set_id_input_search' );
 
 function set_id_input_search() {
 	?>
@@ -352,7 +352,7 @@ function replace_text() {
  * 13. BOTÃO ENTER NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'set_apply_button', 999 );
+add_action( 'wp_footer', 'set_apply_button' );
 
 function set_apply_button() {
 	?>
@@ -397,7 +397,7 @@ function single_display_none() {
  * 15. ADICIONA ÍCONE DE LUPA NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'search_add_lupa', 999);
+add_action( 'wp_footer', 'search_add_lupa' );
 
 function search_add_lupa() {
 	?>
@@ -414,6 +414,14 @@ function search_add_lupa() {
 	<?php
 }
 
+
+/* ============================================================
+ * 16. INCLUDE DO ARQUIVO FUNCTIONS-AC
+ * ============================================================ */
+
+include get_template_directory() . '/functions-ac.php';
+
+add_action( 'wp_footer', 'ac' );
 
 
 /* ============================================================
@@ -691,14 +699,4 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
-
-
-/* ============================================================
- * 16. INCLUDE DO ARQUIVO FUNCTIONS-AC
- * ============================================================ */
-
-include get_template_directory() . '/functions-ac.php';
-add_action( 'wp_footer', 'ac' );
-
-
 
