@@ -1,18 +1,5 @@
 <?php
 
-
-add_action( 'wp_head', 'teste' );
-
-function teste() {
-	?>
-
-	<script>
-	console.log('teste');
-	</script>
-	<?php
-}
-
-
 /* ============================================================
  * 01. CARREGAMENTO DE ESTILOS DO TEMA
  * ============================================================ */
