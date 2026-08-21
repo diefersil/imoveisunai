@@ -92,22 +92,110 @@ function adsense() {
 
 
 /* ============================================================
- * 08. JET SEARCH - DEFINE ID NO CAMPO DE BUSCA
+ * 08. JET SEARCH - CAMPO DE BUSCA
+ *     08.1 Define ID no campo visível
+ *     08.2 Enter aciona o botão Buscar
+ *     08.3 Adiciona ícone de lupa no campo visível
  * ============================================================ */
+
+/* ------------------------------------------------------------
+ * 08.1 DEFINE ID NO CAMPO DE BUSCA VISÍVEL
+ * ------------------------------------------------------------ */
 
 add_action( 'wp_footer', 'set_id_input_search' );
 
 function set_id_input_search() {
 	?>
 	<script>
-		const searchInputId = document.querySelector(".jet-search-filter__input");
+	(function () {
+		const searchInputId = Array.from(
+			document.querySelectorAll('.jet-search-filter__input')
+		).find(function(input) {
+			return input.offsetParent !== null;
+		});
 
 		if (searchInputId) {
 			searchInputId.setAttribute('id', 'search-ac');
 		}
+	})();
 	</script>
 	<?php
 }
+
+/* ------------------------------------------------------------
+ * 08.2 ENTER ACIONA O BOTÃO BUSCAR
+ * ------------------------------------------------------------ */
+
+add_action( 'wp_footer', 'set_apply_button' );
+
+function set_apply_button() {
+	?>
+	<script>
+	(function () {
+		document.addEventListener('keyup', function(event) {
+			if (
+				event.key === 'Enter' &&
+				event.target.matches('.jet-search-filter__input')
+			) {
+				event.preventDefault();
+
+				const applyButton = Array.from(
+					document.querySelectorAll('.apply-filters__button')
+				).find(function(button) {
+					return button.offsetParent !== null;
+				});
+
+				if (applyButton) {
+					applyButton.click();
+				}
+			}
+		});
+	})();
+	</script>
+	<?php
+}
+
+/* ------------------------------------------------------------
+ * 08.3 ADICIONA ÍCONE DE LUPA NO CAMPO VISÍVEL
+ * ------------------------------------------------------------ */
+
+add_action( 'wp_footer', 'search_add_lupa' );
+
+function search_add_lupa() {
+	?>
+	<script>
+	(function () {
+		const searchInput = Array.from(
+			document.querySelectorAll('.jet-search-filter__input')
+		).find(function(input) {
+			return input.offsetParent !== null;
+		});
+
+		if (!searchInput) {
+			return;
+		}
+
+		const searchWrapper = searchInput.closest('.jet-search-filter__input-wrapper');
+
+		if (!searchWrapper) {
+			return;
+		}
+
+		if (searchWrapper.querySelector('.imu-search-lupa')) {
+			return;
+		}
+
+		searchWrapper.style.position = 'relative';
+
+		searchWrapper.insertAdjacentHTML(
+			'beforeend',
+			"<img class='imu-search-lupa' src='https://guiaunai.com.br/wp-content/uploads/2025/09/icon-search-lupa.png' style='width:16px;height:16px;position:absolute;right:15px;top:50%;transform:translateY(-50%);pointer-events:none;'>"
+		);
+	})();
+	</script>
+	<?php
+}
+
 
 
 /* ============================================================
@@ -165,7 +253,7 @@ function corta_titulo() {
 // add_action( 'wp_footer', 'corta_titulo' );
 
 /* ============================================================
- * 10. Preço
+ * 11. PREÇO
  * ============================================================ */
 
 
@@ -249,7 +337,7 @@ function preco() {
 }
 
 /* ============================================================
- * 11. SHORTCODE WHATSAPP
+ * 12. SHORTCODE WHATSAPP
  * ============================================================ */
 
 
@@ -301,7 +389,7 @@ add_shortcode( 'whatsapp_imovel_url', 'imu_whatsapp_imovel_url_shortcode' );
 
 
 /* ============================================================
- * 11. FUNÇÃO JS PARA CORTAR TEXTO - DESATIVADO
+ * 13. FUNÇÃO JS PARA CORTAR TEXTO - DESATIVADO
  * ============================================================ */
 
 function cut_str() {
@@ -320,7 +408,7 @@ function cut_str() {
 
 
 /* ============================================================
- * 12. SUBSTITUI TEXTOS NA LISTAGEM
+ * 14. SUBSTITUI TEXTOS NA LISTAGEM
  * ============================================================ */
 
 add_action( 'wp_footer', 'replace_text' );
@@ -348,33 +436,9 @@ function replace_text() {
 }
 
 
-/* ============================================================
- * 13. BOTÃO ENTER NO CAMPO DE BUSCA
- * ============================================================ */
-
-add_action( 'wp_footer', 'set_apply_button' );
-
-function set_apply_button() {
-	?>
-	<script>
-		const searchInput = document.querySelector('.jet-search-filter__input');
-		const applyButton = document.querySelector('.apply-filters__button');
-
-		if (searchInput && applyButton) {
-			searchInput.addEventListener("keyup", function(event) {
-				if (event.keyCode === 13) {
-					event.preventDefault();
-					applyButton.click();
-				}
-			});
-		}
-	</script>
-	<?php
-}
-
 
 /* ============================================================
- * 14. ESCONDE BLOCO SOBRE SE ESTIVER VAZIO
+ * 15. ESCONDE BLOCO SOBRE SE ESTIVER VAZIO
  * ============================================================ */
 
 add_action( 'wp_footer', 'single_display_none' );
@@ -392,27 +456,6 @@ function single_display_none() {
 	<?php
 }
 
-
-/* ============================================================
- * 15. ADICIONA ÍCONE DE LUPA NO CAMPO DE BUSCA
- * ============================================================ */
-
-add_action( 'wp_footer', 'search_add_lupa' );
-
-function search_add_lupa() {
-	?>
-	<script>
-		const searchWrapper = document.querySelector('.jet-search-filter__input-wrapper');
-
-		if (searchWrapper) {
-			searchWrapper.insertAdjacentHTML(
-				'beforeend',
-				"<img src='https://guiaunai.com.br/wp-content/uploads/2025/09/icon-search-lupa.png' style='width:16px; position:absolute; right:15px; top:30%;'>"
-			);
-		}
-	</script>
-	<?php
-}
 
 
 /* ============================================================
@@ -699,54 +742,3 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
-
-
-add_action( 'wp_footer', function() {
-	?>
-	<script>
-
-	console.log(
-		'IMEDIATO:',
-		document.querySelectorAll('.jet-search-filter__input').length
-	);
-
-	setTimeout(function() {
-
-		console.log(
-			'100ms:',
-			document.querySelectorAll('.jet-search-filter__input').length
-		);
-
-	}, 100);
-
-	setTimeout(function() {
-
-		console.log(
-			'500ms:',
-			document.querySelectorAll('.jet-search-filter__input').length
-		);
-
-	}, 500);
-
-	setTimeout(function() {
-
-		console.log(
-			'1000ms:',
-			document.querySelectorAll('.jet-search-filter__input').length
-		);
-
-	}, 1000);
-
-	setTimeout(function() {
-
-		console.log(
-			'2000ms:',
-			document.querySelectorAll('.jet-search-filter__input').length
-		);
-
-	}, 2000);
-
-	</script>
-	<?php
-}, 999);
-
