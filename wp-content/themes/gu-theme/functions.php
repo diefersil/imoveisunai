@@ -95,7 +95,7 @@ function adsense() {
  * 08. JET SEARCH - DEFINE ID NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'set_id_input_search' );
+add_action( 'wp_footer', 'set_id_input_search', 999 );
 
 function set_id_input_search() {
 	?>
@@ -352,7 +352,7 @@ function replace_text() {
  * 13. BOTÃO ENTER NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'set_apply_button' );
+add_action( 'wp_footer', 'set_apply_button', 999 );
 
 function set_apply_button() {
 	?>
@@ -397,7 +397,7 @@ function single_display_none() {
  * 15. ADICIONA ÍCONE DE LUPA NO CAMPO DE BUSCA
  * ============================================================ */
 
-add_action( 'wp_footer', 'search_add_lupa' );
+add_action( 'wp_footer', 'search_add_lupa', 999);
 
 function search_add_lupa() {
 	?>
