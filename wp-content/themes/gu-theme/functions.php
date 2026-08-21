@@ -699,3 +699,12 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
+
+
+add_action( 'wp_footer', function() {
+	?>
+	<script>
+		console.log('### TESTE JAVASCRIPT IMU FUNCIONANDO ###');
+	</script>
+	<?php
+}, 999);
