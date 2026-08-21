@@ -708,3 +708,29 @@ add_action( 'wp_footer', function() {
 	</script>
 	<?php
 }, 999);
+
+add_action( 'wp_footer', function() {
+	?>
+	<script>
+		window.IMU_JS_TESTE = 'FUNCIONOU';
+
+		document.body.insertAdjacentHTML(
+			'beforeend',
+			'<div id="imu-js-teste" style="' +
+				'position:fixed;' +
+				'top:0;' +
+				'left:0;' +
+				'right:0;' +
+				'z-index:99999999;' +
+				'background:blue;' +
+				'color:white;' +
+				'padding:15px;' +
+				'text-align:center;' +
+				'font-size:20px;' +
+			'">JAVASCRIPT EXECUTOU</div>'
+		);
+
+		console.log('### JAVASCRIPT IMU EXECUTOU ###');
+	</script>
+	<?php
+}, 9999);
