@@ -698,7 +698,6 @@ add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
  * ============================================================ */
 
 include get_template_directory() . '/functions-ac.php';
-
 add_action( 'wp_footer', 'ac' );
 
 
