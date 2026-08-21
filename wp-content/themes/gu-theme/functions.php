@@ -1,5 +1,12 @@
 <?php
 
+if ( isset($_GET['teste_functions']) ) {
+	die(
+		'<h1>FUNCTIONS.PHP CARREGADO</h1>' .
+		'<pre>' . __FILE__ . '</pre>'
+	);
+}
+
 /* ============================================================
  * 01. CARREGAMENTO DE ESTILOS DO TEMA
  * ============================================================ */
