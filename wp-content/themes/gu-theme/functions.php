@@ -700,3 +700,53 @@ function shortcode_taxonomia_loop($atts) {
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
+
+add_action( 'wp_footer', function() {
+	?>
+	<script>
+
+	console.log(
+		'IMEDIATO:',
+		document.querySelectorAll('.jet-search-filter__input').length
+	);
+
+	setTimeout(function() {
+
+		console.log(
+			'100ms:',
+			document.querySelectorAll('.jet-search-filter__input').length
+		);
+
+	}, 100);
+
+	setTimeout(function() {
+
+		console.log(
+			'500ms:',
+			document.querySelectorAll('.jet-search-filter__input').length
+		);
+
+	}, 500);
+
+	setTimeout(function() {
+
+		console.log(
+			'1000ms:',
+			document.querySelectorAll('.jet-search-filter__input').length
+		);
+
+	}, 1000);
+
+	setTimeout(function() {
+
+		console.log(
+			'2000ms:',
+			document.querySelectorAll('.jet-search-filter__input').length
+		);
+
+	}, 2000);
+
+	</script>
+	<?php
+}, 999);
+
