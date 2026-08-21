@@ -1,18 +1,17 @@
 <?php
 
-add_action( 'init', function() {
 
-	if (
-		isset( $_GET['teste_functions_imu'] ) &&
-		current_user_can( 'manage_options' )
-	) {
-		wp_die(
-			'<h1>FUNCTIONS CARREGADO</h1>' .
-			'<pre>' . esc_html( __FILE__ ) . '</pre>'
-		);
-	}
+add_action( 'wp_head', 'teste' );
 
-});
+function teste() {
+	?>
+
+	<script>
+	console.log('teste');
+	</script>
+	<?php
+}
+
 
 /* ============================================================
  * 01. CARREGAMENTO DE ESTILOS DO TEMA
@@ -723,18 +722,4 @@ add_action( 'wp_head', function() {
 		);
 	</script>
 	<?php
-});
-
-add_action( 'init', function() {
-
-	if (
-		isset( $_GET['teste_functions_imu'] ) &&
-		current_user_can( 'manage_options' )
-	) {
-		wp_die(
-			'<h1>FUNCTIONS CARREGADO</h1>' .
-			'<pre>' . esc_html( __FILE__ ) . '</pre>'
-		);
-	}
-
 });
