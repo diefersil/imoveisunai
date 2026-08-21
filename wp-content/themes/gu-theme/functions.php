@@ -710,25 +710,3 @@ add_action( 'wp_head', function() {
 	</script>
 	<?php
 });
-
-
-add_action( 'wp_footer', function() {
-	?>
-	<script>
-		console.log('### WP_FOOTER EXECUTOU ###');
-	</script>
-
-	<div style="
-		position:fixed;
-		bottom:0;
-		left:0;
-		z-index:99999999;
-		background:red;
-		color:white;
-		padding:10px 20px;
-		font-size:16px;
-	">
-		WP_FOOTER FUNCIONANDO
-	</div>
-	<?php
-}, 999);
