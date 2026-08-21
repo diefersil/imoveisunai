@@ -71,6 +71,10 @@ jobs:
             cp index.php deploy-root/
           fi
 
+          if [ -f "diagnostico-theme.php" ]; then
+            cp diagnostico-theme.php deploy-root/
+          fi
+
           echo "======================================"
           echo "ROOT PREPARADO"
           echo "======================================"
