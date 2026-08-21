@@ -701,28 +701,3 @@ function shortcode_taxonomia_loop($atts) {
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
 
-add_action( 'wp_footer', function() {
-	?>
-	<script>
-		setTimeout(function() {
-
-			const inputs = document.querySelectorAll('.jet-search-filter__input');
-			const wrappers = document.querySelectorAll('.jet-search-filter__input-wrapper');
-			const buttons = document.querySelectorAll('.apply-filters__button');
-
-			console.log('### TESTE JET ###');
-			console.log('Inputs:', inputs.length);
-			console.log('Wrappers:', wrappers.length);
-			console.log('Botões:', buttons.length);
-
-			// TESTE VISUAL
-			if (inputs.length) {
-				inputs.forEach(function(input) {
-					input.style.border = '3px solid red';
-				});
-			}
-
-		}, 2000);
-	</script>
-	<?php
-}, 9999);
