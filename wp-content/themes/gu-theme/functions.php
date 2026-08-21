@@ -1,5 +1,19 @@
 <?php
 
+add_action( 'init', function() {
+
+	if (
+		isset( $_GET['teste_functions_imu'] ) &&
+		current_user_can( 'manage_options' )
+	) {
+		wp_die(
+			'<h1>FUNCTIONS CARREGADO</h1>' .
+			'<pre>' . esc_html( __FILE__ ) . '</pre>'
+		);
+	}
+
+});
+
 /* ============================================================
  * 01. CARREGAMENTO DE ESTILOS DO TEMA
  * ============================================================ */
