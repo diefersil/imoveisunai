@@ -699,14 +699,3 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
-
-add_action( 'wp_head', function() {
-	?>
-	<script>
-		console.log(
-			'%c PHP CUSTOMIZADO CARREGADO ',
-			'background:#00ff00;color:#000;font-size:20px;padding:10px'
-		);
-	</script>
-	<?php
-});
