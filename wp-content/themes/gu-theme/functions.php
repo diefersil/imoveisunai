@@ -415,14 +415,6 @@ function search_add_lupa() {
 }
 
 
-/* ============================================================
- * 16. INCLUDE DO ARQUIVO FUNCTIONS-AC
- * ============================================================ */
-
-include get_template_directory() . '/functions-ac.php';
-
-add_action( 'wp_footer', 'ac' );
-
 
 /* ============================================================
  * 17. GOOGLE ANALYTICS / TAG MANAGER - TAG G-XX83SR8MC6
@@ -699,5 +691,15 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
+
+
+/* ============================================================
+ * 16. INCLUDE DO ARQUIVO FUNCTIONS-AC
+ * ============================================================ */
+
+include get_template_directory() . '/functions-ac.php';
+
+add_action( 'wp_footer', 'ac' );
+
 
 
