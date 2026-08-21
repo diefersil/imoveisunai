@@ -1,3 +1,249 @@
+on:
+  push:
+    branches:
+      - main
+
+name: 🚀 Deploy WordPress SSH
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy WordPress
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 120
+
+    env:
+      SSH_HOST: imoveisunai.com.br
+      SSH_USER: guiaun34
+      SSH_PORT: 2222
+      REMOTE_ROOT: /home4/guiaun34/imoveisunai.com.br/imu
+      SSHPASS: ${{ secrets.SSH_PASSWORD }}
+
+    steps:
+
+      # ==================================================
+      # 1. BAIXAR REPOSITÓRIO
+      # ==================================================
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+
+      # ==================================================
+      # 2. INSTALAR DEPENDÊNCIAS
+      # ==================================================
+      - name: 📦 Instalar Rsync + SSHPass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync sshpass openssh-client
+
+
+      # ==================================================
+      # 3. CONFIGURAR SSH
+      # ==================================================
+      - name: 🔐 Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          ssh-keyscan \
+            -p "$SSH_PORT" \
+            -H "$SSH_HOST" \
+            >> ~/.ssh/known_hosts
+
+          chmod 600 ~/.ssh/known_hosts
+
+
+      # ==================================================
+      # 4. PREPARAR ROOT
+      # ==================================================
+      - name: 📦 Preparar Root
+        run: |
+          rm -rf deploy-root
+          mkdir -p deploy-root
+
+          for file in wp-*.php; do
+            if [ -f "$file" ] && [ "$file" != "wp-config.php" ]; then
+              cp "$file" deploy-root/
+            fi
+          done
+
+          if [ -f "index.php" ]; then
+            cp index.php deploy-root/
+          fi
+
+          echo "======================================"
+          echo "ROOT PREPARADO"
+          echo "======================================"
+
+          find deploy-root -type f | sort
+
+
+      # ==================================================
+      # 5. PREPARAR WP-CONTENT
+      # ==================================================
+      - name: 📦 Preparar WP Content
+        run: |
+          rm -rf deploy-wp-content
+          mkdir -p deploy-wp-content
+
+          if [ -f "wp-content/index.php" ]; then
+            cp wp-content/index.php deploy-wp-content/
+          fi
+
+          echo "======================================"
+          echo "WP-CONTENT PREPARADO"
+          echo "======================================"
+
+          find deploy-wp-content -type f | sort
+
+
+      # ==================================================
+      # 6. DEPLOY COMPLETO
+      # ==================================================
+      - name: 🚀 Deploy WordPress
+        run: |
+          CONTROL_SOCKET="$HOME/.ssh/hostgator-control"
+
+          rm -f "$CONTROL_SOCKET"
+
+
+          # ==================================================
+          # ENCERRAR CONEXÃO SSH AO FINAL
+          # ==================================================
+          cleanup() {
+            echo ""
+            echo "Encerrando conexão SSH..."
+
+            ssh \
+              -S "$CONTROL_SOCKET" \
+              -O exit \
+              -p "$SSH_PORT" \
+              "$SSH_USER@$SSH_HOST" \
+              2>/dev/null || true
+          }
+
+          trap cleanup EXIT
+
+
+          # ==================================================
+          # ABRIR CONEXÃO SSH PERSISTENTE
+          # ==================================================
+          echo "======================================"
+          echo "ABRINDO CONEXÃO SSH"
+          echo "======================================"
+
+          conectado=0
+
+          for tentativa in 1 2 3 4 5; do
+
+            echo ""
+            echo "Tentativa SSH: $tentativa de 5"
+
+            if sshpass -e \
+              ssh \
+                -M \
+                -S "$CONTROL_SOCKET" \
+                -fN \
+                -p "$SSH_PORT" \
+                -o PubkeyAuthentication=no \
+                -o PreferredAuthentications=keyboard-interactive,password \
+                -o KbdInteractiveAuthentication=yes \
+                -o PasswordAuthentication=yes \
+                -o NumberOfPasswordPrompts=1 \
+                -o ConnectTimeout=30 \
+                -o ServerAliveInterval=30 \
+                -o ServerAliveCountMax=10 \
+                "$SSH_USER@$SSH_HOST"
+            then
+              conectado=1
+              break
+            fi
+
+            echo "Falha ao conectar."
+
+            espera=$((tentativa * 15))
+
+            echo "Nova tentativa em ${espera}s..."
+
+            sleep "$espera"
+
+          done
+
+
+          if [ "$conectado" -ne 1 ]; then
+            echo "======================================"
+            echo "ERRO: NÃO FOI POSSÍVEL CONECTAR"
+            echo "======================================"
+
+            exit 1
+          fi
+
+
+          echo ""
+          echo "SSH conectado com sucesso."
+
+
+          # ==================================================
+          # TESTAR CONEXÃO
+          # ==================================================
+          ssh \
+            -S "$CONTROL_SOCKET" \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "echo 'Servidor SSH OK'"
+
+
+          # ==================================================
+          # CRIAR DIRETÓRIOS REMOTOS
+          # ==================================================
+          ssh \
+            -S "$CONTROL_SOCKET" \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" \
+            "mkdir -p \
+              '$REMOTE_ROOT' \
+              '$REMOTE_ROOT/wp-admin' \
+              '$REMOTE_ROOT/wp-includes' \
+              '$REMOTE_ROOT/wp-content' \
+              '$REMOTE_ROOT/wp-content/themes' \
+              '$REMOTE_ROOT/wp-content/languages' \
+              '$REMOTE_ROOT/wp-content/mu-plugins' \
+              '$REMOTE_ROOT/wp-content/plugins'"
+
+
+          # ==================================================
+          # FUNÇÃO DE DEPLOY
+          # ==================================================
+          deploy() {
+
+            ORIGEM="$1"
+            DESTINO="$2"
+            NOME="$3"
+
+            echo ""
+            echo "======================================"
+            echo "DEPLOY: $NOME"
+            echo "======================================"
+
+            rsync \
+              -az \
+              --partial \
+              --timeout=600 \
+              --info=progress2 \
+              --stats \
+              -e "ssh \
+                -S $CONTROL_SOCKET \
+                -p $SSH_PORT \
+                -o ServerAliveInterval=30 \
+                -o ServerAliveCountMax=10" \
+              "$ORIGEM" \
+              "$SSH_USER@$SSH_HOST:$DESTINO"
+
+            echo ""
+            echo "$NOME concluído."
+          }
+
+
           # ==================================================
           # 1. THEMES
           # ==================================================
