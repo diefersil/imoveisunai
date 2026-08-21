@@ -704,33 +704,25 @@ add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 add_action( 'wp_footer', function() {
 	?>
 	<script>
-		console.log('### TESTE JAVASCRIPT IMU FUNCIONANDO ###');
-	</script>
-	<?php
-}, 999);
+		setTimeout(function() {
 
-add_action( 'wp_footer', function() {
-	?>
-	<script>
-		window.IMU_JS_TESTE = 'FUNCIONOU';
+			const inputs = document.querySelectorAll('.jet-search-filter__input');
+			const wrappers = document.querySelectorAll('.jet-search-filter__input-wrapper');
+			const buttons = document.querySelectorAll('.apply-filters__button');
 
-		document.body.insertAdjacentHTML(
-			'beforeend',
-			'<div id="imu-js-teste" style="' +
-				'position:fixed;' +
-				'top:0;' +
-				'left:0;' +
-				'right:0;' +
-				'z-index:99999999;' +
-				'background:blue;' +
-				'color:white;' +
-				'padding:15px;' +
-				'text-align:center;' +
-				'font-size:20px;' +
-			'">JAVASCRIPT EXECUTOU</div>'
-		);
+			console.log('### TESTE JET ###');
+			console.log('Inputs:', inputs.length);
+			console.log('Wrappers:', wrappers.length);
+			console.log('Botões:', buttons.length);
 
-		console.log('### JAVASCRIPT IMU EXECUTOU ###');
+			// TESTE VISUAL
+			if (inputs.length) {
+				inputs.forEach(function(input) {
+					input.style.border = '3px solid red';
+				});
+			}
+
+		}, 2000);
 	</script>
 	<?php
 }, 9999);
