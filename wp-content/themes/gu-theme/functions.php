@@ -354,12 +354,52 @@ function imu_whatsapp_imovel_url_shortcode() {
         return '';
     }
 
-    // Campos do CPT imoveis
-    $phone        = get_post_meta( $post_id, 'contato_fone', true );
-    $contato_nome = get_post_meta( $post_id, 'contato_nome', true );
+    // ID do autor do imóvel
+    $author_id = (int) get_post_field( 'post_author', $post_id );
 
+    // =====================================================
+    // AUTOR ID = 4
+    // Usa os campos do próprio imóvel
+    // =====================================================
+    if ( $author_id === 4 ) {
+
+        $phone = get_post_meta(
+            $post_id,
+            'contato_whatsapp',
+            true
+        );
+
+        $contato_nome = get_post_meta(
+            $post_id,
+            'contato_nome',
+            true
+        );
+
+    // =====================================================
+    // OUTROS AUTORES
+    // Usa os dados do usuário
+    // =====================================================
+    } else {
+
+        // Nickname padrão do WordPress
+        $contato_nome = get_user_meta(
+            $author_id,
+            'nickname',
+            true
+        );
+
+        // Campo de usuário criado pelo JetEngine
+        $phone = get_user_meta(
+            $author_id,
+            'whatsapp',
+            true
+        );
+    }
+
+    // Título do imóvel
     $post_title = get_the_title( $post_id );
 
+    // Se não houver WhatsApp, não retorna nada
     if ( empty( $phone ) ) {
         return '';
     }
@@ -372,20 +412,41 @@ function imu_whatsapp_imovel_url_shortcode() {
         $phone = '55' . $phone;
     }
 
-    // Mensagem do WhatsApp
+    // =====================================================
+    // MENSAGEM DO WHATSAPP
+    // =====================================================
+
     if ( empty( $contato_nome ) ) {
-        $msg = 'Olá. Vi seu imóvel: ' . $post_title . ', no site Imóveis Unaí e gostaria de saber mais informações.';
+
+        $msg = 'Olá. Vi seu imóvel: ' 
+             . $post_title 
+             . ', no site Imóveis Unaí e gostaria de saber mais informações.';
+
     } else {
-        $msg = 'Olá, ' . $contato_nome . '. Vi seu imóvel: ' . $post_title . ', no site Imóveis Unaí e gostaria de saber mais informações.';
+
+        $msg = 'Olá, ' 
+             . $contato_nome 
+             . '. Vi seu imóvel: ' 
+             . $post_title 
+             . ', no site Imóveis Unaí e gostaria de saber mais informações.';
     }
 
-    // URL final
-    $url = 'https://wa.me/' . $phone . '?text=' . rawurlencode( $msg );
+    // =====================================================
+    // URL FINAL
+    // =====================================================
 
-    // Retorna somente a URL
+    $url = 'https://wa.me/' 
+         . $phone 
+         . '?text=' 
+         . rawurlencode( $msg );
+
     return esc_url( $url );
 }
-add_shortcode( 'whatsapp_imovel_url', 'imu_whatsapp_imovel_url_shortcode' );
+
+add_shortcode(
+    'whatsapp_imovel_url',
+    'imu_whatsapp_imovel_url_shortcode'
+);
 
 
 /* ============================================================
