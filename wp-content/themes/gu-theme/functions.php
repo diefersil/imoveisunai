@@ -803,3 +803,12 @@ function shortcode_taxonomia_loop($atts) {
     return implode($atts['separador'], $resultado);
 }
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
+
+/* ============================================================
+ * 23. ATIVAR EDITOR
+ * ============================================================ */
+
+function imu_ativar_editor_imoveis() {
+    add_post_type_support( 'imoveis', 'editor' );
+}
+add_action( 'init', 'imu_ativar_editor_imoveis', 99 );
