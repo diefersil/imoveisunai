@@ -344,7 +344,11 @@ function preco() {
 /// Shortcode: [whatsapp_imovel_url]
 function imu_whatsapp_imovel_url_shortcode() {
 
-    $post_id = get_the_ID();
+    $post_id = get_queried_object_id();
+
+    if ( ! $post_id ) {
+        $post_id = get_the_ID();
+    }
 
     if ( ! $post_id ) {
         return '';
@@ -357,9 +361,12 @@ function imu_whatsapp_imovel_url_shortcode() {
     // ID do autor do imóvel
     $author_id = (int) get_post_field( 'post_author', $post_id );
 
+    $phone        = '';
+    $contato_nome = '';
+
     // =====================================================
     // AUTOR ID = 4
-    // Usa os campos do próprio imóvel
+    // Usa campos do próprio imóvel
     // =====================================================
     if ( $author_id === 4 ) {
 
@@ -377,29 +384,30 @@ function imu_whatsapp_imovel_url_shortcode() {
 
     // =====================================================
     // OUTROS AUTORES
-    // Usa os dados do usuário
+    // Usa dados do usuário WordPress
     // =====================================================
     } else {
 
-        // Nickname padrão do WordPress
-        $contato_nome = get_user_meta(
-            $author_id,
-            'nickname',
-            true
-        );
+        $user = get_userdata( $author_id );
 
-        // Campo de usuário criado pelo JetEngine
-        $phone = get_user_meta(
-            $author_id,
-            'whatsapp',
-            true
-        );
+        if ( $user ) {
+
+            // Display Name do autor
+            $contato_nome = $user->display_name;
+
+            // Meta Field "whatsapp" do usuário
+            $phone = get_user_meta(
+                $author_id,
+                'whatsapp',
+                true
+            );
+        }
     }
 
     // Título do imóvel
     $post_title = get_the_title( $post_id );
 
-    // Se não houver WhatsApp, não retorna nada
+    // Se não tiver WhatsApp
     if ( empty( $phone ) ) {
         return '';
     }
@@ -407,38 +415,39 @@ function imu_whatsapp_imovel_url_shortcode() {
     // Remove tudo que não for número
     $phone = preg_replace( '/\D+/', '', $phone );
 
-    // Adiciona código do Brasil caso não tenha
+    if ( empty( $phone ) ) {
+        return '';
+    }
+
+    // Adiciona código do Brasil
     if ( substr( $phone, 0, 2 ) !== '55' ) {
         $phone = '55' . $phone;
     }
 
     // =====================================================
-    // MENSAGEM DO WHATSAPP
+    // MENSAGEM
     // =====================================================
 
-    if ( empty( $contato_nome ) ) {
+    if ( ! empty( $contato_nome ) ) {
 
-        $msg = 'Olá. Vi seu imóvel: ' 
-             . $post_title 
-             . ', no site Imóveis Unaí e gostaria de saber mais informações.';
+        $msg = 'Olá, ' . $contato_nome .
+               '. Vi seu imóvel: ' . $post_title .
+               ', no site Imóveis Unaí e gostaria de saber mais informações.';
 
     } else {
 
-        $msg = 'Olá, ' 
-             . $contato_nome 
-             . '. Vi seu imóvel: ' 
-             . $post_title 
-             . ', no site Imóveis Unaí e gostaria de saber mais informações.';
+        $msg = 'Olá. Vi seu imóvel: ' . $post_title .
+               ', no site Imóveis Unaí e gostaria de saber mais informações.';
     }
 
     // =====================================================
     // URL FINAL
     // =====================================================
 
-    $url = 'https://wa.me/' 
-         . $phone 
-         . '?text=' 
-         . rawurlencode( $msg );
+    $url = 'https://wa.me/' .
+           $phone .
+           '?text=' .
+           rawurlencode( $msg );
 
     return esc_url( $url );
 }
