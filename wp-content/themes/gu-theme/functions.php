@@ -82,7 +82,6 @@ function google_font() {
  * ============================================================ */
 
 //add_action( 'wp_head', 'adsense' );
-
 function adsense() {
 	?>
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0370842058394618"
@@ -827,3 +826,49 @@ function imu_forcar_editor_imoveis() {
 }
 
 add_action( 'admin_init', 'imu_forcar_editor_imoveis', 999 );
+
+
+/* ============================================================
+ * 23. Redirecionar Taxonomias para Busca
+ * ============================================================ */
+
+
+function imu_redirect_taxonomy_to_busca() {
+
+    if ( ! is_tax() ) {
+        return;
+    }
+
+    $term = get_queried_object();
+
+    if (
+        ! $term ||
+        empty( $term->term_id ) ||
+        empty( $term->taxonomy )
+    ) {
+        return;
+    }
+
+    $taxonomias_permitidas = array(
+        'categoria',
+        'negociacao',
+        'cidade',
+    );
+
+    if ( ! in_array( $term->taxonomy, $taxonomias_permitidas, true ) ) {
+        return;
+    }
+
+    $url = add_query_arg(
+        array(
+            'jsf' => 'jet-engine:listing-filter',
+            'tax' => $term->taxonomy . ':' . (int) $term->term_id,
+        ),
+        home_url( '/busca/' )
+    );
+
+    wp_safe_redirect( $url, 302 );
+    exit;
+}
+
+add_action( 'template_redirect', 'imu_redirect_taxonomy_to_busca' );
