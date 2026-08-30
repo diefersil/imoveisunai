@@ -835,30 +835,24 @@ add_action( 'admin_init', 'imu_forcar_editor_imoveis', 999 );
 
 function imu_redirect_taxonomy_to_busca() {
 
-    if ( ! is_tax() ) {
+    // Somente páginas das taxonomias desejadas
+    if ( ! is_tax( array( 'categoria', 'negociacao', 'cidade' ) ) ) {
         return;
     }
 
     $term = get_queried_object();
 
+    // Confirma que realmente estamos dentro de um termo
     if (
         ! $term ||
-        empty( $term->term_id ) ||
-        empty( $term->taxonomy )
+        ! isset( $term->term_id ) ||
+        ! isset( $term->taxonomy ) ||
+        ! isset( $term->slug )
     ) {
         return;
     }
 
-    $taxonomias_permitidas = array(
-        'categoria',
-        'negociacao',
-        'cidade',
-    );
-
-    if ( ! in_array( $term->taxonomy, $taxonomias_permitidas, true ) ) {
-        return;
-    }
-
+    // Monta URL do filtro
     $url = add_query_arg(
         array(
             'jsf' => 'jet-engine:listing-filter',
