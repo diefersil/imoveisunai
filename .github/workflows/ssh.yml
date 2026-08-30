@@ -16,7 +16,7 @@ jobs:
       SSH_HOST: imoveisunai.com.br
       SSH_USER: guiaun34
       SSH_PORT: 2222
-      REMOTE_ROOT: /home4/guiaun34/imoveisunai.com.br/imu
+      REMOTE_ROOT: /home4/guiaun34/imoveisunai.com.br/
       SSHPASS: ${{ secrets.SSH_PASSWORD }}
 
     steps:
