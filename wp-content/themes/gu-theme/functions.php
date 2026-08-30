@@ -819,45 +819,31 @@ add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 /**
  * Força o editor no CPT imoveis
  */
-function imu_forcar_editor_imoveis() {
-
-    add_post_type_support( 'imoveis', 'editor' );
-    add_post_type_support( 'imoveis', 'author' );
-}
-
-add_action( 'admin_init', 'imu_forcar_editor_imoveis', 999 );
-
-
-/* ============================================================
- * 23. Redirecionar Taxonomias para Busca
- * ============================================================ */
-
-
 function imu_redirect_taxonomy_to_busca() {
 
-    // Somente páginas das taxonomias desejadas
+    // Só executa dentro dessas páginas de taxonomia
     if ( ! is_tax( array( 'categoria', 'negociacao', 'cidade' ) ) ) {
         return;
     }
 
-    $term = get_queried_object();
-
-    // Confirma que realmente estamos dentro de um termo
-    if (
-        ! $term ||
-        ! isset( $term->term_id ) ||
-        ! isset( $term->taxonomy ) ||
-        ! isset( $term->slug )
-    ) {
+    // Se ainda não aplicou nenhum filtro, permanece na página
+    if ( empty( $_GET['jsf'] ) ) {
         return;
     }
 
-    // Monta URL do filtro
+    // Confirma que é o filtro do JetEngine
+    $jsf = sanitize_text_field( wp_unslash( $_GET['jsf'] ) );
+
+    if ( $jsf !== 'jet-engine:listing-filter' ) {
+        return;
+    }
+
+    // Mantém todos os parâmetros aplicados pelo JetSmartFilters
+    $query_args = $_GET;
+
+    // Nova URL
     $url = add_query_arg(
-        array(
-            'jsf' => 'jet-engine:listing-filter',
-            'tax' => $term->taxonomy . ':' . (int) $term->term_id,
-        ),
+        $query_args,
         home_url( '/busca/' )
     );
 
