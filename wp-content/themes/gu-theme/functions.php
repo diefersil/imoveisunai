@@ -818,52 +818,42 @@ add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
 function imu_redirect_taxonomy_filter_to_busca() {
 
-    // Verifica se existe REQUEST_URI
-    if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+    // Só executa nas taxonomias desejadas
+    if ( ! is_tax( array( 'categoria', 'negociacao', 'cidade' ) ) ) {
         return;
     }
 
-    // URL atual
-    $request_uri = urldecode(
-        wp_unslash( $_SERVER['REQUEST_URI'] )
+    // Só redireciona se o JetSmartFilters estiver ativo na URL
+    if ( empty( $_GET['jsf'] ) ) {
+        return;
+    }
+
+    $jsf = sanitize_text_field(
+        wp_unslash( $_GET['jsf'] )
+    );
+
+    // Confirma que é o filtro do JetEngine
+    if ( $jsf !== 'jet-engine:listing-filter' ) {
+        return;
+    }
+
+    // Precisa existir o parâmetro tax
+    if ( empty( $_GET['tax'] ) ) {
+        return;
+    }
+
+    $tax_filter = sanitize_text_field(
+        wp_unslash( $_GET['tax'] )
     );
 
     /*
-     * Taxonomias permitidas:
+     * Exemplo:
      *
-     * /categoria/casas/
-     * /negociacao/venda/
-     * /cidade/unai/
-     *
-     * O redirecionamento só acontece quando existir:
-     *
-     * /jsf=jet-engine:listing-filter&tax=...
-     */
-    $pattern = '#/(categoria|negociacao|cidade)/[^/]+/jsf=jet-engine:listing-filter&tax=([^&/]+)#';
-
-    if ( ! preg_match( $pattern, $request_uri, $matches ) ) {
-        return;
-    }
-
-    /*
-     * $matches[1]
-     * Taxonomia da página:
-     * categoria, negociacao ou cidade
-     *
-     * $matches[2]
-     * Valor recebido no filtro:
-     * categoria:1394
+     * categoria:1398,1392
      * cidade:123
      * negociacao:456
      */
-    $tax_filter = sanitize_text_field( $matches[2] );
 
-    if ( empty( $tax_filter ) ) {
-        return;
-    }
-
-    // Monta:
-    // /busca/?tax=categoria:1394
     $url = add_query_arg(
         array(
             'tax' => $tax_filter,
@@ -871,7 +861,6 @@ function imu_redirect_taxonomy_filter_to_busca() {
         home_url( '/busca/' )
     );
 
-    // Redireciona
     wp_safe_redirect( $url, 302 );
     exit;
 }
