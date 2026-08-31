@@ -37,8 +37,10 @@ function ac() {?>
     					b.innerHTML = "<strong>" + arr[i].nome.substr(0, val.length) + "</strong>";
     					b.innerHTML += arr[i].nome.substr(val.length);
     					/*insert a input field that will hold the current array item's value:*/	
-    					let set_url = arr[i].tipo == 'marca' ? 'marcas/' : 'busca/?&_s=';/*ADD*/
-    					let set_text = arr[i].tipo == 'marca' ? arr[i].nome.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replaceAll(' ','-') : arr[i].nome;/*ADD*/
+    					//let set_url = arr[i].tipo == 'marca' ? 'marcas/' : 'busca/?&_s=';/*ADD*/
+    					//let set_text = arr[i].tipo == 'marca' ? arr[i].nome.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().replaceAll(' ','-') : arr[i].nome;/*ADD*/
+						let set_url = arr[i].tipo == 'marca' ? 'busca/?&_s=' : '';
+    					let set_text = arr[i].tipo == 'marca' ? arr[i].nome : '';/*ADD*/
     					//b.setAttribute('onclick',`location.href='https://imoveisunai.com.br/busca/?_s=${arr[i]}'`);/*ADD*/
     					b.setAttribute('onclick',`location.href='https://imoveisunai.com.br/${set_url + set_text}'`);/*ADD*/
     					b.innerHTML += "<input type='hidden' value='" + arr[i].nome + "'>";
