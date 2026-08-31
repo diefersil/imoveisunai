@@ -813,8 +813,25 @@ function shortcode_taxonomia_loop($atts) {
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
 /* ============================================================
- * 23. Redirecionar 
+ * 23. ATIVAR EDITOR
  * ============================================================ */
+
+/**
+ * Força o editor no CPT imoveis
+ */
+function imu_forcar_editor_imoveis() {
+
+    add_post_type_support( 'imoveis', 'editor' );
+    add_post_type_support( 'imoveis', 'author' );
+}
+
+add_action( 'admin_init', 'imu_forcar_editor_imoveis', 999 );
+
+
+/* ============================================================
+ * 23. Redirecionar Taxonomias para Busca
+ * ============================================================ */
+
 
 function imu_redirect_taxonomy_filter_to_busca() {
 
