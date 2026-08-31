@@ -81,11 +81,11 @@ function google_font() {
  * 07. GOOGLE ADSENSE
  * ============================================================ */
 
-//add_action( 'wp_head', 'adsense' );
+add_action( 'wp_head', 'adsense' );
 function adsense() {
 	?>
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0370842058394618"
-		crossorigin="anonymous"></script>
+     crossorigin="anonymous"></script>
 	<?php
 }
 
