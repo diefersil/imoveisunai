@@ -813,42 +813,71 @@ function shortcode_taxonomia_loop($atts) {
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
 /* ============================================================
- * 23. ATIVAR EDITOR
+ * 23. Redirecionar 
  * ============================================================ */
 
-/**
- * Força o editor no CPT imoveis
- */
-function imu_redirect_taxonomy_to_busca() {
+function imu_redirect_taxonomy_filter_to_busca() {
 
-    // Só executa dentro dessas páginas de taxonomia
-    if ( ! is_tax( array( 'categoria', 'negociacao', 'cidade' ) ) ) {
+    // Verifica se existe REQUEST_URI
+    if ( empty( $_SERVER['REQUEST_URI'] ) ) {
         return;
     }
 
-    // Se ainda não aplicou nenhum filtro, permanece na página
-    if ( empty( $_GET['jsf'] ) ) {
+    // URL atual
+    $request_uri = urldecode(
+        wp_unslash( $_SERVER['REQUEST_URI'] )
+    );
+
+    /*
+     * Taxonomias permitidas:
+     *
+     * /categoria/casas/
+     * /negociacao/venda/
+     * /cidade/unai/
+     *
+     * O redirecionamento só acontece quando existir:
+     *
+     * /jsf=jet-engine:listing-filter&tax=...
+     */
+    $pattern = '#/(categoria|negociacao|cidade)/[^/]+/jsf=jet-engine:listing-filter&tax=([^&/]+)#';
+
+    if ( ! preg_match( $pattern, $request_uri, $matches ) ) {
         return;
     }
 
-    // Confirma que é o filtro do JetEngine
-    $jsf = sanitize_text_field( wp_unslash( $_GET['jsf'] ) );
+    /*
+     * $matches[1]
+     * Taxonomia da página:
+     * categoria, negociacao ou cidade
+     *
+     * $matches[2]
+     * Valor recebido no filtro:
+     * categoria:1394
+     * cidade:123
+     * negociacao:456
+     */
+    $tax_filter = sanitize_text_field( $matches[2] );
 
-    if ( $jsf !== 'jet-engine:listing-filter' ) {
+    if ( empty( $tax_filter ) ) {
         return;
     }
 
-    // Mantém todos os parâmetros aplicados pelo JetSmartFilters
-    $query_args = $_GET;
-
-    // Nova URL
+    // Monta:
+    // /busca/?tax=categoria:1394
     $url = add_query_arg(
-        $query_args,
+        array(
+            'tax' => $tax_filter,
+        ),
         home_url( '/busca/' )
     );
 
+    // Redireciona
     wp_safe_redirect( $url, 302 );
     exit;
 }
 
-add_action( 'template_redirect', 'imu_redirect_taxonomy_to_busca' );
+add_action(
+    'template_redirect',
+    'imu_redirect_taxonomy_filter_to_busca',
+    1
+);
