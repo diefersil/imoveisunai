@@ -887,3 +887,37 @@ add_action(
     'imu_redirect_taxonomy_filter_to_busca',
     1
 );
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.addEventListener('keydown', function (e) {
+
+        if (e.key !== 'Enter') {
+            return;
+        }
+
+        const input = e.target.closest('#search-ac');
+
+        if (!input) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const termo = input.value.trim();
+
+        if (!termo) {
+            return;
+        }
+
+        const url =
+            'https://imoveisunai.com.br/busca/?_s=' +
+            encodeURIComponent(termo);
+
+        window.location.href = url;
+    });
+
+});
