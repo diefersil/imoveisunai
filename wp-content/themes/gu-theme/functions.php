@@ -888,36 +888,45 @@ add_action(
     1
 );
 
+/* ============================================================
+ * 23. Redirecionar Taxonomias para Busca
+ * ============================================================ */
 
 
-document.addEventListener('DOMContentLoaded', function () {
+add_action('wp_footer', function () {
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-    document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function (e) {
 
-        if (e.key !== 'Enter') {
-            return;
-        }
+            if (e.key !== 'Enter') {
+                return;
+            }
 
-        const input = e.target.closest('#search-ac');
+            const input = e.target.closest('#search-ac');
 
-        if (!input) {
-            return;
-        }
+            if (!input) {
+                return;
+            }
 
-        e.preventDefault();
-        e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
 
-        const termo = input.value.trim();
+            const termo = input.value.trim();
 
-        if (!termo) {
-            return;
-        }
+            if (!termo) {
+                return;
+            }
 
-        const url =
-            'https://imoveisunai.com.br/busca/?_s=' +
-            encodeURIComponent(termo);
+            const url =
+                'https://imoveisunai.com.br/busca/?_s=' +
+                encodeURIComponent(termo);
 
-        window.location.href = url;
+            window.location.href = url;
+        });
+
     });
-
+    </script>
+    <?php
 });
