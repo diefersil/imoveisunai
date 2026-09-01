@@ -93,8 +93,8 @@ function adsense() {
 /* ============================================================
  * 08. JET SEARCH - CAMPO DE BUSCA
  *     08.1 Define ID no campo visível
- *     08.2 Enter aciona o botão Buscar
- *     08.3 Adiciona ícone de lupa no campo visível
+ *     08.2 Adiciona ícone de lupa no campo visível
+ *     08.3 Enter redireciona para /busca/?_s=
  * ============================================================ */
 
 /* ------------------------------------------------------------
@@ -122,40 +122,7 @@ function set_id_input_search() {
 }
 
 /* ------------------------------------------------------------
- * 08.2 ENTER ACIONA O BOTÃO BUSCAR
- * ------------------------------------------------------------ */
-
-add_action( 'wp_footer', 'set_apply_button' );
-
-function set_apply_button() {
-	?>
-	<script>
-	(function () {
-		document.addEventListener('keyup', function(event) {
-			if (
-				event.key === 'Enter' &&
-				event.target.matches('.jet-search-filter__input')
-			) {
-				event.preventDefault();
-
-				const applyButton = Array.from(
-					document.querySelectorAll('.apply-filters__button')
-				).find(function(button) {
-					return button.offsetParent !== null;
-				});
-
-				if (applyButton) {
-					applyButton.click();
-				}
-			}
-		});
-	})();
-	</script>
-	<?php
-}
-
-/* ------------------------------------------------------------
- * 08.3 ADICIONA ÍCONE DE LUPA NO CAMPO VISÍVEL
+ * 08.2 ADICIONA ÍCONE DE LUPA NO CAMPO VISÍVEL
  * ------------------------------------------------------------ */
 
 add_action( 'wp_footer', 'search_add_lupa' );
@@ -195,6 +162,47 @@ function search_add_lupa() {
 	<?php
 }
 
+
+
+/* ------------------------------------------------------------
+ * 08.3 ENTER REDIRECIONA PARA A PÁGINA DE BUSCA
+ * ------------------------------------------------------------ */
+
+add_action( 'wp_footer', 'imu_search_redirect' );
+
+function imu_search_redirect() {
+    ?>
+    <script>
+    document.addEventListener('keydown', function(e) {
+
+        if (e.key !== 'Enter') {
+            return;
+        }
+
+        const input = e.target.closest('#search-ac');
+
+        if (!input) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        const termo = input.value.trim();
+
+        if (!termo) {
+            return;
+        }
+
+        window.location.href =
+            'https://imoveisunai.com.br/busca/?_s=' +
+            encodeURIComponent(termo);
+
+    }, true);
+    </script>
+    <?php
+}
 
 
 /* ============================================================
@@ -712,7 +720,7 @@ add_action( 'admin_head', function () {
 
 
 /* ============================================================
- * 23. JETENGINE - MACRO PERSONALIZADA POR CATEGORIA GET
+ * 23. LIMPA SEPARADORES DAS ETIQUETAS NO LOOP
  * ============================================================ */
 
 add_action('wp_footer', 'limpar_loop_etiquetas');
@@ -757,7 +765,7 @@ function limpar_loop_etiquetas() {
 }
 
 /* ============================================================
- * 23. JETENGINE - MACRO PERSONALIZADA POR CATEGORIA GET
+ * 24. SHORTCODE GENÉRICO DE TAXONOMIA NO LOOP
  * ============================================================ */
 
 // Shortcode genérico para mostrar termo de qualquer taxonomia no loop
@@ -813,7 +821,7 @@ function shortcode_taxonomia_loop($atts) {
 add_shortcode('taxonomia_loop', 'shortcode_taxonomia_loop');
 
 /* ============================================================
- * 23. ATIVAR EDITOR
+ * 25. ATIVAR EDITOR NO CPT IMÓVEIS
  * ============================================================ */
 
 /**
@@ -829,7 +837,7 @@ add_action( 'admin_init', 'imu_forcar_editor_imoveis', 999 );
 
 
 /* ============================================================
- * 23. Redirecionar Taxonomias para Busca
+ * 26. REDIRECIONAR TAXONOMIAS PARA BUSCA
  * ============================================================ */
 
 
@@ -888,45 +896,3 @@ add_action(
     1
 );
 
-/* ============================================================
- * 23. Redirecionar Taxonomias para Busca
- * ============================================================ */
-
-
-add_action('wp_footer', function () {
-    ?>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        document.addEventListener('keydown', function (e) {
-
-            if (e.key !== 'Enter') {
-                return;
-            }
-
-            const input = e.target.closest('#search-ac');
-
-            if (!input) {
-                return;
-            }
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            const termo = input.value.trim();
-
-            if (!termo) {
-                return;
-            }
-
-            const url =
-                'https://imoveisunai.com.br/busca/?_s=' +
-                encodeURIComponent(termo);
-
-            window.location.href = url;
-        });
-
-    });
-    </script>
-    <?php
-});
