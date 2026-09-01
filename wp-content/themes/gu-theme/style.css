@@ -132,6 +132,10 @@ label,
    SINGLE
 ================================================== */
 
+.swiper-slide-image {
+  max-height: 350px !important;
+}
+
 /*.single .swiper-slide-inner{
     background: black !important;
     text-align: center !important;
