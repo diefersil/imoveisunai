@@ -137,10 +137,30 @@ label,
     text-align: center !important;
 }
 
+.single .elementor-widget-image-carousel .swiper {
+  position: static;
+  background: black;
+  text-align: center !important;
+}
+
 @media(min-width:700px){
   .single img.swiper-slide-image{
       width: 100%;
-      max-height: 250px;
+      max-height: 300px;
+      height: 300px;
+  }
+
+  .elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center !important;
+  }
+}
+
+@media(max-width:700px){
+  .single img.swiper-slide-image{
+      width: 100%;
+      max-height: 300px;
       height: 300px;
   }
 
