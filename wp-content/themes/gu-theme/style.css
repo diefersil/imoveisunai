@@ -132,8 +132,8 @@ label,
    SINGLE
 ================================================== */
 
-.single .swiper-slide-inner{
-    /*background: black !important;*/
+/*.single .swiper-slide-inner{
+    background: black !important;
     text-align: center !important;
 }
 
@@ -169,7 +169,7 @@ label,
     align-items: center;
     justify-content: center !important;
   }
-}
+}*/
 
 
 /* ==================================================
