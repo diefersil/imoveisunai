@@ -896,3 +896,129 @@ add_action(
     1
 );
 
+/*--------------------------------------------------------------------------------*/
+
+/* ------------------------------------------------------------
+ * META DESCRIPTION E OG DESCRIPTION - SINGLE DE IMÓVEIS
+ * ------------------------------------------------------------ */
+
+add_action( 'wp_head', 'imu_meta_description_imoveis', 5 );
+
+function imu_meta_description_imoveis() {
+
+    // Executa somente no single do CPT "imoveis"
+    if ( ! is_singular( 'imoveis' ) ) {
+        return;
+    }
+
+    // ID do imóvel atual
+    $post_id = get_queried_object_id();
+
+    if ( ! $post_id ) {
+        return;
+    }
+
+    // ---------------------------------------------------------
+    // PEGA O CONTEÚDO DO THE_CONTENT
+    // ---------------------------------------------------------
+
+    $content = get_post_field(
+        'post_content',
+        $post_id
+    );
+
+    if ( empty( $content ) ) {
+        return;
+    }
+
+    // ---------------------------------------------------------
+    // LIMPA O CONTEÚDO
+    // ---------------------------------------------------------
+
+    // Remove shortcodes
+    $content = strip_shortcodes( $content );
+
+    // Remove tags HTML
+    $content = wp_strip_all_tags( $content );
+
+    // Converte entidades HTML
+    $content = html_entity_decode(
+        $content,
+        ENT_QUOTES | ENT_HTML5,
+        'UTF-8'
+    );
+
+    // Remove múltiplos espaços, tabs e quebras de linha
+    $content = preg_replace(
+        '/\s+/u',
+        ' ',
+        $content
+    );
+
+    $content = trim( $content );
+
+    if ( empty( $content ) ) {
+        return;
+    }
+
+    // ---------------------------------------------------------
+    // META DESCRIPTION
+    // LIMITE RECOMENDADO: ATÉ 160 CARACTERES
+    // ---------------------------------------------------------
+
+    $limite = 160;
+
+    if ( mb_strlen( $content, 'UTF-8' ) > $limite ) {
+
+        $description = mb_substr(
+            $content,
+            0,
+            $limite,
+            'UTF-8'
+        );
+
+        // Evita cortar a última palavra pela metade
+        $ultimo_espaco = mb_strrpos(
+            $description,
+            ' ',
+            0,
+            'UTF-8'
+        );
+
+        if ( $ultimo_espaco !== false ) {
+
+            $description = mb_substr(
+                $description,
+                0,
+                $ultimo_espaco,
+                'UTF-8'
+            );
+
+        }
+
+        $description .= '...';
+
+    } else {
+
+        $description = $content;
+
+    }
+
+    // ---------------------------------------------------------
+    // META DESCRIPTION
+    // ---------------------------------------------------------
+
+    echo "\n";
+    echo '<meta name="description" content="' .
+        esc_attr( $description ) .
+        '">' . "\n";
+
+
+    // ---------------------------------------------------------
+    // OPEN GRAPH DESCRIPTION
+    // ---------------------------------------------------------
+
+    echo '<meta property="og:description" content="' .
+        esc_attr( $description ) .
+        '">' . "\n";
+}
