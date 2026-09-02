@@ -925,6 +925,34 @@ function imu_meta_description_imoveis() {
     }
 
 
+   /* ------------------------------------------------------------
+ * META DESCRIPTION E OG DESCRIPTION - SINGLE DE IMÓVEIS
+ * ------------------------------------------------------------ */
+
+add_action( 'wp_head', 'imu_meta_description_imoveis', 5 );
+
+function imu_meta_description_imoveis() {
+
+    /* ------------------------------------------------------------
+     * SOMENTE SINGLE DO CPT IMÓVEIS
+     * ------------------------------------------------------------ */
+
+    if ( ! is_singular( 'imoveis' ) ) {
+        return;
+    }
+
+
+    /* ------------------------------------------------------------
+     * PEGA O ID DO IMÓVEL
+     * ------------------------------------------------------------ */
+
+    $post_id = get_queried_object_id();
+
+    if ( ! $post_id ) {
+        return;
+    }
+
+
     /* ------------------------------------------------------------
      * PEGA O CONTEÚDO DO THE_CONTENT
      * ------------------------------------------------------------ */
