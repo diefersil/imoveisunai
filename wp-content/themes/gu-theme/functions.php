@@ -917,9 +917,10 @@ function imu_meta_description_imoveis() {
         return;
     }
 
-    // ---------------------------------------------------------
-    // PEGA O CONTEÚDO DO THE_CONTENT
-    // ---------------------------------------------------------
+
+    /* ------------------------------------------------------------
+     * PEGA O CONTEÚDO DO THE_CONTENT
+     * ------------------------------------------------------------ */
 
     $content = get_post_field(
         'post_content',
@@ -930,24 +931,66 @@ function imu_meta_description_imoveis() {
         return;
     }
 
-    // ---------------------------------------------------------
-    // LIMPA O CONTEÚDO
-    // ---------------------------------------------------------
 
-    // Remove shortcodes
+    /* ------------------------------------------------------------
+     * REMOVE SHORTCODES
+     * ------------------------------------------------------------ */
+
     $content = strip_shortcodes( $content );
 
-    // Remove tags HTML
+
+    /* ------------------------------------------------------------
+     * TRANSFORMA QUEBRAS E BLOCOS HTML EM ESPAÇOS
+     * ------------------------------------------------------------ */
+
+    // <br>, <br/>, <br />
+    $content = preg_replace(
+        '/<br\s*\/?>/i',
+        ' ',
+        $content
+    );
+
+    // Tags de bloco que normalmente representam quebra de linha
+    $content = preg_replace(
+        '/<\/?(p|div|section|article|header|footer|aside|li|ul|ol|h[1-6]|table|tr|td|th|blockquote)[^>]*>/i',
+        ' ',
+        $content
+    );
+
+
+    /* ------------------------------------------------------------
+     * REMOVE O RESTANTE DAS TAGS HTML
+     * ------------------------------------------------------------ */
+
     $content = wp_strip_all_tags( $content );
 
-    // Converte entidades HTML
+
+    /* ------------------------------------------------------------
+     * CONVERTE ENTIDADES HTML
+     * ------------------------------------------------------------ */
+
     $content = html_entity_decode(
         $content,
         ENT_QUOTES | ENT_HTML5,
         'UTF-8'
     );
 
-    // Remove múltiplos espaços, tabs e quebras de linha
+
+    /* ------------------------------------------------------------
+     * NORMALIZA ESPAÇOS
+     * ------------------------------------------------------------ */
+
+    // Troca espaços especiais por espaço normal
+    $content = str_replace(
+        array(
+            "\xc2\xa0",
+            '&nbsp;'
+        ),
+        ' ',
+        $content
+    );
+
+    // Remove múltiplos espaços, tabs e quebras
     $content = preg_replace(
         '/\s+/u',
         ' ',
@@ -960,10 +1003,10 @@ function imu_meta_description_imoveis() {
         return;
     }
 
-    // ---------------------------------------------------------
-    // META DESCRIPTION
-    // LIMITE RECOMENDADO: ATÉ 160 CARACTERES
-    // ---------------------------------------------------------
+
+    /* ------------------------------------------------------------
+     * LIMITA A META DESCRIPTION
+     * ------------------------------------------------------------ */
 
     $limite = 160;
 
@@ -992,7 +1035,6 @@ function imu_meta_description_imoveis() {
                 $ultimo_espaco,
                 'UTF-8'
             );
-
         }
 
         $description .= '...';
@@ -1000,22 +1042,23 @@ function imu_meta_description_imoveis() {
     } else {
 
         $description = $content;
-
     }
 
-    // ---------------------------------------------------------
-    // META DESCRIPTION
-    // ---------------------------------------------------------
+
+    /* ------------------------------------------------------------
+     * META DESCRIPTION
+     * ------------------------------------------------------------ */
 
     echo "\n";
+
     echo '<meta name="description" content="' .
         esc_attr( $description ) .
         '">' . "\n";
 
 
-    // ---------------------------------------------------------
-    // OPEN GRAPH DESCRIPTION
-    // ---------------------------------------------------------
+    /* ------------------------------------------------------------
+     * OPEN GRAPH DESCRIPTION
+     * ------------------------------------------------------------ */
 
     echo '<meta property="og:description" content="' .
         esc_attr( $description ) .
