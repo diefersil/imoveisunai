@@ -1092,33 +1092,3 @@ function imu_meta_description_imoveis() {
         '">' . "\n";
 }
 
-/**
- * ------------------------------------------------------------
- * EXIBIR TODOS OS USUÁRIOS NO CAMPO AUTOR DOS IMÓVEIS
- * ------------------------------------------------------------
- */
-add_filter( 'wp_dropdown_users_args', function( $query_args, $parsed_args ) {
-
-    // Apenas no campo "Autor" da edição de posts
-    if (
-        isset( $parsed_args['name'] ) &&
-        $parsed_args['name'] === 'post_author_override'
-    ) {
-
-        $screen = get_current_screen();
-
-        // Apenas no CPT imoveis
-        if (
-            $screen &&
-            $screen->post_type === 'imoveis'
-        ) {
-
-            // Remove a limitação padrão para somente "autores"
-            unset( $query_args['who'] );
-
-        }
-    }
-
-    return $query_args;
-
-}, 10, 2 );
