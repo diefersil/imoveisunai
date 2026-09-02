@@ -1091,4 +1091,3 @@ function imu_meta_description_imoveis() {
         esc_attr( $description ) .
         '">' . "\n";
 }
-
