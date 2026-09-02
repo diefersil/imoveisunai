@@ -905,12 +905,19 @@ add_action( 'wp_head', 'imu_meta_description_imoveis', 5 );
 
 function imu_meta_description_imoveis() {
 
-    // Executa somente no single do CPT "imoveis"
+    /* ------------------------------------------------------------
+     * SOMENTE SINGLE DO CPT IMÓVEIS
+     * ------------------------------------------------------------ */
+
     if ( ! is_singular( 'imoveis' ) ) {
         return;
     }
 
-    // ID do imóvel atual
+
+    /* ------------------------------------------------------------
+     * PEGA O ID DO IMÓVEL
+     * ------------------------------------------------------------ */
+
     $post_id = get_queried_object_id();
 
     if ( ! $post_id ) {
@@ -940,26 +947,29 @@ function imu_meta_description_imoveis() {
 
 
     /* ------------------------------------------------------------
-     * TRANSFORMA QUEBRAS E BLOCOS HTML EM ESPAÇOS
+     * TRANSFORMA QUEBRAS HTML EM ESPAÇOS
      * ------------------------------------------------------------ */
 
-    // <br>, <br/>, <br />
     $content = preg_replace(
         '/<br\s*\/?>/i',
         ' ',
         $content
     );
 
-    // Tags de bloco que normalmente representam quebra de linha
+
+    /* ------------------------------------------------------------
+     * TRANSFORMA TAGS DE BLOCO EM ESPAÇOS
+     * ------------------------------------------------------------ */
+
     $content = preg_replace(
-        '/<\/?(p|div|section|article|header|footer|aside|li|ul|ol|h[1-6]|table|tr|td|th|blockquote)[^>]*>/i',
+        '/<\/?(p|div|section|article|header|footer|aside|li|ul|ol|h[1-6]|table|tbody|thead|tfoot|tr|td|th|blockquote)[^>]*>/i',
         ' ',
         $content
     );
 
 
     /* ------------------------------------------------------------
-     * REMOVE O RESTANTE DAS TAGS HTML
+     * REMOVE AS DEMAIS TAGS HTML
      * ------------------------------------------------------------ */
 
     $content = wp_strip_all_tags( $content );
@@ -977,10 +987,20 @@ function imu_meta_description_imoveis() {
 
 
     /* ------------------------------------------------------------
-     * NORMALIZA ESPAÇOS
+     * REMOVE PALAVRAS E TEXTOS INDESEJADOS
      * ------------------------------------------------------------ */
 
-    // Troca espaços especiais por espaço normal
+    $content = preg_replace(
+        '/(?<!\p{L})(?:descrição|ver\s+mais)(?!\p{L})/iu',
+        ' ',
+        $content
+    );
+
+
+    /* ------------------------------------------------------------
+     * REMOVE ESPAÇOS ESPECIAIS
+     * ------------------------------------------------------------ */
+
     $content = str_replace(
         array(
             "\xc2\xa0",
@@ -990,7 +1010,11 @@ function imu_meta_description_imoveis() {
         $content
     );
 
-    // Remove múltiplos espaços, tabs e quebras
+
+    /* ------------------------------------------------------------
+     * NORMALIZA ESPAÇOS
+     * ------------------------------------------------------------ */
+
     $content = preg_replace(
         '/\s+/u',
         ' ',
@@ -1005,7 +1029,7 @@ function imu_meta_description_imoveis() {
 
 
     /* ------------------------------------------------------------
-     * LIMITA A META DESCRIPTION
+     * LIMITA A DESCRIPTION A 160 CARACTERES
      * ------------------------------------------------------------ */
 
     $limite = 160;
@@ -1019,7 +1043,11 @@ function imu_meta_description_imoveis() {
             'UTF-8'
         );
 
-        // Evita cortar a última palavra pela metade
+
+        /* ------------------------------------------------------------
+         * EVITA CORTAR A ÚLTIMA PALAVRA
+         * ------------------------------------------------------------ */
+
         $ultimo_espaco = mb_strrpos(
             $description,
             ' ',
