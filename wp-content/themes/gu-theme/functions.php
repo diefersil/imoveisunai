@@ -1044,12 +1044,35 @@ add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
 
 
 add_action( 'wp_footer', function() {
-    if ( ! is_singular( 'imoveis' ) ) return;
+
+    if ( ! is_singular( 'imoveis' ) ) {
+        return;
+    }
     ?>
     <script>
-    if(document.querySelectorAll('img.swiper-slide-image').length < 3)
-        document.querySelector('.elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper')?.style.setProperty('justify-content','center','important');
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const imagens = document.querySelectorAll(
+            '.elementor-27881 .elementor-element.elementor-element-fd988c8 img.swiper-slide-image'
+        );
+
+        if ( imagens.length < 3 ) {
+
+            const wrapper = document.querySelector(
+                '.elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper'
+            );
+
+            if ( wrapper ) {
+                wrapper.style.setProperty(
+                    'justify-content',
+                    'center',
+                    'important'
+                );
+            }
+        }
+
+    });
     </script>
     <?php
-});
 
+});
