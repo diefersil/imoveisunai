@@ -1120,3 +1120,19 @@ function imu_preco_shortcode( $atts ) {
 
 add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
 
+
+/* ------------------------------------------------------------
+ * CSS - No single se tiver menos de 3 imagens na galeria, centralizar ela
+ * ------------------------------------------------------------ */
+
+
+add_action( 'wp_footer', function() {
+    if ( ! is_singular( 'imoveis' ) ) return;
+    ?>
+    <script>
+    if(document.querySelectorAll('img.swiper-slide-image').length < 3)
+        document.querySelector('.elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper')?.style.setProperty('justify-content','center','important');
+    </script>
+    <?php
+});
+
