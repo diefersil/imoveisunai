@@ -1099,13 +1099,11 @@ function imu_meta_description_imoveis() {
 function imu_preco_shortcode( $atts ) {
 
     $atts = shortcode_atts( [
-        'type' => '1',
-        'pre'  => '1',
+        'decimal' => '0',
+        'pretext' => '1',
     ], $atts );
 
-    $post_id = get_the_ID();
-
-    $valor = get_post_meta( $post_id, 'preco', true );
+    $valor = get_post_meta( get_the_ID(), 'preco', true );
 
     if ( $valor === '' ) {
         return '';
@@ -1114,11 +1112,10 @@ function imu_preco_shortcode( $atts ) {
     $valor = str_replace( [ 'R$', ' ', '.' ], '', $valor );
     $valor = str_replace( ',', '.', $valor );
 
-    $decimais = $atts['type'] === '2' ? 2 : 0;
-
+    $decimais = $atts['decimal'] === '1' ? 2 : 0;
     $preco = number_format( (float) $valor, $decimais, ',', '.' );
 
-    return $atts['pre'] === '1' ? 'R$ ' . $preco : $preco;
+    return $atts['pretext'] === '1' ? 'R$ ' . $preco : $preco;
 }
 
 add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
