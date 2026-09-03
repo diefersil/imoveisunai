@@ -1045,30 +1045,21 @@ add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
 
 add_action( 'wp_footer', function() {
 
-    if ( ! is_singular( 'imoveis' ) ) {
-        return;
-    }
+    if ( ! is_singular( 'imoveis' ) ) return;
     ?>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        const imagens = document.querySelectorAll(
-            '.elementor-27881 .elementor-element.elementor-element-fd988c8 img.swiper-slide-image'
-        );
+        if (document.querySelectorAll('.elementor-27881 .elementor-element.elementor-element-fd988c8 img.swiper-slide-image').length < 3) {
 
-        if ( imagens.length < 3 ) {
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    .elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper {
+                        justify-content: center !important;
+                    }
+                </style>
+            `);
 
-            const wrapper = document.querySelector(
-                '.elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper'
-            );
-
-            if ( wrapper ) {
-                wrapper.style.setProperty(
-                    'justify-content',
-                    'center',
-                    'important'
-                );
-            }
         }
 
     });
