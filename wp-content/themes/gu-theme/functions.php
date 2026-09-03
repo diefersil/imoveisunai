@@ -1049,7 +1049,7 @@ add_action( 'wp_footer', function() {
     <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        if (document.querySelectorAll('img.swiper-slide-image').length > 6) {
+        if (document.querySelectorAll('img.swiper-slide-image').length < 6) {
 
             document.head.insertAdjacentHTML('beforeend', `
                 <style>
