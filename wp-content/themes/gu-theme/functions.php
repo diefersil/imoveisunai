@@ -1093,22 +1093,35 @@ function imu_meta_description_imoveis() {
 }
 
 /* ------------------------------------------------------------
- * META DESCRIPTION E OG DESCRIPTION - SINGLE DE IMÓVEIS
+ * Shortcode de Preço
  * ------------------------------------------------------------ */
 
-add_shortcode( 'imu_endereco', function() {
+function imu_preco_shortcode( $atts ) {
 
-    $post_id = get_queried_object_id();
+    $atts = shortcode_atts( [
+        'type' => '1',
+        'pre'  => '1',
+    ], $atts );
 
-    if ( ! $post_id ) {
+    $valor = get_post_meta( get_queried_object_id(), 'preco', true );
+
+    if ( $valor === '' ) {
         return '';
     }
 
-    $endereco = get_post_meta( $post_id, 'endereco', true );
+    $valor = str_replace( [ 'R$', ' ', '.' ], '', $valor );
+    $valor = str_replace( ',', '.', $valor );
+    $valor = (float) $valor;
 
-    if ( empty( $endereco ) ) {
-        return '';
+    $decimais = $atts['type'] === '2' ? 2 : 0;
+
+    $preco = number_format( $valor, $decimais, ',', '.' );
+
+    if ( $atts['pre'] === '1' ) {
+        $preco = 'R$ ' . $preco;
     }
 
-    return esc_html( $endereco );
-});
+    return $preco;
+}
+
+add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
