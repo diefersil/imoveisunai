@@ -1092,6 +1092,9 @@ function imu_meta_description_imoveis() {
         '">' . "\n";
 }
 
+/* ------------------------------------------------------------
+ * META DESCRIPTION E OG DESCRIPTION - SINGLE DE IMÓVEIS
+ * ------------------------------------------------------------ */
 
 add_shortcode( 'imu_endereco', function() {
 
