@@ -322,7 +322,7 @@ function imu_whatsapp_imovel_url_shortcode() {
             // Meta Field "whatsapp" do usuário
             $phone = get_user_meta(
                 $author_id,
-                'whatsapp',
+                'user_whatsapp',
                 true
             );
         }
