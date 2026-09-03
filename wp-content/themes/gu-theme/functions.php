@@ -1103,7 +1103,9 @@ function imu_preco_shortcode( $atts ) {
         'pre'  => '1',
     ], $atts );
 
-    $valor = get_post_meta( get_queried_object_id(), 'preco', true );
+    $post_id = get_the_ID();
+
+    $valor = get_post_meta( $post_id, 'preco', true );
 
     if ( $valor === '' ) {
         return '';
@@ -1111,17 +1113,12 @@ function imu_preco_shortcode( $atts ) {
 
     $valor = str_replace( [ 'R$', ' ', '.' ], '', $valor );
     $valor = str_replace( ',', '.', $valor );
-    $valor = (float) $valor;
 
     $decimais = $atts['type'] === '2' ? 2 : 0;
 
-    $preco = number_format( $valor, $decimais, ',', '.' );
+    $preco = number_format( (float) $valor, $decimais, ',', '.' );
 
-    if ( $atts['pre'] === '1' ) {
-        $preco = 'R$ ' . $preco;
-    }
-
-    return $preco;
+    return $atts['pre'] === '1' ? 'R$ ' . $preco : $preco;
 }
 
 add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
