@@ -1042,7 +1042,7 @@ add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
  * CSS - No single se tiver menos de 3 imagens na galeria, centralizar ela
  * ------------------------------------------------------------ */
 
-
+<?php
 add_action( 'wp_footer', function() {
 
     if ( ! is_singular( 'imoveis' ) ) return;
@@ -1050,7 +1050,7 @@ add_action( 'wp_footer', function() {
     <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        if (document.querySelectorAll('.elementor-27881 .elementor-element.elementor-element-fd988c8 img.swiper-slide-image').length < 3) {
+        if (document.querySelectorAll('.elementor-27881 .elementor-element.elementor-element-fd988c8 img.swiper-slide-image').length < 6) {
 
             document.head.insertAdjacentHTML('beforeend', `
                 <style>
@@ -1067,3 +1067,6 @@ add_action( 'wp_footer', function() {
     <?php
 
 });
+
+
+
