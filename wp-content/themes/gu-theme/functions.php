@@ -1122,3 +1122,4 @@ function imu_preco_shortcode( $atts ) {
 }
 
 add_shortcode( 'imu_preco', 'imu_preco_shortcode' );
+
