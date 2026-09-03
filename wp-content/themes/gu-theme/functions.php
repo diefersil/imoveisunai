@@ -1091,3 +1091,25 @@ function imu_meta_description_imoveis() {
         esc_attr( $description ) .
         '">' . "\n";
 }
+
+
+add_shortcode( 'imu_debug_endereco', function() {
+
+    $post_id = get_queried_object_id();
+
+    if ( ! $post_id ) {
+        return 'POST ID NÃO ENCONTRADO';
+    }
+
+    $valor = get_post_meta(
+        $post_id,
+        'endereco',
+        true
+    );
+
+    return '<pre style="background:#111;color:#0f0;padding:20px;">'
+        . 'POST ID: ' . esc_html( $post_id ) . "\n\n"
+        . 'META endereco:' . "\n"
+        . esc_html( print_r( $valor, true ) )
+        . '</pre>';
+});
