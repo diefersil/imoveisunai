@@ -2141,7 +2141,7 @@ function validarExtensoesObrigatoriasScraper() {
  *
  * As funções de notificação ficam separadas para facilitar manutenção.
  */
-require_once __DIR__ . "/scraper-email-novo-imovel.php";
+require_once __DIR__ . "/scraper-email.php";
 
 validarExtensoesObrigatoriasScraper();
 
