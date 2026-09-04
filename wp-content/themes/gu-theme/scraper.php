@@ -45,6 +45,8 @@ function detectarRaizWordPress() {
 
 $arquivoCsv = "scraper-res.csv";
 $arquivoCsvUsuarios = "scraper-users.csv";
+$enviarEmailNovoImovel = "sim";
+$emailNotificacaoNovoImovel = "diefersil@gmail.com";
 $gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
@@ -2036,6 +2038,14 @@ function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) 
     return array_slice(array_values($resultado), 0, $limite);
 }
 
+
+/**
+ * FUNÇÕES DE E-MAIL PARA NOVO IMÓVEL
+ *
+ * As funções de notificação ficam separadas para facilitar manutenção.
+ */
+require_once __DIR__ . "/scraper-email.php";
+
 /**
  * PROCESSAMENTO
  */
@@ -2784,6 +2794,8 @@ $registrosUsuarios = gerarRegistrosUsuariosSites($sites);
  * GRAVAR OU APENAS TESTAR SEM ALTERAR CSV
  */
 $gravarCsvNormalizado = normalizarBusca($gravar_csv);
+$novosImoveisCadastrados = [];
+$logsEmailNovoImovel = [];
 
 if ($gravarCsvNormalizado === "sim") {
 
@@ -2793,6 +2805,11 @@ if ($gravarCsvNormalizado === "sim") {
         $registrosAntigos,
         array_values($resultados),
         $limiteRegistrosCsv
+    );
+
+    $novosImoveisCadastrados = filtrarImoveisNovosCadastrados(
+        $registrosAntigos,
+        $registrosFinais
     );
 
     /**
@@ -2844,6 +2861,16 @@ if ($gravarCsvNormalizado === "sim") {
     $csvUsuariosGravado = gravarCsvSimples($arquivoCsvUsuarios, $colunasUsuarios, $registrosUsuarios);
     $csvUsuariosStatus = $csvUsuariosGravado ? "gravado" : "erro_gravacao";
 
+    /**
+     * ENVIAR NOTIFICAÇÃO POR E-MAIL PARA IMÓVEIS NOVOS
+     *
+     * O e-mail só é enviado depois que o scraper-res.csv foi gravado com sucesso.
+     */
+    $logsEmailNovoImovel = enviarEmailsNovosImoveisCadastrados(
+        $novosImoveisCadastrados,
+        $emailNotificacaoNovoImovel
+    );
+
 } else {
 
     /**
@@ -2881,6 +2908,10 @@ $retornoJson = [
     "gravar_csv" => $gravar_csv,
     "csv_status" => $csvStatus,
     "csv_usuarios_status" => $csvUsuariosStatus,
+    "enviar_email_novo_imovel" => $enviarEmailNovoImovel,
+    "email_notificacao_novo_imovel" => $emailNotificacaoNovoImovel,
+    "total_imoveis_cadastrados_novos" => count($novosImoveisCadastrados),
+    "total_emails_novo_imovel" => count($logsEmailNovoImovel),
     "data_execucao" => date("d/m/Y H:i:s"),
     "horario_atual" => date("H:i"),
     "total_sites" => count($sites),
@@ -2896,6 +2927,7 @@ $retornoJson = [
     "total_imagens_ja_existiam" => $totalImagensJaExistiam,
     "total_erros_imagens" => $totalErrosImagens,
     "logs" => $logs,
+    "logs_email_novo_imovel" => $logsEmailNovoImovel,
     "resultado" => array_values($resultados),
     "resultado_usuarios" => $registrosUsuarios
 ];
