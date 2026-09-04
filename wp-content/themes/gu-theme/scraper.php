@@ -47,6 +47,8 @@ $arquivoCsv = "scraper-res.csv";
 $arquivoCsvUsuarios = "scraper-users.csv";
 $enviarEmailNovoImovel = "sim";
 $emailNotificacaoNovoImovel = "diefersil@gmail.com";
+$enviarEmailResumoScraper = "sim";
+$emailNotificacaoResumoScraper = "diefersil@gmail.com";
 $gravar_csv = "sim";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
@@ -2044,7 +2046,7 @@ function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) 
  *
  * As funções de notificação ficam separadas para facilitar manutenção.
  */
-require_once __DIR__ . "/scraper-email.php";
+require_once __DIR__ . "/scraper-email-novo-imovel.php";
 
 /**
  * PROCESSAMENTO
@@ -2796,6 +2798,7 @@ $registrosUsuarios = gerarRegistrosUsuariosSites($sites);
 $gravarCsvNormalizado = normalizarBusca($gravar_csv);
 $novosImoveisCadastrados = [];
 $logsEmailNovoImovel = [];
+$logEmailResumoScraper = [];
 
 if ($gravarCsvNormalizado === "sim") {
 
@@ -2910,6 +2913,8 @@ $retornoJson = [
     "csv_usuarios_status" => $csvUsuariosStatus,
     "enviar_email_novo_imovel" => $enviarEmailNovoImovel,
     "email_notificacao_novo_imovel" => $emailNotificacaoNovoImovel,
+    "enviar_email_resumo_scraper" => $enviarEmailResumoScraper,
+    "email_notificacao_resumo_scraper" => $emailNotificacaoResumoScraper,
     "total_imoveis_cadastrados_novos" => count($novosImoveisCadastrados),
     "total_emails_novo_imovel" => count($logsEmailNovoImovel),
     "data_execucao" => date("d/m/Y H:i:s"),
@@ -2935,6 +2940,19 @@ $retornoJson = [
 if (normalizarBusca($exibir_log_imagens) === "sim") {
     $retornoJson["logs_imagens"] = $logsImagens;
 }
+
+/**
+ * ENVIAR E-MAIL COM RESUMO DA EXECUÇÃO DO SCRAPER
+ *
+ * Dispara um resumo geral ao final de cada execução real do scraper.
+ * Em modo teste ($gravar_csv = "nao"), a função registra como não enviado.
+ */
+$logEmailResumoScraper = enviarEmailResumoScraperRealizado(
+    $retornoJson,
+    $emailNotificacaoResumoScraper
+);
+
+$retornoJson["log_email_resumo_scraper"] = $logEmailResumoScraper;
 
 echo json_encode($retornoJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
