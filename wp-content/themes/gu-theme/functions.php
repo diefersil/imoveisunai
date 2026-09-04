@@ -1067,5 +1067,61 @@ add_action( 'wp_footer', function() {
 
 });
 
+/* ------------------------------------------------------------
+ * CSS - Enviar email quando cadastra um imovel
+ * ------------------------------------------------------------ */
+
+
+add_action('transition_post_status', function ($new_status, $old_status, $post) {
+
+    if (!$post || empty($post->ID)) {
+        return;
+    }
+
+    if ($post->post_type !== 'imoveis') {
+        return;
+    }
+
+    // Envia apenas quando o imóvel entra em publicado.
+    if ($new_status !== 'publish' || $old_status === 'publish') {
+        return;
+    }
+
+    $post_id = (int) $post->ID;
+
+    // Evita envio duplicado.
+    if (get_post_meta($post_id, '_imu_email_imovel_enviado', true) === 'sim') {
+        return;
+    }
+
+    $titulo = get_the_title($post_id);
+    $permalink = get_permalink($post_id);
+
+    $categorias = [];
+    $termos = get_the_terms($post_id, 'categoria');
+
+    if (!empty($termos) && !is_wp_error($termos)) {
+        foreach ($termos as $termo) {
+            $categorias[] = $termo->name;
+        }
+    }
+
+    $categoria = !empty($categorias) ? implode(', ', $categorias) : 'Sem categoria';
+
+    $para = 'diefersil@gmail.com';
+    $assunto = 'Novo imóvel cadastrado: ' . $titulo;
+
+    $mensagem = "Título: " . $titulo . "\n";
+    $mensagem .= "Categoria: " . $categoria . "\n";
+    $mensagem .= "Link: " . $permalink . "\n";
+
+    $enviado = wp_mail($para, $assunto, $mensagem);
+
+    if ($enviado) {
+        update_post_meta($post_id, '_imu_email_imovel_enviado', 'sim');
+    }
+
+}, 10, 3);
+
 
 
