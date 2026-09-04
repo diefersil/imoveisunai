@@ -32,8 +32,8 @@ $sites = [
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "horario",
-            "horario_inicio" => "00:00",
-            "horario_fim" => "02:00"
+            "horario_inicio" => "16:00",
+            "horario_fim" => "18:00"
         ],
         "verificar_string" => "",
         "seletores" => [
