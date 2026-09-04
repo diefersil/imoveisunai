@@ -10,6 +10,63 @@
  * - enviar e-mails de notificação para imóveis novos cadastrados.
  */
 
+
+
+/**
+ * CARREGAR WORDPRESS PARA USAR WP_MAIL
+ *
+ * Se o scraper estiver rodando fora do WordPress, tenta carregar wp-load.php
+ * usando a raiz já detectada pelo scraper-res.php.
+ */
+function carregarWordPressParaEmailScraper() {
+
+    if (function_exists("wp_mail")) {
+        return true;
+    }
+
+    $possiveisCaminhos = [];
+
+    if (!empty($GLOBALS["raizWordPress"])) {
+        $possiveisCaminhos[] = rtrim((string)$GLOBALS["raizWordPress"], "/\\") . "/wp-load.php";
+    }
+
+    $possiveisCaminhos[] = __DIR__ . "/wp-load.php";
+    $possiveisCaminhos[] = dirname(__DIR__) . "/wp-load.php";
+    $possiveisCaminhos[] = dirname(__DIR__, 2) . "/wp-load.php";
+    $possiveisCaminhos[] = dirname(__DIR__, 3) . "/wp-load.php";
+
+    foreach ($possiveisCaminhos as $wpLoad) {
+
+        if (is_string($wpLoad) && file_exists($wpLoad)) {
+            require_once $wpLoad;
+            break;
+        }
+    }
+
+    return function_exists("wp_mail");
+}
+
+/**
+ * ENVIAR E-MAIL DO SCRAPER
+ */
+function enviarEmailScraper($emailDestino, $assunto, $mensagem, $headersArray) {
+
+    carregarWordPressParaEmailScraper();
+
+    $assuntoEmail = $assunto;
+
+    if (function_exists("mb_encode_mimeheader")) {
+        $assuntoEmail = mb_encode_mimeheader($assunto, "UTF-8", "B", "\r\n");
+    }
+
+    if (function_exists("wp_mail")) {
+        return wp_mail($emailDestino, $assuntoEmail, $mensagem, $headersArray);
+    }
+
+    return @mail($emailDestino, $assuntoEmail, $mensagem, implode("\r\n", $headersArray));
+}
+
+
 /**
  * FILTRAR IMÓVEIS REALMENTE NOVOS NO CSV
  *
@@ -58,6 +115,10 @@ function getEmailRemetenteNotificacaoNovoImovel($item) {
 
     if ($urlBase !== "") {
         $host = parse_url($urlBase, PHP_URL_HOST) ?: "";
+    }
+
+    if ($host === "" && function_exists("home_url")) {
+        $host = parse_url(home_url("/"), PHP_URL_HOST) ?: "";
     }
 
     if ($host === "" && !empty($_SERVER["HTTP_HOST"])) {
@@ -325,7 +386,13 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
     $mensagem .= "- Imóveis: " . limpar($resumoScraper["arquivo_csv"] ?? "") . "\n";
     $mensagem .= "- Usuários: " . limpar($resumoScraper["arquivo_csv_usuarios"] ?? "") . "\n";
 
-    $remetente = getEmailRemetenteNotificacaoNovoImovel([]);
+    $itemRemetenteResumo = [];
+
+    if (!empty($resultados) && is_array($resultados)) {
+        $itemRemetenteResumo = $resultados[0] ?? [];
+    }
+
+    $remetente = getEmailRemetenteNotificacaoNovoImovel($itemRemetenteResumo);
 
     $headersArray = [
         "MIME-Version: 1.0",

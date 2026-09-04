@@ -6,6 +6,67 @@ set_time_limit(2000);
 date_default_timezone_set("America/Sao_Paulo");
 
 /**
+ * COMPATIBILIDADE COM SERVIDORES SEM EXTENSÃO MBSTRING
+ *
+ * Alguns servidores PHP podem estar sem mbstring ativa.
+ * Estas funções simples evitam erro fatal em mb_strtolower(), mb_stripos()
+ * e mb_convert_case(), mantendo o scraper funcionando.
+ */
+if (!defined("MB_CASE_UPPER")) {
+    define("MB_CASE_UPPER", 0);
+}
+
+if (!defined("MB_CASE_LOWER")) {
+    define("MB_CASE_LOWER", 1);
+}
+
+if (!defined("MB_CASE_TITLE")) {
+    define("MB_CASE_TITLE", 2);
+}
+
+if (!function_exists("mb_strtolower")) {
+    function mb_strtolower($texto, $encoding = null) {
+
+        $texto = (string)$texto;
+
+        $mapa = [
+            "Á" => "á", "À" => "à", "Ã" => "ã", "Â" => "â", "Ä" => "ä",
+            "É" => "é", "È" => "è", "Ê" => "ê", "Ë" => "ë",
+            "Í" => "í", "Ì" => "ì", "Î" => "î", "Ï" => "ï",
+            "Ó" => "ó", "Ò" => "ò", "Õ" => "õ", "Ô" => "ô", "Ö" => "ö",
+            "Ú" => "ú", "Ù" => "ù", "Û" => "û", "Ü" => "ü",
+            "Ç" => "ç"
+        ];
+
+        return strtolower(strtr($texto, $mapa));
+    }
+}
+
+if (!function_exists("mb_stripos")) {
+    function mb_stripos($haystack, $needle, $offset = 0, $encoding = null) {
+        return stripos((string)$haystack, (string)$needle, (int)$offset);
+    }
+}
+
+if (!function_exists("mb_convert_case")) {
+    function mb_convert_case($texto, $modo, $encoding = null) {
+
+        $texto = (string)$texto;
+
+        if ($modo === MB_CASE_UPPER) {
+            return strtoupper($texto);
+        }
+
+        if ($modo === MB_CASE_TITLE) {
+            return ucwords(strtolower($texto));
+        }
+
+        return strtolower($texto);
+    }
+}
+
+
+/**
  * DESCOBRIR A RAIZ DO WORDPRESS
  *
  * Se o script estiver dentro de tema/plugin/subpasta, esta função sobe
@@ -2042,11 +2103,47 @@ function mesclarRegistrosLimitados($registrosAntigos, $registrosNovos, $limite) 
 
 
 /**
+ * VALIDAR EXTENSÕES OBRIGATÓRIAS DO PHP
+ *
+ * Evita tela branca/erro fatal quando o servidor não tem alguma extensão ativa.
+ */
+function validarExtensoesObrigatoriasScraper() {
+
+    $faltando = [];
+
+    if (!function_exists("curl_init")) {
+        $faltando[] = "curl";
+    }
+
+    if (!class_exists("DOMDocument") || !class_exists("DOMXPath")) {
+        $faltando[] = "dom/xml";
+    }
+
+    if (empty($faltando)) {
+        return;
+    }
+
+    header("Content-Type: application/json; charset=utf-8");
+
+    echo json_encode([
+        "status" => "error",
+        "mensagem" => "Extensões obrigatórias do PHP não estão ativas no servidor.",
+        "extensoes_faltando" => $faltando,
+        "orientacao" => "Ative as extensões PHP informadas no cPanel/HostGator ou no php.ini."
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    exit;
+}
+
+
+/**
  * FUNÇÕES DE E-MAIL PARA NOVO IMÓVEL
  *
  * As funções de notificação ficam separadas para facilitar manutenção.
  */
 require_once __DIR__ . "/scraper-email-novo-imovel.php";
+
+validarExtensoesObrigatoriasScraper();
 
 /**
  * PROCESSAMENTO
