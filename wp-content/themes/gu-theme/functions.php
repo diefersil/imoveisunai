@@ -282,19 +282,33 @@ function imu_whatsapp_imovel_url_shortcode() {
         return '';
     }
 
-    // ID do autor do imóvel
-    $author_id = (int) get_post_field( 'post_author', $post_id );
+    // =====================================================
+    // AUTOR DO IMÓVEL
+    // =====================================================
 
-    $phone        = '';
-    $contato_nome = '';
+    $author_id = (int) get_post_field(
+        'post_author',
+        $post_id
+    );
+
+    $fone          = '';
+    $whatsapp      = '';
+    $contato_nome  = '';
 
     // =====================================================
     // AUTOR ID = 4
-    // Usa campos do próprio imóvel
+    // Usa os campos cadastrados diretamente no imóvel
     // =====================================================
+
     if ( $author_id === 4 ) {
 
-        $phone = get_post_meta(
+        $fone = get_post_meta(
+            $post_id,
+            'contato_fone',
+            true
+        );
+
+        $whatsapp = get_post_meta(
             $post_id,
             'contato_whatsapp',
             true
@@ -307,20 +321,28 @@ function imu_whatsapp_imovel_url_shortcode() {
         );
 
     // =====================================================
-    // OUTROS AUTORES
-    // Usa dados do usuário WordPress
+    // DEMAIS AUTORES
+    // Usa os dados cadastrados no usuário WordPress
     // =====================================================
+
     } else {
 
         $user = get_userdata( $author_id );
 
         if ( $user ) {
 
-            // Display Name do autor
+            // Nome do autor
             $contato_nome = $user->display_name;
 
-            // Meta Field "whatsapp" do usuário
-            $phone = get_user_meta(
+            // Telefone
+            $fone = get_user_meta(
+                $author_id,
+                'user_fone',
+                true
+            );
+
+            // WhatsApp
+            $whatsapp = get_user_meta(
                 $author_id,
                 'user_whatsapp',
                 true
@@ -328,28 +350,41 @@ function imu_whatsapp_imovel_url_shortcode() {
         }
     }
 
-    // Título do imóvel
+    // =====================================================
+    // TÍTULO DO IMÓVEL
+    // =====================================================
+
     $post_title = get_the_title( $post_id );
 
-    // Se não tiver WhatsApp
-    if ( empty( $phone ) ) {
+    // =====================================================
+    // VERIFICA WHATSAPP
+    // =====================================================
+
+    if ( empty( $whatsapp ) ) {
         return '';
     }
 
-    // Remove tudo que não for número
-    $phone = preg_replace( '/\D+/', '', $phone );
+    // Remove espaços, parênteses, traços etc.
+    $whatsapp = preg_replace(
+        '/\D+/',
+        '',
+        $whatsapp
+    );
 
-    if ( empty( $phone ) ) {
+    if ( empty( $whatsapp ) ) {
         return '';
-    }
-
-    // Adiciona código do Brasil
-    if ( substr( $phone, 0, 2 ) !== '55' ) {
-        $phone = '55' . $phone;
     }
 
     // =====================================================
-    // MENSAGEM
+    // ADICIONA CÓDIGO DO BRASIL
+    // =====================================================
+
+    if ( substr( $whatsapp, 0, 2 ) !== '55' ) {
+        $whatsapp = '55' . $whatsapp;
+    }
+
+    // =====================================================
+    // MENSAGEM DO WHATSAPP
     // =====================================================
 
     if ( ! empty( $contato_nome ) ) {
@@ -365,16 +400,22 @@ function imu_whatsapp_imovel_url_shortcode() {
     }
 
     // =====================================================
-    // URL FINAL
+    // URL FINAL DO WHATSAPP
     // =====================================================
 
     $url = 'https://wa.me/' .
-           $phone .
+           $whatsapp .
            '?text=' .
            rawurlencode( $msg );
 
     return esc_url( $url );
 }
+
+
+// =========================================================
+// SHORTCODE
+// [whatsapp_imovel_url]
+// =========================================================
 
 add_shortcode(
     'whatsapp_imovel_url',
