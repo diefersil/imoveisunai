@@ -173,8 +173,8 @@ $sites = [
             "https://area38.com.br/busca?page=3",
             "https://area38.com.br/busca?page=4"
         ],
-        "numero_registros" => 5,
-        "numero_maximo_por_url" => 5,
+        "numero_registros" => 50,
+        "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "sempre",
             "horario_inicio" => "22:00",
