@@ -289,7 +289,7 @@ $sites = [
             "galeria" => "//div[contains(@class,'fotorama')]//img",
             "descricao" => "//div[contains(@class,'descricao_imovel')]"
         ]
-    ]
+    ],
 
     /*----------------------------------------------------------------------------*
      * SITE: Formosa Imóveis
