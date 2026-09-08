@@ -309,11 +309,8 @@ $sites = [
         "contato_desc" => "",
         "periodo" => 30,
         "url" => [
-            "https://area38.com.br/busca?tipo=Fazenda",
-            "https://area38.com.br/busca",
-            "https://area38.com.br/busca?page=2",
-            "https://area38.com.br/busca?page=3",
-            "https://area38.com.br/busca?finalidade=Aluguel"
+            "https://imoveisformosa.com.br/comprar/apartamento/formosa-go?by_type_or_subtype_slug%5B0%5D=apartamento&typeArea=private_area&floorComparision=equals&sort=-is_price_shown%2C-calculated_price%2Cid&offset=1&limit=21"
+    
         ],
         "numero_registros" => 50,
         "numero_maximo_por_url" => 10,
@@ -324,8 +321,8 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//a[contains(@class,'mb-2')]",
-            "card_nome" => ".//h4[contains(@class,'text-lg')]",
+            "card" => "//div[contains(@class,'CardProperty')]",
+            "card_nome" => ".//div[contains(@class,'WrapperContent__content')]/span[2]",
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
@@ -333,10 +330,10 @@ $sites = [
             "card_area" => "",
             "card_area_contruida" => "",
             "preco" => ".//h5[contains(@class,'text-lg')]",
-            "card_imagem_url" => ".//img[contains(@class,'w-full')]",
+            "card_imagem_url" => ".//img[contains(@class,'CardImage__image  ')]",
             "card_url" => ".",
             "galeria" => "//img[contains(@class,'transition-all')]",
-            "descricao" => "//p[contains(@class,'my-5')]//span"
+            "descricao" => "//p"
         ]
     ]
 ];
