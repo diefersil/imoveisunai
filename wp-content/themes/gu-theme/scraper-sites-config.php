@@ -171,7 +171,7 @@ $sites = [
             "https://area38.com.br/busca",
             "https://area38.com.br/busca?page=2",
             "https://area38.com.br/busca?page=3",
-            "https://area38.com.br/busca?page=4"
+            "https://area38.com.br/busca?finalidade=Aluguel"
         ],
         "numero_registros" => 50,
         "numero_maximo_por_url" => 10,
