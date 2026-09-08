@@ -220,7 +220,7 @@ $sites = [
             "https://moradoimoveis.com.br/busca/?finalidade=sale"
         ],
         "numero_registros" => 48,
-        "numero_maximo_por_url" => 12,
+        "numero_maximo_por_url" => 15,
         "frequencia" => [
             "tipo" => "sempre",
             "horario_inicio" => "22:00",
