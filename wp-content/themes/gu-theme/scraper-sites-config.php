@@ -216,7 +216,8 @@ $sites = [
         "contato_desc" => "",
         "periodo" => 30,
         "url" => [
-            "https://moradoimoveis.com.br/imoveis/venda/fazenda"
+            "https://moradoimoveis.com.br/imoveis/venda/fazenda",
+            "https://moradoimoveis.com.br/busca/?finalidade=sale"
         ],
         "numero_registros" => 48,
         "numero_maximo_por_url" => 12,
