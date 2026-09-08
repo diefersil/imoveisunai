@@ -177,8 +177,8 @@ $sites = [
         "numero_maximo_por_url" => 10,
         "frequencia" => [
             "tipo" => "sempre",
-            "horario_inicio" => "22:00",
-            "horario_fim" => "12:00"
+            "horario_inicio" => "16:00",
+            "horario_fim" => "18:00"
         ],
         "verificar_string" => "",
         "seletores" => [
@@ -288,6 +288,55 @@ $sites = [
             "card_url" => ".",
             "galeria" => "//div[contains(@class,'fotorama')]//img",
             "descricao" => "//div[contains(@class,'descricao_imovel')]"
+        ]
+    ]
+
+    /*----------------------------------------------------------------------------*
+     * SITE: Formosa Imóveis
+     * ---------------------------------------------------------------------------- */
+    [
+        "nome_site" => "Formosa Imóveis",
+        "contato_nome" => "Formosa Imóveis",
+        "usuario" => "formosaimoveis",
+        "usuario_email" => "formosaimoveis@imoveisunai.com.br",
+        "cidade" => "Formosa",
+        "uf" => "Go",
+        "categoria" => "",
+        "tags" => "",
+        "contato_fone" => "(61) 99932-6115",
+        "contato_whatsapp" => "(61) 99932-6115",
+        "contato_instagram" => "",
+        "contato_desc" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://area38.com.br/busca?tipo=Fazenda",
+            "https://area38.com.br/busca",
+            "https://area38.com.br/busca?page=2",
+            "https://area38.com.br/busca?page=3",
+            "https://area38.com.br/busca?finalidade=Aluguel"
+        ],
+        "numero_registros" => 50,
+        "numero_maximo_por_url" => 10,
+        "frequencia" => [
+            "tipo" => "sempre",
+            "horario_inicio" => "22:00",
+            "horario_fim" => "12:00"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//a[contains(@class,'mb-2')]",
+            "card_nome" => ".//h4[contains(@class,'text-lg')]",
+            "card_contato" => "",
+            "card_contato_nome" => "",
+            "card_contato_whatsapp" => "",
+            "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
+            "card_area" => "",
+            "card_area_contruida" => "",
+            "preco" => ".//h5[contains(@class,'text-lg')]",
+            "card_imagem_url" => ".//img[contains(@class,'w-full')]",
+            "card_url" => ".",
+            "galeria" => "//img[contains(@class,'transition-all')]",
+            "descricao" => "//p[contains(@class,'my-5')]//span"
         ]
     ]
 ];
