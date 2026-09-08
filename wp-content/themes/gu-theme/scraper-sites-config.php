@@ -326,13 +326,13 @@ $sites = [
             "card_contato" => "",
             "card_contato_nome" => "",
             "card_contato_whatsapp" => "",
-            "card_localizacao" => ".//div[contains(@class,'container-endereco')]//span",
+            "card_localizacao" => "",
             "card_area" => "",
             "card_area_contruida" => "",
             "preco" => ".//h5[contains(@class,'text-lg')]",
             "card_imagem_url" => ".//img[contains(@class,'CardImage__image  ')]",
             "card_url" => ".",
-            "galeria" => "//img[contains(@class,'transition-all')]",
+            "galeria" => "//img[contains(@class,'ReactModal__Content')]",
             "descricao" => "//p"
         ]
     ]
