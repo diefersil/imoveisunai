@@ -168,6 +168,10 @@ $sites = [
         "periodo" => 30,
         "url" => [
             "https://area38.com.br/busca?tipo=Fazenda",
+            "https://area38.com.br/busca",
+            "https://area38.com.br/busca?page=2",
+            "https://area38.com.br/busca?page=3",
+            "https://area38.com.br/busca?page=4"
         ],
         "numero_registros" => 5,
         "numero_maximo_por_url" => 5,
