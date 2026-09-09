@@ -224,7 +224,7 @@ $sites = [
         "frequencia" => [
             "tipo" => "horario",
             "horario_inicio" => "22:00",
-            "horario_fim" => "12:00"
+            "horario_fim" => "24:00"
         ],
         "verificar_string" => "",
         "seletores" => [
