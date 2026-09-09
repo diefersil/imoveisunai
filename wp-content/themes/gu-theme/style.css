@@ -136,8 +136,6 @@ label,
   max-height: 350px !important;
 }
 
-
-
 @media(max-width:700px){
   .single img.swiper-slide-image{
       width: 100%;
@@ -152,6 +150,25 @@ label,
   }
 }*/
 
+/* GALERIA - ALTURA MÁXIMA 350PX */
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+img.swiper-slide-image {
+    max-height: 350px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+/* CENTRALIZA A IMAGEM */
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+.swiper-slide-inner {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
 
 /* ==================================================
    AUTOCOMPLETE
