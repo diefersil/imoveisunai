@@ -381,7 +381,7 @@ $sites = [
             "card_imagem_url" => ".//img",
             "card_url" => ".",
             "galeria" => "//div[contains(@class,'detail-hero')]",
-            "descricao" => "//div[contains(@class,'detail-block')]"
+            "descricao" => "//div[contains(@class,'detail-about')]"
         ]
     ]
 ];
