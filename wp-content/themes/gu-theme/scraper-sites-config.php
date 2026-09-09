@@ -222,7 +222,7 @@ $sites = [
         "numero_registros" => 48,
         "numero_maximo_por_url" => 15,
         "frequencia" => [
-            "tipo" => "sempre",
+            "tipo" => "horario",
             "horario_inicio" => "22:00",
             "horario_fim" => "12:00"
         ],
