@@ -388,7 +388,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'listing-price')]",
             "card_imagem_url" => ".//img",
             "card_url" => ".",
-            "galeria" => "//div[contains(@class, 'detail-filmstrip')]//img[contains(@src, 'cdn.sanity.io')]",
+            "galeria" => "//button[contains(@class, 'strip-cell')]//img",
             "descricao" => "//div[contains(@class,'detail-about')]"
         ]
     ]
