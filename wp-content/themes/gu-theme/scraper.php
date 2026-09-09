@@ -20,6 +20,7 @@ $emailNotificacaoNovoImovel = "diefersil@gmail.com";
 $enviarEmailResumoScraper = "sim";
 $emailNotificacaoResumoScraper = "diefersil@gmail.com";
 $gravar_csv = "nao";
+$executarTodosUsuariosHorario = "nao";
 $limiteRegistrosCsv = 500;
 $limiteImagensGaleria = 10;
 $raizWordPress = detectarRaizWordPress();
@@ -361,6 +362,8 @@ function getUrlPrincipalSemBarra($url) {
  */
 function deveRodarAgora($frequencia) {
 
+    global $executarTodosUsuariosHorario;
+
     if (empty($frequencia) || empty($frequencia["tipo"])) {
         return true;
     }
@@ -376,6 +379,20 @@ function deveRodarAgora($frequencia) {
     }
 
     if ($tipo === "horario") {
+
+        /**
+         * REGRA GLOBAL:
+         * Se estiver como "sim", ignora horario_inicio/horario_fim
+         * e executa todos os sites/usuários configurados como "horario".
+         */
+        $forcarTodosHorario = mb_strtolower(
+            trim((string)($executarTodosUsuariosHorario ?? "nao")),
+            "UTF-8"
+        ) === "sim";
+
+        if ($forcarTodosHorario) {
+            return true;
+        }
 
         $inicio = $frequencia["horario_inicio"] ?? "";
         $fim = $frequencia["horario_fim"] ?? "";
@@ -3067,6 +3084,7 @@ $retornoJson = [
     "arquivo_csv" => $arquivoCsv,
     "arquivo_csv_usuarios" => $arquivoCsvUsuarios,
     "gravar_csv" => $gravar_csv,
+    "executar_todos_usuarios_horario" => $executarTodosUsuariosHorario,
     "csv_status" => $csvStatus,
     "csv_usuarios_status" => $csvUsuariosStatus,
     "enviar_email_resumo_scraper" => $enviarEmailResumoScraper,
