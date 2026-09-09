@@ -132,53 +132,26 @@ label,
    SINGLE
 ================================================== */
 
-/*.swiper-slide-image {
-  max-height: 350px !important;
-}
-
-@media(max-width:700px){
-  .single img.swiper-slide-image{
-      width: 100%;
-      max-height: 300px;
-      height: 300px;
-  }
-
-  .elementor-27881 .elementor-element.elementor-element-fd988c8 .swiper-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center !important;
-  }
-}*/
-
-/* GALERIA - CADA IMAGEM OCUPA SOMENTE O SEU SLOT */
-.elementor-27881
-.elementor-element.elementor-element-fd988c8
-.swiper-slide > a {
-    display: block !important;
-    width: 100% !important;
-    height: 350px !important;
-}
-
-.elementor-27881
-.elementor-element.elementor-element-fd988c8
-.swiper-slide-inner {
-    width: 100% !important;
-    height: 350px !important;
-    margin: 0 !important;
-}
-
+/* GALERIA - ALTURA MÁXIMA 350PX */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 img.swiper-slide-image {
-    width: 100% !important;
-    height: 350px !important;
     max-height: 350px !important;
-
-    object-fit: cover !important;
-    object-position: center !important;
-
-    display: block !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
 }
+
+/* CENTRALIZA A IMAGEM */
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+.swiper-slide-inner {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
 
 /* ==================================================
    AUTOCOMPLETE
