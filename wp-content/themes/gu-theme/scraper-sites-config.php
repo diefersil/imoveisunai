@@ -363,7 +363,7 @@ $sites = [
         "numero_registros" => 50,
         "numero_maximo_por_url" => 15,
         "frequencia" => [
-            "tipo" => "nunca",
+            "tipo" => "sempre",
             "horario_inicio" => "22:00",
             "horario_fim" => "12:00"
         ],
