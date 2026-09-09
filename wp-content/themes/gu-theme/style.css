@@ -132,24 +132,50 @@ label,
    SINGLE
 ================================================== */
 
-/* GALERIA - ALTURA MÁXIMA 350PX */
+/* DESKTOP / PADRÃO */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 img.swiper-slide-image {
+
     max-height: 450px !important;
+
     width: auto !important;
     max-width: 100% !important;
+
     height: auto !important;
+
     object-fit: contain !important;
 }
+
 
 /* CENTRALIZA A IMAGEM */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 .swiper-slide-inner {
+
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+}
+
+
+/* MOBILE */
+@media (max-width: 767px) {
+
+    .elementor-27881
+    .elementor-element.elementor-element-fd988c8
+    img.swiper-slide-image {
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: 450px !important;
+        max-height: 450px !important;
+
+        object-fit: cover !important;
+        object-position: center center !important;
+    }
+
 }
 
 /* ==================================================
