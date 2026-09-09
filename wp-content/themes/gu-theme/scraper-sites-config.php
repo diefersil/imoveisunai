@@ -336,6 +336,52 @@ $sites = [
             "galeria" => "//img[contains(@class,'ReactModal__Content')]",
             "descricao" => "//p"
         ]
+    ],
+
+    /*----------------------------------------------------------------------------*
+     * SITE: Bueno Imóveis
+     * ---------------------------------------------------------------------------- */
+    [
+        "nome_site" => "Formosa Imóveis",
+        "contato_nome" => "Formosa Imóveis",
+        "usuario" => "formosaimoveis",
+        "usuario_email" => "formosaimoveis@imoveisunai.com.br",
+        "cidade" => "Formosa",
+        "uf" => "Go",
+        "categoria" => "",
+        "tags" => "",
+        "contato_fone" => "(61) 99932-6115",
+        "contato_whatsapp" => "(61) 99932-6115",
+        "contato_instagram" => "",
+        "contato_desc" => "",
+        "periodo" => 30,
+        "url" => [
+            "https://imoveisformosa.com.br/comprar/apartamento/formosa-go?by_type_or_subtype_slug%5B0%5D=apartamento&typeArea=private_area&floorComparision=equals&sort=-is_price_shown%2C-calculated_price%2Cid&offset=1&limit=21"
+    
+        ],
+        "numero_registros" => 50,
+        "numero_maximo_por_url" => 10,
+        "frequencia" => [
+            "tipo" => "nunca",
+            "horario_inicio" => "22:00",
+            "horario_fim" => "12:00"
+        ],
+        "verificar_string" => "",
+        "seletores" => [
+            "card" => "//div[contains(@class,'CardProperty')]",
+            "card_nome" => ".//div[contains(@class,'WrapperContent__content')]/span[2]",
+            "card_contato" => "",
+            "card_contato_nome" => "",
+            "card_contato_whatsapp" => "",
+            "card_localizacao" => "",
+            "card_area" => "",
+            "card_area_contruida" => "",
+            "preco" => ".//h5[contains(@class,'text-lg')]",
+            "card_imagem_url" => ".//img[contains(@class,'CardImage__image  ')]",
+            "card_url" => ".",
+            "galeria" => "//img[contains(@class,'ReactModal__Content')]",
+            "descricao" => "//p"
+        ]
     ]
 ];
 
