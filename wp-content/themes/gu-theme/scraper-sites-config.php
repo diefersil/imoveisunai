@@ -380,7 +380,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'listing-price')]",
             "card_imagem_url" => ".//img",
             "card_url" => ".",
-            "galeria" => "//div[contains(@class,'detail-hero')]//img",
+            "galeria" => "//img[starts-with(@alt, 'Foto ') and contains(@src, 'cdn.sanity.io')]/@src",
             "descricao" => "//div[contains(@class,'detail-about')]"
         ]
     ]
