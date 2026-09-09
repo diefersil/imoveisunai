@@ -1910,7 +1910,7 @@ function getMetaContent($xpath, $queries) {
 /**
  * PEGAR OG, DESCRIÇÃO E GALERIA DA URL DO CARD
  */
-function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = "") {
+function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = "", $selectorCardNomeSingle = "") {
 
     global $limiteImagensGaleria;
 
@@ -1919,6 +1919,7 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
         "og_image" => "",
         "og_description" => "",
         "og_status" => "",
+        "card_nome_single" => "",
         "galeria" => "",
         "descricao" => ""
     ];
@@ -1942,6 +1943,21 @@ function getDadosInternos($urlCard, $selectorGaleria = "", $selectorDescricao = 
     }
 
     $xpath = criarXpath($resposta["html"]);
+
+    /**
+     * CARD NOME PELO SINGLE
+     *
+     * Se card_nome_single estiver configurado no site, o nome é buscado
+     * dentro da página individual do imóvel (card_url).
+     */
+    if (!empty($selectorCardNomeSingle)) {
+
+        $cardNomeSingleNode = $xpath->query($selectorCardNomeSingle);
+
+        if ($cardNomeSingleNode && $cardNomeSingleNode->length > 0) {
+            $dados["card_nome_single"] = limpar($cardNomeSingleNode->item(0)->textContent);
+        }
+    }
 
     $dados["og_title"] = getMetaContent($xpath, [
         "//meta[@property='og:title']",
@@ -2670,11 +2686,6 @@ foreach ($sites as $site) {
                 $seletores["card_area_contruida"] ?? ""
             );
 
-            $categoriaImovel = definirCategoriaImovel(
-                $cardNome,
-                $categoriaImovelRegras
-            );
-
             $precoOriginal = getTextoSeletor(
                 $xpath,
                 $card,
@@ -2703,15 +2714,39 @@ foreach ($sites as $site) {
                 continue;
             }
 
+            $dadosInternos = getDadosInternos(
+                $cardUrl,
+                $seletores["galeria"] ?? "",
+                $seletores["descricao"] ?? "",
+                $seletores["card_nome_single"] ?? ""
+            );
+
+            /**
+             * PRIORIDADE DO NOME DO IMÓVEL
+             *
+             * REGRA:
+             * - card_nome_single preenchido no config => card_nome vem do single;
+             * - card_nome_single vazio => mantém card_nome capturado na listagem.
+             *
+             * Não há fallback para o nome da listagem quando card_nome_single
+             * estiver configurado. Se o XPath do single não encontrar o nome,
+             * card_nome ficará vazio e o registro será invalidado normalmente.
+             */
+            if (!empty($seletores["card_nome_single"] ?? "")) {
+                $cardNome = $dadosInternos["card_nome_single"] ?? "";
+            }
+
+            /**
+             * A partir daqui, categoria e filtros usam o card_nome definitivo.
+             */
             if (!deveSalvarPorString($cardNome, $verificarString)) {
                 $ignoradosPorString++;
                 continue;
             }
 
-            $dadosInternos = getDadosInternos(
-                $cardUrl,
-                $seletores["galeria"] ?? "",
-                $seletores["descricao"] ?? ""
+            $categoriaImovel = definirCategoriaImovel(
+                $cardNome,
+                $categoriaImovelRegras
             );
 
             $galeria = $dadosInternos["galeria"];
