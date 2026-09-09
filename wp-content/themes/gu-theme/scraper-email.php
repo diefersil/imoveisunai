@@ -1,22 +1,68 @@
 <?php
 
 /**
- * FUNÇÕES DE E-MAIL PARA NOVO IMÓVEL
+ * FUNÇÕES DE E-MAIL DO SCRAPER
  *
- * Este arquivo deve ser chamado pelo scraper-res.php.
- * Ele concentra somente as funções responsáveis por:
- * - identificar imóveis novos em relação ao CSV antigo;
- * - montar o remetente;
- * - enviar e-mails de notificação para imóveis novos cadastrados.
+ * Este arquivo deve ser chamado pelo scraper.php.
+ *
+ * IMPORTANTE:
+ * A função individual enviarEmailNovoImovelCadastrado() fica desativada/removida.
+ * O controle $enviarEmailNovoImovel continua existindo no scraper.php.
+ * Quando estiver "sim", o fluxo usa somente enviarEmailsNovosImoveisCadastrados().
  */
 
+/**
+ * LIMPAR TEXTO PARA O E-MAIL
+ */
+function scraperEmailLimparTexto($texto) {
 
+    if (function_exists("limpar")) {
+        return limpar($texto);
+    }
+
+    return trim(
+        preg_replace('/\s+/', ' ', strip_tags((string)$texto))
+    );
+}
+
+/**
+ * NORMALIZAR TEXTO PARA COMPARAÇÃO
+ */
+function scraperEmailNormalizarBusca($texto) {
+
+    if (function_exists("normalizarBusca")) {
+        return normalizarBusca($texto);
+    }
+
+    $texto = scraperEmailLimparTexto($texto);
+    $texto = strtolower($texto);
+
+    $comAcento = [
+        "á", "à", "ã", "â", "ä",
+        "é", "è", "ê", "ë",
+        "í", "ì", "î", "ï",
+        "ó", "ò", "õ", "ô", "ö",
+        "ú", "ù", "û", "ü",
+        "ç"
+    ];
+
+    $semAcento = [
+        "a", "a", "a", "a", "a",
+        "e", "e", "e", "e",
+        "i", "i", "i", "i",
+        "o", "o", "o", "o", "o",
+        "u", "u", "u", "u",
+        "c"
+    ];
+
+    return str_replace($comAcento, $semAcento, $texto);
+}
 
 /**
  * CARREGAR WORDPRESS PARA USAR WP_MAIL
  *
  * Se o scraper estiver rodando fora do WordPress, tenta carregar wp-load.php
- * usando a raiz já detectada pelo scraper-res.php.
+ * usando a raiz já detectada pelo scraper.php.
  */
 function carregarWordPressParaEmailScraper() {
 
@@ -66,40 +112,6 @@ function enviarEmailScraper($emailDestino, $assunto, $mensagem, $headersArray) {
     return @mail($emailDestino, $assuntoEmail, $mensagem, implode("\r\n", $headersArray));
 }
 
-
-/**
- * FILTRAR IMÓVEIS REALMENTE NOVOS NO CSV
- *
- * Compara as chaves dos registros finais com as chaves do CSV antigo.
- * Assim o e-mail é disparado somente para imóvel que ainda não existia
- * e que entrou no arquivo scraper-res.csv nesta execução.
- */
-function filtrarImoveisNovosCadastrados($registrosAntigos, $registrosFinais) {
-
-    $chavesAntigas = [];
-
-    foreach ($registrosAntigos as $itemAntigo) {
-        $chavesAntigas[gerarChaveRegistro($itemAntigo)] = true;
-    }
-
-    $novos = [];
-    $chavesNovas = [];
-
-    foreach ($registrosFinais as $itemFinal) {
-
-        $chave = gerarChaveRegistro($itemFinal);
-
-        if (isset($chavesAntigas[$chave]) || isset($chavesNovas[$chave])) {
-            continue;
-        }
-
-        $novos[] = $itemFinal;
-        $chavesNovas[$chave] = true;
-    }
-
-    return $novos;
-}
-
 /**
  * DEFINIR E-MAIL REMETENTE DA NOTIFICAÇÃO
  */
@@ -135,84 +147,104 @@ function getEmailRemetenteNotificacaoNovoImovel($item) {
     return "nao-responda@" . $host;
 }
 
+
 /**
- * ENVIAR E-MAIL QUANDO UM IMÓVEL NOVO FOR CADASTRADO
+ * FILTRAR IMÓVEIS NOVOS EM RELAÇÃO AO CSV ANTIGO
  *
- * Envia um e-mail para cada imóvel realmente novo cadastrado no CSV.
- * O link enviado é o card_url capturado/gerado pelo scraper.
+ * Esta função continua existindo porque o scraper.php usa esse resultado
+ * para montar os logs e saber quantos imóveis entraram no CSV.
  */
-function enviarEmailNovoImovelCadastrado($item, $emailDestino) {
+function filtrarImoveisNovosCadastrados($registrosAntigos, $registrosFinais) {
 
-    $emailDestino = trim((string)$emailDestino);
+    $chavesAntigas = [];
 
-    if ($emailDestino === "") {
-        return [
-            "status" => "nao_enviado",
-            "motivo" => "email_destino_vazio",
-            "card_nome" => $item["card_nome"] ?? "",
-            "card_url" => $item["card_url"] ?? ""
-        ];
+    foreach ((array)$registrosAntigos as $itemAntigo) {
+
+        if (!function_exists("gerarChaveRegistro")) {
+            continue;
+        }
+
+        $chavesAntigas[gerarChaveRegistro($itemAntigo)] = true;
     }
 
-    $cardNome = limpar($item["card_nome"] ?? "");
-    $linkGerado = trim((string)($item["card_url"] ?? ""));
+    $novos = [];
+    $chavesNovas = [];
 
-    if ($cardNome === "") {
-        $cardNome = "Imóvel sem título";
+    foreach ((array)$registrosFinais as $itemFinal) {
+
+        if (!function_exists("gerarChaveRegistro")) {
+            continue;
+        }
+
+        $chave = gerarChaveRegistro($itemFinal);
+
+        if (isset($chavesAntigas[$chave]) || isset($chavesNovas[$chave])) {
+            continue;
+        }
+
+        $novos[] = $itemFinal;
+        $chavesNovas[$chave] = true;
     }
 
-    $assunto = "Novo imóvel cadastrado: " . $cardNome;
-
-    $mensagem = "Novo imóvel cadastrado no scraper.\n\n";
-    $mensagem .= "Imóvel: " . $cardNome . "\n";
-    $mensagem .= "Link gerado: " . ($linkGerado !== "" ? $linkGerado : "Sem link") . "\n";
-    $mensagem .= "Site de origem: " . limpar($item["nome_site"] ?? "") . "\n";
-    $mensagem .= "Data do cadastro: " . date("d/m/Y H:i:s") . "\n";
-
-    $remetente = getEmailRemetenteNotificacaoNovoImovel($item);
-
-    $headersArray = [
-        "MIME-Version: 1.0",
-        "Content-Type: text/plain; charset=UTF-8",
-        "From: Scraper Imóveis <" . $remetente . ">"
-    ];
-
-    $assuntoEmail = $assunto;
-
-    if (function_exists("mb_encode_mimeheader")) {
-        $assuntoEmail = mb_encode_mimeheader($assunto, "UTF-8", "B", "\r\n");
-    }
-
-    if (function_exists("wp_mail")) {
-        $enviado = wp_mail($emailDestino, $assuntoEmail, $mensagem, $headersArray);
-    } else {
-        $enviado = @mail($emailDestino, $assuntoEmail, $mensagem, implode("\r\n", $headersArray));
-    }
-
-    return [
-        "status" => $enviado ? "enviado" : "erro_envio",
-        "email_destino" => $emailDestino,
-        "card_nome" => $cardNome,
-        "card_url" => $linkGerado,
-        "data" => date("d/m/Y H:i:s")
-    ];
+    return $novos;
 }
 
 /**
  * ENVIAR E-MAILS DOS IMÓVEIS NOVOS
+ *
+ * Esta é a ÚNICA função usada pelo scraper.php para o fluxo controlado por:
+ * $enviarEmailNovoImovel.
+ *
+ * A função antiga enviarEmailNovoImovelCadastrado() não é usada aqui.
  */
 function enviarEmailsNovosImoveisCadastrados($imoveisNovos, $emailDestino) {
 
     global $enviarEmailNovoImovel;
+    global $gravar_csv;
 
     $logsEmail = [];
+    $imoveisNovos = is_array($imoveisNovos) ? $imoveisNovos : [];
 
-    if (normalizarBusca($enviarEmailNovoImovel) !== "sim") {
+    if (empty($imoveisNovos)) {
+        return $logsEmail;
+    }
+
+    if (scraperEmailNormalizarBusca($enviarEmailNovoImovel ?? "nao") !== "sim") {
 
         foreach ($imoveisNovos as $item) {
             $logsEmail[] = [
                 "status" => "nao_enviado",
-                "motivo" => "envio_desativado",
+                "motivo" => "enviar_email_novo_imovel_desativado",
+                "card_nome" => $item["card_nome"] ?? "",
+                "card_url" => $item["card_url"] ?? ""
+            ];
+        }
+
+        return $logsEmail;
+    }
+
+    if (scraperEmailNormalizarBusca($gravar_csv ?? "") !== "sim") {
+
+        foreach ($imoveisNovos as $item) {
+            $logsEmail[] = [
+                "status" => "nao_enviado",
+                "motivo" => "modo_teste_gravar_csv_nao",
+                "card_nome" => $item["card_nome"] ?? "",
+                "card_url" => $item["card_url"] ?? ""
+            ];
+        }
+
+        return $logsEmail;
+    }
+
+    $emailDestino = trim((string)$emailDestino);
+
+    if ($emailDestino === "") {
+
+        foreach ($imoveisNovos as $item) {
+            $logsEmail[] = [
+                "status" => "nao_enviado",
+                "motivo" => "email_destino_vazio",
                 "card_nome" => $item["card_nome"] ?? "",
                 "card_url" => $item["card_url"] ?? ""
             ];
@@ -222,12 +254,45 @@ function enviarEmailsNovosImoveisCadastrados($imoveisNovos, $emailDestino) {
     }
 
     foreach ($imoveisNovos as $item) {
-        $logsEmail[] = enviarEmailNovoImovelCadastrado($item, $emailDestino);
+
+        $cardNome = scraperEmailLimparTexto($item["card_nome"] ?? "");
+        $linkGerado = trim((string)($item["card_url"] ?? ""));
+        $siteOrigem = scraperEmailLimparTexto($item["nome_site"] ?? "");
+
+        if ($cardNome === "") {
+            $cardNome = "Imóvel sem título";
+        }
+
+        $assunto = "Novo imóvel identificado: " . $cardNome;
+
+        $mensagem = "Novo imóvel identificado.\n\n";
+        $mensagem .= "Imóvel: " . $cardNome . "\n";
+        $mensagem .= "Link: " . ($linkGerado !== "" ? $linkGerado : "Sem link") . "\n";
+        $mensagem .= "Site de origem: " . ($siteOrigem !== "" ? $siteOrigem : "Não informado") . "\n";
+        $mensagem .= "Data: " . date("d/m/Y H:i:s") . "\n";
+
+        $remetente = getEmailRemetenteNotificacaoNovoImovel($item);
+
+        $headersArray = [
+            "MIME-Version: 1.0",
+            "Content-Type: text/plain; charset=UTF-8",
+            "From: Scraper Imóveis <" . $remetente . ">"
+        ];
+
+        $enviado = enviarEmailScraper($emailDestino, $assunto, $mensagem, $headersArray);
+
+        $logsEmail[] = [
+            "status" => $enviado ? "enviado" : "erro_envio",
+            "email_destino" => $emailDestino,
+            "card_nome" => $cardNome,
+            "card_url" => $linkGerado,
+            "funcao_usada" => "enviarEmailsNovosImoveisCadastrados",
+            "data" => date("d/m/Y H:i:s")
+        ];
     }
 
     return $logsEmail;
 }
-
 
 /**
  * CONTAR STATUS DOS LOGS DO SCRAPER
@@ -242,7 +307,7 @@ function contarStatusLogsScraper($logs) {
 
     foreach ($logs as $item) {
 
-        $status = limpar($item["status"] ?? "sem_status");
+        $status = scraperEmailLimparTexto($item["status"] ?? "sem_status");
 
         if ($status === "") {
             $status = "sem_status";
@@ -273,7 +338,7 @@ function contarResultadosPorSiteScraper($resultados) {
 
     foreach ($resultados as $item) {
 
-        $nomeSite = limpar($item["nome_site"] ?? "Site não informado");
+        $nomeSite = scraperEmailLimparTexto($item["nome_site"] ?? "Site não informado");
 
         if ($nomeSite === "") {
             $nomeSite = "Site não informado";
@@ -309,7 +374,6 @@ function formatarListaResumoEmail($titulo, $itens) {
     return $texto;
 }
 
-
 /**
  * FORMATAR SITES QUE RODARAM OU FORAM IGNORADOS NO RESUMO
  */
@@ -323,11 +387,11 @@ function formatarSitesExecucaoResumoEmail($titulo, $sites) {
 
     foreach ($sites as $site) {
 
-        $nomeSite = limpar($site["nome_site"] ?? "Site não informado");
-        $tipoFrequencia = limpar($site["tipo_frequencia"] ?? "");
-        $horarioInicio = limpar($site["horario_inicio"] ?? "");
-        $horarioFim = limpar($site["horario_fim"] ?? "");
-        $status = limpar($site["status"] ?? "");
+        $nomeSite = scraperEmailLimparTexto($site["nome_site"] ?? "Site não informado");
+        $tipoFrequencia = scraperEmailLimparTexto($site["tipo_frequencia"] ?? "");
+        $horarioInicio = scraperEmailLimparTexto($site["horario_inicio"] ?? "");
+        $horarioFim = scraperEmailLimparTexto($site["horario_fim"] ?? "");
+        $status = scraperEmailLimparTexto($site["status"] ?? "");
 
         if ($nomeSite === "") {
             $nomeSite = "Site não informado";
@@ -356,7 +420,7 @@ function formatarSitesExecucaoResumoEmail($titulo, $sites) {
 /**
  * ENVIAR E-MAIL COM RESUMO DA EXECUÇÃO DO SCRAPER
  *
- * Este e-mail é enviado ao final da execução do scraper-res.php.
+ * Este e-mail é enviado ao final da execução do scraper.php.
  * Ele não depende de existir imóvel novo.
  */
 function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
@@ -366,7 +430,7 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
 
     $emailDestino = trim((string)$emailDestino);
 
-    if (normalizarBusca($enviarEmailResumoScraper ?? "nao") !== "sim") {
+    if (scraperEmailNormalizarBusca($enviarEmailResumoScraper ?? "nao") !== "sim") {
         return [
             "status" => "nao_enviado",
             "motivo" => "envio_resumo_desativado",
@@ -374,7 +438,7 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
         ];
     }
 
-    if (normalizarBusca($gravar_csv ?? "") !== "sim") {
+    if (scraperEmailNormalizarBusca($gravar_csv ?? "") !== "sim") {
         return [
             "status" => "nao_enviado",
             "motivo" => "modo_teste_gravar_csv_nao",
@@ -392,7 +456,7 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
 
     $resumoScraper = is_array($resumoScraper) ? $resumoScraper : [];
 
-    $dataExecucao = limpar($resumoScraper["data_execucao"] ?? date("d/m/Y H:i:s"));
+    $dataExecucao = scraperEmailLimparTexto($resumoScraper["data_execucao"] ?? date("d/m/Y H:i:s"));
     $assunto = "Resumo do scraper de imóveis - " . $dataExecucao;
 
     $logs = $resumoScraper["logs"] ?? [];
@@ -405,32 +469,34 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
 
     $mensagem = "Resumo do scraper realizado.\n\n";
     $mensagem .= "Data da execução: " . $dataExecucao . "\n";
-    $mensagem .= "Horário atual: " . limpar($resumoScraper["horario_atual"] ?? "") . "\n";
-    $mensagem .= "Status: " . limpar($resumoScraper["status"] ?? "") . "\n";
-    $mensagem .= "Gravar CSV: " . limpar($resumoScraper["gravar_csv"] ?? "") . "\n";
-    $mensagem .= "Status CSV imóveis: " . limpar($resumoScraper["csv_status"] ?? "") . "\n";
-    $mensagem .= "Status CSV usuários: " . limpar($resumoScraper["csv_usuarios_status"] ?? "") . "\n\n";
+    $mensagem .= "Horário atual: " . scraperEmailLimparTexto($resumoScraper["horario_atual"] ?? "") . "\n";
+    $mensagem .= "Status: " . scraperEmailLimparTexto($resumoScraper["status"] ?? "") . "\n";
+    $mensagem .= "Gravar CSV: " . scraperEmailLimparTexto($resumoScraper["gravar_csv"] ?? "") . "\n";
+    $mensagem .= "Status CSV imóveis: " . scraperEmailLimparTexto($resumoScraper["csv_status"] ?? "") . "\n";
+    $mensagem .= "Status CSV usuários: " . scraperEmailLimparTexto($resumoScraper["csv_usuarios_status"] ?? "") . "\n\n";
 
     $mensagem .= "Totais\n";
     $mensagem .= "- Sites configurados: " . (int)($resumoScraper["total_sites"] ?? 0) . "\n";
+    $mensagem .= "- Sites executados nesta execução: " . (int)($resumoScraper["total_sites_executados_scraper"] ?? 0) . "\n";
+    $mensagem .= "- Sites ignorados por frequência/horário: " . (int)($resumoScraper["total_sites_ignorados_por_frequencia"] ?? 0) . "\n";
     $mensagem .= "- Resultados coletados nesta execução: " . (int)($resumoScraper["total_resultados_novos"] ?? 0) . "\n";
     $mensagem .= "- Total atual no CSV de imóveis: " . (int)($resumoScraper["total_resultados_csv"] ?? 0) . "\n";
-    $mensagem .= "- Total no CSV de usuários: " . (int)($resumoScraper["total_usuarios_csv"] ?? 0) . "\n";
-    $mensagem .= "- Imóveis novos cadastrados: " . (int)($resumoScraper["total_imoveis_cadastrados_novos"] ?? 0) . "\n";
-    $mensagem .= "- E-mails de imóvel novo: " . (int)($resumoScraper["total_emails_novo_imovel"] ?? 0) . "\n\n";
+    $mensagem .= "- Total no CSV de usuários: " . (int)($resumoScraper["total_usuarios_csv"] ?? 0) . "\n\n";
 
     $mensagem .= "Imagens\n";
-    $mensagem .= "- Baixar imagens: " . limpar($resumoScraper["baixar_imagens"] ?? "") . "\n";
+    $mensagem .= "- Baixar imagens: " . scraperEmailLimparTexto($resumoScraper["baixar_imagens"] ?? "") . "\n";
     $mensagem .= "- Imagens baixadas: " . (int)($resumoScraper["total_imagens_baixadas"] ?? 0) . "\n";
     $mensagem .= "- Imagens que já existiam: " . (int)($resumoScraper["total_imagens_ja_existiam"] ?? 0) . "\n";
     $mensagem .= "- Erros de imagem: " . (int)($resumoScraper["total_erros_imagens"] ?? 0) . "\n\n";
 
+    $mensagem .= formatarSitesExecucaoResumoEmail("Sites que rodaram nesta execução", $sitesExecutadosScraper) . "\n";
+    $mensagem .= formatarSitesExecucaoResumoEmail("Sites ignorados por frequência/horário", $sitesIgnoradosPorFrequencia) . "\n";
     $mensagem .= formatarListaResumoEmail("Resultados por site", $resultadosPorSite) . "\n";
     $mensagem .= formatarListaResumoEmail("Status dos logs", $statusLogs) . "\n";
 
     $mensagem .= "Arquivos\n";
-    $mensagem .= "- Imóveis: " . limpar($resumoScraper["arquivo_csv"] ?? "") . "\n";
-    $mensagem .= "- Usuários: " . limpar($resumoScraper["arquivo_csv_usuarios"] ?? "") . "\n";
+    $mensagem .= "- Imóveis: " . scraperEmailLimparTexto($resumoScraper["arquivo_csv"] ?? "") . "\n";
+    $mensagem .= "- Usuários: " . scraperEmailLimparTexto($resumoScraper["arquivo_csv_usuarios"] ?? "") . "\n";
 
     $itemRemetenteResumo = [];
 
@@ -446,17 +512,7 @@ function enviarEmailResumoScraperRealizado($resumoScraper, $emailDestino) {
         "From: Scraper Imóveis <" . $remetente . ">"
     ];
 
-    $assuntoEmail = $assunto;
-
-    if (function_exists("mb_encode_mimeheader")) {
-        $assuntoEmail = mb_encode_mimeheader($assunto, "UTF-8", "B", "\r\n");
-    }
-
-    if (function_exists("wp_mail")) {
-        $enviado = wp_mail($emailDestino, $assuntoEmail, $mensagem, $headersArray);
-    } else {
-        $enviado = @mail($emailDestino, $assuntoEmail, $mensagem, implode("\r\n", $headersArray));
-    }
+    $enviado = enviarEmailScraper($emailDestino, $assunto, $mensagem, $headersArray);
 
     return [
         "status" => $enviado ? "enviado" : "erro_envio",
