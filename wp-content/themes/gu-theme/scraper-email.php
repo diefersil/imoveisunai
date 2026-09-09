@@ -6,9 +6,12 @@
  * Este arquivo deve ser chamado pelo scraper.php.
  *
  * IMPORTANTE:
- * A função individual enviarEmailNovoImovelCadastrado() fica desativada/removida.
- * O controle $enviarEmailNovoImovel continua existindo no scraper.php.
- * Quando estiver "sim", o fluxo usa somente enviarEmailsNovosImoveisCadastrados().
+ * A função antiga que enviava o e-mail individual com a mensagem
+ * "E-mail individual do scraper desativado." foi removida daqui.
+ *
+ * O e-mail de novo imóvel deve ficar somente no hook do WordPress,
+ * no arquivo imu-email-post-imoveis.php, quando um post do tipo
+ * imoveis for publicado.
  */
 
 /**
@@ -149,146 +152,35 @@ function getEmailRemetenteNotificacaoNovoImovel($item) {
 
 
 /**
- * FILTRAR IMÓVEIS NOVOS EM RELAÇÃO AO CSV ANTIGO
+ * COMPATIBILIDADE: FILTRAR IMÓVEIS NOVOS DO SCRAPER
  *
- * Esta função continua existindo porque o scraper.php usa esse resultado
- * para montar os logs e saber quantos imóveis entraram no CSV.
+ * Mantida somente para evitar erro caso algum scraper antigo ainda chame.
+ * Não dispara e-mail. O e-mail de novo imóvel deve ser enviado apenas pelo hook
+ * do WordPress quando um post do tipo "imoveis" for publicado.
  */
 function filtrarImoveisNovosCadastrados($registrosAntigos, $registrosFinais) {
-
-    $chavesAntigas = [];
-
-    foreach ((array)$registrosAntigos as $itemAntigo) {
-
-        if (!function_exists("gerarChaveRegistro")) {
-            continue;
-        }
-
-        $chavesAntigas[gerarChaveRegistro($itemAntigo)] = true;
-    }
-
-    $novos = [];
-    $chavesNovas = [];
-
-    foreach ((array)$registrosFinais as $itemFinal) {
-
-        if (!function_exists("gerarChaveRegistro")) {
-            continue;
-        }
-
-        $chave = gerarChaveRegistro($itemFinal);
-
-        if (isset($chavesAntigas[$chave]) || isset($chavesNovas[$chave])) {
-            continue;
-        }
-
-        $novos[] = $itemFinal;
-        $chavesNovas[$chave] = true;
-    }
-
-    return $novos;
+    return [];
 }
 
 /**
- * ENVIAR E-MAILS DOS IMÓVEIS NOVOS
+ * COMPATIBILIDADE: E-MAIL INDIVIDUAL DE IMÓVEL NOVO NO SCRAPER DESATIVADO
  *
- * Esta é a ÚNICA função usada pelo scraper.php para o fluxo controlado por:
- * $enviarEmailNovoImovel.
- *
- * A função antiga enviarEmailNovoImovelCadastrado() não é usada aqui.
+ * Esta função não envia mais e-mail do scraper.
+ * Use o hook do WordPress para novo post_type "imoveis".
  */
 function enviarEmailsNovosImoveisCadastrados($imoveisNovos, $emailDestino) {
-
-    global $enviarEmailNovoImovel;
-    global $gravar_csv;
-
     $logsEmail = [];
-    $imoveisNovos = is_array($imoveisNovos) ? $imoveisNovos : [];
 
-    if (empty($imoveisNovos)) {
-        return $logsEmail;
-    }
-
-    if (scraperEmailNormalizarBusca($enviarEmailNovoImovel ?? "nao") !== "sim") {
-
+    if (!empty($imoveisNovos) && is_array($imoveisNovos)) {
         foreach ($imoveisNovos as $item) {
             $logsEmail[] = [
                 "status" => "nao_enviado",
-                "motivo" => "enviar_email_novo_imovel_desativado",
-                "card_nome" => $item["card_nome"] ?? "",
-                "card_url" => $item["card_url"] ?? ""
+                "motivo" => "email_individual_do_scraper_desativado_usar_hook_post_imoveis",
+                "card_nome" => is_array($item) ? ($item["card_nome"] ?? "") : "",
+                "card_url" => is_array($item) ? ($item["card_url"] ?? "") : "",
+                "data" => date("d/m/Y H:i:s")
             ];
         }
-
-        return $logsEmail;
-    }
-
-    if (scraperEmailNormalizarBusca($gravar_csv ?? "") !== "sim") {
-
-        foreach ($imoveisNovos as $item) {
-            $logsEmail[] = [
-                "status" => "nao_enviado",
-                "motivo" => "modo_teste_gravar_csv_nao",
-                "card_nome" => $item["card_nome"] ?? "",
-                "card_url" => $item["card_url"] ?? ""
-            ];
-        }
-
-        return $logsEmail;
-    }
-
-    $emailDestino = trim((string)$emailDestino);
-
-    if ($emailDestino === "") {
-
-        foreach ($imoveisNovos as $item) {
-            $logsEmail[] = [
-                "status" => "nao_enviado",
-                "motivo" => "email_destino_vazio",
-                "card_nome" => $item["card_nome"] ?? "",
-                "card_url" => $item["card_url"] ?? ""
-            ];
-        }
-
-        return $logsEmail;
-    }
-
-    foreach ($imoveisNovos as $item) {
-
-        $cardNome = scraperEmailLimparTexto($item["card_nome"] ?? "");
-        $linkGerado = trim((string)($item["card_url"] ?? ""));
-        $siteOrigem = scraperEmailLimparTexto($item["nome_site"] ?? "");
-
-        if ($cardNome === "") {
-            $cardNome = "Imóvel sem título";
-        }
-
-        $assunto = "Novo imóvel identificado: " . $cardNome;
-
-        $mensagem = "Novo imóvel identificado.\n\n";
-        $mensagem .= "Imóvel: " . $cardNome . "\n";
-        $mensagem .= "Link: " . ($linkGerado !== "" ? $linkGerado : "Sem link") . "\n";
-        $mensagem .= "Site de origem: " . ($siteOrigem !== "" ? $siteOrigem : "Não informado") . "\n";
-        $mensagem .= "Data: " . date("d/m/Y H:i:s") . "\n";
-
-        $remetente = getEmailRemetenteNotificacaoNovoImovel($item);
-
-        $headersArray = [
-            "MIME-Version: 1.0",
-            "Content-Type: text/plain; charset=UTF-8",
-            "From: Scraper Imóveis <" . $remetente . ">"
-        ];
-
-        $enviado = enviarEmailScraper($emailDestino, $assunto, $mensagem, $headersArray);
-
-        $logsEmail[] = [
-            "status" => $enviado ? "enviado" : "erro_envio",
-            "email_destino" => $emailDestino,
-            "card_nome" => $cardNome,
-            "card_url" => $linkGerado,
-            "funcao_usada" => "enviarEmailsNovosImoveisCadastrados",
-            "data" => date("d/m/Y H:i:s")
-        ];
     }
 
     return $logsEmail;
