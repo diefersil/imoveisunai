@@ -169,8 +169,8 @@ img.swiper-slide-image {
         width: 100% !important;
         max-width: 100% !important;
 
-        height: 450px !important;
-        max-height: 450px !important;
+        height: 350px !important;
+        max-height: 350px !important;
 
         object-fit: cover !important;
         object-position: center center !important;
