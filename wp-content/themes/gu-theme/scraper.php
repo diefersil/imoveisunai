@@ -5,103 +5,12 @@ set_time_limit(2000);
 
 date_default_timezone_set("America/Sao_Paulo");
 
-/**
- * COMPATIBILIDADE COM SERVIDORES SEM EXTENSÃO MBSTRING
- *
- * Alguns servidores PHP podem estar sem mbstring ativa.
- * Estas funções simples evitam erro fatal em mb_strtolower(), mb_stripos()
- * e mb_convert_case(), mantendo o scraper funcionando.
- */
-if (!defined("MB_CASE_UPPER")) {
-    define("MB_CASE_UPPER", 0);
-}
-
-if (!defined("MB_CASE_LOWER")) {
-    define("MB_CASE_LOWER", 1);
-}
-
-if (!defined("MB_CASE_TITLE")) {
-    define("MB_CASE_TITLE", 2);
-}
-
-if (!function_exists("mb_strtolower")) {
-    function mb_strtolower($texto, $encoding = null) {
-
-        $texto = (string)$texto;
-
-        $mapa = [
-            "Á" => "á", "À" => "à", "Ã" => "ã", "Â" => "â", "Ä" => "ä",
-            "É" => "é", "È" => "è", "Ê" => "ê", "Ë" => "ë",
-            "Í" => "í", "Ì" => "ì", "Î" => "î", "Ï" => "ï",
-            "Ó" => "ó", "Ò" => "ò", "Õ" => "õ", "Ô" => "ô", "Ö" => "ö",
-            "Ú" => "ú", "Ù" => "ù", "Û" => "û", "Ü" => "ü",
-            "Ç" => "ç"
-        ];
-
-        return strtolower(strtr($texto, $mapa));
-    }
-}
-
-if (!function_exists("mb_stripos")) {
-    function mb_stripos($haystack, $needle, $offset = 0, $encoding = null) {
-        return stripos((string)$haystack, (string)$needle, (int)$offset);
-    }
-}
-
-if (!function_exists("mb_convert_case")) {
-    function mb_convert_case($texto, $modo, $encoding = null) {
-
-        $texto = (string)$texto;
-
-        if ($modo === MB_CASE_UPPER) {
-            return strtoupper($texto);
-        }
-
-        if ($modo === MB_CASE_TITLE) {
-            return ucwords(strtolower($texto));
-        }
-
-        return strtolower($texto);
-    }
-}
-
+/* ============================================================
+ * 01. REGRAS GLOBAIS E CONFIGURAÇÕES
+ * ============================================================ */
 
 /**
- * DESCOBRIR A RAIZ DO WORDPRESS
- *
- * Se o script estiver dentro de tema/plugin/subpasta, esta função sobe
- * os diretórios até encontrar wp-load.php ou wp-config.php.
- * Assim as imagens são salvas na raiz correta do WordPress.
- */
-function detectarRaizWordPress() {
-
-    if (defined("ABSPATH") && ABSPATH !== "") {
-        return rtrim(ABSPATH, "/\\");
-    }
-
-    $dir = __DIR__;
-
-    for ($i = 0; $i < 8; $i++) {
-
-        if (file_exists($dir . "/wp-load.php") || file_exists($dir . "/wp-config.php")) {
-            return rtrim($dir, "/\\");
-        }
-
-        $dirPai = dirname($dir);
-
-        if ($dirPai === $dir) {
-            break;
-        }
-
-        $dir = $dirPai;
-    }
-
-    // Fallback: mantém o comportamento antigo caso não encontre a raiz
-    return rtrim(__DIR__, "/\\");
-}
-
-/**
- * REGRA GLOBAIS
+ * 01. REGRAS GLOBAIS
  */
 
 $arquivoCsv = "scraper-res.csv";
@@ -176,13 +85,193 @@ $StatusImovelRegras = [
     ]
 ];
 
+/* ============================================================
+ * 02. COLUNAS DOS CSVs
+ * ============================================================ */
+
+/**
+ * COLUNAS DO CSV
+ */
+$colunas = [
+    "nome_site",
+    "contato_nome",
+    "usuario",
+    "cidade",
+    "uf",
+    "categoria",
+    "tags",
+    "categoria_imovel",
+    "negociacao",
+
+    "contato_fone",
+    "contato_whatsapp",
+    "contato_instagram",
+    "contato_site",
+    "contato_desc",
+
+    "card_nome",
+    "card_localizacao",
+    "card_area",
+    "card_area_contruida",
+    "descricao",
+    "preco",
+    "card_imagem_url",
+    "card_url",
+
+    "og_title",
+    "og_image",
+    "og_description",
+    "og_status",
+    "galeria",
+
+    "data_primeiro_scraper_brasil",
+    "data_primeiro_scraper_eua",
+
+    "data_ultimo_scraper_brasil",
+    "data_ultimo_scraper_eua",
+
+    "data_expiracao",
+
+    "cidade_sugerida",
+    "uf_sugerido",
+    "cidade_confianca",
+    "usuario_email"
+];
+
+
+/**
+ * COLUNAS DO CSV DE USUÁRIOS
+ */
+$colunasUsuarios = [
+    "contato_nome",
+    "usuario",
+    "usuario_email",
+    "contato_fone",
+    "contato_whatsapp",
+    "contato_instagram",
+    "contato_desc",
+    "contato_site"
+];
+
+/* ============================================================
+ * 03. ARQUIVOS EXTERNOS
+ * ============================================================ */
+
 /**
  * CONFIGURAÇÃO DOS SITES
  *
  * O array $sites foi separado para facilitar manutenção.
  */
 require_once __DIR__ . "/scraper-sites-config.php";
+/**
+ * FUNÇÕES DE E-MAIL PARA NOVO IMÓVEL
+ *
+ * As funções de notificação ficam separadas para facilitar manutenção.
+ */
+require_once __DIR__ . "/scraper-email.php";
 
+/* ============================================================
+ * 04. COMPATIBILIDADE DO SERVIDOR
+ * ============================================================ */
+
+/**
+ * COMPATIBILIDADE COM SERVIDORES SEM EXTENSÃO MBSTRING
+ *
+ * Alguns servidores PHP podem estar sem mbstring ativa.
+ * Estas funções simples evitam erro fatal em mb_strtolower(), mb_stripos()
+ * e mb_convert_case(), mantendo o scraper funcionando.
+ */
+if (!defined("MB_CASE_UPPER")) {
+    define("MB_CASE_UPPER", 0);
+}
+
+if (!defined("MB_CASE_LOWER")) {
+    define("MB_CASE_LOWER", 1);
+}
+
+if (!defined("MB_CASE_TITLE")) {
+    define("MB_CASE_TITLE", 2);
+}
+
+if (!function_exists("mb_strtolower")) {
+    function mb_strtolower($texto, $encoding = null) {
+
+        $texto = (string)$texto;
+
+        $mapa = [
+            "Á" => "á", "À" => "à", "Ã" => "ã", "Â" => "â", "Ä" => "ä",
+            "É" => "é", "È" => "è", "Ê" => "ê", "Ë" => "ë",
+            "Í" => "í", "Ì" => "ì", "Î" => "î", "Ï" => "ï",
+            "Ó" => "ó", "Ò" => "ò", "Õ" => "õ", "Ô" => "ô", "Ö" => "ö",
+            "Ú" => "ú", "Ù" => "ù", "Û" => "û", "Ü" => "ü",
+            "Ç" => "ç"
+        ];
+
+        return strtolower(strtr($texto, $mapa));
+    }
+}
+
+if (!function_exists("mb_stripos")) {
+    function mb_stripos($haystack, $needle, $offset = 0, $encoding = null) {
+        return stripos((string)$haystack, (string)$needle, (int)$offset);
+    }
+}
+
+if (!function_exists("mb_convert_case")) {
+    function mb_convert_case($texto, $modo, $encoding = null) {
+
+        $texto = (string)$texto;
+
+        if ($modo === MB_CASE_UPPER) {
+            return strtoupper($texto);
+        }
+
+        if ($modo === MB_CASE_TITLE) {
+            return ucwords(strtolower($texto));
+        }
+
+        return strtolower($texto);
+    }
+}
+
+
+/* ============================================================
+ * 05. FUNÇÕES BASE E NORMALIZAÇÃO
+ * ============================================================ */
+
+/**
+ * DESCOBRIR A RAIZ DO WORDPRESS
+ *
+ * Se o script estiver dentro de tema/plugin/subpasta, esta função sobe
+ * os diretórios até encontrar wp-load.php ou wp-config.php.
+ * Assim as imagens são salvas na raiz correta do WordPress.
+ */
+function detectarRaizWordPress() {
+
+    if (defined("ABSPATH") && ABSPATH !== "") {
+        return rtrim(ABSPATH, "/\\");
+    }
+
+    $dir = __DIR__;
+
+    for ($i = 0; $i < 8; $i++) {
+
+        if (file_exists($dir . "/wp-load.php") || file_exists($dir . "/wp-config.php")) {
+            return rtrim($dir, "/\\");
+        }
+
+        $dirPai = dirname($dir);
+
+        if ($dirPai === $dir) {
+            break;
+        }
+
+        $dir = $dirPai;
+    }
+
+    // Fallback: mantém o comportamento antigo caso não encontre a raiz
+    return rtrim(__DIR__, "/\\");
+}
 /**
  * NORMALIZAR URLS DO SITE
  */
@@ -2134,16 +2223,198 @@ function validarExtensoesObrigatoriasScraper() {
 
     exit;
 }
+/**
+ * LIMPAR CAMPO CSV PADRÃO
+ *
+ * Usado em campos comuns para evitar quebra de linha real,
+ * ponto e vírgula interno e espaços duplicados no CSV.
+ */
+function limparCampoCsv($texto) {
+
+    $texto = html_entity_decode($texto ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // Remove quebras reais para manter 1 imóvel por linha no CSV
+    $texto = str_replace(["\r\n", "\r", "\n"], ' ', $texto);
+
+    // Evita conflito visual com separador CSV ;
+    $texto = str_replace(';', ',', $texto);
+
+    // Remove espaços duplicados
+    $texto = preg_replace('/\s+/', ' ', $texto);
+
+    return trim($texto);
+}
+
+/**
+ * LIMPAR DESCRIÇÃO PARA CSV / WP ALL IMPORT
+ *
+ * A descrição pode conter HTML permitido, então não deve usar
+ * a limpeza genérica. Mantém somente:
+ * h4.desc-title, ul, li, b e br.
+ */
+function limparDescricaoCsv($html) {
+
+    $html = (string)($html ?? "");
+
+    if ($html === "") {
+        return "";
+    }
+
+    // Decodifica entidades HTML
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+    // Normaliza quebras reais para <br/>
+    $html = str_replace(["\r\n", "\r", "\n"], "<br/>", $html);
+
+    // Normaliza variações de <br>
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    /**
+     * IMPORTANTE:
+     * Remove ponto e vírgula da descrição para não quebrar CSV separado por ;
+     *
+     * Exemplo:
+     * Área total 1.401,6027 hectares;
+     * vira:
+     * Área total 1.401,6027 hectares<br/>
+     */
+    $html = str_replace([";", "；"], "<br/>", $html);
+
+    // Remove atributos extras das tags permitidas
+    $html = preg_replace('/<\s*h4\b[^>]*>/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/<\s*\/\s*h4\s*>/i', '</h4>', $html);
+    $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
+    $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
+    $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
+
+    // Mantém somente estas tags
+    $html = strip_tags($html, '<h4><ul><li><b><br>');
+
+    // Garante <br/> novamente depois do strip_tags
+    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
+
+    // Remove espaços duplicados
+    $html = preg_replace('/\s+/', ' ', $html);
+
+    // Remove <br/> repetidos
+    $html = preg_replace('/(<br\/>\s*){2,}/i', '<br/>', $html);
+
+    // Limpa espaços perto das tags
+    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
+    $html = preg_replace('/\s*<h4\s+class=[\'\"]desc-title[\'\"]>\s*/i', "<h4 class='desc-title'>", $html);
+    $html = preg_replace('/\s*<\/h4>\s*/i', '</h4>', $html);
+    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
+    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
+    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
+    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
+
+    // Remove <br/> sobrando no início/fim
+    $html = preg_replace('/^(<br\/>)+/i', '', $html);
+    $html = preg_replace('/(<br\/>)+$/i', '', $html);
+
+    return trim($html);
+}
 
 
 /**
- * FUNÇÕES DE E-MAIL PARA NOVO IMÓVEL
+ * GERAR REGISTROS DO CSV DE USUÁRIOS
  *
- * As funções de notificação ficam separadas para facilitar manutenção.
+ * Gera o arquivo scraper-users.csv com dados exclusivos do responsável/contato
+ * configurado em cada site.
  */
-require_once __DIR__ . "/scraper-email.php";
+function gerarRegistrosUsuariosSites($sites) {
+
+    $registros = [];
+
+    if (empty($sites) || !is_array($sites)) {
+        return $registros;
+    }
+
+    foreach ($sites as $site) {
+
+        $urlsSite = normalizarUrlsSite($site["url"] ?? "");
+        $urlPrincipal = $urlsSite[0] ?? "";
+        $contatoSite = getUrlPrincipalSemBarra($urlPrincipal);
+
+        $contatoNome = $site["contato_nome"] ?? ($site["nome_site"] ?? "");
+        $usuario = $site["usuario"] ?? "";
+        $usuarioEmail = $site["usuario_email"] ?? "";
+        $contatoFone = $site["contato_fone"] ?? ($site["contato"] ?? "");
+        $contatoWhatsapp = $site["contato_whatsapp"] ?? "";
+        $contatoInstagram = $site["contato_instagram"] ?? "";
+        $contatoDesc = $site["contato_desc"] ?? "";
+
+        $item = [
+            "contato_nome" => $contatoNome,
+            "usuario" => $usuario,
+            "usuario_email" => $usuarioEmail,
+            "contato_fone" => $contatoFone,
+            "contato_whatsapp" => $contatoWhatsapp,
+            "contato_instagram" => $contatoInstagram,
+            "contato_desc" => $contatoDesc,
+            "contato_site" => $contatoSite
+        ];
+
+        /**
+         * Evita registros duplicados no scraper-users.csv.
+         */
+        $chave = md5(
+            mb_strtolower(
+                ($item["contato_nome"] ?? "") . "|" .
+                ($item["usuario"] ?? "") . "|" .
+                ($item["usuario_email"] ?? "") . "|" .
+                ($item["contato_fone"] ?? "") . "|" .
+                ($item["contato_whatsapp"] ?? "") . "|" .
+                ($item["contato_site"] ?? ""),
+                "UTF-8"
+            )
+        );
+
+        $registros[$chave] = $item;
+    }
+
+    return array_values($registros);
+}
+
+/**
+ * GRAVAR CSV SIMPLES
+ */
+function gravarCsvSimples($arquivoCsv, $colunas, $registros) {
+
+    $fp = fopen($arquivoCsv, "w");
+
+    if (!$fp) {
+        return false;
+    }
+
+    fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
+    fputcsv($fp, $colunas, ";");
+
+    foreach ($registros as $item) {
+
+        $linha = [];
+
+        foreach ($colunas as $coluna) {
+            $linha[] = limparCampoCsv($item[$coluna] ?? "");
+        }
+
+        fputcsv($fp, $linha, ";");
+    }
+
+    fclose($fp);
+
+    return true;
+}
+
+/* ============================================================
+ * 06. VALIDAÇÃO ANTES DE PROCESSAR
+ * ============================================================ */
 
 validarExtensoesObrigatoriasScraper();
+
+/* ============================================================
+ * 07. PROCESSAMENTO DOS SITES
+ * ============================================================ */
 
 /**
  * PROCESSAMENTO
@@ -2656,252 +2927,9 @@ foreach ($sites as $site) {
 }
 
 
-/**
- * LIMPAR CAMPO CSV PADRÃO
- *
- * Usado em campos comuns para evitar quebra de linha real,
- * ponto e vírgula interno e espaços duplicados no CSV.
- */
-function limparCampoCsv($texto) {
-
-    $texto = html_entity_decode($texto ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
-
-    // Remove quebras reais para manter 1 imóvel por linha no CSV
-    $texto = str_replace(["\r\n", "\r", "\n"], ' ', $texto);
-
-    // Evita conflito visual com separador CSV ;
-    $texto = str_replace(';', ',', $texto);
-
-    // Remove espaços duplicados
-    $texto = preg_replace('/\s+/', ' ', $texto);
-
-    return trim($texto);
-}
-
-/**
- * LIMPAR DESCRIÇÃO PARA CSV / WP ALL IMPORT
- *
- * A descrição pode conter HTML permitido, então não deve usar
- * a limpeza genérica. Mantém somente:
- * h4.desc-title, ul, li, b e br.
- */
-function limparDescricaoCsv($html) {
-
-    $html = (string)($html ?? "");
-
-    if ($html === "") {
-        return "";
-    }
-
-    // Decodifica entidades HTML
-    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, "UTF-8");
-
-    // Normaliza quebras reais para <br/>
-    $html = str_replace(["\r\n", "\r", "\n"], "<br/>", $html);
-
-    // Normaliza variações de <br>
-    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
-
-    /**
-     * IMPORTANTE:
-     * Remove ponto e vírgula da descrição para não quebrar CSV separado por ;
-     *
-     * Exemplo:
-     * Área total 1.401,6027 hectares;
-     * vira:
-     * Área total 1.401,6027 hectares<br/>
-     */
-    $html = str_replace([";", "；"], "<br/>", $html);
-
-    // Remove atributos extras das tags permitidas
-    $html = preg_replace('/<\s*h4\b[^>]*>/i', "<h4 class='desc-title'>", $html);
-    $html = preg_replace('/<\s*\/\s*h4\s*>/i', '</h4>', $html);
-    $html = preg_replace('/<\s*ul\s+[^>]*>/i', '<ul>', $html);
-    $html = preg_replace('/<\s*li\s+[^>]*>/i', '<li>', $html);
-    $html = preg_replace('/<\s*b\s+[^>]*>/i', '<b>', $html);
-
-    // Mantém somente estas tags
-    $html = strip_tags($html, '<h4><ul><li><b><br>');
-
-    // Garante <br/> novamente depois do strip_tags
-    $html = preg_replace('/<br\s*\/?>/i', '<br/>', $html);
-
-    // Remove espaços duplicados
-    $html = preg_replace('/\s+/', ' ', $html);
-
-    // Remove <br/> repetidos
-    $html = preg_replace('/(<br\/>\s*){2,}/i', '<br/>', $html);
-
-    // Limpa espaços perto das tags
-    $html = preg_replace('/\s*<br\/>\s*/i', '<br/>', $html);
-    $html = preg_replace('/\s*<h4\s+class=[\'\"]desc-title[\'\"]>\s*/i', "<h4 class='desc-title'>", $html);
-    $html = preg_replace('/\s*<\/h4>\s*/i', '</h4>', $html);
-    $html = preg_replace('/\s*<li>\s*/i', '<li>', $html);
-    $html = preg_replace('/\s*<\/li>\s*/i', '</li>', $html);
-    $html = preg_replace('/\s*<ul>\s*/i', '<ul>', $html);
-    $html = preg_replace('/\s*<\/ul>\s*/i', '</ul>', $html);
-
-    // Remove <br/> sobrando no início/fim
-    $html = preg_replace('/^(<br\/>)+/i', '', $html);
-    $html = preg_replace('/(<br\/>)+$/i', '', $html);
-
-    return trim($html);
-}
-
-
-/**
- * GERAR REGISTROS DO CSV DE USUÁRIOS
- *
- * Gera o arquivo scraper-users.csv com dados exclusivos do responsável/contato
- * configurado em cada site.
- */
-function gerarRegistrosUsuariosSites($sites) {
-
-    $registros = [];
-
-    if (empty($sites) || !is_array($sites)) {
-        return $registros;
-    }
-
-    foreach ($sites as $site) {
-
-        $urlsSite = normalizarUrlsSite($site["url"] ?? "");
-        $urlPrincipal = $urlsSite[0] ?? "";
-        $contatoSite = getUrlPrincipalSemBarra($urlPrincipal);
-
-        $contatoNome = $site["contato_nome"] ?? ($site["nome_site"] ?? "");
-        $usuario = $site["usuario"] ?? "";
-        $usuarioEmail = $site["usuario_email"] ?? "";
-        $contatoFone = $site["contato_fone"] ?? ($site["contato"] ?? "");
-        $contatoWhatsapp = $site["contato_whatsapp"] ?? "";
-        $contatoInstagram = $site["contato_instagram"] ?? "";
-        $contatoDesc = $site["contato_desc"] ?? "";
-
-        $item = [
-            "contato_nome" => $contatoNome,
-            "usuario" => $usuario,
-            "usuario_email" => $usuarioEmail,
-            "contato_fone" => $contatoFone,
-            "contato_whatsapp" => $contatoWhatsapp,
-            "contato_instagram" => $contatoInstagram,
-            "contato_desc" => $contatoDesc,
-            "contato_site" => $contatoSite
-        ];
-
-        /**
-         * Evita registros duplicados no scraper-users.csv.
-         */
-        $chave = md5(
-            mb_strtolower(
-                ($item["contato_nome"] ?? "") . "|" .
-                ($item["usuario"] ?? "") . "|" .
-                ($item["usuario_email"] ?? "") . "|" .
-                ($item["contato_fone"] ?? "") . "|" .
-                ($item["contato_whatsapp"] ?? "") . "|" .
-                ($item["contato_site"] ?? ""),
-                "UTF-8"
-            )
-        );
-
-        $registros[$chave] = $item;
-    }
-
-    return array_values($registros);
-}
-
-/**
- * GRAVAR CSV SIMPLES
- */
-function gravarCsvSimples($arquivoCsv, $colunas, $registros) {
-
-    $fp = fopen($arquivoCsv, "w");
-
-    if (!$fp) {
-        return false;
-    }
-
-    fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
-    fputcsv($fp, $colunas, ";");
-
-    foreach ($registros as $item) {
-
-        $linha = [];
-
-        foreach ($colunas as $coluna) {
-            $linha[] = limparCampoCsv($item[$coluna] ?? "");
-        }
-
-        fputcsv($fp, $linha, ";");
-    }
-
-    fclose($fp);
-
-    return true;
-}
-
-/**
- * COLUNAS DO CSV
- */
-$colunas = [
-    "nome_site",
-    "contato_nome",
-    "usuario",
-    "cidade",
-    "uf",
-    "categoria",
-    "tags",
-    "categoria_imovel",
-    "negociacao",
-
-    "contato_fone",
-    "contato_whatsapp",
-    "contato_instagram",
-    "contato_site",
-    "contato_desc",
-
-    "card_nome",
-    "card_localizacao",
-    "card_area",
-    "card_area_contruida",
-    "descricao",
-    "preco",
-    "card_imagem_url",
-    "card_url",
-
-    "og_title",
-    "og_image",
-    "og_description",
-    "og_status",
-    "galeria",
-
-    "data_primeiro_scraper_brasil",
-    "data_primeiro_scraper_eua",
-
-    "data_ultimo_scraper_brasil",
-    "data_ultimo_scraper_eua",
-
-    "data_expiracao",
-
-    "cidade_sugerida",
-    "uf_sugerido",
-    "cidade_confianca",
-    "usuario_email"
-];
-
-
-/**
- * COLUNAS DO CSV DE USUÁRIOS
- */
-$colunasUsuarios = [
-    "contato_nome",
-    "usuario",
-    "usuario_email",
-    "contato_fone",
-    "contato_whatsapp",
-    "contato_instagram",
-    "contato_desc",
-    "contato_site"
-];
+/* ============================================================
+ * 08. REGISTROS DE USUÁRIOS E GRAVAÇÃO/RETORNO
+ * ============================================================ */
 
 $registrosUsuarios = gerarRegistrosUsuariosSites($sites);
 
