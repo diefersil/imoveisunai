@@ -369,7 +369,7 @@ $sites = [
         ],
         "verificar_string" => "",
         "seletores" => [
-            "card" => "//div[contains(@class,'listing-card')]",
+            "card" => "//a[contains(@class,'listing-card')]",
             "card_nome" => ".//h4",
             "card_contato" => "",
             "card_contato_nome" => "",
