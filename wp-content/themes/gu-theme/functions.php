@@ -1020,5 +1020,65 @@ add_action('transition_post_status', function ($new_status, $old_status, $post) 
 }, 10, 3);
 
 
+/* ------------------------------------------------------------
+ * CSS - Corrigi Lisitngs
+ * ------------------------------------------------------------ */
+
+
+add_action( 'wp_footer', function() {
+?>
+<script>
+(function() {
+
+    function corrigirImagensListings() {
+
+        document.querySelectorAll('.jet-listing-grid__item').forEach(function(item) {
+
+            const destino = item.querySelector('.loop-search-img');
+
+            const img = item.querySelector(
+                '.elementor-element-f98f4f5 img'
+            );
+
+            if (!destino || !img) {
+                return;
+            }
+
+            const src =
+                img.getAttribute('src') ||
+                img.getAttribute('data-src') ||
+                img.currentSrc;
+
+            if (!src) {
+                return;
+            }
+
+            destino.style.setProperty(
+                'background-image',
+                'url("' + src + '")',
+                'important'
+            );
+
+        });
+
+    }
+
+    document.addEventListener('DOMContentLoaded', corrigirImagensListings);
+    window.addEventListener('load', corrigirImagensListings);
+
+    const observer = new MutationObserver(function() {
+        corrigirImagensListings();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+<?php
+}, 100 );
+
 
 
