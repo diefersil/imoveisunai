@@ -380,7 +380,7 @@ $sites = [
             "preco" => ".//div[contains(@class,'listing-price')]",
             "card_imagem_url" => ".//img",
             "card_url" => ".",
-            'galeria' => '//img[contains(@alt, "Foto ")],
+            "galeria" => "//img[starts-with(@alt, 'Foto ]",
             "descricao" => "//div[contains(@class,'detail-about')]"
         ]
     ]
