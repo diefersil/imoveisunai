@@ -1076,6 +1076,16 @@ add_action(
             $whatsapp_url
         );
 
+
+        // =================================================
+        // REDIRECIONAMENTO IMU (FALLBACK FRONTEND)
+        // =================================================
+
+        $ajax_handler->add_response_data(
+            'imu_whatsapp_redirect',
+            $whatsapp_url
+        );
+
     },
     10,
     2
@@ -1224,6 +1234,59 @@ add_action( 'wp_footer', function() {
 
 
     <script>
+
+    // =====================================================
+    // REDIRECIONAMENTO APÓS SUCESSO DO FORM ELEMENTOR
+    //
+    // O Elementor envia o formulário via AJAX.
+    // Mesmo que o redirect_url nativo não seja executado
+    // por alguma configuração do formulário, este listener
+    // recebe a URL devolvida pelo PHP e abre o WhatsApp.
+    // =====================================================
+
+    if ( typeof jQuery !== 'undefined' ) {
+
+        jQuery( document ).on(
+            'submit_success',
+            function( event, response ) {
+
+                const formularioEnviado = event.target;
+
+                if (
+                    ! formularioEnviado ||
+                    ! formularioEnviado.closest ||
+                    ! formularioEnviado.closest( '.imu-form-whatsapp' )
+                ) {
+                    return;
+                }
+
+                if (
+                    ! response ||
+                    ! response.data
+                ) {
+                    return;
+                }
+
+                const url =
+                    response.data.imu_whatsapp_redirect ||
+                    response.data.redirect_url ||
+                    '';
+
+                if ( ! url ) {
+                    return;
+                }
+
+                // Aceita somente o destino WhatsApp gerado
+                // pelo nosso PHP.
+                if ( ! /^https:\/\/wa\.me\//i.test( url ) ) {
+                    return;
+                }
+
+                window.location.assign( url );
+            }
+        );
+    }
+
 
     document.addEventListener(
         'DOMContentLoaded',
