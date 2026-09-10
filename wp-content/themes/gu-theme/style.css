@@ -132,34 +132,38 @@ label,
    SINGLE
 ================================================== */
 
-/* GALERIA - CADA IMAGEM OCUPA SOMENTE O SEU SLOT */
+/* RESERVA O ESPAÇO DA GALERIA */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
-.swiper-slide > a {
-    display: block !important;
-    width: 100% !important;
-    height: 350px !important;
+.elementor-image-carousel-wrapper {
+    min-height: 450px;
 }
 
+
+/* ESCONDE ENQUANTO O SWIPER CARREGA */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
-.swiper-slide-inner {
-    width: 100% !important;
-    height: 350px !important;
-    margin: 0 !important;
+.elementor-image-carousel-wrapper:not(.swiper-initialized) {
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
+
+/* MOSTRA QUANDO ESTIVER PRONTO */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
-img.swiper-slide-image {
-    width: 100% !important;
-    height: 350px !important;
-    max-height: 350px !important;
+.elementor-image-carousel-wrapper.swiper-initialized {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity 0.15s ease-in;
+}
 
-    object-fit: cover !important;
-    object-position: center !important;
 
-    display: block !important;
+/* NÃO DEIXA OS SLIDES ESPREMEREM */
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+.swiper-slide {
+    flex-shrink: 0 !important;
 }
 
 /* ==================================================
