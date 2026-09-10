@@ -132,15 +132,51 @@ label,
    SINGLE - Galeria
 ================================================== */
 
-/* RESERVA O ESPAÇO DA GALERIA */
+/* DESKTOP */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
-.elementor-image-carousel-wrapper {
-    min-height: 450px;
+img.swiper-slide-image {
+    max-height: 450px !important;
+
+    width: auto !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+
+    object-fit: contain !important;
 }
 
 
-/* ESCONDE ENQUANTO O SWIPER CARREGA */
+/* CENTRALIZA */
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+.swiper-slide-inner {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+
+/* MOBILE */
+@media (max-width: 767px) {
+
+    .elementor-27881
+    .elementor-element.elementor-element-fd988c8
+    img.swiper-slide-image {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: 350px !important;
+        max-height: 350px !important;
+
+        object-fit: cover !important;
+        object-position: center center !important;
+    }
+
+}
+
+
+/* ESCONDE ENQUANTO O SWIPER NÃO INICIALIZAR */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 .elementor-image-carousel-wrapper:not(.swiper-initialized) {
@@ -159,7 +195,7 @@ label,
 }
 
 
-/* NÃO DEIXA OS SLIDES ESPREMEREM */
+/* EVITA OS SLIDES ESPREMIDOS */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 .swiper-slide {
