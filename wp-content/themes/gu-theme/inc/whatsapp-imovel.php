@@ -351,6 +351,25 @@ function imu_ajax_registrar_clique() {
     );
 
 
+    // =====================================================
+    // IP BLOQUEADO
+    // =====================================================
+
+    if (
+        function_exists( 'imu_whatsapp_ip_bloqueado' ) &&
+        function_exists( 'imu_whatsapp_get_ip_atual' ) &&
+        imu_whatsapp_ip_bloqueado( imu_whatsapp_get_ip_atual() )
+    ) {
+
+        wp_send_json_error(
+            [
+                'message' => 'Acesso bloqueado.',
+            ],
+            403
+        );
+    }
+
+
     $post_id = isset( $_POST['post_id'] )
         ? absint( $_POST['post_id'] )
         : 0;
@@ -462,6 +481,25 @@ add_action(
             IMU_WHATSAPP_FORM_NAME !==
             $form_name
         ) {
+
+            return;
+        }
+
+
+        // =================================================
+        // IP BLOQUEADO
+        // =================================================
+
+        if (
+            function_exists( 'imu_whatsapp_ip_bloqueado' ) &&
+            function_exists( 'imu_whatsapp_get_ip_atual' ) &&
+            imu_whatsapp_ip_bloqueado( imu_whatsapp_get_ip_atual() )
+        ) {
+
+            $ajax_handler->add_error(
+                'whatsapp',
+                'Não foi possível continuar com esta solicitação.'
+            );
 
             return;
         }
@@ -603,6 +641,16 @@ add_action(
             $form_name
         ) {
 
+            return;
+        }
+
+
+        // Segurança extra: não processa leads de IP bloqueado.
+        if (
+            function_exists( 'imu_whatsapp_ip_bloqueado' ) &&
+            function_exists( 'imu_whatsapp_get_ip_atual' ) &&
+            imu_whatsapp_ip_bloqueado( imu_whatsapp_get_ip_atual() )
+        ) {
             return;
         }
 
@@ -1124,6 +1172,13 @@ add_action( 'wp_footer', function() {
         'imu_registrar_clique'
     );
 
+
+    $ip_bloqueado = (
+        function_exists( 'imu_whatsapp_ip_bloqueado' ) &&
+        function_exists( 'imu_whatsapp_get_ip_atual' ) &&
+        imu_whatsapp_ip_bloqueado( imu_whatsapp_get_ip_atual() )
+    );
+
     ?>
 
     <style>
@@ -1291,6 +1346,8 @@ add_action( 'wp_footer', function() {
     document.addEventListener(
         'DOMContentLoaded',
         function () {
+
+            const ipBloqueado = <?php echo $ip_bloqueado ? 'true' : 'false'; ?>;
 
             // =================================================
             // ELEMENTOS
@@ -1583,6 +1640,12 @@ add_action( 'wp_footer', function() {
                 function (event) {
 
                     event.preventDefault();
+
+
+                    if ( ipBloqueado ) {
+                        alert( 'Não foi possível continuar pelo WhatsApp.' );
+                        return;
+                    }
 
 
                     if (
