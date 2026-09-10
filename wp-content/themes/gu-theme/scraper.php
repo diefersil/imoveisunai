@@ -13,13 +13,15 @@ date_default_timezone_set("America/Sao_Paulo");
  * 01. REGRAS GLOBAIS
  */
 
-$arquivoCsv = "scraper-res.csv";
-$arquivoCsvUsuarios = "scraper-users.csv";
+$diretorioScraper = __DIR__;
+$arquivoCsv = $diretorioScraper . "/scraper-res.csv";
+$arquivoCsvUsuarios = $diretorioScraper . "/scraper-users.csv";
 $enviarEmailNovoImovel = "sim"; // Mantido apenas como configuração geral; o scraper não envia e-mail individual de imóvel novo.
 $emailNotificacaoNovoImovel = "diefersil@gmail.com";
 $enviarEmailResumoScraper = "nao";
 $emailNotificacaoResumoScraper = "diefersil@gmail.com";
 $gravar_csv = "sim";
+$gravar_csv_usuarios = "sim"; // Controla separadamente o scraper-users.csv.
 $executarTodosUsuariosHorario = "nao";
 $baixar_imagens = "sim";
 $limiteRegistrosCsv = 500;
@@ -2414,11 +2416,29 @@ function gerarRegistrosUsuariosSites($sites) {
  */
 function gravarCsvSimples($arquivoCsv, $colunas, $registros) {
 
-    $fp = fopen($arquivoCsv, "w");
+    $arquivoCsv = trim((string)$arquivoCsv);
+
+    if ($arquivoCsv === "") {
+        return false;
+    }
+
+    $diretorioCsv = dirname($arquivoCsv);
+
+    if ($diretorioCsv !== "" && $diretorioCsv !== "." && !is_dir($diretorioCsv)) {
+        @mkdir($diretorioCsv, 0755, true);
+    }
+
+    if ($diretorioCsv !== "" && $diretorioCsv !== "." && !is_writable($diretorioCsv)) {
+        return false;
+    }
+
+    $fp = @fopen($arquivoCsv, "w");
 
     if (!$fp) {
         return false;
     }
+
+    flock($fp, LOCK_EX);
 
     fprintf($fp, chr(0xEF) . chr(0xBB) . chr(0xBF));
     fputcsv($fp, $colunas, ";");
@@ -2434,9 +2454,11 @@ function gravarCsvSimples($arquivoCsv, $colunas, $registros) {
         fputcsv($fp, $linha, ";");
     }
 
+    fflush($fp);
+    flock($fp, LOCK_UN);
     fclose($fp);
 
-    return true;
+    return file_exists($arquivoCsv) && filesize($arquivoCsv) > 0;
 }
 
 /* ============================================================
@@ -3046,20 +3068,33 @@ if ($gravarCsvNormalizado === "sim") {
     fclose($fp);
 
     $csvStatus = "gravado";
-
-    $csvUsuariosGravado = gravarCsvSimples($arquivoCsvUsuarios, $colunasUsuarios, $registrosUsuarios);
-    $csvUsuariosStatus = $csvUsuariosGravado ? "gravado" : "erro_gravacao";
 } else {
 
     /**
      * MODO TESTE
      *
-     * Não lê nem grava o CSV.
+     * Não lê nem grava o CSV de imóveis.
+     * O CSV de usuários é controlado separadamente por $gravar_csv_usuarios.
      * Retorna apenas os resultados novos da execução atual.
      */
     $registrosFinais = array_values($resultados);
     $csvStatus = "nao_gravado_modo_teste";
-    $csvUsuariosStatus = "nao_gravado_modo_teste";
+}
+
+/**
+ * GRAVAR SCRAPER-USERS.CSV
+ *
+ * O arquivo de usuários agora é atualizado separadamente do scraper-res.csv.
+ * Assim ele continua sendo gravado mesmo quando não há imóvel novo ou quando
+ * nenhum site do horário atual encontrou registros.
+ */
+$gravarCsvUsuariosNormalizado = normalizarBusca($gravar_csv_usuarios ?? "sim");
+
+if ($gravarCsvUsuariosNormalizado === "sim") {
+    $csvUsuariosGravado = gravarCsvSimples($arquivoCsvUsuarios, $colunasUsuarios, $registrosUsuarios);
+    $csvUsuariosStatus = $csvUsuariosGravado ? "gravado" : "erro_gravacao";
+} else {
+    $csvUsuariosStatus = "nao_gravado_desativado";
 }
 
 /**
@@ -3084,6 +3119,7 @@ $retornoJson = [
     "arquivo_csv" => $arquivoCsv,
     "arquivo_csv_usuarios" => $arquivoCsvUsuarios,
     "gravar_csv" => $gravar_csv,
+    "gravar_csv_usuarios" => $gravar_csv_usuarios,
     "executar_todos_usuarios_horario" => $executarTodosUsuariosHorario,
     "csv_status" => $csvStatus,
     "csv_usuarios_status" => $csvUsuariosStatus,
