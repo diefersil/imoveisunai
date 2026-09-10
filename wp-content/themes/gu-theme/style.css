@@ -132,50 +132,34 @@ label,
    SINGLE
 ================================================== */
 
-/* DESKTOP / PADRÃO */
+/* GALERIA - CADA IMAGEM OCUPA SOMENTE O SEU SLOT */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
-img.swiper-slide-image {
-
-    max-height: 450px !important;
-
-    width: auto !important;
-    max-width: 100% !important;
-
-    height: auto !important;
-
-    object-fit: contain !important;
+.swiper-slide > a {
+    display: block !important;
+    width: 100% !important;
+    height: 350px !important;
 }
 
-
-/* CENTRALIZA A IMAGEM */
 .elementor-27881
 .elementor-element.elementor-element-fd988c8
 .swiper-slide-inner {
-
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    width: 100% !important;
+    height: 350px !important;
+    margin: 0 !important;
 }
 
+.elementor-27881
+.elementor-element.elementor-element-fd988c8
+img.swiper-slide-image {
+    width: 100% !important;
+    height: 350px !important;
+    max-height: 350px !important;
 
-/* MOBILE */
-@media (max-width: 767px) {
+    object-fit: cover !important;
+    object-position: center !important;
 
-    .elementor-27881
-    .elementor-element.elementor-element-fd988c8
-    img.swiper-slide-image {
-
-        width: 100% !important;
-        max-width: 100% !important;
-
-        height: 350px !important;
-        max-height: 350px !important;
-
-        object-fit: cover !important;
-        object-position: center center !important;
-    }
-
+    display: block !important;
 }
 
 /* ==================================================
