@@ -19,6 +19,11 @@ function imu_whatsapp_nome_tabela() {
 
 // =========================================================
 // CRIAR / ATUALIZAR TABELA
+//
+// Versão 1.3:
+// - mantém os registros antigos
+// - adiciona nome, email e WhatsApp do visitante
+// - adiciona status: clique / lead
 // =========================================================
 
 function imu_whatsapp_criar_tabela() {
@@ -43,13 +48,23 @@ function imu_whatsapp_criar_tabela() {
 
         categoria TEXT NULL,
 
+        nome_visitante VARCHAR(190) NOT NULL DEFAULT '',
+
+        email_visitante VARCHAR(190) NOT NULL DEFAULT '',
+
+        whatsapp_visitante VARCHAR(50) NOT NULL DEFAULT '',
+
+        status VARCHAR(20) NOT NULL DEFAULT 'clique',
+
         PRIMARY KEY (id),
 
         KEY imovel_id (imovel_id),
 
         KEY autor_id (autor_id),
 
-        KEY data_clique (data_clique)
+        KEY data_clique (data_clique),
+
+        KEY status (status)
 
     ) {$charset_collate};";
 
@@ -59,13 +74,13 @@ function imu_whatsapp_criar_tabela() {
 
     update_option(
         'imu_whatsapp_db_version',
-        '1.0'
+        '1.3'
     );
 }
 
 
 // =========================================================
-// VERIFICA SE A TABELA PRECISA SER CRIADA
+// VERIFICA SE A TABELA PRECISA SER CRIADA / ATUALIZADA
 // =========================================================
 
 add_action( 'init', function() {
@@ -74,7 +89,7 @@ add_action( 'init', function() {
         'imu_whatsapp_db_version'
     );
 
-    if ( $versao !== '1.0' ) {
+    if ( $versao !== '1.3' ) {
 
         imu_whatsapp_criar_tabela();
     }
@@ -84,6 +99,11 @@ add_action( 'init', function() {
 
 // =========================================================
 // REGISTRAR CLIQUE
+//
+// Executada assim que a pessoa clica em "Falar com Vendedor".
+//
+// Retorna o ID do registro criado para depois atualizar
+// o MESMO registro quando o formulário for enviado.
 // =========================================================
 
 function imu_registrar_clique_whatsapp( $post_id ) {
@@ -113,8 +133,6 @@ function imu_registrar_clique_whatsapp( $post_id ) {
 
     // =====================================================
     // CATEGORIA DO IMÓVEL
-    //
-    // Taxonomia utilizada: categoria
     // =====================================================
 
     $categorias = wp_get_post_terms(
@@ -156,7 +174,7 @@ function imu_registrar_clique_whatsapp( $post_id ) {
 
 
     // =====================================================
-    // GRAVA NO BANCO
+    // GRAVA O CLIQUE
     // =====================================================
 
     $resultado = $wpdb->insert(
@@ -164,11 +182,15 @@ function imu_registrar_clique_whatsapp( $post_id ) {
         imu_whatsapp_nome_tabela(),
 
         [
-            'imovel_id'   => $post_id,
-            'data_clique' => current_time( 'mysql' ),
-            'ip'          => $ip,
-            'autor_id'    => $autor_id,
-            'categoria'   => $categoria,
+            'imovel_id'          => $post_id,
+            'data_clique'        => current_time( 'mysql' ),
+            'ip'                 => $ip,
+            'autor_id'           => $autor_id,
+            'categoria'          => $categoria,
+            'nome_visitante'     => '',
+            'email_visitante'    => '',
+            'whatsapp_visitante' => '',
+            'status'             => 'clique',
         ],
 
         [
@@ -177,6 +199,81 @@ function imu_registrar_clique_whatsapp( $post_id ) {
             '%s',
             '%d',
             '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+        ]
+    );
+
+
+    if ( false === $resultado ) {
+        return false;
+    }
+
+
+    return (int) $wpdb->insert_id;
+}
+
+
+// =========================================================
+// ATUALIZAR CLIQUE PARA LEAD
+//
+// Quando o formulário Elementor é enviado, atualiza
+// o MESMO registro criado no clique.
+//
+// O post_id também entra no WHERE para impedir que um
+// click_id de outro imóvel seja usado por engano.
+// =========================================================
+
+function imu_atualizar_clique_whatsapp(
+    $click_id,
+    $post_id,
+    $nome,
+    $email,
+    $whatsapp
+) {
+
+    global $wpdb;
+
+    $click_id = absint( $click_id );
+    $post_id  = absint( $post_id );
+
+    if ( ! $click_id || ! $post_id ) {
+        return false;
+    }
+
+    if ( get_post_type( $post_id ) !== 'imoveis' ) {
+        return false;
+    }
+
+
+    $resultado = $wpdb->update(
+
+        imu_whatsapp_nome_tabela(),
+
+        [
+            'nome_visitante'     => sanitize_text_field( $nome ),
+            'email_visitante'    => sanitize_email( $email ),
+            'whatsapp_visitante' => sanitize_text_field( $whatsapp ),
+            'status'             => 'lead',
+        ],
+
+        [
+            'id'        => $click_id,
+            'imovel_id' => $post_id,
+        ],
+
+        [
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+        ],
+
+        [
+            '%d',
+            '%d',
         ]
     );
 
@@ -205,7 +302,6 @@ add_action( 'admin_menu', function() {
         'imu-whatsapp-cliques',
 
         'imu_whatsapp_pagina_admin'
-
     );
 
 });
@@ -242,16 +338,32 @@ function imu_whatsapp_pagina_admin() {
 
 
     // =====================================================
-    // TOTAL DE REGISTROS
+    // INDICADORES
     // =====================================================
 
     $total = (int) $wpdb->get_var(
         "SELECT COUNT(*) FROM {$tabela}"
     );
 
+    $total_leads = (int) $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$tabela} WHERE status = %s",
+            'lead'
+        )
+    );
+
+    $total_so_cliques = max(
+        0,
+        $total - $total_leads
+    );
+
+    $conversao = $total > 0
+        ? ( $total_leads / $total ) * 100
+        : 0;
+
 
     // =====================================================
-    // BUSCA REGISTROS
+    // REGISTROS
     // =====================================================
 
     $registros = $wpdb->get_results(
@@ -265,9 +377,7 @@ function imu_whatsapp_pagina_admin() {
 
             $por_pagina,
             $offset
-
         )
-
     );
 
 
@@ -290,228 +400,482 @@ function imu_whatsapp_pagina_admin() {
             Cliques no WhatsApp
         </h1>
 
-        <p>
-            Total de cliques registrados:
-            <strong>
-                <?php echo number_format_i18n( $total ); ?>
-            </strong>
-        </p>
+
+        <!-- =================================================
+        INDICADORES
+        ================================================== -->
+
+        <div
+            style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:12px;
+                margin:20px 0;
+            "
+        >
+
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #dcdcde;
+                    padding:14px 18px;
+                    min-width:160px;
+                "
+            >
+                <div style="color:#646970;">
+                    Total de cliques
+                </div>
+
+                <strong style="font-size:24px;">
+                    <?php echo number_format_i18n( $total ); ?>
+                </strong>
+            </div>
 
 
-        <table class="wp-list-table widefat fixed striped">
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #dcdcde;
+                    padding:14px 18px;
+                    min-width:160px;
+                "
+            >
+                <div style="color:#646970;">
+                    Leads preenchidos
+                </div>
 
-            <thead>
-
-                <tr>
-
-                    <th style="width:70px;">
-                        ID
-                    </th>
-
-                    <th>
-                        Imóvel
-                    </th>
-
-                    <th style="width:170px;">
-                        Data
-                    </th>
-
-                    <th style="width:150px;">
-                        IP
-                    </th>
-
-                    <th>
-                        Autor
-                    </th>
-
-                    <th>
-                        Categoria
-                    </th>
-
-                </tr>
-
-            </thead>
+                <strong style="font-size:24px;">
+                    <?php echo number_format_i18n( $total_leads ); ?>
+                </strong>
+            </div>
 
 
-            <tbody>
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #dcdcde;
+                    padding:14px 18px;
+                    min-width:160px;
+                "
+            >
+                <div style="color:#646970;">
+                    Não preencheram
+                </div>
 
-            <?php
-
-            if ( ! empty( $registros ) ) :
-
-                foreach ( $registros as $registro ) :
-
-                    // =====================================
-                    // IMÓVEL
-                    // =====================================
-
-                    $titulo_imovel = get_the_title(
-                        $registro->imovel_id
-                    );
-
-                    if ( ! $titulo_imovel ) {
-
-                        $titulo_imovel =
-                            'Imóvel #' .
-                            $registro->imovel_id;
-                    }
+                <strong style="font-size:24px;">
+                    <?php echo number_format_i18n( $total_so_cliques ); ?>
+                </strong>
+            </div>
 
 
-                    // =====================================
-                    // AUTOR
-                    // =====================================
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #dcdcde;
+                    padding:14px 18px;
+                    min-width:160px;
+                "
+            >
+                <div style="color:#646970;">
+                    Conversão
+                </div>
 
-                    $autor = get_userdata(
-                        $registro->autor_id
-                    );
+                <strong style="font-size:24px;">
+                    <?php echo esc_html( number_format_i18n( $conversao, 1 ) ); ?>%
+                </strong>
+            </div>
 
-                    $nome_autor = '';
-
-                    if ( $autor ) {
-
-                        $nome_autor =
-                            $autor->display_name;
-
-                    } else {
-
-                        $nome_autor =
-                            'Autor #' .
-                            $registro->autor_id;
-                    }
+        </div>
 
 
-                    // =====================================
-                    // LINK DO IMÓVEL
-                    // =====================================
+        <!-- =================================================
+        TABELA
+        ================================================== -->
 
-                    $link_imovel = get_permalink(
-                        $registro->imovel_id
-                    );
+        <div style="overflow-x:auto;">
+
+            <table
+                class="wp-list-table widefat striped"
+                style="min-width:1450px;"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th style="width:65px;">
+                            ID
+                        </th>
+
+                        <th style="width:220px;">
+                            Imóvel
+                        </th>
+
+                        <th style="width:155px;">
+                            Data
+                        </th>
+
+                        <th style="width:150px;">
+                            Nome
+                        </th>
+
+                        <th style="width:190px;">
+                            E-mail
+                        </th>
+
+                        <th style="width:150px;">
+                            WhatsApp
+                        </th>
+
+                        <th style="width:120px;">
+                            Status
+                        </th>
+
+                        <th style="width:140px;">
+                            IP
+                        </th>
+
+                        <th style="width:170px;">
+                            Autor
+                        </th>
+
+                        <th style="width:170px;">
+                            Categoria
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                <?php
+
+                if ( ! empty( $registros ) ) :
+
+                    foreach ( $registros as $registro ) :
+
+
+                        // =====================================
+                        // IMÓVEL
+                        // =====================================
+
+                        $titulo_imovel = get_the_title(
+                            $registro->imovel_id
+                        );
+
+                        if ( ! $titulo_imovel ) {
+
+                            $titulo_imovel =
+                                'Imóvel #' .
+                                $registro->imovel_id;
+                        }
+
+
+                        $link_imovel = get_permalink(
+                            $registro->imovel_id
+                        );
+
+
+                        // =====================================
+                        // AUTOR
+                        // =====================================
+
+                        $autor = get_userdata(
+                            $registro->autor_id
+                        );
+
+                        if ( $autor ) {
+
+                            $nome_autor =
+                                $autor->display_name;
+
+                        } else {
+
+                            $nome_autor =
+                                'Autor #' .
+                                $registro->autor_id;
+                        }
+
+
+                        // =====================================
+                        // COMPATIBILIDADE COM REGISTROS ANTIGOS
+                        // =====================================
+
+                        $nome_visitante = isset( $registro->nome_visitante )
+                            ? $registro->nome_visitante
+                            : '';
+
+                        $email_visitante = isset( $registro->email_visitante )
+                            ? $registro->email_visitante
+                            : '';
+
+                        $whatsapp_visitante = isset( $registro->whatsapp_visitante )
+                            ? $registro->whatsapp_visitante
+                            : '';
+
+                        $status = isset( $registro->status ) && $registro->status
+                            ? $registro->status
+                            : 'clique';
+
+                        ?>
+
+                        <tr>
+
+                            <!-- ID -->
+
+                            <td>
+
+                                <?php
+                                echo esc_html(
+                                    $registro->id
+                                );
+                                ?>
+
+                            </td>
+
+
+                            <!-- IMÓVEL -->
+
+                            <td>
+
+                                <?php if ( $link_imovel ) : ?>
+
+                                    <a
+                                        href="<?php echo esc_url( $link_imovel ); ?>"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+
+                                        <strong>
+
+                                            <?php
+                                            echo esc_html(
+                                                $titulo_imovel
+                                            );
+                                            ?>
+
+                                        </strong>
+
+                                    </a>
+
+                                <?php else : ?>
+
+                                    <?php
+                                    echo esc_html(
+                                        $titulo_imovel
+                                    );
+                                    ?>
+
+                                <?php endif; ?>
+
+
+                                <br>
+
+
+                                <small>
+
+                                    ID:
+
+                                    <?php
+                                    echo esc_html(
+                                        $registro->imovel_id
+                                    );
+                                    ?>
+
+                                </small>
+
+                            </td>
+
+
+                            <!-- DATA -->
+
+                            <td>
+
+                                <?php
+
+                                echo esc_html(
+
+                                    mysql2date(
+                                        'd/m/Y H:i:s',
+                                        $registro->data_clique
+                                    )
+
+                                );
+
+                                ?>
+
+                            </td>
+
+
+                            <!-- NOME -->
+
+                            <td>
+
+                                <?php if ( $nome_visitante ) : ?>
+
+                                    <strong>
+                                        <?php echo esc_html( $nome_visitante ); ?>
+                                    </strong>
+
+                                <?php else : ?>
+
+                                    <span style="color:#999;">
+                                        —
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                <?php if ( $email_visitante ) : ?>
+
+                                    <a href="mailto:<?php echo esc_attr( $email_visitante ); ?>">
+                                        <?php echo esc_html( $email_visitante ); ?>
+                                    </a>
+
+                                <?php else : ?>
+
+                                    <span style="color:#999;">
+                                        —
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <!-- WHATSAPP VISITANTE -->
+
+                            <td>
+
+                                <?php if ( $whatsapp_visitante ) : ?>
+
+                                    <?php echo esc_html( $whatsapp_visitante ); ?>
+
+                                <?php else : ?>
+
+                                    <span style="color:#999;">
+                                        —
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <?php if ( 'lead' === $status ) : ?>
+
+                                    <span
+                                        style="
+                                            display:inline-block;
+                                            background:#d7f5df;
+                                            color:#176b2c;
+                                            padding:4px 8px;
+                                            border-radius:4px;
+                                            font-weight:600;
+                                        "
+                                    >
+                                        Lead
+                                    </span>
+
+                                <?php else : ?>
+
+                                    <span
+                                        style="
+                                            display:inline-block;
+                                            background:#fff3cd;
+                                            color:#7a5d00;
+                                            padding:4px 8px;
+                                            border-radius:4px;
+                                            font-weight:600;
+                                        "
+                                    >
+                                        Clique
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <!-- IP -->
+
+                            <td>
+
+                                <?php
+                                echo esc_html(
+                                    $registro->ip
+                                );
+                                ?>
+
+                            </td>
+
+
+                            <!-- AUTOR -->
+
+                            <td>
+
+                                <?php
+                                echo esc_html(
+                                    $nome_autor
+                                );
+                                ?>
+
+                                <br>
+
+                                <small>
+
+                                    ID:
+
+                                    <?php
+                                    echo esc_html(
+                                        $registro->autor_id
+                                    );
+                                    ?>
+
+                                </small>
+
+                            </td>
+
+
+                            <!-- CATEGORIA -->
+
+                            <td>
+
+                                <?php
+                                echo esc_html(
+                                    $registro->categoria
+                                );
+                                ?>
+
+                            </td>
+
+                        </tr>
+
+                        <?php
+
+                    endforeach;
+
+                else :
 
                     ?>
 
                     <tr>
 
-                        <td>
+                        <td colspan="10">
 
-                            <?php
-                            echo esc_html(
-                                $registro->id
-                            );
-                            ?>
-
-                        </td>
-
-
-                        <td>
-
-                            <?php if ( $link_imovel ) : ?>
-
-                                <a
-                                    href="<?php echo esc_url( $link_imovel ); ?>"
-                                    target="_blank"
-                                >
-
-                                    <strong>
-
-                                        <?php
-                                        echo esc_html(
-                                            $titulo_imovel
-                                        );
-                                        ?>
-
-                                    </strong>
-
-                                </a>
-
-                            <?php else : ?>
-
-                                <?php
-                                echo esc_html(
-                                    $titulo_imovel
-                                );
-                                ?>
-
-                            <?php endif; ?>
-
-
-                            <br>
-
-
-                            <small>
-
-                                ID:
-                                <?php
-                                echo esc_html(
-                                    $registro->imovel_id
-                                );
-                                ?>
-
-                            </small>
-
-                        </td>
-
-
-                        <td>
-
-                            <?php
-
-                            echo esc_html(
-
-                                mysql2date(
-                                    'd/m/Y H:i:s',
-                                    $registro->data_clique
-                                )
-
-                            );
-
-                            ?>
-
-                        </td>
-
-
-                        <td>
-
-                            <?php
-                            echo esc_html(
-                                $registro->ip
-                            );
-                            ?>
-
-                        </td>
-
-
-                        <td>
-
-                            <?php
-                            echo esc_html(
-                                $nome_autor
-                            );
-                            ?>
-
-                            <br>
-
-                            <small>
-
-                                ID:
-                                <?php
-                                echo esc_html(
-                                    $registro->autor_id
-                                );
-                                ?>
-
-                            </small>
-
-                        </td>
-
-
-                        <td>
-
-                            <?php
-                            echo esc_html(
-                                $registro->categoria
-                            );
-                            ?>
+                            Nenhum clique registrado ainda.
 
                         </td>
 
@@ -519,31 +883,15 @@ function imu_whatsapp_pagina_admin() {
 
                     <?php
 
-                endforeach;
-
-            else :
+                endif;
 
                 ?>
 
-                <tr>
+                </tbody>
 
-                    <td colspan="6">
+            </table>
 
-                        Nenhum clique registrado ainda.
-
-                    </td>
-
-                </tr>
-
-                <?php
-
-            endif;
-
-            ?>
-
-            </tbody>
-
-        </table>
+        </div>
 
 
         <?php
@@ -564,17 +912,16 @@ function imu_whatsapp_pagina_admin() {
                         '%#%'
                     ),
 
-                    'format'  => '',
+                    'format' => '',
 
                     'current' => $pagina_atual,
 
-                    'total'   => $total_paginas,
+                    'total' => $total_paginas,
 
                     'prev_text' => '« Anterior',
 
                     'next_text' => 'Próxima »',
                 ]
-
             );
 
             echo '</div>';

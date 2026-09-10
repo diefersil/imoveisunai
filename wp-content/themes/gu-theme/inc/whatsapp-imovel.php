@@ -9,15 +9,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 // CONFIGURAÇÕES
 // =========================================================
 
-define(
-    'IMU_WHATSAPP_FORM_NAME',
-    'imu_whatsapp'
-);
+if ( ! defined( 'IMU_WHATSAPP_FORM_NAME' ) ) {
 
-define(
-    'IMU_WHATSAPP_EMAIL_DESTINO',
-    'diefersil@gmail.com'
-);
+    define(
+        'IMU_WHATSAPP_FORM_NAME',
+        'imu_whatsapp'
+    );
+}
+
+if ( ! defined( 'IMU_WHATSAPP_EMAIL_DESTINO' ) ) {
+
+    define(
+        'IMU_WHATSAPP_EMAIL_DESTINO',
+        'diefersil@gmail.com'
+    );
+}
 
 
 // =========================================================
@@ -42,7 +48,6 @@ function imu_get_contato_imovel( $post_id ) {
         return false;
     }
 
-
     if ( get_post_type( $post_id ) !== 'imoveis' ) {
         return false;
     }
@@ -57,21 +62,16 @@ function imu_get_contato_imovel( $post_id ) {
         $post_id
     );
 
-
     if ( ! $author_id ) {
         return false;
     }
 
 
     $dados = [
-
         'author_id' => $author_id,
-
-        'nome' => '',
-
-        'fone' => '',
-
-        'whatsapp' => '',
+        'nome'      => '',
+        'fone'      => '',
+        'whatsapp'  => '',
     ];
 
 
@@ -82,26 +82,17 @@ function imu_get_contato_imovel( $post_id ) {
 
     if ( $author_id === 4 ) {
 
-
-        // Nome
-
         $dados['nome'] = get_post_meta(
             $post_id,
             'contato_nome',
             true
         );
 
-
-        // Fone
-
         $dados['fone'] = get_post_meta(
             $post_id,
             'contato_fone',
             true
         );
-
-
-        // WhatsApp
 
         $dados['whatsapp'] = get_post_meta(
             $post_id,
@@ -117,24 +108,18 @@ function imu_get_contato_imovel( $post_id ) {
 
     } else {
 
-
         $user = get_userdata(
             $author_id
         );
-
 
         if ( ! $user ) {
             return false;
         }
 
 
-        // Nome
-
         $dados['nome'] =
             $user->display_name;
 
-
-        // Fone
 
         $dados['fone'] = get_user_meta(
             $author_id,
@@ -143,14 +128,11 @@ function imu_get_contato_imovel( $post_id ) {
         );
 
 
-        // WhatsApp
-
         $dados['whatsapp'] = get_user_meta(
             $author_id,
             'user_whatsapp',
             true
         );
-
     }
 
 
@@ -169,7 +151,6 @@ function imu_normalizar_whatsapp( $numero ) {
         '',
         (string) $numero
     );
-
 
     if ( empty( $numero ) ) {
         return '';
@@ -205,7 +186,6 @@ function imu_get_whatsapp_real_url(
         $post_id
     );
 
-
     if ( ! $post_id ) {
         return '';
     }
@@ -219,7 +199,6 @@ function imu_get_whatsapp_real_url(
         $post_id
     );
 
-
     if ( ! $dados ) {
         return '';
     }
@@ -232,7 +211,6 @@ function imu_get_whatsapp_real_url(
     $whatsapp = imu_normalizar_whatsapp(
         $dados['whatsapp']
     );
-
 
     if ( empty( $whatsapp ) ) {
         return '';
@@ -301,61 +279,34 @@ function imu_get_whatsapp_real_url(
 // SHORTCODE
 //
 // [whatsapp_imovel_url]
-//
-// Este shortcode continua podendo ser utilizado no
-// botão/container que abre o formulário deslizante.
 // =========================================================
 
 function imu_whatsapp_imovel_url_shortcode() {
 
-    // =====================================================
-    // ID DO IMÓVEL ATUAL
-    // =====================================================
-
     $post_id = get_queried_object_id();
-
 
     if ( ! $post_id ) {
 
         $post_id = get_the_ID();
     }
 
-
     if ( ! $post_id ) {
         return '';
     }
-
-
-    // =====================================================
-    // POST TYPE
-    // =====================================================
 
     if ( get_post_type( $post_id ) !== 'imoveis' ) {
         return '';
     }
 
 
-    // =====================================================
-    // VERIFICA SE EXISTE WHATSAPP
-    // =====================================================
-
     $whatsapp_url = imu_get_whatsapp_real_url(
         $post_id
     );
-
 
     if ( empty( $whatsapp_url ) ) {
         return '';
     }
 
-
-    // =====================================================
-    // URL INTERMEDIÁRIA
-    //
-    // Você pode continuar usando esta URL no botão.
-    // O popup/form Elementor será aberto pelo próprio
-    // Elementor.
-    // =====================================================
 
     return esc_url(
         add_query_arg(
@@ -378,20 +329,129 @@ add_shortcode(
 
 
 // =========================================================
+// AJAX - REGISTRA O CLIQUE ASSIM QUE ABRE O FORMULÁRIO
+// =========================================================
+
+add_action(
+    'wp_ajax_imu_registrar_clique',
+    'imu_ajax_registrar_clique'
+);
+
+add_action(
+    'wp_ajax_nopriv_imu_registrar_clique',
+    'imu_ajax_registrar_clique'
+);
+
+
+function imu_ajax_registrar_clique() {
+
+    check_ajax_referer(
+        'imu_registrar_clique',
+        'nonce'
+    );
+
+
+    $post_id = isset( $_POST['post_id'] )
+        ? absint( $_POST['post_id'] )
+        : 0;
+
+
+    if (
+        ! $post_id ||
+        get_post_type( $post_id ) !== 'imoveis'
+    ) {
+
+        wp_send_json_error(
+            [
+                'message' => 'Imóvel inválido.',
+            ],
+            400
+        );
+    }
+
+
+    if (
+        ! function_exists(
+            'imu_registrar_clique_whatsapp'
+        )
+    ) {
+
+        wp_send_json_error(
+            [
+                'message' => 'Função de registro não disponível.',
+            ],
+            500
+        );
+    }
+
+
+    $click_id = imu_registrar_clique_whatsapp(
+        $post_id
+    );
+
+
+    if ( ! $click_id ) {
+
+        wp_send_json_error(
+            [
+                'message' => 'Não foi possível registrar o clique.',
+            ],
+            500
+        );
+    }
+
+
+    // =====================================================
+    // COOKIE DE APOIO
+    //
+    // Guarda o click_id por 1 hora. Assim, mesmo que o
+    // campo hidden click_id não exista no Elementor, o
+    // envio do formulário ainda consegue localizar e
+    // atualizar o mesmo registro do clique.
+    // =====================================================
+
+    $cookie_name =
+        'imu_whatsapp_click_' .
+        $post_id;
+
+
+    setcookie(
+        $cookie_name,
+        (string) $click_id,
+        time() + HOUR_IN_SECONDS,
+        COOKIEPATH ? COOKIEPATH : '/',
+        COOKIE_DOMAIN,
+        is_ssl(),
+        true
+    );
+
+
+    wp_send_json_success(
+        [
+            'click_id' => $click_id,
+        ]
+    );
+}
+
+
+// =========================================================
 // VALIDA FORMULÁRIO ELEMENTOR
 //
 // Form Name:
 // imu_whatsapp
+//
+// IDs esperados:
+// nome
+// email
+// whatsapp
+// imovel_id
+// click_id  (hidden, pode estar vazio antes do clique)
 // =========================================================
 
 add_action(
     'elementor_pro/forms/validation',
     function( $record, $ajax_handler ) {
 
-
-        // =================================================
-        // FORM NAME
-        // =================================================
 
         $form_name = $record->get_form_settings(
             'form_name'
@@ -406,10 +466,6 @@ add_action(
             return;
         }
 
-
-        // =================================================
-        // CAMPOS
-        // =================================================
 
         $raw_fields = $record->get(
             'fields'
@@ -524,7 +580,8 @@ add_action(
 // =========================================================
 // CAPTURA ENVIO DO FORMULÁRIO ELEMENTOR
 //
-// Executado depois que o formulário foi processado.
+// O clique já foi salvo antes de abrir o form.
+// Aqui atualizamos o MESMO registro para status "lead".
 // =========================================================
 
 add_action(
@@ -627,6 +684,108 @@ add_action(
 
 
         // =================================================
+        // CLICK ID
+        //
+        // Hidden field do Elementor:
+        // ID = click_id
+        // =================================================
+
+        $click_id =
+            isset( $fields['click_id'] )
+            ? absint(
+                $fields['click_id']
+            )
+            : 0;
+
+
+        // =================================================
+        // FALLBACK PELO COOKIE
+        //
+        // Se o campo hidden click_id não estiver no
+        // formulário Elementor, tenta recuperar o ID do
+        // clique registrado ao abrir o formulário.
+        // =================================================
+
+        if ( ! $click_id ) {
+
+            $cookie_name =
+                'imu_whatsapp_click_' .
+                $post_id;
+
+
+            if ( ! empty( $_COOKIE[ $cookie_name ] ) ) {
+
+                $click_id = absint(
+                    wp_unslash(
+                        $_COOKIE[ $cookie_name ]
+                    )
+                );
+            }
+        }
+
+
+        // =================================================
+        // GARANTE QUE EXISTA UM REGISTRO
+        //
+        // Se por algum motivo o AJAX do clique falhou,
+        // cria um registro agora para não perder o lead.
+        // =================================================
+
+        if (
+            ! $click_id &&
+            function_exists(
+                'imu_registrar_clique_whatsapp'
+            )
+        ) {
+
+            $click_id = imu_registrar_clique_whatsapp(
+                $post_id
+            );
+        }
+
+
+        // =================================================
+        // ATUALIZA O MESMO REGISTRO PARA LEAD
+        // =================================================
+
+        if (
+            $click_id &&
+            function_exists(
+                'imu_atualizar_clique_whatsapp'
+            )
+        ) {
+
+            imu_atualizar_clique_whatsapp(
+                $click_id,
+                $post_id,
+                $nome,
+                $email,
+                $whatsapp_visitante
+            );
+
+
+            // =============================================
+            // REMOVE COOKIE DE APOIO APÓS VIRAR LEAD
+            // =============================================
+
+            $cookie_name =
+                'imu_whatsapp_click_' .
+                $post_id;
+
+
+            setcookie(
+                $cookie_name,
+                '',
+                time() - HOUR_IN_SECONDS,
+                COOKIEPATH ? COOKIEPATH : '/',
+                COOKIE_DOMAIN,
+                is_ssl(),
+                true
+            );
+        }
+
+
+        // =================================================
         // ID DO AUTOR
         // =================================================
 
@@ -715,37 +874,6 @@ add_action(
 
 
         // =================================================
-        // GRAVA NA NOSSA TABELA
-        // =================================================
-        //
-        // A função de registros será ajustada para receber:
-        //
-        // imóvel
-        // nome
-        // email
-        // whatsapp
-        //
-        // Autor, categoria, data e IP são calculados
-        // dentro da própria função de registros.
-        // =================================================
-
-        if (
-            function_exists(
-                'imu_registrar_clique_whatsapp'
-            )
-        ) {
-
-            imu_registrar_clique_whatsapp(
-                $post_id,
-                $nome,
-                $email,
-                $whatsapp_visitante
-            );
-
-        }
-
-
-        // =================================================
         // DADOS DO IMÓVEL
         // =================================================
 
@@ -762,25 +890,17 @@ add_action(
 
 
         // =================================================
-        // EMAIL DE DESTINO
+        // EMAIL
         // =================================================
 
         $email_destino =
             IMU_WHATSAPP_EMAIL_DESTINO;
 
 
-        // =================================================
-        // ASSUNTO
-        // =================================================
-
         $assunto =
             'Novo Lead WhatsApp - ' .
             $titulo;
 
-
-        // =================================================
-        // CONTEÚDO DO EMAIL
-        // =================================================
 
         $mensagem_email = '';
 
@@ -900,6 +1020,12 @@ add_action(
 
 
         $mensagem_email .=
+            "Registro do clique: #" .
+            $click_id .
+            "\n";
+
+
+        $mensagem_email .=
             "Data/Hora: " .
             mysql2date(
                 'd/m/Y H:i:s',
@@ -943,12 +1069,6 @@ add_action(
 
         // =================================================
         // REDIRECIONAMENTO ELEMENTOR AJAX
-        //
-        // Não usamos wp_redirect() aqui porque o formulário
-        // do Elementor é enviado via AJAX.
-        //
-        // O redirect_url é devolvido para o frontend do
-        // Elementor.
         // =================================================
 
         $ajax_handler->add_response_data(
@@ -962,17 +1082,37 @@ add_action(
 );
 
 
-/// =========================================================
+// =========================================================
 // FORM WHATSAPP
-// ABRIR / FECHAR + EXPANDIR CONTAINER NO MOBILE
+//
+// - abre / fecha
+// - expande container no mobile
+// - registra clique mesmo se a pessoa não preencher o form
+// - coloca click_id no campo hidden do Elementor
 // =========================================================
 
 add_action( 'wp_footer', function() {
 
-    // Somente na single de imóveis
     if ( ! is_singular( 'imoveis' ) ) {
         return;
     }
+
+
+    $post_id = get_queried_object_id();
+
+    if ( ! $post_id ) {
+        return;
+    }
+
+
+    $ajax_url = admin_url(
+        'admin-ajax.php'
+    );
+
+
+    $nonce = wp_create_nonce(
+        'imu_registrar_clique'
+    );
 
     ?>
 
@@ -1051,11 +1191,8 @@ add_action( 'wp_footer', function() {
                 max-width: 100% !important;
 
                 flex-basis: 100% !important;
-
             }
 
-
-            /* Form também ocupa toda largura */
 
             .imu-contato-container.imu-contato-expandido
             .imu-form-whatsapp {
@@ -1063,11 +1200,8 @@ add_action( 'wp_footer', function() {
                 width: 100% !important;
 
                 max-width: 100% !important;
-
             }
 
-
-            /* Widget Form do Elementor */
 
             .imu-contato-container.imu-contato-expandido
             .elementor-widget-form {
@@ -1075,17 +1209,13 @@ add_action( 'wp_footer', function() {
                 width: 100% !important;
 
                 max-width: 100% !important;
-
             }
 
-
-            /* Form interno */
 
             .imu-contato-container.imu-contato-expandido
             .elementor-form {
 
                 width: 100% !important;
-
             }
 
         }
@@ -1116,10 +1246,6 @@ add_action( 'wp_footer', function() {
             );
 
 
-            // =================================================
-            // VERIFICAÇÃO
-            // =================================================
-
             if (!botao) {
 
                 console.log(
@@ -1148,6 +1274,38 @@ add_action( 'wp_footer', function() {
 
                 return;
             }
+
+
+            // =================================================
+            // CAMPO HIDDEN click_id DO ELEMENTOR
+            // =================================================
+
+            const clickIdInput = form.querySelector(
+                'input[name="form_fields[click_id]"]'
+            );
+
+
+            if (!clickIdInput) {
+
+                console.log(
+                    'IMU: campo hidden click_id não encontrado no formulário Elementor.'
+                );
+            }
+
+
+            // =================================================
+            // CONTROLE DO REGISTRO DO CLIQUE
+            //
+            // 1 clique por carregamento da página.
+            // Abrir, fechar e abrir novamente não cria
+            // vários registros.
+            // =================================================
+
+            let clickId = 0;
+
+            let registrandoClique = false;
+
+            let cliqueRegistrado = false;
 
 
             // =================================================
@@ -1187,12 +1345,134 @@ add_action( 'wp_footer', function() {
                 form.prepend(
                     fechar
                 );
-
             }
 
 
             // =================================================
-            // FUNÇÃO ABRIR
+            // REGISTRA O CLIQUE NO BANCO
+            // =================================================
+
+            async function registrarClique() {
+
+                if (
+                    cliqueRegistrado ||
+                    registrandoClique
+                ) {
+                    return;
+                }
+
+
+                registrandoClique = true;
+
+
+                const dados = new FormData();
+
+
+                dados.append(
+                    'action',
+                    'imu_registrar_clique'
+                );
+
+
+                dados.append(
+                    'post_id',
+                    <?php echo wp_json_encode( (int) $post_id ); ?>
+                );
+
+
+                dados.append(
+                    'nonce',
+                    <?php echo wp_json_encode( $nonce ); ?>
+                );
+
+
+                try {
+
+                    const resposta = await fetch(
+                        <?php echo wp_json_encode( $ajax_url ); ?>,
+                        {
+                            method: 'POST',
+
+                            body: dados,
+
+                            credentials: 'same-origin'
+                        }
+                    );
+
+
+                    const json = await resposta.json();
+
+
+                    if (
+                        json.success &&
+                        json.data &&
+                        json.data.click_id
+                    ) {
+
+                        clickId =
+                            parseInt(
+                                json.data.click_id,
+                                10
+                            ) || 0;
+
+
+                        cliqueRegistrado =
+                            clickId > 0;
+
+
+                        // =====================================
+                        // COLOCA O ID DO REGISTRO NO FORM
+                        // =====================================
+
+                        if (
+                            cliqueRegistrado &&
+                            clickIdInput
+                        ) {
+
+                            clickIdInput.value =
+                                String(
+                                    clickId
+                                );
+
+
+                            // Dispara change para garantir
+                            // que o Elementor reconheça o valor.
+
+                            clickIdInput.dispatchEvent(
+                                new Event(
+                                    'change',
+                                    {
+                                        bubbles: true
+                                    }
+                                )
+                            );
+                        }
+
+                    } else {
+
+                        console.log(
+                            'IMU: não foi possível registrar o clique.',
+                            json
+                        );
+                    }
+
+
+                } catch (erro) {
+
+                    console.log(
+                        'IMU: erro ao registrar clique.',
+                        erro
+                    );
+
+                } finally {
+
+                    registrandoClique = false;
+                }
+            }
+
+
+            // =================================================
+            // ABRIR
             // =================================================
 
             function abrirFormulario() {
@@ -1206,11 +1486,16 @@ add_action( 'wp_footer', function() {
                     'imu-contato-expandido'
                 );
 
+
+                // Registra imediatamente o interesse,
+                // mesmo que o visitante nunca envie o form.
+
+                registrarClique();
             }
 
 
             // =================================================
-            // FUNÇÃO FECHAR
+            // FECHAR
             // =================================================
 
             function fecharFormulario() {
@@ -1223,7 +1508,6 @@ add_action( 'wp_footer', function() {
                 contatoContainer.classList.remove(
                     'imu-contato-expandido'
                 );
-
             }
 
 
@@ -1235,12 +1519,8 @@ add_action( 'wp_footer', function() {
                 'click',
                 function (event) {
 
-                    // Impede href="#"
                     event.preventDefault();
 
-
-                    // Se estiver aberto, fecha.
-                    // Se estiver fechado, abre.
 
                     if (
                         form.classList.contains(
@@ -1253,7 +1533,6 @@ add_action( 'wp_footer', function() {
                     } else {
 
                         abrirFormulario();
-
                     }
 
                 }
